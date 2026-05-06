@@ -1,8 +1,8 @@
-# 5-Minute YouTube Video Plan: Rosetta dbt Studio DuckLake UI + SQL Editor
+# 5-Minute YouTube Video Plan: Rosetta DBT studio DuckLake UI + SQL Editor
 
 ## Goal
 
-Create a polished 5-minute YouTube product video that promotes Rosetta dbt Studio as a modern desktop workspace for data teams, with a focused spotlight on the DuckLake UI, SQL Editor, and SQL Notebooks.
+Create a polished 5-minute YouTube product video that promotes Rosetta DBT studio as a modern desktop workspace for data teams, with a focused spotlight on the DuckLake UI, SQL Editor, and SQL Notebooks.
 
 The video should feel like a high-quality SaaS product demo: clear, practical, energetic, and visually grounded in real screenshots. Use the provided screenshots and logo assets from:
 
@@ -10,9 +10,9 @@ The video should feel like a high-quality SaaS product demo: clear, practical, e
 
 ## Core Message
 
-Rosetta dbt Studio brings data lake management, SQL exploration, notebooks, cloud storage, database connections, and AI-assisted analytics into one desktop workspace. With DuckLake support, teams can create new lakehouse instances, import existing DuckLakes, inspect metadata, query data, export results, and work interactively through SQL notebooks.
+Rosetta DBT studio brings data lake management, SQL exploration, notebooks, cloud storage, database connections, and AI-assisted analytics into one desktop workspace. With DuckLake support, teams can create new lakehouse instances, import existing DuckLakes, inspect metadata, query data, export results, and work interactively through SQL notebooks.
 
-Under the hood, Rosetta dbt Studio uses `@duckdb/node-api`, the DuckDB Node.js API, to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension.
+Under the hood, Rosetta DBT studio uses `@duckdb/node-api`, the DuckDB Node.js API, to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension.
 
 ## Audience
 
@@ -86,32 +86,32 @@ Use these assets as the main visual sequence:
 - Start with `logo_new_05.png` centered on a dark background.
 - Quick cuts of `ducklake_overview.png`, `sql-editor-query-data.png`, and `sql-notebooks_01.png`.
 - Add kinetic text overlays:
-  - "dbt Studio"
+  - "Rosetta DBT studio"
   - "DuckLake UI"
   - "SQL Editor"
   - "SQL Notebooks"
 
 **Voiceover**
 
-"Meet dbt Studio: a desktop workspace for modern data teams. Manage DuckLake lakehouses, connect to cloud storage, explore metadata, query data, and build notebook workflows without jumping between tools."
+"Meet Rosetta DBT studio: a desktop workspace for modern data teams. Manage DuckLake lakehouses, connect to cloud storage, explore metadata, query data, and build notebook workflows without jumping between tools."
 
-"Under the hood, dbt Studio uses the DuckDB Node.js API to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension."
+"Under the hood, Rosetta DBT studio uses the DuckDB Node.js API to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension."
 
 **On-Screen Text**
 
-"Rosetta dbt Studio: DuckLake, SQL, Notebooks, and Cloud Data in one workspace"
+"Rosetta DBT studio: DuckLake, SQL, Notebooks, and Cloud Data in one workspace"
 
 ### 0:20-0:55 - The Problem: Data Work Is Fragmented
 
 **Visuals**
 
-- Show a soft abstract transition from multiple scattered panels into a single dbt Studio workspace.
+- Show a soft abstract transition from multiple scattered panels into a single Rosetta DBT studio workspace.
 - Use `database-connection-suported.png` and `database-and-sorage-object-connections.png`.
 - Highlight icons for PostgreSQL, Snowflake, BigQuery, DuckDB, S3, Azure Blob, GCS, and DuckLake from the visible UI.
 
 **Voiceover**
 
-"Data work often gets split across database clients, cloud consoles, SQL tools, notebooks, and file explorers. dbt Studio brings those workflows together, so teams can move from connection setup to analysis and lakehouse operations in one focused interface."
+"Data work often gets split across database clients, cloud consoles, SQL tools, notebooks, and file explorers. Rosetta DBT studio brings those workflows together, so teams can move from connection setup to analysis and lakehouse operations in one focused interface."
 
 **On-Screen Text**
 
@@ -128,7 +128,7 @@ Use these assets as the main visual sequence:
 
 **Voiceover**
 
-"Start by connecting the systems your team already uses. Rosetta dbt Studio supports database connections and cloud object storage, including S3-compatible storage, Azure Blob, and Google Cloud Storage. Those saved cloud connections can be reused when creating new DuckLake instances or importing existing DuckLakes, keeping setup clean and secure."
+"Start by connecting the systems your team already uses. Rosetta DBT studio supports database connections and cloud object storage, including S3-compatible storage, Azure Blob, and Google Cloud Storage. Those saved cloud connections can be reused when creating new DuckLake instances or importing existing DuckLakes, keeping setup clean and secure."
 
 **On-Screen Text**
 
@@ -175,7 +175,7 @@ Use these assets as the main visual sequence:
 
 **Voiceover**
 
-"Once the instance is running, dbt Studio becomes a visual control center for DuckLake. Browse tables and views, inspect schemas, review statistics, see Parquet data files, examine partitions, and follow snapshot history. It gives teams a practical way to understand what is inside the lakehouse, not just query it."
+"Once the instance is running, Rosetta DBT studio becomes a visual control center for DuckLake. Browse tables and views, inspect schemas, review statistics, see Parquet data files, examine partitions, and follow snapshot history. It gives teams a practical way to understand what is inside the lakehouse, not just query it."
 
 **On-Screen Text**
 
@@ -246,7 +246,7 @@ Use these assets as the main visual sequence:
 
 "SQL + Markdown notebooks for repeatable analytics"
 
-### 4:40-5:00 - Closing: Build With dbt Studio
+### 4:40-5:00 - Closing: Build With Rosetta DBT studio
 
 **Visuals**
 
@@ -260,25 +260,25 @@ Use these assets as the main visual sequence:
 
 **Voiceover**
 
-"dbt Studio brings DuckLake management, SQL exploration, notebooks, cloud storage, and AI-ready analytics into one desktop experience. Download the dbt Studio desktop app today for macOS, Windows, or Linux, and join our community on GitHub. Let’s build the modern lakehouse together."
+"Rosetta DBT studio brings DuckLake management, SQL exploration, notebooks, cloud storage, and AI-ready analytics into one desktop experience. Download the Rosetta DBT studio desktop app today for macOS, Windows, or Linux, and join our community on GitHub. Let’s build the modern lakehouse together."
 
 **On-Screen Text**
 
-"Ready to build your lakehouse? Download Rosetta dbt Studio for macOS, Windows, and Linux. Star us on GitHub."
+"Ready to build your lakehouse? Download Rosetta DBT studio for macOS, Windows, and Linux. Star us on GitHub."
 
 ## Full Voiceover Script
 
-Meet dbt Studio: a desktop workspace for modern data teams. Manage DuckLake lakehouses, connect to cloud storage, explore metadata, query data, and build notebook workflows without jumping between tools.
+Meet Rosetta DBT studio: a desktop workspace for modern data teams. Manage DuckLake lakehouses, connect to cloud storage, explore metadata, query data, and build notebook workflows without jumping between tools.
 
-Under the hood, dbt Studio uses the DuckDB Node.js API to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension.
+Under the hood, Rosetta DBT studio uses the DuckDB Node.js API to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension.
 
-Data work often gets split across database clients, cloud consoles, SQL tools, notebooks, and file explorers. dbt Studio brings those workflows together, so teams can move from connection setup to analysis and lakehouse operations in one focused interface.
+Data work often gets split across database clients, cloud consoles, SQL tools, notebooks, and file explorers. Rosetta DBT studio brings those workflows together, so teams can move from connection setup to analysis and lakehouse operations in one focused interface.
 
-Start by connecting the systems your team already uses. dbt Studio supports database connections and cloud object storage, including S3-compatible storage, Azure Blob, and Google Cloud Storage. Those saved cloud connections can be reused when creating new DuckLake instances or importing existing DuckLakes, keeping setup clean and secure.
+Start by connecting the systems your team already uses. Rosetta DBT studio supports database connections and cloud object storage, including S3-compatible storage, Azure Blob, and Google Cloud Storage. Those saved cloud connections can be reused when creating new DuckLake instances or importing existing DuckLakes, keeping setup clean and secure.
 
 The DuckLake setup flow guides you through the essentials: instance details, catalog configuration, storage location, runtime options, and final review. You can create a new DuckLake or import an existing one by connecting the metadata catalog and data storage, matching the way DuckLake is designed to work.
 
-Once the instance is running, dbt Studio becomes a visual control center for DuckLake. Browse tables and views, inspect schemas, review statistics, see Parquet data files, examine partitions, and follow snapshot history. It gives teams a practical way to understand what is inside the lakehouse, not just query it.
+Once the instance is running, Rosetta DBT studio becomes a visual control center for DuckLake. Browse tables and views, inspect schemas, review statistics, see Parquet data files, examine partitions, and follow snapshot history. It gives teams a practical way to understand what is inside the lakehouse, not just query it.
 
 The DuckLake UI is built for real operations: schema evolution, row updates, deletes, and importing data from cloud storage or URLs. It helps turn lakehouse management into a guided workflow instead of a set of disconnected commands.
 
@@ -286,17 +286,17 @@ DuckLake also works directly inside the SQL Editor. Select a DuckLake instance, 
 
 For deeper analysis, SQL Notebooks provide a cell-based workflow with SQL and Markdown. Create reusable notebooks, run cells against DuckLake or database connections, keep results paginated for large tables, and document the analysis as you go.
 
-dbt Studio brings DuckLake management, SQL exploration, notebooks, cloud storage, and AI-ready analytics into one desktop experience. Download the dbt Studio desktop app today for macOS, Windows, or Linux, and join our community on GitHub. Let’s build the modern lakehouse together.
+Rosetta DBT studio brings DuckLake management, SQL exploration, notebooks, cloud storage, and AI-ready analytics into one desktop experience. Download the Rosetta DBT studio desktop app today for macOS, Windows, or Linux, and join our community on GitHub. Let’s build the modern lakehouse together.
 
 ## AI Video Generator Prompt
 
-Create a 5-minute YouTube product video promoting dbt Studio, focusing on its DuckLake UI, SQL Editor, and SQL Notebooks. Use the provided image assets as the primary visuals. The video must include professional narration, modern technology background music, subtle UI zooms, cursor highlights, clean callout labels, and short on-screen text.
+Create a 5-minute YouTube product video promoting Rosetta DBT studio, focusing on its DuckLake UI, SQL Editor, and SQL Notebooks. Use the provided image assets as the primary visuals. The video must include professional narration, modern technology background music, subtle UI zooms, cursor highlights, clean callout labels, and short on-screen text.
 
-Style: polished SaaS product demo, dark modern interface, orange accent highlights matching the dbt Studio logo, crisp readable screenshots, smooth transitions, confident but practical tone. Avoid generic stock footage unless used only as subtle abstract transitions. Do not invent UI screens; use the supplied screenshots.
+Style: polished SaaS product demo, dark modern interface, orange accent highlights matching the Rosetta DBT studio logo, crisp readable screenshots, smooth transitions, confident but practical tone. Avoid generic stock footage unless used only as subtle abstract transitions. Do not invent UI screens; use the supplied screenshots.
 
 Use this structure:
 
-1. 0:00-0:20: Open with `logo_new_05.png`, then quick montage of `ducklake_overview.png`, `sql-editor-query-data.png`, and `sql-notebooks_01.png`. On-screen text: "dbt Studio: DuckLake, SQL, Notebooks, and Cloud Data in one workspace."
+1. 0:00-0:20: Open with `logo_new_05.png`, then quick montage of `ducklake_overview.png`, `sql-editor-query-data.png`, and `sql-notebooks_01.png`. On-screen text: "Rosetta DBT studio: DuckLake, SQL, Notebooks, and Cloud Data in one workspace."
 2. 0:20-0:55: Show the problem of fragmented data workflows using `database-connection-suported.png` and `database-and-sorage-object-connections.png`. On-screen text: "Less context switching. More productive data work."
 3. 0:55-1:35: Show connection setup using `database-connection-create-example.png`, `create-cloud-object-storage-types.png`, and `database-and-sorage-object-connections.png`. Emphasize database and cloud object storage connections.
 4. 1:35-2:15: Show the DuckLake setup wizard with `create-ducklake-instance-details.png`, `create-ducklake-catalog-configuration.png`, `create-ducklake-storage-configuration.png`, `create-ducklake-runtime-options.png`, and `create-ducklake-review.png`. Emphasize that users can create new DuckLakes or import existing ones.
@@ -304,7 +304,7 @@ Use this structure:
 6. 2:55-3:25: Show table operations and imports using `table-schema-add-column.png`, `table-schema-rename-column.png`, `table-schema-alter-column-type.png`, `table-schem-delete-column.png`, `table-data-update-rows.png`, `table-data-delete-rows.png`, `import-data-from-storage.png`, and `import-data-from-url.png`.
 7. 3:25-4:05: Show DuckLake in the SQL Editor using `sql-editor-schema-view.png`, `sql-editor-autocomplete.png`, `sql-editor-autocomplete-01.png`, `sql-editor-query-data.png`, and `sql-editor-preview-and export-data.png`. Add callouts for schema browser, autocomplete, pagination, and export.
 8. 4:05-4:40: Show SQL Notebooks using `sql-notebooks_01.png`, `sql-notebooks-02.png`, and `sql-notebooks-03.png`. Highlight SQL cells, Markdown cells, output tables, notebook tabs, and repeatable analysis.
-9. 4:40-5:00: Closing montage with `ducklake_overview.png`, `tables_and_views.png`, `sql-editor-query-data.png`, `sql-notebooks_01.png`. End on the CTA screen: `logo_new_05.png`, "Ready to build your lakehouse?", download buttons for macOS, Windows, Linux, and "Star us on GitHub". On-screen text: "Ready to build your lakehouse? Download dbt Studio for macOS, Windows, and Linux. Star us on GitHub."
+9. 4:40-5:00: Closing montage with `ducklake_overview.png`, `tables_and_views.png`, `sql-editor-query-data.png`, `sql-notebooks_01.png`. End on the CTA screen: `logo_new_05.png`, "Ready to build your lakehouse?", download buttons for macOS, Windows, Linux, and "Star us on GitHub". On-screen text: "Ready to build your lakehouse? Download Rosetta DBT studio for macOS, Windows, and Linux. Star us on GitHub."
 
 Use the full voiceover script from this plan. Time the visuals to match the narration. Make sure all screenshot text remains readable. Use subtle camera movements: slow zoom in, pan, crop to important UI areas, and highlight boxes around relevant controls. Keep text overlays short and readable.
 
@@ -314,7 +314,7 @@ Use `logo_new_05.png` on the left and a collage of `ducklake_overview.png`, `sql
 
 Thumbnail text:
 
-"DuckLake in dbt Studio"
+"DuckLake in Rosetta DBT studio"
 
 Small supporting text:
 
@@ -324,16 +324,16 @@ Small supporting text:
 
 **Title**
 
-Rosetta dbt Studio DuckLake UI: SQL Editor, Notebooks, Cloud Storage, and Lakehouse Management
+Rosetta DBT studio DuckLake UI: SQL Editor, Notebooks, Cloud Storage, and Lakehouse Management
 
 **Description**
 
-Explore dbt Studio's DuckLake workflow: create new DuckLake instances, import existing DuckLakes, connect cloud storage, browse tables and metadata, inspect snapshots, run SQL, export data, and build repeatable SQL notebooks.
+Explore Rosetta DBT studio's DuckLake workflow: create new DuckLake instances, import existing DuckLakes, connect cloud storage, browse tables and metadata, inspect snapshots, run SQL, export data, and build repeatable SQL notebooks.
 
-This 5-minute demo shows how dbt Studio brings DuckLake management, SQL exploration, notebooks, database connections, and cloud object storage into one desktop workspace. Download the app for macOS, Windows, or Linux and start building.
+This 5-minute demo shows how Rosetta DBT studio brings DuckLake management, SQL exploration, notebooks, database connections, and cloud object storage into one desktop workspace. Download the app for macOS, Windows, or Linux and start building.
 
 GitHub: https://github.com/rosettadb/dbt-studio
 
 **Tags**
 
-dbt Studio, DuckLake, DuckDB, SQL Editor, SQL Notebooks, lakehouse, data engineering, analytics engineering, cloud storage, S3, Azure Blob, Google Cloud Storage, Parquet, dbt, data platform
+Rosetta DBT studio, DuckLake, DuckDB, SQL Editor, SQL Notebooks, lakehouse, data engineering, analytics engineering, cloud storage, S3, Azure Blob, Google Cloud Storage, Parquet, dbt, data platform
