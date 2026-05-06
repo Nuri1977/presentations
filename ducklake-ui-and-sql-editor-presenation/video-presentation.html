@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dbt Studio DuckLake UI + SQL Editor</title>
+    <style>
+        :root {
+            --bg: #08090d;
+            --panel: #11141b;
+            --panel-2: #171b24;
+            --line: rgba(255, 255, 255, 0.12);
+            --text: #f6f7fb;
+            --muted: #a9b0bf;
+            --soft: #747b89;
+            --orange: #ff7a1a;
+            --orange-2: #ff9a3d;
+            --blue: #72b7ff;
+            --green: #60d394;
+            --shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(255, 122, 26, 0.18), transparent 28%),
+                radial-gradient(circle at 90% 18%, rgba(114, 183, 255, 0.14), transparent 30%),
+                linear-gradient(135deg, #07080c 0%, #11141b 55%, #08090d 100%);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body::before {
+            position: fixed;
+            inset: 0;
+            content: "";
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at center, black, transparent 78%);
+        }
+
+        .deck {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-rows: 1fr auto;
+            gap: 18px;
+            padding: 54px 64px 72px;
+            opacity: 0;
+            transform: translateX(40px) scale(0.985);
+            transition: opacity 420ms ease, transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+            z-index: 5;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-34px) scale(0.99);
+        }
+
+        .slide-inner {
+            width: min(1500px, 100%);
+            height: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 0.88fr 1.12fr;
+            gap: 34px;
+            align-items: center;
+        }
+
+        .slide-inner.full {
+            grid-template-columns: 1fr;
+        }
+
+        .slide-inner.reverse {
+            grid-template-columns: 1.15fr 0.85fr;
+        }
+
+        .copy {
+            position: relative;
+            z-index: 2;
+            transition: opacity 520ms ease, transform 620ms ease;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            color: var(--orange-2);
+            font-size: clamp(13px, 1vw, 16px);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .eyebrow::before {
+            width: 36px;
+            height: 3px;
+            content: "";
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--orange), var(--orange-2));
+        }
+
+        h1,
+        h2 {
+            margin: 0;
+            color: var(--text);
+            letter-spacing: 0;
+            line-height: 0.98;
+        }
+
+        h1 {
+            max-width: 920px;
+            font-size: clamp(58px, 7vw, 118px);
+            font-weight: 900;
+        }
+
+        h2 {
+            max-width: 780px;
+            font-size: clamp(46px, 5.3vw, 82px);
+            font-weight: 900;
+        }
+
+        .subtitle {
+            max-width: 760px;
+            margin: 24px 0 0;
+            color: var(--muted);
+            font-size: clamp(20px, 2vw, 31px);
+            line-height: 1.35;
+            font-weight: 500;
+        }
+
+        .small-copy {
+            max-width: 720px;
+            margin-top: 22px;
+            color: var(--muted);
+            font-size: clamp(17px, 1.28vw, 22px);
+            line-height: 1.48;
+        }
+
+        .detail-copy {
+            max-width: 760px;
+            margin-top: 20px;
+            padding-left: 18px;
+            border-left: 3px solid rgba(255, 122, 26, 0.75);
+            color: #d7dbe5;
+            font-size: clamp(16px, 1.15vw, 20px);
+            line-height: 1.48;
+            font-weight: 560;
+        }
+
+        .accent {
+            color: var(--orange-2);
+        }
+
+        .blue {
+            color: var(--blue);
+        }
+
+        .logo-mark {
+            width: min(380px, 44vw);
+            height: auto;
+            filter: drop-shadow(0 26px 70px rgba(255, 122, 26, 0.28));
+        }
+
+        .hero-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .hero-badges,
+        .metric-row,
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .badge,
+        .chip,
+        .metric {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.055);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        .badge,
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            color: var(--text);
+            font-size: clamp(15px, 1vw, 18px);
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .badge::before,
+        .chip::before {
+            width: 8px;
+            height: 8px;
+            content: "";
+            border-radius: 50%;
+            background: var(--orange);
+            box-shadow: 0 0 20px rgba(255, 122, 26, 0.75);
+        }
+
+        .badge.has-icon::before,
+        .chip.has-icon::before {
+            display: none;
+        }
+
+        .badge img,
+        .chip img,
+        .inline-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            flex: 0 0 auto;
+            filter: drop-shadow(0 4px 12px rgba(255, 122, 26, 0.28));
+        }
+
+        .inline-icon {
+            width: 0.78em;
+            height: 0.78em;
+            margin-right: 0.16em;
+            vertical-align: -0.08em;
+        }
+
+        .brand-pair {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 26px;
+        }
+
+        .brand-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 58px;
+            padding: 13px 17px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+            color: var(--text);
+            font-size: clamp(17px, 1.25vw, 22px);
+            font-weight: 850;
+        }
+
+        .brand-card img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
+
+        .metric {
+            min-width: 150px;
+            padding: 18px 20px;
+            border-radius: 18px;
+        }
+
+        .metric strong {
+            display: block;
+            color: var(--text);
+            font-size: clamp(27px, 2.4vw, 42px);
+            line-height: 1;
+        }
+
+        .metric span {
+            display: block;
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .visual {
+            position: relative;
+            min-width: 0;
+            transition: opacity 420ms ease, transform 680ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .visual.stack {
+            height: min(67vh, 670px);
+        }
+
+        .screenshot {
+            width: 100%;
+            max-height: 72vh;
+            object-fit: contain;
+            display: block;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .screenshot.tall {
+            width: auto;
+            max-width: 100%;
+            max-height: 76vh;
+            margin: 0 auto;
+        }
+
+        .screen-frame {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(15, 18, 25, 0.9);
+            box-shadow: var(--shadow);
+        }
+
+        .screen-frame img {
+            width: 100%;
+            height: 100%;
+            max-height: 72vh;
+            object-fit: contain;
+            display: block;
+        }
+
+        .screen-label {
+            position: absolute;
+            left: 18px;
+            top: 18px;
+            display: inline-flex;
+            align-items: center;
+            min-height: 36px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 122, 26, 0.44);
+            border-radius: 999px;
+            background: rgba(10, 12, 16, 0.78);
+            color: #fff3e9;
+            font-size: 14px;
+            font-weight: 800;
+            backdrop-filter: blur(16px);
+        }
+
+        .stack-card {
+            position: absolute;
+            width: 78%;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            transition: inset 720ms ease, width 720ms ease, height 720ms ease, transform 720ms ease;
+        }
+
+        .stack-card img {
+            width: 100%;
+            display: block;
+        }
+
+        .stack-card.one {
+            top: 0;
+            left: 0;
+            transform: rotate(-3deg);
+        }
+
+        .stack-card.two {
+            top: 16%;
+            right: 0;
+            transform: rotate(3deg);
+        }
+
+        .stack-card.three {
+            left: 8%;
+            bottom: 0;
+            transform: rotate(-1deg);
+        }
+
+        .grid-visual {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .mini-shot {
+            position: relative;
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--panel);
+            box-shadow: 0 22px 52px rgba(0, 0, 0, 0.36);
+        }
+
+        .mini-shot img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+        }
+
+        .wizard-grid {
+            align-self: stretch;
+            height: min(58vh, 560px);
+            grid-template-rows: repeat(2, minmax(0, 1fr));
+        }
+
+        .wizard-grid .mini-shot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            background: rgba(9, 11, 16, 0.92);
+        }
+
+        .wizard-grid .mini-shot img {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: auto;
+            object-fit: contain;
+        }
+
+        .mini-shot .caption {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.72);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .step {
+            min-height: 110px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.055);
+        }
+
+        .step strong {
+            display: block;
+            color: var(--orange-2);
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .step span {
+            display: block;
+            margin-top: 12px;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .callouts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .callout {
+            min-height: 72px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.055);
+            color: var(--text);
+            font-size: clamp(15px, 1.15vw, 20px);
+            font-weight: 800;
+        }
+
+        .quote-card {
+            width: min(1040px, 92vw);
+            margin: 0 auto;
+            padding: 54px;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+            box-shadow: var(--shadow);
+        }
+
+        .quote-card p {
+            margin: 0;
+            color: var(--text);
+            font-size: clamp(30px, 3.5vw, 58px);
+            line-height: 1.12;
+            font-weight: 900;
+        }
+
+        .footer {
+            width: min(1500px, calc(100vw - 128px));
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: end;
+            color: var(--soft);
+            font-size: 13px;
+            font-weight: 700;
+            transition: opacity 360ms ease;
+        }
+
+        .notes {
+            max-width: 1050px;
+            min-height: 34px;
+            opacity: 0;
+            transition: opacity 220ms ease;
+        }
+
+        body.show-notes .notes {
+            opacity: 1;
+        }
+
+        .slide-number {
+            white-space: nowrap;
+        }
+
+        .progress {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--orange), var(--orange-2), var(--blue));
+            transition: width 280ms ease;
+        }
+
+        .help {
+            position: fixed;
+            right: 18px;
+            top: 18px;
+            z-index: 30;
+            display: flex;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .key {
+            padding: 7px 9px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        @media (max-width: 980px) {
+            .slide {
+                padding: 36px 26px 62px;
+            }
+
+            .slide-inner,
+            .slide-inner.reverse {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                align-content: center;
+            }
+
+            .visual.stack {
+                height: 44vh;
+            }
+
+            .timeline {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .footer {
+                width: calc(100vw - 52px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help">
+        <span class="key">Arrows</span>
+        <span class="key">Space</span>
+        <span class="key">N notes</span>
+        <span class="key">F fullscreen</span>
+    </div>
+
+    <main class="deck" id="deck">
+        <section class="slide active" data-time="0:00-0:20" data-notes="Meet dbt Studio: a desktop workspace for modern data teams. Manage DuckLake lakehouses, connect to cloud storage, explore metadata, query data, and build notebook workflows without jumping between tools.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">Hook</div>
+                    <h1>One workspace for <span class="accent"><img class="inline-icon" src="connectionIcons/ducklake.png" alt="">DuckLake</span></h1>
+                    <p class="subtitle">DuckLake UI, SQL Editor, SQL Notebooks, cloud storage, and analytics workflows inside dbt Studio.</p>
+                    <p class="detail-copy">Meet dbt Studio: a desktop workspace for modern data teams. Manage DuckLake lakehouses, connect to cloud storage, explore metadata, query data, and build notebook workflows without jumping between tools.</p>
+                    <div class="hero-badges">
+                        <span class="badge has-icon"><img src="connectionIcons/ducklake.png" alt="">DuckLake UI</span>
+                        <span class="badge">SQL Editor</span>
+                        <span class="badge">SQL Notebooks</span>
+                        <span class="badge">Cloud Data</span>
+                    </div>
+                </div>
+                <div class="hero-logo">
+                    <img class="logo-mark" src="logo_new_05.png" alt="dbt Studio logo">
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="0:00-0:20" data-notes="Quick product montage: show that this is not just a database client. It is a complete workspace for DuckLake, SQL, notebooks, and cloud data. Under the hood, dbt Studio uses the DuckDB Node.js API to connect to DuckDB and run DuckLake workflows through DuckDB's DuckLake extension.">
+            <div class="slide-inner reverse">
+                <div class="visual stack">
+                    <div class="stack-card one"><img src="ducklake_overview.png" alt="DuckLake overview"></div>
+                    <div class="stack-card two"><img src="sql-editor-query-data.png" alt="SQL Editor query results"></div>
+                    <div class="stack-card three"><img src="sql-notebooks_01.png" alt="SQL Notebooks"></div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">Product Demo</div>
+                    <h2>Build, query, manage, and explore your lakehouse</h2>
+                    <p class="subtitle">A practical desktop workspace for modern data teams.</p>
+                    <p class="detail-copy">dbt Studio brings data lake management, SQL exploration, notebooks, cloud storage, database connections, and AI-assisted analytics into one desktop experience. Under the hood, it uses <strong>@duckdb/node-api</strong>, the DuckDB Node.js API, to connect to DuckDB and power DuckLake workflows through DuckDB's DuckLake extension.</p>
+                    <div class="brand-pair">
+                        <span class="brand-card"><img src="connectionIcons/ducklake.png" alt="">DuckLake</span>
+                        <span class="brand-card"><img src="connectionIcons/duckdb.png" alt="">DuckDB</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="0:20-0:55" data-notes="Data work often gets split across database clients, cloud consoles, SQL tools, notebooks, and file explorers. dbt Studio brings those workflows together, so teams can move from connection setup to analysis and lakehouse operations in one focused interface.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">The Problem</div>
+                    <h2>Data work is still too fragmented</h2>
+                    <p class="subtitle">Database clients. Cloud consoles. SQL tabs. Notebooks. File explorers. dbt Studio brings the workflow into one focused place.</p>
+                    <p class="detail-copy">Data teams should be able to move from connection setup to analysis and lakehouse operations without constantly switching applications.</p>
+                    <div class="callouts">
+                        <div class="callout">Less context switching</div>
+                        <div class="callout">More productive analysis</div>
+                        <div class="callout">One desktop workflow</div>
+                        <div class="callout">Built for data teams</div>
+                    </div>
+                </div>
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Connections in one workspace</span>
+                        <img src="database-connection-suported.png" alt="Supported database connections">
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="0:55-1:35" data-notes="Start by connecting the systems your team already uses. dbt Studio supports database connections and cloud object storage, including S3-compatible storage, Azure Blob, and Google Cloud Storage.">
+            <div class="slide-inner reverse">
+                <div class="visual">
+                    <div class="grid-visual">
+                        <div class="mini-shot">
+                            <img src="database-connection-create-example.png" alt="Create database connection">
+                            <span class="caption">Database connections</span>
+                        </div>
+                        <div class="mini-shot">
+                            <img src="create-cloud-object-storage-types.png" alt="Cloud object storage types">
+                            <span class="caption">Object storage</span>
+                        </div>
+                        <div class="mini-shot">
+                            <img src="database-and-sorage-object-connections.png" alt="Connections and storage">
+                            <span class="caption">Unified list</span>
+                        </div>
+                        <div class="mini-shot">
+                            <img src="create-ducklake-storage-configuration.png" alt="DuckLake storage configuration">
+                            <span class="caption">Reuse in DuckLake</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">Connections</div>
+                    <h2>Connect databases and cloud storage</h2>
+                    <p class="subtitle">Save connections once, then reuse them across Cloud Explorer, DuckLake creation, SQL workflows, and notebooks.</p>
+                    <p class="detail-copy">dbt Studio supports database connections and cloud object storage, including S3-compatible storage, Azure Blob, and Google Cloud Storage. Saved cloud connections can be reused when creating new DuckLake instances or importing existing DuckLakes.</p>
+                    <div class="chip-row">
+                        <span class="chip">PostgreSQL</span>
+                        <span class="chip">Snowflake</span>
+                        <span class="chip">BigQuery</span>
+                        <span class="chip has-icon"><img src="connectionIcons/duckdb.png" alt="">DuckDB</span>
+                        <span class="chip">S3</span>
+                        <span class="chip">Azure Blob</span>
+                        <span class="chip">GCS</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="1:35-2:15" data-notes="The DuckLake setup flow guides you through the essentials: instance details, catalog configuration, storage location, runtime options, and final review, whether you are creating a new DuckLake or importing an existing one.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">Create Or Import DuckLake</div>
+                    <h2>Guided <img class="inline-icon" src="connectionIcons/ducklake.png" alt="">DuckLake instance setup</h2>
+                    <p class="subtitle">Create new lakehouse instances or import existing DuckLakes with clear steps for catalog, storage, runtime options, and review.</p>
+                    <p class="detail-copy">The DuckLake setup flow guides you through instance details, catalog configuration, storage location, runtime options, and final review, whether you are starting fresh or connecting to an existing DuckLake.</p>
+                    <div class="timeline">
+                        <div class="step"><strong>1</strong><span>Instance</span></div>
+                        <div class="step"><strong>2</strong><span>Catalog</span></div>
+                        <div class="step"><strong>3</strong><span>Storage</span></div>
+                        <div class="step"><strong>4</strong><span>Runtime</span></div>
+                        <div class="step"><strong>5</strong><span>Review</span></div>
+                    </div>
+                </div>
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Instance details</span>
+                        <img src="create-ducklake-instance-details.png" alt="Create DuckLake instance details">
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="1:35-2:15" data-notes="You can connect DuckLake to local or cloud-backed storage and keep the metadata catalog separate from the data files, matching the way DuckLake is designed to work.">
+            <div class="slide-inner full">
+                <div class="copy">
+                    <div class="eyebrow">DuckLake Wizard</div>
+                    <h2><img class="inline-icon" src="connectionIcons/ducklake.png" alt="">Catalog, storage, runtime, review</h2>
+                    <p class="detail-copy">Create a new DuckLake or import an existing one by connecting the metadata catalog and data storage. Keep the catalog separate from the data files, matching the way DuckLake is designed to work.</p>
+                </div>
+                <div class="grid-visual wizard-grid">
+                    <div class="mini-shot">
+                        <img src="create-ducklake-catalog-configuration.png" alt="Catalog configuration">
+                        <span class="caption">Catalog configuration</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="create-ducklake-storage-configuration.png" alt="Storage configuration">
+                        <span class="caption">Storage configuration</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="create-ducklake-runtime-options.png" alt="Runtime options">
+                        <span class="caption">Runtime options</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="create-ducklake-review.png" alt="Review DuckLake setup">
+                        <span class="caption">Review and create</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="2:15-2:55" data-notes="Once the instance is running, dbt Studio becomes a visual control center for DuckLake. Browse tables and views, inspect schemas, review statistics, see Parquet data files, examine partitions, and follow snapshot history.">
+            <div class="slide-inner reverse">
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">DuckLake overview</span>
+                        <img src="ducklake_overview.png" alt="DuckLake overview">
+                    </div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">DuckLake UI</div>
+                    <h2>A visual control center for <img class="inline-icon" src="connectionIcons/ducklake.png" alt="">DuckLake</h2>
+                    <p class="subtitle">Understand what is inside the lakehouse, not just query it.</p>
+                    <p class="detail-copy">Browse tables and views, inspect schemas, review statistics, see Parquet data files, examine partitions, and follow snapshot history from a single visual workspace.</p>
+                    <div class="metric-row">
+                        <div class="metric"><strong>Tables</strong><span>Views and schemas</span></div>
+                        <div class="metric"><strong>Files</strong><span>Parquet registry</span></div>
+                        <div class="metric"><strong>History</strong><span>Snapshots</span></div>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="2:15-2:55" data-notes="This section should move quickly through the metadata views: tables, overview, schema, statistics, files, partitions, and snapshots.">
+            <div class="slide-inner full">
+                <div class="copy">
+                    <div class="eyebrow">Metadata Explorer</div>
+                    <h2>Tables, schemas, files, partitions, snapshots</h2>
+                    <p class="detail-copy">dbt Studio gives teams a practical way to understand table structure, storage layout, file-level metadata, statistics, and change history inside the lakehouse.</p>
+                </div>
+                <div class="grid-visual">
+                    <div class="mini-shot">
+                        <img src="tables_and_views.png" alt="Tables and views">
+                        <span class="caption">Tables and views</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="table_schema.png" alt="Table schema">
+                        <span class="caption">Schema</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="table-statistics.png" alt="Table statistics">
+                        <span class="caption">Statistics</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="table-snapshot-history.png" alt="Snapshot history">
+                        <span class="caption">Snapshot history</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="2:55-3:25" data-notes="The DuckLake UI is built for real operations: schema evolution, row updates, deletes, and importing data from cloud storage or URLs.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">Operations</div>
+                    <h2>Real table operations, guided in the UI</h2>
+                    <p class="subtitle">Schema evolution, data changes, imports, and exports without dropping into disconnected command workflows.</p>
+                    <p class="detail-copy">The DuckLake UI supports operational workflows such as adding columns, renaming columns, changing types, updating rows, deleting rows, and importing data from storage or URLs.</p>
+                    <div class="chip-row">
+                        <span class="chip">Add columns</span>
+                        <span class="chip">Rename columns</span>
+                        <span class="chip">Alter types</span>
+                        <span class="chip">Update rows</span>
+                        <span class="chip">Delete rows</span>
+                        <span class="chip">Import data</span>
+                    </div>
+                </div>
+                <div class="visual">
+                    <div class="grid-visual">
+                        <div class="mini-shot">
+                            <img src="table-schema-add-column.png" alt="Add column">
+                            <span class="caption">Add column</span>
+                        </div>
+                        <div class="mini-shot">
+                            <img src="table-schema-rename-column.png" alt="Rename column">
+                            <span class="caption">Rename column</span>
+                        </div>
+                        <div class="mini-shot">
+                            <img src="table-data-update-rows.png" alt="Update rows">
+                            <span class="caption">Update rows</span>
+                        </div>
+                        <div class="mini-shot">
+                            <img src="import-data-from-storage.png" alt="Import data from storage">
+                            <span class="caption">Import from storage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="3:25-4:05" data-notes="DuckLake also works directly inside the SQL Editor. Select a DuckLake instance, browse schemas, get Monaco-powered autocomplete for tables and columns, run queries, page through large results, and export full datasets to CSV, JSON, or Parquet.">
+            <div class="slide-inner reverse">
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">DuckLake in SQL Editor</span>
+                        <img src="sql-editor-query-data.png" alt="SQL Editor querying DuckLake">
+                    </div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">SQL Editor</div>
+                    <h2>Query <img class="inline-icon" src="connectionIcons/ducklake.png" alt="">DuckLake directly in the SQL Editor</h2>
+                    <p class="subtitle">Browse schemas, write SQL, preview results, paginate large data, and export full datasets.</p>
+                    <p class="detail-copy">Select a DuckLake instance, browse schemas, get Monaco-powered autocomplete for tables and columns, run queries, page through large results, and export to CSV, JSON, or Parquet.</p>
+                    <div class="callouts">
+                        <div class="callout">Schema browser</div>
+                        <div class="callout">Autocomplete</div>
+                        <div class="callout">Server-side pagination</div>
+                        <div class="callout">CSV, JSON, Parquet export</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="3:25-4:05" data-notes="Move through schema browsing, autocomplete, query execution, and export. Keep the screenshots large and readable during recording.">
+            <div class="slide-inner full">
+                <div class="copy">
+                    <div class="eyebrow">SQL Workflow</div>
+                    <h2>Schema, autocomplete, results, export</h2>
+                    <p class="detail-copy">DuckLake instances appear alongside regular database connections, so the same SQL Editor workflow can handle metadata browsing, query execution, pagination, and full-dataset export.</p>
+                </div>
+                <div class="grid-visual">
+                    <div class="mini-shot">
+                        <img src="sql-editor-schema-view.png" alt="SQL Editor schema view">
+                        <span class="caption">Schema browser</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="sql-editor-autocomplete.png" alt="SQL Editor autocomplete">
+                        <span class="caption">Autocomplete</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="sql-editor-autocomplete-01.png" alt="SQL Editor autocomplete detail">
+                        <span class="caption">SQL assistance</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="sql-editor-preview-and export-data.png" alt="Preview and export data">
+                        <span class="caption">Preview and export</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="4:05-4:40" data-notes="For deeper analysis, SQL Notebooks provide a cell-based workflow with SQL and Markdown. Create reusable notebooks, run cells against DuckLake or database connections, keep results paginated for large tables, and document the analysis as you go.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">SQL Notebooks</div>
+                    <h2>Repeatable analysis with SQL and Markdown</h2>
+                    <p class="subtitle">Create reusable notebooks, run cells, keep results paginated, and document the work as you go.</p>
+                    <p class="detail-copy">SQL Notebooks provide a cell-based workflow with SQL and Markdown. Run cells against DuckLake or database connections and keep large result sets safe with server-side pagination.</p>
+                    <div class="chip-row">
+                        <span class="chip">SQL cells</span>
+                        <span class="chip">Markdown cells</span>
+                        <span class="chip">Notebook tabs</span>
+                        <span class="chip">Result tables</span>
+                    </div>
+                </div>
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">SQL Notebooks</span>
+                        <img src="sql-notebooks_01.png" alt="SQL Notebooks">
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="4:05-4:40" data-notes="Show multiple notebook screens so the viewer understands this is a workflow, not a single query window.">
+            <div class="slide-inner full">
+                <div class="copy">
+                    <div class="eyebrow">Notebook Workflow</div>
+                    <h2>Run cells, compare outputs, keep context</h2>
+                    <p class="detail-copy">Use notebooks when analysis needs context, repeatability, and explanation: SQL cells for execution, Markdown cells for documentation, and output tables for review and export.</p>
+                </div>
+                <div class="grid-visual">
+                    <div class="mini-shot">
+                        <img src="sql-notebooks_01.png" alt="SQL notebook first view">
+                        <span class="caption">Notebook workspace</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="sql-notebooks-02.png" alt="SQL notebook second view">
+                        <span class="caption">Cell outputs</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="sql-notebooks-03.png" alt="SQL notebook third view">
+                        <span class="caption">Repeatable analysis</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="table-data-export.png" alt="Data export options">
+                        <span class="caption">Export results</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="4:40-5:00" data-notes="dbt Studio brings DuckLake management, SQL exploration, notebooks, cloud storage, and AI-ready analytics into one desktop experience. If you are building with DuckLake, DuckDB, dbt, or modern lakehouse workflows, dbt Studio gives you the workspace to move faster.">
+            <div class="slide-inner reverse">
+                <div class="visual stack">
+                    <div class="stack-card one"><img src="tables_and_views.png" alt="Tables and views"></div>
+                    <div class="stack-card two"><img src="sql-editor-query-data.png" alt="SQL query data"></div>
+                    <div class="stack-card three"><img src="sql-notebooks_01.png" alt="SQL notebooks"></div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">Closing</div>
+                    <h2>Move faster with dbt Studio</h2>
+                    <p class="subtitle">DuckLake management, SQL exploration, notebooks, cloud storage, and AI-ready analytics in one desktop experience.</p>
+                    <p class="detail-copy">If you are building with DuckLake, DuckDB, dbt, or modern lakehouse workflows, dbt Studio gives you the workspace to move faster.</p>
+                    <div class="brand-pair">
+                        <span class="brand-card"><img src="connectionIcons/ducklake.png" alt="">DuckLake workflows</span>
+                        <span class="brand-card"><img src="connectionIcons/duckdb.png" alt="">DuckDB powered</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <section class="slide" data-time="5:00" data-notes="End on the brand. Leave this slide on screen for a few seconds so the recording has a clean outro.">
+            <div class="slide-inner full">
+                <div class="quote-card">
+                    <div class="hero-logo">
+                        <img class="logo-mark" src="logo_new_05.png" alt="dbt Studio logo">
+                    </div>
+                    <p>dbt Studio. Build, query, manage, and explore your lakehouse.</p>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+    </main>
+
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+    <script>
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        const progressFill = document.getElementById("progressFill");
+        let currentSlide = 0;
+
+        function updateDeck() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove("active", "prev");
+                if (index === currentSlide) {
+                    slide.classList.add("active");
+                } else if (index < currentSlide) {
+                    slide.classList.add("prev");
+                }
+
+                const notes = slide.querySelector(".notes");
+                const slideNumber = slide.querySelector(".slide-number");
+                if (notes) {
+                    notes.textContent = slide.dataset.notes || "";
+                }
+                if (slideNumber) {
+                    slideNumber.textContent = `${index + 1} / ${slides.length}`;
+                }
+            });
+
+            progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() {
+            currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+            updateDeck();
+        }
+
+        function previousSlide() {
+            currentSlide = Math.max(currentSlide - 1, 0);
+            updateDeck();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen?.();
+            } else {
+                document.exitFullscreen?.();
+            }
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowRight" || event.key === " " || event.key === "Enter") {
+                event.preventDefault();
+                nextSlide();
+            }
+            if (event.key === "ArrowLeft" || event.key === "Backspace") {
+                event.preventDefault();
+                previousSlide();
+            }
+            if (event.key.toLowerCase() === "n") {
+                document.body.classList.toggle("show-notes");
+            }
+            if (event.key.toLowerCase() === "f") {
+                toggleFullscreen();
+            }
+            if (event.key === "Home") {
+                currentSlide = 0;
+                updateDeck();
+            }
+            if (event.key === "End") {
+                currentSlide = slides.length - 1;
+                updateDeck();
+            }
+        });
+
+        document.getElementById("deck").addEventListener("click", (event) => {
+            if (event.clientX > window.innerWidth / 2) {
+                nextSlide();
+            } else {
+                previousSlide();
+            }
+        });
+
+        updateDeck();
+    </script>
+</body>
+</html>
