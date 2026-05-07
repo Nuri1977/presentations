@@ -336,18 +336,18 @@
         <!-- SLIDE 4: Auto-Open Files -->
         <section class="slide"
             data-time="0:30–1:15"
-            data-notes="Files the agent writes open automatically in Monaco tabs. You can see the code the moment it is created, review it side by side with the agent's explanation, and choose to Keep or Discard the changes.">
+            data-notes="Files the agent writes open automatically as editor tabs. You can see the code the moment it is created, review it side by side with the agent's explanation, and choose to Keep or Discard the changes.">
             <div class="slide-inner reverse">
                 <div class="visual">
                     <div class="screen-frame">
-                        <span class="screen-label">Auto-opens in Monaco</span>
+                        <span class="screen-label">Auto-opens as editor tab</span>
                         <img src="agent-auto-write-file.png" alt="File auto-opened by the agent">
                     </div>
                 </div>
                 <div class="copy">
                     <div class="eyebrow">Immediate Review</div>
                     <h2>Files open <span class="accent">automatically</span></h2>
-                    <p class="detail-copy">Every file the Agent writes or edits appears instantly as a Monaco tab. Review the code the moment it is created. Then decide — click <strong>Keep</strong> to accept the changes or <strong>Discard</strong> to roll them back. You stay in complete control.</p>
+                    <p class="detail-copy">Every file the Agent writes or edits appears instantly as an editor tab. Review the code the moment it is created. Then decide — click <strong>Keep</strong> to accept the changes or <strong>Discard</strong> to roll them back. You stay in complete control.</p>
                 </div>
             </div>
             <footer class="footer">
@@ -471,6 +471,22 @@
         const slides = Array.from(document.querySelectorAll(".slide"));
         const progressFill = document.getElementById("progressFill");
         let currentSlide = 0;
+        let notesTimer = null;
+
+        function typeWords(el, text, delay = 80) {
+            if (notesTimer) clearInterval(notesTimer);
+            el.textContent = "";
+            const words = text.split(" ");
+            let i = 0;
+            notesTimer = setInterval(() => {
+                if (i < words.length) {
+                    el.textContent += (i === 0 ? "" : " ") + words[i];
+                    i++;
+                } else {
+                    clearInterval(notesTimer);
+                }
+            }, delay);
+        }
 
         function updateDeck() {
             slides.forEach((slide, index) => {
@@ -479,7 +495,13 @@
                 else if (index < currentSlide) slide.classList.add("prev");
                 const notes = slide.querySelector(".notes");
                 const sn = slide.querySelector(".slide-number");
-                if (notes) notes.textContent = slide.dataset.notes || "";
+                if (notes) {
+                    if (index === currentSlide && document.body.classList.contains("show-notes")) {
+                        typeWords(notes, slide.dataset.notes || "");
+                    } else {
+                        notes.textContent = slide.dataset.notes || "";
+                    }
+                }
                 if (sn) sn.textContent = `${index + 1} / ${slides.length}`;
             });
             progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;

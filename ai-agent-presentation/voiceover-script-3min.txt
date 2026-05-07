@@ -41,7 +41,7 @@ Every step is visible in real time, right inside the chat panel.
 
 [SLIDE 4 — "Files open automatically" — agent-auto-write-file.png]
 
-Every file the Agent writes opens automatically as a Monaco editor tab.
+Every file the Agent writes opens automatically as an editor tab.
 You see the code the moment it is created.
 Then you decide — click Keep to accept the changes,
 or Discard to roll them back instantly.
