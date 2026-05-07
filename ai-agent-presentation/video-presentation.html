@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosetta DBT Studio — The AI Agent</title>
+    <style>
+        :root {
+            --bg: #08090d;
+            --panel: #11141b;
+            --panel-2: #171b24;
+            --line: rgba(255, 255, 255, 0.12);
+            --text: #f6f7fb;
+            --muted: #a9b0bf;
+            --soft: #747b89;
+            --orange: #ff7a1a;
+            --orange-2: #ff9a3d;
+            --blue: #72b7ff;
+            --green: #60d394;
+            --red: #ff6b6b;
+            --shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%; margin: 0; overflow: hidden;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(255, 122, 26, 0.18), transparent 28%),
+                radial-gradient(circle at 90% 18%, rgba(114, 183, 255, 0.14), transparent 30%),
+                linear-gradient(135deg, #07080c 0%, #11141b 55%, #08090d 100%);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body::before {
+            position: fixed; inset: 0; content: ""; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at center, black, transparent 78%);
+        }
+
+        .deck { position: relative; width: 100vw; height: 100vh; }
+
+        .slide {
+            position: absolute; inset: 0;
+            display: grid; grid-template-rows: 1fr auto; gap: 18px;
+            padding: 54px 64px 72px;
+            opacity: 0; transform: translateX(40px) scale(0.985);
+            transition: opacity 420ms ease, transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none;
+        }
+        .slide.active { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; z-index: 5; }
+        .slide.prev  { opacity: 0; transform: translateX(-34px) scale(0.99); }
+
+        .slide-inner {
+            width: min(1500px, 100%); height: 100%; margin: 0 auto;
+            display: grid; grid-template-columns: 0.88fr 1.12fr;
+            gap: 34px; align-items: center;
+        }
+        .slide-inner.full    { grid-template-columns: 1fr; }
+        .slide-inner.reverse { grid-template-columns: 1.12fr 0.88fr; }
+
+        .copy { position: relative; z-index: 2; }
+
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 10px;
+            margin-bottom: 18px; color: var(--orange-2);
+            font-size: clamp(13px, 1vw, 16px); font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.12em;
+        }
+        .eyebrow::before {
+            width: 36px; height: 3px; content: "";
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--orange), var(--orange-2));
+        }
+
+        h1, h2 { margin: 0; color: var(--text); letter-spacing: 0; line-height: 0.98; }
+        h1 { max-width: 920px; font-size: clamp(58px, 7vw, 118px); font-weight: 900; }
+        h2 { max-width: 780px; font-size: clamp(42px, 5.3vw, 82px); font-weight: 900; }
+
+        .subtitle {
+            max-width: 760px; margin: 24px 0 0; color: var(--muted);
+            font-size: clamp(20px, 2vw, 31px); line-height: 1.35; font-weight: 500;
+        }
+        .detail-copy {
+            max-width: 760px; margin-top: 20px; padding-left: 18px;
+            border-left: 3px solid rgba(255, 122, 26, 0.75);
+            color: #d7dbe5; font-size: clamp(16px, 1.15vw, 20px);
+            line-height: 1.48; font-weight: 560;
+        }
+
+        .accent { color: var(--orange-2); }
+        .blue   { color: var(--blue); }
+        .green  { color: var(--green); }
+
+        .hero-logo { display: flex; justify-content: center; align-items: center; min-height: 200px; }
+        .logo-mark { width: min(380px, 44vw); height: auto; filter: drop-shadow(0 26px 70px rgba(255, 122, 26, 0.36)); }
+
+        .hero-badges, .chip-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+        .badge, .chip {
+            display: inline-flex; align-items: center; gap: 8px;
+            min-height: 44px; padding: 10px 16px;
+            border: 1px solid var(--line); border-radius: 999px;
+            background: rgba(255, 255, 255, 0.055);
+            backdrop-filter: blur(18px); box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+            color: var(--text); font-size: clamp(15px, 1vw, 18px); font-weight: 750;
+            white-space: nowrap;
+        }
+        .badge::before, .chip::before {
+            width: 8px; height: 8px; content: "";
+            border-radius: 50%; background: var(--orange);
+            box-shadow: 0 0 20px rgba(255, 122, 26, 0.75);
+        }
+        .badge.no-dot::before, .chip.no-dot::before { display: none; }
+
+        .visual { position: relative; min-width: 0; }
+        .visual.stack { height: min(67vh, 670px); }
+
+        .screenshot {
+            width: 100%; max-height: 72vh; object-fit: contain; display: block;
+            border: 1px solid var(--line); border-radius: 18px;
+            background: var(--panel); box-shadow: var(--shadow);
+        }
+
+        .screen-frame {
+            position: relative; overflow: hidden;
+            border: 1px solid var(--line); border-radius: 22px;
+            background: rgba(15, 18, 25, 0.9); box-shadow: var(--shadow);
+        }
+        .screen-frame img {
+            width: 100%; max-height: 72vh;
+            object-fit: contain; display: block;
+        }
+        .screen-label {
+            position: absolute; left: 18px; top: 18px;
+            display: inline-flex; align-items: center;
+            min-height: 36px; padding: 8px 14px;
+            border: 1px solid rgba(255, 122, 26, 0.44); border-radius: 999px;
+            background: rgba(10, 12, 16, 0.78); color: #fff3e9;
+            font-size: 14px; font-weight: 800; backdrop-filter: blur(16px); z-index: 10;
+        }
+
+        .stack-card {
+            position: absolute; width: 78%; overflow: hidden;
+            border: 1px solid var(--line); border-radius: 20px;
+            background: var(--panel); box-shadow: var(--shadow);
+            transition: all 720ms ease;
+        }
+        .stack-card img { width: 100%; display: block; }
+        .stack-card.one   { top: 0;   left: 0;  transform: rotate(-3deg); }
+        .stack-card.two   { top: 16%; right: 0; transform: rotate(3deg);  }
+        .stack-card.three { left: 8%; bottom: 0; transform: rotate(-1deg); }
+
+        .grid-visual { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+        .mini-shot {
+            position: relative; min-height: 0; overflow: hidden;
+            border: 1px solid var(--line); border-radius: 16px;
+            background: var(--panel); box-shadow: 0 22px 52px rgba(0,0,0,0.36);
+        }
+        .mini-shot img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+        .mini-shot .caption {
+            position: absolute; left: 12px; bottom: 12px;
+            padding: 6px 10px; border-radius: 999px;
+            background: rgba(0,0,0,0.72); color: #fff;
+            font-size: 13px; font-weight: 800;
+        }
+
+        .callouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 26px; }
+        .callout {
+            min-height: 72px; padding: 16px;
+            border: 1px solid var(--line); border-radius: 16px;
+            background: rgba(255, 255, 255, 0.055);
+            color: var(--text); font-size: clamp(15px, 1.15vw, 20px); font-weight: 800;
+        }
+
+        /* Security callout list */
+        .check-list { list-style: none; padding: 0; margin: 28px 0 0; }
+        .check-list li {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 0; border-bottom: 1px solid var(--line);
+            font-size: clamp(16px, 1.2vw, 22px); font-weight: 700; color: #d7dbe5;
+        }
+        .check-list li:last-child { border-bottom: none; }
+        .check-list li::before {
+            content: "✔"; flex-shrink: 0; width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: rgba(96, 211, 148, 0.18);
+            color: var(--green); font-size: 16px; font-weight: 900;
+        }
+
+        /* Tool loop pills */
+        .tool-loop {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 28px;
+        }
+        .tool-pill {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 18px;
+            border: 1px solid var(--line); border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            font-size: clamp(15px, 1.1vw, 20px); font-weight: 700;
+        }
+        .tool-pill .icon {
+            width: 28px; height: 28px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 900; flex-shrink: 0;
+        }
+        .icon-read   { background: rgba(114, 183, 255, 0.18); color: var(--blue); }
+        .icon-write  { background: rgba(255, 122, 26, 0.18);  color: var(--orange-2); }
+        .icon-run    { background: rgba(96, 211, 148, 0.18);  color: var(--green); }
+        .icon-list   { background: rgba(255,255,255, 0.08);   color: var(--muted); }
+
+        .quote-card {
+            width: min(1040px, 92vw); margin: 0 auto; padding: 54px;
+            border: 1px solid var(--line); border-radius: 28px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.095), rgba(255,255,255,0.035));
+            box-shadow: var(--shadow);
+        }
+        .quote-card p {
+            margin: 0; color: var(--text);
+            font-size: clamp(30px, 3.5vw, 58px); line-height: 1.12; font-weight: 900;
+        }
+
+        .footer {
+            width: min(1500px, calc(100vw - 128px)); margin: 0 auto;
+            display: grid; grid-template-columns: 1fr auto; gap: 20px;
+            align-items: end; color: var(--soft); font-size: 13px; font-weight: 700;
+        }
+        .notes { max-width: 1050px; min-height: 34px; opacity: 0; transition: opacity 220ms ease; }
+        body.show-notes .notes { opacity: 1; }
+        .slide-number { white-space: nowrap; }
+
+        .progress { position: fixed; left: 0; bottom: 0; z-index: 20; width: 100%; height: 6px; background: rgba(255,255,255,0.08); }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--orange), var(--orange-2), var(--blue)); transition: width 280ms ease; }
+
+        .help {
+            position: fixed; right: 18px; top: 18px; z-index: 30; display: flex; gap: 8px;
+            color: rgba(255,255,255,0.58); font-size: 12px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .key { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: rgba(0,0,0,0.35); }
+
+        @media (max-width: 980px) {
+            .slide { padding: 36px 26px 62px; }
+            .slide-inner, .slide-inner.reverse { grid-template-columns: 1fr; gap: 22px; align-content: center; }
+            .visual.stack { height: 44vh; }
+            .footer { width: calc(100vw - 52px); }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="deck" id="deck">
+
+        <!-- SLIDE 1: Hook -->
+        <section class="slide active"
+            data-time="0:00–0:30"
+            data-notes="Stop copy-pasting AI suggestions. Meet the AI Agent in Rosetta DBT Studio — your autonomous partner for the full dbt lifecycle. It doesn't just chat. It reads your project, writes your models, and runs your commands.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">AI Agent</div>
+                    <h1>Your Autonomous <span class="accent">dbt</span> Engineer</h1>
+                    <p class="subtitle">Not just a chatbot. A tool-loop engine that reads, writes, and runs — inside your real project.</p>
+                    <div class="hero-badges">
+                        <span class="badge">Vercel AI SDK v6</span>
+                        <span class="badge">OpenAI · Anthropic · Gemini</span>
+                        <span class="badge">Ollama Local</span>
+                    </div>
+                </div>
+                <div class="hero-logo">
+                    <img class="logo-mark" src="logo_hero.png" alt="Rosetta DBT Studio">
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 2: Agent Mode Active -->
+        <section class="slide"
+            data-time="0:00–0:30"
+            data-notes="The Agent panel lives right inside the workspace. You write a prompt, choose Code mode, select your provider, and send. The agent starts thinking immediately.">
+            <div class="slide-inner reverse">
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Agent Mode: Code</span>
+                        <img src="agent-mode-active.png" alt="Agent mode active in the workspace">
+                    </div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">One Workspace</div>
+                    <h2>Code, files, and AI in a <span class="accent">single</span> view</h2>
+                    <p class="detail-copy">The file explorer, SQL editor, and AI Agent panel all share the same window. No tab-switching. No copy-pasting. Just describe what you need and the agent gets to work inside your actual project.</p>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 3: Thinking in Tools -->
+        <section class="slide"
+            data-time="0:30–1:15"
+            data-notes="Watch the agent in action. With a single prompt — create a staging model for my customers table — it lists the directory, reads the schema files, writes the SQL, runs dbt to confirm it compiles, and reads the logs. Every step is visible in real time.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">Intelligence</div>
+                    <h2>Thinking in <span class="accent">Tools</span></h2>
+                    <p class="subtitle">The Agent reasons step by step using native dbt and filesystem tools — all visible in real time.</p>
+                    <div class="tool-loop">
+                        <div class="tool-pill"><span class="icon icon-list">☰</span> Lists directories to understand your project structure</div>
+                        <div class="tool-pill"><span class="icon icon-read">◎</span> Reads schema and config files for context</div>
+                        <div class="tool-pill"><span class="icon icon-write">✎</span> Writes the dbt model SQL and YAML</div>
+                        <div class="tool-pill"><span class="icon icon-run">▶</span> Runs dbt to confirm the model compiles</div>
+                    </div>
+                </div>
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Interleaved execution</span>
+                        <img src="agent-thinking-tools.png" alt="Agent reasoning with tool calls">
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 4: Auto-Open Files -->
+        <section class="slide"
+            data-time="0:30–1:15"
+            data-notes="Files the agent writes open automatically in Monaco tabs. You can see the code the moment it is created, review it side by side with the agent's explanation, and choose to Keep or Discard the changes.">
+            <div class="slide-inner reverse">
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Auto-opens in Monaco</span>
+                        <img src="agent-auto-write-file.png" alt="File auto-opened by the agent">
+                    </div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">Immediate Review</div>
+                    <h2>Files open <span class="accent">automatically</span></h2>
+                    <p class="detail-copy">Every file the Agent writes or edits appears instantly as a Monaco tab. Review the code the moment it is created. Then decide — click <strong>Keep</strong> to accept the changes or <strong>Discard</strong> to roll them back. You stay in complete control.</p>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 5: Terminal Gate -->
+        <section class="slide"
+            data-time="1:15–1:45"
+            data-notes="Autonomy requires trust. Before running any terminal command — like dbt run — the Agent pauses and shows you exactly what it wants to execute. You click Allow or Deny. It never runs anything behind your back.">
+            <div class="slide-inner">
+                <div class="copy">
+                    <div class="eyebrow">Security</div>
+                    <h2>Human <span class="accent">in the Loop</span></h2>
+                    <p class="subtitle">The Terminal Confirmation Gate means the Agent never runs a command without your explicit approval.</p>
+                    <ul class="check-list">
+                        <li>Shows exactly the command it wants to run</li>
+                        <li>Waits for Allow or Deny before proceeding</li>
+                        <li>Credentials stored in your OS secure keychain</li>
+                        <li>Path and extension validation on every file write</li>
+                    </ul>
+                </div>
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Allow or Deny</span>
+                        <img src="agent-terminal-confirm.png" alt="Terminal confirmation gate">
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 6: Skills & MCP side by side -->
+        <section class="slide"
+            data-time="1:45–2:30"
+            data-notes="Every team works differently. The Skills Library lets you teach the Agent your naming conventions, SQL style guides, or any repeatable workflow — just write a Markdown file. The MCP Servers panel connects it to external documentation and tools like Rosetta CLI, dbt Core, DuckDB, and DuckLake.">
+            <div class="slide-inner full">
+                <div class="copy">
+                    <div class="eyebrow">Extensibility</div>
+                    <h2>Your Standards, <span class="accent">Automated</span></h2>
+                    <p class="detail-copy">Teach the Agent your team's conventions using the <strong>Skills Library</strong> — import skills from GitHub in one click. Connect to external documentation and tool servers using <strong>MCP Servers</strong>: Rosetta CLI, dbt Core, DuckDB, and DuckLake are built in.</p>
+                </div>
+                <div class="grid-visual" style="margin-top: 28px;">
+                    <div class="mini-shot">
+                        <img src="agent-skills-library.png" alt="Skills library UI">
+                        <span class="caption">Skills Library — import from GitHub</span>
+                    </div>
+                    <div class="mini-shot">
+                        <img src="agent-mcp-settings.png" alt="MCP servers settings">
+                        <span class="caption">MCP Servers — Rosetta, dbt, DuckDB, DuckLake</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 7: Context Usage -->
+        <section class="slide"
+            data-time="2:30–3:00"
+            data-notes="The Agent tracks how much of its context window it is using in real time. You can see the breakdown at any moment: how many tokens are used by conversation, user files, skills, and MCP tools. When the window fills up, it automatically summarizes older messages so you never lose the thread.">
+            <div class="slide-inner reverse">
+                <div class="visual">
+                    <div class="screen-frame">
+                        <span class="screen-label">Context Window Usage</span>
+                        <img src="agent-context-usage.png" alt="Context usage popup">
+                    </div>
+                </div>
+                <div class="copy">
+                    <div class="eyebrow">Smart Context</div>
+                    <h2>Always <span class="accent">aware</span> of its limits</h2>
+                    <p class="subtitle">Real-time token tracking, automatic summarization, and intelligent message prioritization.</p>
+                    <div class="callouts">
+                        <div class="callout">Conversation tokens</div>
+                        <div class="callout">User file context</div>
+                        <div class="callout">MCP tool tokens</div>
+                        <div class="callout">Auto-compaction at 85%</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+        <!-- SLIDE 8: Closing CTA -->
+        <section class="slide"
+            data-time="3:00"
+            data-notes="Rosetta DBT Studio's AI Agent brings the full dbt engineering lifecycle into one intelligent, secure, and extensible desktop workspace. Download it today for macOS, Windows, or Linux. Star us on GitHub and build with us.">
+            <div class="slide-inner full">
+                <div class="quote-card">
+                    <div class="hero-logo">
+                        <img class="logo-mark" src="logo_hero.png" alt="Rosetta DBT Studio">
+                    </div>
+                    <p style="text-align:center; margin-top:32px;">
+                        The AI Agent for <span class="accent">dbt</span>.<br>
+                        Download for macOS, Windows, and Linux.<br>
+                        <span style="color: var(--soft); font-size: 0.6em;">github.com/rosettadb/dbt-studio</span>
+                    </p>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="notes"></div>
+                <div class="slide-number"></div>
+            </footer>
+        </section>
+
+    </main>
+
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+    <script>
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        const progressFill = document.getElementById("progressFill");
+        let currentSlide = 0;
+
+        function updateDeck() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove("active", "prev");
+                if (index === currentSlide) slide.classList.add("active");
+                else if (index < currentSlide) slide.classList.add("prev");
+                const notes = slide.querySelector(".notes");
+                const sn = slide.querySelector(".slide-number");
+                if (notes) notes.textContent = slide.dataset.notes || "";
+                if (sn) sn.textContent = `${index + 1} / ${slides.length}`;
+            });
+            progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide()     { currentSlide = Math.min(currentSlide + 1, slides.length - 1); updateDeck(); }
+        function previousSlide() { currentSlide = Math.max(currentSlide - 1, 0);                 updateDeck(); }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") { e.preventDefault(); nextSlide(); }
+            if (e.key === "ArrowLeft"  || e.key === "Backspace")              { e.preventDefault(); previousSlide(); }
+            if (e.key.toLowerCase() === "n") document.body.classList.toggle("show-notes");
+            if (e.key.toLowerCase() === "f") {
+                !document.fullscreenElement
+                    ? document.documentElement.requestFullscreen?.()
+                    : document.exitFullscreen?.();
+            }
+            if (e.key === "Home") { currentSlide = 0; updateDeck(); }
+            if (e.key === "End")  { currentSlide = slides.length - 1; updateDeck(); }
+        });
+
+        document.getElementById("deck").addEventListener("click", (e) => {
+            e.clientX > window.innerWidth / 2 ? nextSlide() : previousSlide();
+        });
+
+        updateDeck();
+    </script>
+</body>
+</html>

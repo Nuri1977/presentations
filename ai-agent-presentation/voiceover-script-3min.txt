@@ -1,0 +1,99 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: The AI Agent (3 min)
+==========================================================================
+8 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+==========================================================================
+
+[SLIDE 1 — "Your Autonomous dbt Engineer" — logo_hero.png]
+
+Stop copy-pasting AI suggestions into your editor.
+Meet the AI Agent in Rosetta DBT Studio — your autonomous partner
+for the full dbt engineering lifecycle.
+This is not a chatbot.
+It is a tool-loop engine that reads your project, writes your models,
+and runs your commands — inside your real workspace.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "Code, files, and AI in a single view" — agent-mode-active.png]
+
+The file explorer, SQL editor, and AI Agent panel all share the same window.
+No tab-switching. No extra tools.
+Just describe what you need, select your AI provider —
+OpenAI, Anthropic, Gemini, or a fully local Ollama model —
+and the Agent gets to work.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Thinking in Tools" — agent-thinking-tools.png]
+★ Hold this slide the longest — this is your hero moment.
+
+Watch the Agent in action.
+With a single prompt — "Create a staging model for my customers table" —
+the Agent starts by listing your project directories,
+reads the existing schema and config files,
+then drafts the staging SQL following dbt best practices.
+It edits the file, runs dbt to confirm the model compiles,
+and reads the logs.
+Every step is visible in real time, right inside the chat panel.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Files open automatically" — agent-auto-write-file.png]
+
+Every file the Agent writes opens automatically as a Monaco editor tab.
+You see the code the moment it is created.
+Then you decide — click Keep to accept the changes,
+or Discard to roll them back instantly.
+You are always in control.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "Human in the Loop" — agent-terminal-confirm.png]
+
+Autonomy requires trust.
+Before the Agent runs any terminal command, it pauses
+and shows you exactly what it wants to execute.
+You click Allow — or Deny.
+It never runs anything behind your back.
+All your warehouse credentials and API keys are stored
+in your operating system's secure keychain.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — "Your Standards, Automated" — agent-skills-library.png + agent-mcp-settings.png]
+
+Every team has its own way of working.
+You can teach the Agent your standards using the Skills Library —
+write a Markdown file with your naming conventions or SQL style guide,
+or import community skills from GitHub in one click.
+
+Need to connect to external documentation?
+The MCP Servers panel gives the Agent access to Rosetta CLI,
+dbt Core, DuckDB, and DuckLake documentation out of the box.
+Add your own servers with a single URL.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 7 — "Always aware of its limits" — agent-context-usage.png]
+
+As your sessions grow longer, the Agent tracks exactly
+how much of its context window is in use.
+You can see a live breakdown of conversation tokens,
+user files, and MCP tool data at any moment.
+When the context window approaches its limit,
+the Agent automatically summarizes older messages —
+so you never lose the thread of a complex session.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 8 — Closing CTA — logo_hero.png]
+
+Rosetta DBT Studio's AI Agent brings the full dbt engineering lifecycle
+into one intelligent, secure, and extensible desktop workspace.
+Download it today for macOS, Windows, or Linux.
+Star us on GitHub and help us build the future of analytics engineering together.
+
+==========================================================================
+END OF SCRIPT — ~3 minutes at natural speaking pace (130 wpm)
+==========================================================================
