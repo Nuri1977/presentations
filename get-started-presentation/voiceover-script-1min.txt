@@ -1,0 +1,61 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: Get Started in 60 Seconds (1 min)
+======================================================================================
+7 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+======================================================================================
+
+[SLIDE 1 — "From Zero to Running in 60 Seconds" — logo_hero.png]
+
+From zero to running in 60 seconds.
+Meet Rosetta DBT Studio — the fastest way to get your dbt project up and running.
+Create a new project, clone from GitHub, or import a folder.
+Pick your database. Start building.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "All your projects in one place" — project-list-screen.png]
+
+When you open Rosetta, you see all your dbt projects in one place.
+Click New Project to start fresh,
+or Clone from Git to bring in an existing repository.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Create your project" — new-project-form.png]
+
+Name your project, choose your database.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Pick your database" — connection-dropdown.png]
+
+Each connection type has smart defaults.
+Fill in your credentials, test the connection, and you're done.
+All credentials are stored securely in your system keychain.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "Clone from GitHub" — clone-modal.png]
+
+Or skip the setup entirely. Clone from GitHub.
+Paste a repository URL, select your branch,
+configure your database connection, and you're ready to work.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — "Start building" — dbt-editor-opened.png]
+
+Your dbt workspace is ready.
+File explorer, SQL editor, integrated terminal.
+Write models, run tests, and see results in real time.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 7 — Closing CTA — logo_hero.png]
+
+Download Rosetta DBT Studio today. Star us on GitHub.
+
+
+======================================================================================
+END OF SCRIPT — ~60 seconds at natural speaking pace (130 wpm)
+======================================================================================
