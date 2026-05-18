@@ -1,0 +1,87 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: Jaffle Shop AI Workflow (2 min)
+=======================================================================================
+7 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+=======================================================================================
+
+[SLIDE 1 — "Build a Complete dbt Project with AI" — logo_hero.svg]
+
+Most dbt projects start the same way:
+raw data, messy schemas, and hours of manual model writing.
+
+What if you could skip that?
+
+Meet the **Rosetta DBT Studio AI Agent** — your partner for building production-ready dbt projects in minutes.
+
+Today, we're building a complete Jaffle Shop project from scratch.
+Import, connect, and let AI do the heavy lifting.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+Step one: **Import Jaffle Shop from GitHub.**
+
+Rosetta clones the entire repository — raw data models, tests, configurations, everything.
+Your project structure is ready to go.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Connect Your Database" — database-connection-setup.png]
+
+Step two: **Connect your database.**
+
+Choose DuckDB, PostgreSQL, Snowflake, or any supported warehouse.
+Fill in your credentials, test the connection.
+Smart defaults handle the rest.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Ask the AI Agent" — ai-agent-prompt.png]
+
+Step three: **Tell the AI Agent what you need.**
+
+"Create staging models for customers, orders, and payments.
+Then build mart models for revenue and customer metrics."
+
+That's it. One prompt. The Agent takes it from here.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "AI Generates Staging & Mart Models" — ai-generating-staging-models.png]
+
+Watch the Agent work.
+
+It reads your raw tables, understands the schema, and writes clean staging SQL.
+Builds mart models with business logic and joins.
+Adds dbt YAML configs with descriptions and tests.
+Runs dbt compile to validate everything compiles.
+
+All in real time. All visible in the chat panel.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — "Your Project is Ready" — full-project-editor.png]
+
+Your complete dbt project is ready.
+
+All models created, tested, and compiled.
+File explorer shows your full DAG.
+Run dbt test to validate everything works.
+
+What took hours of manual work took minutes with AI.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 7 — Closing CTA — logo_hero.svg]
+
+Build better dbt projects faster.
+
+Let the AI Agent handle the repetitive work.
+You focus on strategy and business logic.
+
+Download **Rosetta DBT Studio** today.
+Star us on GitHub.
+
+======================================================================================
+END OF SCRIPT — ~2 minutes at natural speaking pace (130 wpm)
+======================================================================================
