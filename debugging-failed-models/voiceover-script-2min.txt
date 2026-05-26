@@ -1,0 +1,68 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: Debugging Failed Models (2 min)
+====================================================================================
+6 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+====================================================================================
+
+[SLIDE 1 — "Debug dbt Errors in Seconds" — logo_hero.svg]
+
+You run dbt. A model fails.
+
+Now what?
+
+In most tools, you're stuck. You dig through logs, hunt for the error, try to understand what went wrong.
+
+In **Rosetta DBT Studio**, debugging is fast.
+
+You see the error. You read the logs. You fix the SQL. You re-run. Done.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "A Model Fails" — model-fails-error.png]
+
+Let's say a model fails.
+
+The terminal shows an error. Something went wrong in the SQL.
+But where? And why?
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Read the Logs" — inspect-logs-compiled-sql.png]
+
+Rosetta shows you everything.
+
+The full error message. The compiled SQL that actually ran. The exact line where it broke.
+
+No guessing. No hunting through logs. It's all right there.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Fix and Re-Run" — fix-and-rerun.png]
+
+You see the problem. You edit the model.
+
+Fix the SQL. Save the file.
+
+Re-run dbt. Instant feedback.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "Model Succeeds" — success-model-runs.png]
+
+Your model runs. Tests pass. Data is clean.
+
+What took hours of debugging in other tools took minutes in Rosetta.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — Closing CTA — logo_hero.svg]
+
+Debug faster. Ship sooner.
+
+Spend less time debugging, more time building.
+
+Download **Rosetta DBT Studio** today.
+
+====================================================================================
+END OF SCRIPT — ~2 minutes at natural speaking pace (130 wpm)
+====================================================================================
