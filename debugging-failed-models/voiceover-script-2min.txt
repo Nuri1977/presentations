@@ -8,50 +8,74 @@ Press the right arrow key (or spacebar) in the HTML presentation to advance.
 
 You run dbt. A model fails.
 
-Now what?
+Traditionally, you'd open a terminal, scroll through hundreds of log lines,
+try to find the error, then open the compiled SQL in a separate folder,
+cross-reference the line number, and guess what went wrong.
 
-In most tools, you're stuck. You dig through logs, hunt for the error, try to understand what went wrong.
+That process can take 20, 30, even 60 minutes.
 
-In **Rosetta DBT Studio**, debugging is fast.
-
-You see the error. You read the logs. You fix the SQL. You re-run. Done.
+In **Rosetta DBT Studio**, it takes seconds.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 2 — "A Model Fails" — model-fails-error.png]
 
-Let's say a model fails.
+Here's a real example.
 
-The terminal shows an error. Something went wrong in the SQL.
-But where? And why?
+We have a staging model — stg_customers.
+We added a column reference that doesn't exist in the source table.
+
+We run dbt. It fails immediately.
+
+Rosetta surfaces the error right in the workspace —
+a red error panel appears instantly with the full failure message.
+No need to scroll. No need to search.
+The error is right in front of you.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 3 — "Read the Logs" — inspect-logs-compiled-sql.png]
 
-Rosetta shows you everything.
+Now look at what Rosetta tells you.
 
-The full error message. The compiled SQL that actually ran. The exact line where it broke.
+The exact error: "Binder Error — Referenced column email_address not found in FROM clause."
+The candidate bindings: name and id — the columns that actually exist.
+The exact line: "LINE 13 — email_address as customer_email."
+And the compiled SQL path — so you can inspect exactly what dbt executed.
 
-No guessing. No hunting through logs. It's all right there.
+In a traditional setup, you'd need to:
+open the target/compiled folder manually,
+find the right file,
+cross-reference the log output,
+and figure out which column was wrong.
+
+Rosetta gives you all of that in one place, instantly.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 4 — "Fix and Re-Run" — fix-and-rerun.png]
 
-You see the problem. You edit the model.
+Now you know exactly what's wrong.
 
-Fix the SQL. Save the file.
+The source schema reference was incorrect.
+You fix it directly in the editor — one line change.
+Save the file. Re-run dbt.
 
-Re-run dbt. Instant feedback.
+No context switching. No terminal juggling.
+Everything happens in the same window.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 5 — "Model Succeeds" — success-model-runs.png]
 
-Your model runs. Tests pass. Data is clean.
+The model runs successfully.
 
-What took hours of debugging in other tools took minutes in Rosetta.
+Green. Clean. Done.
+
+What used to mean opening multiple tools,
+hunting through log files,
+and manually inspecting compiled SQL —
+is now a single, focused workflow inside Rosetta.
 
 ─────────────────────────────────────────────────────────────────────────
 
