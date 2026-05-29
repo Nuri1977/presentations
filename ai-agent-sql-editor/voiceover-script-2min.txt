@@ -1,0 +1,101 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: AI Agent in SQL Editor (2 min)
+====================================================================================
+7 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+====================================================================================
+
+[SLIDE 1 — "Your AI Analyst, Inside the SQL Editor" — logo_hero.svg]
+
+Writing SQL is one thing.
+Understanding your data — knowing which tables exist, what columns mean,
+how to join them correctly — that's the hard part.
+
+Meet the AI Agent in Rosetta's SQL Editor.
+
+It knows your schema. It reads your current query.
+It can execute SQL and inspect the results.
+All without leaving the editor.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "SQL Editor and AI Side by Side" — sql-editor-ai-panel.png]
+
+The AI Agent panel lives right next to your SQL editor.
+
+Schema browser on the left.
+SQL editor in the center.
+AI Agent on the right.
+
+No tab switching. No copy-pasting queries into a chat window.
+Everything in one workspace.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Ask Questions About Your Data" — ask-mode-schema.png]
+
+Start in Ask mode.
+
+Ask the Agent anything about your data.
+"What tables are available?"
+"What does this column mean?"
+"How should I join orders to customers?"
+
+The Agent explores your schema and answers in context.
+Read-only. Safe. No risk of accidentally running anything.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Generate, Execute, Inspect" — code-mode-execute.png]
+
+Switch to Code mode and the Agent goes further.
+
+Describe what you need.
+The Agent writes the SQL, appends it to the editor,
+executes it against your database,
+and reads the results — all in one loop.
+
+Multi-step tasks run end to end without stopping.
+No "shall I continue?" — it just does the work.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "You Approve Every Write Operation" — dml-approval-gate.png]
+
+Autonomy requires trust.
+
+Before running any INSERT, UPDATE, DELETE, or DDL statement,
+the Agent pauses and shows you exactly what it wants to execute.
+
+You click Allow — or Deny.
+
+It never modifies your data without your explicit permission.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — "Agent Reads the Results" — agent-reads-results.png]
+
+After executing a query, the Agent reads the result pane.
+
+Rows, columns, row count, duration — it sees everything you see.
+
+It uses that context to answer follow-up questions,
+continue multi-step tasks,
+or tell you exactly what the data means.
+
+This is a closed loop. The Agent acts, observes, and adapts.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 7 — Closing CTA — logo_hero.svg]
+
+Schema-aware. Query-aware. Result-aware.
+
+The AI Agent in Rosetta DBT Studio is the analyst
+that actually understands your SQL workspace.
+
+Download Rosetta DBT Studio today.
+Star us on GitHub.
+
+====================================================================================
+END OF SCRIPT — ~2 minutes at natural speaking pace (130 wpm)
+====================================================================================
