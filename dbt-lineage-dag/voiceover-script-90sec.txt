@@ -47,6 +47,38 @@ column by column.
 ─────────────────────────────────────────────────────────────────────────
 
 
+Zoom in to focus.
+
+Zoom in to see specific clusters clearly.
+Pan across the canvas to follow connections.
+
+Navigate your DAG with ease.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+Drag nodes to reorganize.
+
+If nodes overlap or relationships get tangled,
+just drag them to better positions.
+
+Rearrange your DAG on the fly
+to create the perfect view for your team.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+Integrates with dbt docs.
+
+Run dbt docs generate and open the docs site.
+The full lineage graph appears right there,
+validated and visualized with official dbt tooling.
+
+Everything Rosetta shows you maps directly to what dbt sees.
+
+─────────────────────────────────────────────────────────────────────────
+
+
 Your pipeline. Visualized.
 
 Stop guessing how your models connect.
