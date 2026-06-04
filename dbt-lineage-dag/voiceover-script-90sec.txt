@@ -1,0 +1,57 @@
+
+
+How many models are in your dbt project?
+Do you know what breaks if you change one?
+
+With Rosetta DBT Studio, you don't have to guess.
+
+Open any model, click the Lineage tab,
+and see your data pipeline as a live interactive graph.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+This is the Lineage view.
+
+Open a model file, click the Lineage tab at the bottom,
+and Rosetta renders the graph instantly.
+
+Raw sources on the left. Your model in the center.
+Downstream consumers and tests on the right.
+
+Use the Depth selector to control how many hops to show —
+1, 2, 3, or 4 levels deep.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+Click any node to inspect it.
+
+The details panel shows you the model description,
+what it depends on, and its columns.
+
+You can see exactly where the data comes from
+and what depends on this model downstream.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+Click Load Lineage to go even deeper.
+
+Rosetta maps column-level lineage —
+showing exactly which upstream columns feed into each output column.
+
+Trace your data from raw source to final mart,
+column by column.
+
+─────────────────────────────────────────────────────────────────────────
+
+
+Your pipeline. Visualized.
+
+Stop guessing how your models connect.
+Open the Lineage tab in Rosetta DBT Studio and see it all at a glance.
+
+Download today for macOS, Windows, or Linux.
+Star us on GitHub.
+
