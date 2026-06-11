@@ -1,0 +1,106 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: AI Agent in Notebooks (2 min)
+====================================================================================
+7 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+====================================================================================
+
+[SLIDE 1 — "Your AI Analyst, Inside the Notebook" — logo_hero.svg]
+
+Data analysis is non-linear.
+You explore, you query, you find something unexpected,
+and you need to follow five threads at once.
+
+That's what Notebooks are for.
+
+And now, the AI Agent lives right inside them.
+It reads your cells. It understands your dbt models.
+It executes SQL, reads the results, and builds on what it just found.
+
+This is iterative analysis with an AI that actually keeps up.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "One Notebook for Everything" — notebook-canvas.png]
+
+A Rosetta notebook is a single canvas.
+
+SQL cells, dbt model references, markdown notes,
+result tables — all in one scrollable view.
+
+You move from question to query to answer
+without switching tools or losing your train of thought.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Ask About Any Cell" — notebook-ask-mode.png]
+
+In Ask mode, you can ask the Agent anything about your notebook.
+
+Highlight a cell — a query, a result, a model reference —
+and ask in plain language.
+
+"Why is revenue dropping in October?"
+"What does this JOIN actually do?"
+"Is this aggregation correct?"
+
+The Agent reads the cell and the surrounding context
+before it answers. It's not guessing — it's reading your actual data.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Describe It. Get a Cell." — notebook-generate-cell.png]
+
+When you need a new query, just describe it.
+
+The Agent writes a new SQL cell, wires up the correct ref() references
+for your dbt models, and drops it straight into your notebook.
+
+It knows your project schema.
+It follows the grain of what you're already building.
+No copy-pasting from a chat window.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "Run. Read. Keep Going." — notebook-execute-iterate.png]
+
+This is where it gets powerful.
+
+The Agent doesn't stop at writing SQL.
+It executes the cell, reads the result, and keeps going.
+
+If the data looks off, it refines the query.
+If a follow-up step is needed, it writes the next cell automatically.
+
+Multi-cell workflows run end to end —
+with the full context of everything in your notebook.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — "You Approve Every Write Cell" — notebook-approval-gate.png]
+
+Autonomy only works if it's safe.
+
+Read queries execute freely.
+But any cell that modifies data — INSERT, UPDATE, DELETE, DDL —
+pauses and shows you exactly what it wants to run.
+
+You click Allow. Or Deny.
+
+It never writes to your data without your explicit permission.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 7 — Closing CTA — logo_hero.svg]
+
+Cell-aware. Schema-aware. Result-aware.
+
+The AI Agent in Rosetta Notebooks is the analyst
+that thinks alongside you —
+keeps track of where you've been,
+and helps you get to answers faster.
+
+Download Rosetta DBT Studio.
+
+====================================================================================
+END OF SCRIPT — ~2 minutes at natural speaking pace (130 wpm)
+====================================================================================
