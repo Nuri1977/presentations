@@ -1,0 +1,67 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: Your dbt Project, Explained (~60 sec)
+===========================================================================================
+5 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+===========================================================================================
+
+[SLIDE 1 — "Your dbt Project, Explained" — logo_hero.svg]
+
+Your dbt project has dozens of models.
+Maybe hundreds.
+
+Do you actually know what each one does?
+Most teams don't — they just hope the name is descriptive enough.
+
+The AI Agent in Rosetta changes that.
+Point it at any model, any metric, any fact table — and just ask.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "Ask What Any Model Actually Does" — agent-explain-model.png]
+
+"What does products calculate? Walk me through the logic."
+
+The Agent opens the model, reads the SQL, traces every ref(), follows every join,
+and explains it back to you in plain language.
+
+No SQL archaeology. No asking the person who wrote it three years ago.
+Just ask.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Trace Any Metric Upstream" — agent-lineage-query.png]
+
+"Which models touch revenue?"
+
+The Agent traces the full lineage —
+every source, every staging model, every intermediate —
+and maps the entire path to your number.
+
+Impact analysis that used to take an hour,
+done in seconds.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Understand the Grain Before You Join" — agent-grain-question.png]
+
+"What's the grain of fct_orders?
+Can I join it to fct_sessions without a fan-out?"
+
+The Agent reads the table definitions,
+tells you the grain,
+and warns you about the fan-out before you write a single line.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — Closing CTA — logo_hero.svg]
+
+Documentation that writes itself.
+
+Every question answered. Every model explained.
+Your entire dbt project, understood — in plain language.
+
+Download Rosetta DBT Studio.
+
+===========================================================================================
+END OF SCRIPT — ~60 seconds at natural speaking pace (130 wpm)
+===========================================================================================
