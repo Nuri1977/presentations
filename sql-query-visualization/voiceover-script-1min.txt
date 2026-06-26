@@ -1,0 +1,43 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: SQL Query Visualization (1 min)
+======================================================================================
+4 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+======================================================================================
+
+[SLIDE 1 — "Your Data, Instantly Visualized" — Hook]
+
+Your SQL results shouldn't live in a boring grid.
+In Rosetta DBT Studio, the moment you run a query,
+you don't just get rows — you get insight.
+A full SQL editor, live schema browser,
+and instant result visualization — all in one place.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "Write SQL. See Results." — sql-editor-query-data.png]
+
+Connect to DuckLake, DuckDB, or any supported warehouse.
+Type your query. Hit Run.
+Results appear instantly — with schema awareness,
+autocomplete, and syntax highlighting built in.
+No context-switching. No copy-pasting into another tool.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Table, Chart, Export" — sql-visualization-chart.png]
+
+One click switches your results from a table grid to a bar chart.
+Configure your X and Y axes right in the panel,
+then hit Export — all without leaving the editor.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — Closing CTA — logo]
+
+SQL that thinks. Results that show.
+Download Rosetta DBT Studio for macOS, Windows, or Linux.
+Star us on GitHub and help us build the future of analytics engineering.
+
+======================================================================================
+END OF SCRIPT — ~1 minute at natural speaking pace (130 wpm, ~135 words)
+======================================================================================
