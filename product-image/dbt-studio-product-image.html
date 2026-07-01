@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Studio Product Image</title>
+    <style>
+        :root {
+            --bg: #05070b;
+            --panel: rgba(13, 17, 24, 0.82);
+            --panel-2: rgba(18, 22, 31, 0.78);
+            --line: rgba(255, 122, 26, 0.78);
+            --soft-line: rgba(255, 255, 255, 0.13);
+            --text: #ffffff;
+            --muted: #c9d0dc;
+            --dim: #7f8797;
+            --orange: #ff7416;
+            --orange-2: #ff9d3b;
+            --green: #61d26f;
+            --blue: #62b8ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .poster {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            min-width: 1180px;
+            min-height: 780px;
+            padding: 8px 0 18px;
+            background:
+                radial-gradient(circle at 9% 5%, rgba(255, 120, 22, 0.26), transparent 25%),
+                radial-gradient(circle at 72% 19%, rgba(84, 171, 255, 0.17), transparent 25%),
+                radial-gradient(circle at 91% 7%, rgba(255, 101, 19, 0.20), transparent 18%),
+                radial-gradient(circle at 82% 91%, rgba(255, 120, 22, 0.13), transparent 25%),
+                linear-gradient(135deg, #05070b 0%, #080c13 52%, #030509 100%);
+        }
+
+        .poster::before {
+            position: absolute;
+            inset: 0;
+            content: "";
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.042) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.042) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(circle at 60% 42%, black, transparent 78%);
+        }
+
+        .poster::after {
+            position: absolute;
+            inset: 0;
+            content: "";
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(0,0,0,0.38), transparent 36%, rgba(0,0,0,0.28)),
+                linear-gradient(0deg, rgba(0,0,0,0.42), transparent 38%, rgba(0,0,0,0.22));
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 2;
+            width: min(100% - 92px, 1440px);
+            height: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-rows: 292px minmax(0, 1fr) 68px 88px 30px;
+            gap: 10px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 14px;
+            min-height: 0;
+        }
+
+        .hero-title {
+            margin: 42px 0 0;
+            font-size: clamp(36px, 3.45vw, 52px);
+            line-height: 0.94;
+            letter-spacing: 0;
+            font-weight: 930;
+        }
+
+        .title-line {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            white-space: nowrap;
+        }
+
+        .title-logo {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 auto;
+            border-radius: 10px;
+            object-fit: contain;
+            filter: drop-shadow(0 14px 30px rgba(255, 116, 22, 0.38));
+        }
+
+        .accent {
+            display: inline-block;
+            color: var(--orange);
+            background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 42px rgba(255, 116, 22, 0.26);
+        }
+
+        .subtitle {
+            margin: 16px 0 0;
+            max-width: 540px;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.34;
+            font-weight: 520;
+        }
+
+        .announcement {
+            position: absolute;
+            top: 72px;
+            right: -64px;
+            display: grid;
+            place-items: center;
+            width: 174px;
+            height: 92px;
+            border: 2px solid var(--orange);
+            border-radius: 8px;
+            background:
+                radial-gradient(circle at 50% -20%, rgba(255, 184, 80, 0.42), transparent 62%),
+                linear-gradient(180deg, rgba(178, 56, 12, 0.94), rgba(83, 23, 12, 0.90));
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+                0 0 28px rgba(255, 91, 15, 0.44),
+                0 18px 44px rgba(0, 0, 0, 0.42);
+            text-align: center;
+        }
+
+        .announcement span {
+            display: block;
+            font-size: 18px;
+            line-height: 1.1;
+            font-weight: 890;
+        }
+
+        .announcement strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 27px;
+            line-height: 1;
+            font-weight: 940;
+        }
+
+        .product-window {
+            align-self: stretch;
+            width: 100%;
+            margin-left: 0;
+            height: 100%;
+            overflow: visible;
+            box-shadow:
+                0 34px 92px rgba(0,0,0,0.50),
+                0 0 72px rgba(66, 156, 255, 0.16);
+        }
+
+        .product-shot {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 18%;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .feature-card {
+            display: grid;
+            grid-template-columns: 74px 1fr;
+            gap: 12px;
+            padding: 14px 14px 13px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018)),
+                rgba(7, 10, 15, 0.82);
+            box-shadow: 0 12px 34px rgba(0,0,0,0.30);
+            overflow: hidden;
+        }
+
+        .feature-icon {
+            width: 62px;
+            height: 62px;
+            align-self: center;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 116, 22, 0.42);
+            border-radius: 8px;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(255, 157, 59, 0.26), transparent 54%),
+                rgba(255,255,255,0.045);
+            color: var(--orange-2);
+            font-size: 30px;
+            font-weight: 850;
+        }
+
+        .feature-icon img {
+            max-width: 38px;
+            max-height: 38px;
+            object-fit: contain;
+        }
+
+        .feature-icon.electron-icon {
+            border-color: rgba(127, 219, 255, 0.48);
+            background:
+                radial-gradient(circle at 50% 50%, rgba(127, 219, 255, 0.18), transparent 62%),
+                rgba(255,255,255,0.045);
+            color: #9feaf9;
+        }
+
+        .electron-logo {
+            width: 44px;
+            height: 44px;
+            overflow: visible;
+            filter: drop-shadow(0 0 10px rgba(127, 219, 255, 0.38));
+        }
+
+        .electron-logo ellipse,
+        .electron-logo circle {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.35;
+        }
+
+        .electron-logo circle {
+            fill: currentColor;
+            stroke: none;
+        }
+
+        .lineage-icon {
+            border-color: rgba(255, 255, 255, 0.32);
+            background:
+                radial-gradient(circle at 70% 65%, rgba(97, 210, 111, 0.18), transparent 48%),
+                rgba(255,255,255,0.045);
+            color: #f4f7fb;
+        }
+
+        .lineage-logo {
+            width: 48px;
+            height: 48px;
+            overflow: visible;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        .lineage-logo path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .lineage-logo circle {
+            fill: #111820;
+            stroke: currentColor;
+            stroke-width: 3;
+        }
+
+        .lineage-logo .active-node {
+            fill: var(--green);
+            stroke: var(--green);
+        }
+
+        .agent-image {
+            width: 66px;
+            height: 66px;
+            align-self: center;
+            border: 1px solid rgba(127, 219, 255, 0.38);
+            border-radius: 12px;
+            object-fit: cover;
+            object-position: 50% 50%;
+            filter: drop-shadow(0 0 14px rgba(127, 219, 255, 0.28));
+        }
+
+        .storage-icons {
+            align-self: center;
+            display: grid;
+            grid-template-columns: repeat(2, 30px);
+            grid-auto-rows: 21px;
+            gap: 5px 6px;
+            place-items: center;
+        }
+
+        .storage-icons img {
+            max-width: 28px;
+            max-height: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        .lake-icons {
+            align-self: center;
+            display: grid;
+            place-items: center;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lake-icons img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        .ai-icons {
+            align-self: center;
+            display: grid;
+            grid-template-columns: repeat(2, 30px);
+            grid-auto-rows: 24px;
+            gap: 6px;
+            place-items: center;
+        }
+
+        .ai-icons img {
+            max-width: 28px;
+            max-height: 22px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        .ai-icons img.white-provider-icon {
+            filter: invert(1) brightness(1.35) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+            opacity: 0.96;
+        }
+
+        .database-icons {
+            align-self: center;
+            display: grid;
+            grid-template-columns: repeat(2, 30px);
+            grid-auto-rows: 23px;
+            gap: 5px 6px;
+            place-items: center;
+        }
+
+        .database-icons img {
+            max-width: 28px;
+            max-height: 22px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        .fileflow-icon {
+            border-color: rgba(127, 219, 255, 0.42);
+            background:
+                radial-gradient(circle at 52% 45%, rgba(127, 219, 255, 0.14), transparent 58%),
+                rgba(255,255,255,0.045);
+        }
+
+        .fileflow-icon img {
+            filter: drop-shadow(0 0 12px rgba(127, 219, 255, 0.25));
+        }
+
+        .feature-card h2 {
+            margin: 0 0 5px;
+            color: var(--orange-2);
+            font-size: 19px;
+            line-height: 1.05;
+            letter-spacing: 0;
+            font-weight: 900;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #d7dce6;
+            font-size: 15px;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        .capability-bar {
+            display: grid;
+            grid-template-columns: repeat(8, auto);
+            align-items: center;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 0 18px;
+            border: 1px solid rgba(255, 116, 22, 0.48);
+            border-radius: 8px;
+            background: rgba(14, 17, 23, 0.82);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.28);
+        }
+
+        .capability {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #ecf1f7;
+            font-size: 16px;
+            font-weight: 620;
+            white-space: nowrap;
+        }
+
+        .capability:not(:last-child)::after {
+            content: "";
+            width: 1px;
+            height: 30px;
+            margin-left: 14px;
+            background: rgba(255,255,255,0.26);
+        }
+
+        .capability img {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .capability img.light-icon {
+            filter: invert(1) brightness(1.2);
+            opacity: 0.92;
+        }
+
+        .cap-symbol {
+            color: var(--orange-2);
+            font-size: 24px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .footer-strip {
+            display: grid;
+            grid-template-columns: 334px 1fr 390px;
+            gap: 16px;
+        }
+
+        .open-source,
+        .integration-strip,
+        .github-box {
+            border: 1px solid rgba(255, 116, 22, 0.42);
+            border-radius: 8px;
+            background: rgba(11, 14, 20, 0.80);
+            box-shadow: 0 15px 36px rgba(0,0,0,0.28);
+        }
+
+        .open-source {
+            display: grid;
+            grid-template-columns: 58px 1fr;
+            align-items: center;
+            padding: 12px 18px;
+        }
+
+        .heart {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 116, 22, 0.72);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,116,22,0.36), rgba(255,116,22,0.05));
+            color: var(--orange-2);
+            font-size: 24px;
+            box-shadow: 0 0 24px rgba(255,116,22,0.34);
+        }
+
+        .open-source strong {
+            display: block;
+            color: var(--orange-2);
+            font-size: 22px;
+            line-height: 1.05;
+            font-weight: 910;
+        }
+
+        .open-source span {
+            display: block;
+            margin-top: 2px;
+            color: #eef2f8;
+            font-size: 18px;
+            line-height: 1.05;
+        }
+
+        .integration-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 10px 16px;
+        }
+
+        .integration {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #f1f4f8;
+            font-size: 17px;
+            font-weight: 760;
+            white-space: nowrap;
+        }
+
+        .integration:not(:last-child)::after {
+            content: "";
+            width: 1px;
+            height: 34px;
+            margin-left: 12px;
+            background: rgba(255,255,255,0.25);
+        }
+
+        .integration img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .github-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+        }
+
+        .github-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #fff;
+            color: #05070b;
+            font-size: 25px;
+            font-weight: 960;
+        }
+
+        .github-box span {
+            display: block;
+            color: var(--orange-2);
+            font-size: 13px;
+            font-weight: 760;
+        }
+
+        .github-box strong {
+            display: block;
+            margin-top: 3px;
+            color: #fff;
+            font-size: 17px;
+            line-height: 1.1;
+            font-weight: 780;
+        }
+
+        .hashtags {
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            gap: 18px;
+            color: rgba(225, 232, 242, 0.72);
+            font-size: 16px;
+            font-weight: 560;
+        }
+
+        @media (max-width: 1280px), (max-height: 850px) {
+            .poster {
+                padding: 6px 0 14px;
+            }
+
+            .content-layer {
+                width: min(100% - 64px, 1440px);
+                grid-template-rows: 258px minmax(0, 1fr) 62px 78px 28px;
+                gap: 8px;
+            }
+
+            .hero-title {
+                margin-top: 28px;
+                font-size: 46px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+            }
+
+            .product-window {
+                width: 100%;
+            }
+
+            .product-shot {
+                height: 100%;
+            }
+
+            .feature-card h2 {
+                font-size: 17px;
+            }
+
+            .feature-card p {
+                font-size: 13px;
+            }
+
+            .capability {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="poster">
+        <div class="content-layer">
+            <section class="hero">
+                <div class="hero-copy">
+                    <h1 class="hero-title"><span class="title-line"><img class="title-logo" src="../../dbt-studio/assets/icon.png" alt="">Rosetta DBT Studio</span><br><span class="accent">v1.5.7 is live.</span></h1>
+                    <p class="subtitle">The all-in-one IDE for data engineers: build dbt models, explore SQL, manage connections, run AI agent workflows, visualize lineage, create notebooks, and ship pipelines from one desktop app.</p>
+                </div>
+
+                <aside class="announcement" aria-label="What's new">
+                    <span>WHAT'S NEW</span>
+                    <strong>AI + dbt</strong>
+                </aside>
+
+                <div class="product-window">
+                    <img class="product-shot" src="../dbt-project-explained/agent-explain-model.png" alt="DBT Studio AI agent explaining a dbt model">
+                </div>
+            </section>
+
+            <section class="feature-grid">
+                <article class="feature-card">
+                    <img class="agent-image" src="rosetta-ai-wizard.png" alt="Rosetta AI Wizard">
+                    <div><h2>AI Agent for dbt</h2><p>Ask the agent to create models, explain SQL, update YAML, run dbt commands, and reason over project context.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="database-icons">
+                        <img src="../../dbt-studio/assets/connectionIcons/postgresql.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/snowflake.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/bigquery.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/databricks.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/duckdb.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/redshift.png" alt="">
+                    </div>
+                    <div><h2>AI SQL editor</h2><p>Monaco autocomplete, schema browser, saved queries, result export, and an agent that writes SQL, runs queries, inspects results, and updates the editor.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon lineage-icon">
+                        <svg class="lineage-logo" viewBox="0 0 64 64" aria-hidden="true">
+                            <path d="M32 14v14M20 42l12-14 12 14"/>
+                            <circle cx="32" cy="14" r="7"/>
+                            <circle cx="20" cy="42" r="7"/>
+                            <circle class="active-node" cx="44" cy="42" r="7"/>
+                        </svg>
+                    </div>
+                    <div><h2>Visual dbt lineage</h2><p>Trace models, sources, exposures, and downstream impact before you change production logic.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon electron-icon">
+                        <svg class="electron-logo" viewBox="0 0 64 64" aria-hidden="true">
+                            <ellipse cx="32" cy="32" rx="27" ry="9" transform="rotate(0 32 32)"/>
+                            <ellipse cx="32" cy="32" rx="27" ry="9" transform="rotate(60 32 32)"/>
+                            <ellipse cx="32" cy="32" rx="27" ry="9" transform="rotate(120 32 32)"/>
+                            <circle cx="32" cy="32" r="4.5"/>
+                        </svg>
+                    </div>
+                    <div><h2>Electron desktop app</h2><p>Local-first Electron workspace for projects, profiles, credentials, DuckDB, and files in one focused desktop loop.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon fileflow-icon"><img src="../../dbt-studio/assets/icons/flow.svg" alt=""></div>
+                    <div><h2>Pipelines + FileFlow</h2><p>Define .rosetta pipeline.yml flows, visualize steps, and run Terraform, Rosetta, dbt seed, run, and test locally or in cloud.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="storage-icons">
+                        <img src="../../dbt-studio/assets/connectionIcons/s3_bucktet.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/azure_blob.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/googlecloud.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/cloudflare_r2.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/minio.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/blackbaze.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/garage-logo.png" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/rustfs.png" alt="">
+                    </div>
+                    <div><h2>Cloud Explorer</h2><p>Browse and preview S3, Azure Blob, GCS, R2, MinIO, Backblaze B2, Garage, RustFS, and compatible storage.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="lake-icons">
+                        <img src="../../dbt-studio/assets/connectionIcons/ducklake.png" alt="">
+                    </div>
+                    <div><h2>DuckLake UI</h2><p>Browse tables, schemas, stats, files, partitions, and snapshots, then query DuckLake from the SQL Editor and Notebooks.</p></div>
+                </article>
+                <article class="feature-card">
+                    <div class="ai-icons">
+                        <img src="../../dbt-studio/assets/connectionIcons/openai.svg" alt="">
+                        <img class="white-provider-icon" src="../../dbt-studio/assets/connectionIcons/anthropic.svg" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/google.svg" alt="">
+                        <img class="white-provider-icon" src="../../dbt-studio/assets/connectionIcons/ollama.svg" alt="">
+                        <img src="../../dbt-studio/assets/connectionIcons/lmstudio.svg" alt="">
+                        <img class="white-provider-icon" src="../../dbt-studio/assets/connectionIcons/openai_compatible.svg" alt="">
+                    </div>
+                    <div><h2>Multi-provider AI</h2><p>Use OpenAI, Anthropic, Gemini, Ollama, LM Studio, and OpenAI-compatible providers with context.</p></div>
+                </article>
+            </section>
+
+            <section class="capability-bar">
+                <div class="capability"><img src="../../dbt-studio/assets/icons/dbt-bit_tm.png" alt=""> dbt Models</div>
+                <div class="capability"><span class="cap-symbol">&lt;/&gt;</span> SQL Editor</div>
+                <div class="capability"><img class="light-icon" src="../../dbt-studio/assets/icons/bot.svg" alt=""> AI Agent</div>
+                <div class="capability"><span class="cap-symbol">⌁</span> Data Lineage</div>
+                <div class="capability"><span class="cap-symbol">☁</span> Cloud Explorer</div>
+                <div class="capability"><img class="light-icon" src="../../dbt-studio/assets/icons/git.svg" alt=""> Git</div>
+                <div class="capability"><span class="cap-symbol">▦</span> Notebooks</div>
+                <div class="capability"><span class="cap-symbol">▤</span> Saved Queries</div>
+            </section>
+
+            <footer class="footer-strip">
+                <div class="open-source">
+                    <div class="heart">♥</div>
+                    <div><strong>100% open source</strong><span>local-first dbt development</span></div>
+                </div>
+
+                <div class="integration-strip">
+                    <div class="integration"><img src="../../dbt-studio/assets/icons/dbt-bit_tm.png" alt=""> dbt</div>
+                    <div class="integration"><img src="../../dbt-studio/assets/connectionIcons/duckdb.png" alt=""> DuckDB</div>
+                    <div class="integration"><img src="../../dbt-studio/assets/connectionIcons/postgresql.png" alt=""> PostgreSQL</div>
+                    <div class="integration"><img src="../../dbt-studio/assets/connectionIcons/snowflake.png" alt=""> Snowflake</div>
+                    <div class="integration"><img src="../../dbt-studio/assets/connectionIcons/bigquery.png" alt=""> BigQuery</div>
+                </div>
+
+                <div class="github-box">
+                    <div class="github-mark">GH</div>
+                    <div>
+                        <span>Available on GitHub</span>
+                        <strong>github.com/rosettadb/dbt-studio</strong>
+                    </div>
+                </div>
+            </footer>
+
+            <div class="hashtags">
+                <span>#dbt</span>
+                <span>#DataEngineering</span>
+                <span>#AnalyticsEngineering</span>
+                <span>#AI</span>
+                <span>#SQL</span>
+                <span>#DuckDB</span>
+                <span>#DataLineage</span>
+                <span>#OpenSource</span>
+                <span>#LocalFirst</span>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
