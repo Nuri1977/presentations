@@ -20,7 +20,7 @@ That's AI-Generated Analytics in Rosetta DBT Studio.
 
 [SLIDE 2 — "Markdown + SQL + Live Preview" — analytics-editor-overview.png]
 
-Analytics pages are built with Evidence-style Markdown.
+Analytics pages are built with simple Markdown.
 
 You have the editor on the left and a live preview on the right. 
 SQL blocks define your datasets, 
