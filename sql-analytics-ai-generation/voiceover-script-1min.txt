@@ -1,79 +1,65 @@
 VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: AI-Generated Analytics (~60 sec)
 ======================================================================================
 6 slides. Switch to the next slide at each [SLIDE X] marker.
-Press the right arrow key (or spacebar) in the HTML presentation to advance.
+Press the right arrow key or spacebar in the HTML presentation to advance.
 ======================================================================================
 
 [SLIDE 1 — "Build Dashboards with AI" — animated analytics terminal]
 
-You need a dashboard.
-Revenue by region. Customer churn trends. Monthly KPIs.
+You need a dashboard — revenue by region, customer churn trends, monthly KPIs.
 
-What if you could just describe it,
-and AI built the entire thing —
-SQL, charts, tables, KPIs —
-in seconds?
+What if you could just describe it, and AI built the entire thing?
+SQL, charts, tables, KPIs, in seconds.
 
-That's AI-Generated Analytics in Rosetta DBT Studio.
+That is AI-Generated Analytics in Rosetta DBT Studio.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 2 — "Markdown + SQL + Live Preview" — analytics-editor-overview.png]
 
 Analytics pages are built with simple Markdown.
+Editor on [the](-1) left, live preview on [the](-1) right.
 
-You have the editor on the left and a live preview on the right. 
-SQL blocks define your datasets, 
-and components like BarChart and DataTable consume that data. Everything renders in real time as you build.
+SQL blocks define your datasets, and components like BarChart and DataTable consume that data.
+Everything renders in real time as you build.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 3 — "AI Writes the Entire Page" — ai-writes-page.png]
 
-Open the AI chat. Describe what you need.
+Open [the](-1) AI chat and describe what you need.
 
-"Generate me a university analytics dashboard with student enrollment by department, GPA trends, and course popularity."
+"Generate a university analytics dashboard with student enrollment by department, GPA trends, and course popularity."
 
-The AI reads your schema,
-writes the SQL blocks,
-wires them to charts —
-full page, ready to run.
+The AI reads your schema, writes the SQL blocks, wires them to charts — and you have a full page, ready to run.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 4 — "One Click. Everything Runs." — run-queries-results.png]
 
-Hit Run.
+Then you hit RUN.
 
-All SQL executes in dependency order.
-Results flow into your charts and tables.
-
-If a query fails, the AI reads the error and fixes it.
-Closed loop. No hand-holding.
+All SQL executes in dependency order, and results flow into your charts and tables.
+If a query fails, it reads the error and fixes it automatically. Closed loop, no hand-holding.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 5 — "Export as Static HTML" — export-static-site.png]
 
-Done? Export it.
+And if you're done, you can export it — one click, to build a static HTML report.
+Query results are pre-fetched, no database connection needed.
 
-One click to build a static HTML report.
-Query results pre-fetched. No database connection needed.
-
-Send it to stakeholders. Deploy it anywhere.
+Send it to stakeholders, deploy it anywhere.
 
 ─────────────────────────────────────────────────────────────────────────
 
 [SLIDE 6 — Closing CTA — logo_hero.svg]
 
-Analytics at the speed of thought.
+Analytics at [the](-1) speed of thought.
+You can describe it and AI builds it — your SQL, charts, and KPIs will be ready in seconds.
 
-Describe it. AI builds it.
-SQL, charts, KPIs — live in seconds.
-
-Download DBT Studio, star us on GitHub, and start building today.
-
-We can't wait to see what you build next.
+Download Rosetta DBT Studio, star us on GitHub, and start building today.
+We cannot wait to see what you will build next.
 
 ======================================================================================
 END OF SCRIPT — ~60 seconds at natural speaking pace (130 wpm)
