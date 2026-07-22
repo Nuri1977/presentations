@@ -1,0 +1,93 @@
+VOICEOVER SCRIPT + SLIDE CUES - Rosetta DBT Studio: Cloud Deploy + CI/CD (90 sec)
+=================================================================================
+8 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+=================================================================================
+
+[SLIDE 1 - "Ship Your dbt Project to the Cloud" - logo_hero.svg]
+
+Deploying a dbt project to the cloud usually means writing CI config files -
+GitHub Actions, YAML pipelines, secrets, runners.
+
+Rosetta DBT Studio skips all of that.
+
+Deploy and run your project in the cloud, straight from the app,
+no CI files to write.
+
+-------------------------------------------------------------------------
+
+[SLIDE 2 - "One Toggle to Go Cloud" - switched-to-cloud.png]
+
+It starts with a single switch.
+
+Flip the toggle in the top-right corner to Cloud.
+
+Your dbt project now runs in Rosetta Cloud -
+same project, running remotely.
+
+-------------------------------------------------------------------------
+
+[SLIDE 3 - "One Click to Run Pipeline" - run-pipeline-dropdown.png]
+
+To ship it, open the Project menu and choose Run Pipeline.
+
+No terminal commands. No separate CI dashboard.
+
+It all starts from right inside the app.
+
+-------------------------------------------------------------------------
+
+[SLIDE 4 - "No CI Files to Write" - create-pipeline-modal.png]
+
+Don't have a pipeline yet? Rosetta builds one for you.
+
+It generates a pipeline config under .rosetta,
+commits it, and pushes it to your repo.
+
+You never hand-write CI YAML.
+
+-------------------------------------------------------------------------
+
+[SLIDE 5 - "It Runs in the Cloud" - pipeline-running.png]
+
+The moment you run it, the pipeline spins up in Rosetta Cloud.
+
+Track it in real time from the dashboard -
+active runs, total runs, and compute usage, all at a glance.
+
+No GitHub Actions. No runners to configure. It just runs.
+
+-------------------------------------------------------------------------
+
+[SLIDE 6 - "Green Across the Board" - pipeline-success-dashboard.png]
+
+And it comes back green.
+
+One run, one success, zero failures.
+
+The green check on your project means the cloud pipeline finished clean.
+
+-------------------------------------------------------------------------
+
+[SLIDE 7 - "Green in the Pipeline Visualization" - pipeline-visualization-success.png]
+
+Back in the app, the pipeline visualization tells the same story.
+
+Open pipeline.yml, and every step is a green node, seed, run, test, teardown.
+
+And the full cloud logs stream right below the graph.
+
+-------------------------------------------------------------------------
+
+[SLIDE 8 - "Green. Repeatable. Done." - logo_hero.svg]
+
+Green. Repeatable. Done.
+
+Deploy and run your dbt project in the cloud,
+with zero CI configuration.
+
+Download Rosetta DBT Studio, and star us on GitHub.
+
+=================================================================================
+END OF SCRIPT - ~90 seconds to 2 minutes at natural speaking pace (130 wpm)
+=================================================================================

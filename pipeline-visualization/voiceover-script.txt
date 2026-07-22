@@ -1,0 +1,187 @@
+VOICEOVER SCRIPT + SLIDE CUES - Rosetta DBT Studio: Pipeline Visualization
+==========================================================================
+17 slides. Slide 1 is the intro, slides 2-16 are the app screenshots, slide 17 is the closing.
+Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+==========================================================================
+
+[SLIDE 1 - Intro - logo_hero.svg]
+
+A pipeline.yml is just a wall of indented config where jobs, steps and commands are all nested in text.
+
+Rosetta DBT Studio turns it into a live, interactive graph
+you can read, edit, and run - without ever handwriting CI.
+
+--------------------------------------------------------------------------
+
+[SLIDE 2 - "Your Pipeline, as a Graph" - 1.pipeline-graph.png]
+
+Here's the pipeline, drawn out as a graph.
+
+Down the left is your control bar.
+The plus and minus zoom in and out.
+The frame button fits the whole pipeline to your screen.
+The lock toggles interactivity - freeze the canvas, or unlock it to move things around.
+
+Then two edit buttons: the wand opens Visual Edit,
+and the pencil opens the raw pipeline.yml.
+
+Let's click the wand - Visual Edit - and see what that opens.
+
+--------------------------------------------------------------------------
+
+[SLIDE 3 - "Visual Edit mode" - 2.visual-edit-mode.png]
+
+This is Visual Edit mode.
+
+On the left is a palette of step types -
+dbt, rosetta, terraform, shell, and more.
+
+You drag them onto the canvas to add steps,
+and wire the nodes together to set the order.
+
+Hover any node, and a little pencil appears in its corner.
+Click that pencil - or just double-click the node - to edit the step.
+
+--------------------------------------------------------------------------
+
+[SLIDE 4 - "Every field explained" - 3.edit-step-dialog.png]
+
+After clicking the pencil - or double-clicking the node - this opens the Edit Step panel.
+
+Step Name is the label you see on the node.
+Plugin is where you pick what runs the step.
+Command is exactly what gets executed.
+Working Dir is the folder it runs in.
+
+And Job Name and Job Type group your steps into jobs -
+a normal build job, or a cleanup job that always runs at the end.
+
+--------------------------------------------------------------------------
+
+[SLIDE 5 - "Make a change" - 4.step-edited-in-dialog.png]
+
+Let's make a change.
+
+We'll rename this step to "Generate docs"
+and change the command to "dbt docs generate".
+
+Then hit Apply.
+
+--------------------------------------------------------------------------
+
+[SLIDE 6 - "The graph reacts" - 5.change-reflected-in-graph.png]
+
+And instantly, the graph updates -
+the node now reads "Generate docs" with the new command.
+
+Nothing's saved yet, though.
+So click Save in the corner to write it back to the file.
+
+--------------------------------------------------------------------------
+
+[SLIDE 7 - "Saved" - 6.after-save.png]
+
+All saved.
+
+And we're back in the normal view,
+and the change is now baked into pipeline.yml.
+
+--------------------------------------------------------------------------
+
+[SLIDE 8 - "Commit it" - 7.commit-in-git.png]
+
+Since the cloud runs your pipeline straight from your repo,
+head to the Git tab.
+
+Stage the change, write a commit message,
+commit it, and sync to GitHub.
+
+--------------------------------------------------------------------------
+
+[SLIDE 9 - "Run it" - 8.run-pipeline.png]
+
+Hit Run Pipeline - the play button right next to pipeline.yml -
+or pick it from the Project dropdown.
+
+And the pipeline kicks off.
+
+--------------------------------------------------------------------------
+
+[SLIDE 10 - "Watch it run" - 9.pipeline-running.png]
+
+You can watch it run live.
+
+The first step lights up as Running - and once it succeeds, the next one kicks off, one after another.
+
+--------------------------------------------------------------------------
+
+[SLIDE 11 - "Success across the board" - 10.pipeline-success.png]
+
+And it comes back successful.
+
+Every step - Success.
+The full cloud logs are right there below the graph.
+
+Now - remember that pencil button?
+Let's click that one instead, and see where it takes us.
+
+--------------------------------------------------------------------------
+
+[SLIDE 12 - "Straight to the code" - 11.pipeline-yml-editor.png]
+
+The pencil takes you straight to the file itself.
+
+This is pipeline.yml in the editor - that same graph, now as plain YAML.
+
+Every job, step, and command is right here - and you can edit any of it.
+
+--------------------------------------------------------------------------
+
+[SLIDE 13 - "Add a step by hand" - 12.yml-added-node.png]
+
+Let's add a step by hand.
+
+We'll drop in a new dbt step and name it "Test staging models", it runs dbt test on just the staging models.
+
+Then save the file.
+
+--------------------------------------------------------------------------
+
+[SLIDE 14 - "New node, no status yet" - 13.new-node-in-graph.png]
+
+Head back to the graph, and there it is -
+the new "Test staging models" node, already wired into the flow.
+
+Notice it has no status yet, because it hasn't run.
+
+Same as before: commit it in Git first, then run.
+
+--------------------------------------------------------------------------
+
+[SLIDE 15 - "Run it again" - 14.rerun-running.png]
+
+The graph lights up just like before. Only now there's a fourth node in the run, the one we just added.
+
+--------------------------------------------------------------------------
+
+[SLIDE 16 - "All four successful" - 15.all-nodes-success.png]
+
+And all four come back successful. 
+
+That's the beauty of it - you get to see your pipeline, tweak it however you like, and run it, right from here.
+
+--------------------------------------------------------------------------
+
+[SLIDE 17 - Closing - logo_hero.svg]
+
+Your pipeline.yml, finally visual and interactive -
+no more parsing config in your head.
+
+Download Rosetta DBT Studio, star us on GitHub, and start building today.
+We can't wait to see what you'll build next.
+
+==========================================================================
+END OF SCRIPT
+==========================================================================
+

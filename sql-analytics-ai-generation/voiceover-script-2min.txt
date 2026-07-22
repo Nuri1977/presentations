@@ -1,0 +1,205 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: AI-Generated Analytics & Reports (~2 min)
+================================================================================================
+9 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key (or spacebar) in the HTML presentation to advance.
+================================================================================================
+
+[SLIDE 1 — "Build Analytics with AI" — logo_hero.svg]
+
+You have the data. You just need the dashboard.
+
+What if you could describe what you want,
+and the AI built the entire analytics page —
+SQL queries, charts, KPIs, tables —
+all of it, instantly?
+
+That's exactly what Rosetta DBT Studio does
+with AI-Generated Analytics and Reports.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "Markdown + SQL + Components" — analytics-editor-overview.png]
+
+Analytics pages in Rosetta are Evidence-style Markdown files.
+
+On the left, a Monaco editor where you write —
+or where AI writes for you.
+
+On the right, a live preview that renders your charts,
+tables, and KPIs in real time.
+
+SQL blocks define your datasets.
+Components like BarChart, DataTable, and BigValue
+consume those datasets and visualize them.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "AI Knows Your Data Model" — ai-request-schema.png]
+
+Open the AI chat and describe what you need.
+
+"Show me monthly revenue by region with a trend line."
+
+The AI reads your database schema.
+It finds the right tables, understands the columns,
+and figures out exactly how to write the query —
+without you lifting a finger.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "SQL Blocks + Charts" — ai-writes-page.png]
+
+Then it writes the full page.
+
+Named SQL blocks for each dataset.
+A LineChart to show the trend.
+A BarChart to break down by region.
+BigValue cards for total revenue and growth percentage.
+
+Every SQL block is immediately followed by a component
+that renders it. You never end up with raw data and no output.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — "Press Run. Everything Executes." — run-queries-results.png]
+
+Hit Run, or press Control Shift Enter.
+
+All SQL blocks execute in dependency order.
+Results flow into the charts and tables.
+Row counts, durations, and status badges
+show you exactly what ran and how long it took.
+
+If a query needs another query's result,
+the engine resolves the dependency automatically.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 6 — "AI Reads Results & Fixes Errors" — ai-reads-results-fix.png]
+
+Now here's where it gets powerful.
+
+After running, the AI reads the results pane.
+It sees row counts, column names, errors, durations.
+
+If something failed, it fixes the SQL.
+If the data looks wrong, it adjusts the query.
+Then it reruns.
+
+This is a fully closed loop.
+The AI acts, observes, and adapts — no human prompting needed.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 7 — "20+ Chart & UI Components" — component-library.png]
+
+You have more than twenty component types to choose from.
+
+DataTable, BarChart, LineChart, AreaChart, PieChart,
+ScatterChart, BigValue, Delta indicator —
+
+Plus layout components: Grid, Tabs, Accordion, Stack.
+And input controls: DateRange picker, ButtonGroup,
+Select dropdowns, NumberInput.
+
+All of them wired directly to your SQL results.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 8 — "Share as Static HTML" — export-static-site.png]
+
+And when you're done, export it.
+
+One click to build a self-contained static HTML site.
+Query results are pre-fetched and bundled in.
+No database connection needed on the viewer side.
+
+Send it to a stakeholder. Deploy it to S3.
+Drop it in a shared folder.
+
+Your analytics report, delivered anywhere.
+
+────────────────────────────────────────────────────────────────────────
+
+[SLIDE 9 — Closing CTA — logo_hero.svg]
+
+Analytics at the speed of thought.
+
+Describe what you need.
+AI builds the dashboard.
+SQL, charts, KPIs — generated, live, in seconds.
+
+That's AI-powered Analytics in Rosetta DBT Studio.
+
+Download it today. Star us on GitHub.
+
+================================================================================================
+END OF SCRIPT — ~2 minutes at natural speaking pace (130 wpm)
+================================================================================================
+
+
+SCREENSHOT GUIDE — which screenshots to take and exactly where
+================================================================
+
+SLIDE 2 → analytics-editor-overview.png
+  Where: Analytics screen in dbt-studio (feature/sql-analitics-and-reports branch)
+  What:  Open an existing analytics page that has SQL blocks and chart components.
+         Make sure the split-pane is visible — Monaco editor on the left with
+         visible SQL blocks (```sql query_name), and the live preview on the right
+         showing rendered charts or a DataTable.
+  Tips:  Use a page with at least one chart visible in the preview pane.
+         Widen the editor window to see both panes clearly.
+
+SLIDE 3 → ai-request-schema.png
+  Where: Analytics screen with the AI chat panel open
+  What:  Type a natural-language analytics request into the AI chat, e.g.
+         "Create a report showing monthly revenue by region with a line chart."
+         Capture the moment BEFORE or WHILE the AI is responding — showing
+         the user's message and the AI starting to reply (or schema inspection step).
+  Tips:  Make the chat panel prominent. It's fine if the AI is mid-response.
+
+SLIDE 4 → ai-writes-page.png
+  Where: Analytics editor (Monaco side)
+  What:  Show the AI-generated markdown in the editor: a SQL block (```sql ...) 
+         followed directly by a chart component tag (<LineChart data={...} />).
+         This is the "AI wrote this page" moment.
+  Tips:  Scroll to show 2–3 SQL blocks with their component pairs visible.
+         Syntax highlighting should be ON in Monaco.
+
+SLIDE 5 → run-queries-results.png
+  Where: Analytics preview pane (right side) after clicking "Run All Queries"
+  What:  Show the rendered preview with charts/tables filled with real data.
+         SQL status badges (green ✓ with row counts) should be visible in the preview.
+         Ideally show a BarChart or LineChart with actual data rendered.
+  Tips:  Click "Run All" first, wait for all queries to succeed, then screenshot.
+         Include the toolbar at the top with the Run button visible.
+
+SLIDE 6 → ai-reads-results-fix.png
+  Where: AI chat panel after running queries
+  What:  Show the AI's response where it reports what it found — something like
+         "Ran 3 queries. Revenue query returned 48 rows. Chart is rendering correctly."
+         OR show the AI fixing a failed query (error state in preview → AI chat → 
+         AI response with fix).
+  Tips:  If you can trigger a minor SQL error first, then show the AI fixing it,
+         that's the most dramatic. Otherwise the AI's success summary works great.
+
+SLIDE 7 → component-library.png
+  Where: Any analytics page or the component autocomplete popup in the editor
+  What:  Show the slash-command autocomplete in Monaco (type "/" inside the editor
+         to trigger component suggestions). This shows the full list of available
+         components: DataTable, BarChart, LineChart, etc.
+         OR: Open a page that has multiple component types visible in the preview.
+  Tips:  The autocomplete popup is the cleanest way to show the component library.
+
+SLIDE 8 → export-static-site.png
+  Where: The "Export Static Site" / "Build" dialog in Analytics
+  What:  Open the StaticSiteBuildDialog — find the export/build button in the
+         analytics toolbar or menu. Capture the dialog open, showing export options.
+         OR: If you've already exported, show the resulting static HTML file open
+         in a browser (no Rosetta needed, just a browser).
+  Tips:  Look for a "Build Static Site" or export icon in the Analytics toolbar.
+
+NOTE: logo_hero.svg is already used by other presentations — copy it from
+      ../ai-agent-sql-editor/logo_hero.svg into this folder.
+
+================================================================================================
