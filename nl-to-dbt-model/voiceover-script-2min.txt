@@ -1,0 +1,88 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: Natural Language to dbt Model
+==============================================================================================
+
+[SLIDE 1 — "Just Describe It. dbt Does the Rest." — logo_hero.svg]
+
+Every data model starts [the](-1) same way.
+
+Someone on [the](-1) team asks a question, for example, what is our monthly revenue by customer segment,
+or which customers have not placed an order in [the](-1) last 90 days?
+
+And then you spend [the](-1) next hour staring at a blank SQL file,
+looking up column names, figuring out joins,
+and those tests you always tell yourself you will add later.
+
+What if you could just describe what you need, and let [the](-1) tool handle [the](-1) rest?
+
+That is exactly what Rosetta DBT Studio lets you do.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "Start with a Business Question" — nl-input-prompt.png]
+
+Here is a real project open in Rosetta, with [the](-1) file tree on [the](-1) left,
+SQL editor in [the](-1) middle, and [the](-1) AI agent panel on [the](-1) right.
+
+You just type [the](-1) question the way you would say it to a teammate.
+
+"Show monthly revenue by customer segment, only for paying customers who placed at least one order in [the](-1) last 12 months."
+
+And that's it, then you hit send, and [the](-1) agent reads your project, understands your schema, and gets to work.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "SQL Written, Tests Included" — model-generated.png]
+
+Within seconds, a brand new file appears in [the](-1) file tree —
+monthly revenue by segment dot sql.
+
+And the SQL is already there, joins, filters, everything — all written out for you.
+[The](-1) agent even tells you what it built — file path, SQL logic, and what to do next.
+
+You didn’t need to write a single line, and [the](-1) model is sitting there, ready to run.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Every Column, Documented" — schema-docs.png]
+
+Then [the](-1) agent keeps going.
+
+It creates [the](-1) schema file right alongside [the](-1) model,
+with column descriptions for segment, order month, and total revenue,
+including data integrity tests like not null, unique, and a custom revenue check.
+
+Both files show up in [the](-1) file tree at [the](-1) same time, both highlighted, both ready to keep.
+
+Your data team gets documentation that actually exists,
+because it gets written [the](-1) moment [the](-1) model is created.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — Closing CTA — logo_hero.svg]
+
+You typed one sentence and Rosetta built [the](-1) SQL, created [the](-1) model,
+wrote [the](-1) schema, and added [the](-1) tests — all in one shot.
+
+That is [the](-1) whole point.
+Your job is deciding what to build, not how to write it.
+
+Download Rosetta DBT Studio, star us on GitHub, and start building today.
+We cannot wait to see what you will build next.
+
+==============================================================================================
+END OF SCRIPT — ~90 seconds at natural speaking pace (130 wpm)
+==============================================================================================
+
+SCREENSHOT REFERENCE:
+──────────────────────────────────────────────────────
+nl-input-prompt.png   → Rosetta IDE open with jaffle_shop project. AI chat panel showing the
+                        business question typed in. dbt Agent Ready panel visible on the right.
+
+model-generated.png   → monthly_revenue_by_segment.sql open in the editor with generated SQL.
+                        AI panel on the right showing File Path, SQL Logic, Next Steps.
+                        File highlighted orange in the file tree.
+
+schema-docs.png       → schema.yml open in the editor showing model description and column entries
+                        with descriptions and dbt tests. AI panel showing Edited schema.yml
+                        with green checkmark. Both files highlighted in the file tree.
+──────────────────────────────────────────────────────
