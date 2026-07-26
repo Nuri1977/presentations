@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosetta DBT Studio — Query Results & Run History (1.6.1)</title>
+    <style>
+        :root {
+            --text: #ffffff;
+            --muted: #d7dce8;
+            --orange: #ff7a1a;
+            --orange-2: #ff9a3d;
+            --line: rgba(255, 255, 255, 0.16);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%;
+            margin: 0; overflow: hidden;
+            background: #05060a;
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .deck { position: relative; width: 100vw; height: 100vh; }
+
+        .slide {
+            position: absolute; inset: 0;
+            opacity: 0; transform: scale(1.015);
+            transition: opacity 420ms ease, transform 620ms cubic-bezier(0.2,0.8,0.2,1);
+            pointer-events: none; overflow: hidden;
+        }
+        .slide.active  { opacity: 1; transform: scale(1); pointer-events: auto; z-index: 2; }
+        .slide.prev    { opacity: 0; transform: scale(0.99); }
+
+        .progress {
+            position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 20;
+            background: rgba(255,255,255,0.08);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--orange), var(--orange-2));
+            transition: width 420ms cubic-bezier(0.2,0.8,0.2,1);
+            box-shadow: 0 0 20px rgba(255,122,26,0.6);
+            width: 0%;
+        }
+
+        .slide-counter {
+            position: fixed; right: 24px; bottom: 22px; z-index: 20;
+            font-size: 13px; font-weight: 700; color: var(--muted);
+            letter-spacing: 0.08em; padding: 8px 14px;
+            border: 1px solid var(--line); border-radius: 4px;
+            background: rgba(6,8,13,0.56); backdrop-filter: blur(14px);
+        }
+
+        /* ── Intro slide ────────────────────────────── */
+        .intro-slide {
+            display: grid;
+            grid-template-rows: 1fr auto;
+            gap: 18px;
+            padding: 54px 64px 72px;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(255,122,26,0.18), transparent 28%),
+                radial-gradient(circle at 90% 18%, rgba(114,183,255,0.14), transparent 30%),
+                linear-gradient(135deg, #07080c 0%, #11141b 55%, #08090d 100%);
+        }
+        .intro-slide::before {
+            position: absolute; inset: 0; content: "";
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at center, black, transparent 78%);
+        }
+        .intro-inner {
+            width: min(1500px,100%); height: 100%; margin: 0 auto;
+            display: grid; grid-template-columns: 1.05fr 0.95fr;
+            gap: 34px; align-items: center;
+        }
+        .copy { position: relative; z-index: 2; }
+        .copy .big-hook {
+            display: block;
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+            color: var(--muted);
+            font-size: clamp(14px, 1.1vw, 18px);
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--orange-2);
+            background: rgba(255,255,255,0.04);
+            border-radius: 0 4px 4px 0;
+            line-height: 1.45;
+        }
+        .copy .big-hook .q { color: var(--orange-2); font-weight: 800; }
+
+        .hero-screenshot {
+            position: relative; z-index: 2;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 38px 120px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,122,26,0.10);
+        }
+        .hero-screenshot img {
+            width: 100%; height: auto; display: block;
+        }
+        .hero-screenshot::after {
+            position: absolute; inset: 0; content: "";
+            background: linear-gradient(180deg, transparent 60%, rgba(5,6,10,0.35));
+            pointer-events: none;
+        }
+
+        /* ── Shared BG / shade ──────────────────────── */
+        .bg {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; filter: none;
+        }
+        .bg.contain { object-fit: contain; padding: 4vh 3vw; }
+        .slide.logo-slide .bg {
+            object-fit: contain; padding: 13vh 12vw;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,122,26,0.20), transparent 34%),
+                radial-gradient(circle at 88% 16%, rgba(91,160,255,0.16), transparent 30%),
+                #07080d;
+        }
+        .shade {
+            position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.56) 42%, rgba(0,0,0,0.18) 80%),
+                linear-gradient(0deg, rgba(0,0,0,0.58), rgba(0,0,0,0.10) 55%);
+        }
+        .shade.right {
+            background:
+                linear-gradient(-90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.56) 42%, rgba(0,0,0,0.18) 80%),
+                linear-gradient(0deg, rgba(0,0,0,0.58), rgba(0,0,0,0.10) 55%);
+        }
+
+        /* ── Content card ───────────────────────────── */
+        .content {
+            position: absolute;
+            left: clamp(42px,6vw,92px);
+            bottom: clamp(70px,10vh,120px);
+            width: min(440px,82vw);
+            padding: clamp(22px,2.4vw,32px);
+            border: 1px solid var(--line); border-radius: 4px;
+            background: rgba(6,8,13,0.68);
+            box-shadow: 0 32px 90px rgba(0,0,0,0.58);
+            backdrop-filter: blur(22px);
+        }
+        .content.right  { left: auto; right: clamp(42px,6vw,92px); }
+        .content.top    { bottom: auto; top: clamp(70px,10vh,120px); }
+        .content.centered-bottom {
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: clamp(10px,2vh,40px);
+            width: min(680px, 90vw);
+            text-align: center;
+        }
+        .content.centered-bottom .chips-row {
+            justify-content: center;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* ── Callout chip (two-image slides) ────────── */
+        .callout-chip {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 10px 16px; margin-right: 10px; margin-bottom: 10px;
+            border: 1px solid var(--line); border-radius: 4px;
+            background: rgba(255,255,255,0.055);
+            font-size: clamp(13px,0.86vw,15px); font-weight: 760; color: var(--text);
+            backdrop-filter: blur(16px);
+        }
+        .callout-chip::before {
+            content: ""; width: 7px; height: 7px; border-radius: 50%;
+            background: var(--orange); box-shadow: 0 0 18px rgba(255,122,26,0.72);
+        }
+        .chips-row { margin-top: 16px; }
+
+        /* ── Typography ─────────────────────────────── */
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-bottom: 12px; color: var(--orange-2);
+            font-size: clamp(11px,0.72vw,13px); font-weight: 850;
+            text-transform: uppercase; letter-spacing: 0.12em;
+        }
+        .eyebrow::before {
+            width: 24px; height: 3px; content: ""; border-radius: 99px;
+            background: linear-gradient(90deg, var(--orange), var(--orange-2));
+        }
+        h1, h2 {
+            margin: 0; color: var(--text);
+            letter-spacing: 0; line-height: 0.98;
+            font-weight: 920; text-wrap: balance;
+        }
+        h1 { font-size: clamp(38px,5vw,76px); }
+        h2 { font-size: clamp(24px,2.3vw,36px); }
+
+        .subtitle {
+            margin: 16px 0 0; color: var(--muted);
+            font-size: clamp(14px,1vw,17px);
+            line-height: 1.48; font-weight: 620; text-wrap: balance;
+        }
+        .slide:first-child h1      { font-size: clamp(42px,5vw,82px); }
+        .slide:first-child .subtitle { font-size: clamp(16px,1.2vw,22px); }
+        .intro-slide .subtitle     { max-width: 760px; margin: 16px 0 0; font-weight: 500; line-height: 1.35; }
+
+        .detail-copy {
+            max-width: 760px; margin-top: 20px;
+            padding-left: 18px;
+            border-left: 3px solid rgba(255,122,26,0.75);
+            color: #d7dbe5;
+            font-size: clamp(16px,1.15vw,20px); line-height: 1.48; font-weight: 560;
+        }
+        .accent { color: var(--orange-2); }
+        .mono {
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.92em; padding: 2px 7px; border-radius: 3px;
+            background: rgba(255,122,26,0.12); color: var(--orange-2);
+            border: 1px solid rgba(255,122,26,0.22);
+        }
+
+        /* ── Hero badges ────────────────────────────── */
+        .hero-badges { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            min-height: 44px; padding: 10px 16px;
+            border: 1px solid var(--line); border-radius: 4px;
+            background: rgba(255,255,255,0.055);
+            color: var(--text); font-size: clamp(15px,1vw,18px); font-weight: 750;
+            white-space: nowrap; backdrop-filter: blur(18px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+        }
+        .badge::before {
+            width: 8px; height: 8px; content: ""; border-radius: 50%;
+            background: var(--orange); box-shadow: 0 0 20px rgba(255,122,26,0.75);
+        }
+
+        /* ── Release highlights list ────────────────── */
+        .release-highlights {
+            list-style: none; padding: 0; margin: 16px 0 0;
+            max-width: 760px;
+        }
+        .release-highlights li {
+            position: relative;
+            padding: 6px 0 6px 28px;
+            color: var(--muted);
+            font-size: clamp(13px,0.9vw,15px);
+            line-height: 1.35;
+            font-weight: 560;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            text-wrap: balance;
+        }
+        .release-highlights li:last-child { border-bottom: none; }
+        .release-highlights li::before {
+            position: absolute; left: 2px; top: 9px;
+            content: ""; width: 12px; height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--orange-2), var(--orange));
+            box-shadow: 0 0 14px rgba(255,122,26,0.55);
+        }
+        .release-highlights li.headline::before {
+            width: 14px; height: 14px; top: 8px;
+            background: radial-gradient(circle at 30% 30%, #ffd28a, var(--orange-2), var(--orange));
+            box-shadow: 0 0 22px rgba(255,122,26,0.82);
+        }
+        .release-highlights li .lead {
+            color: var(--text); font-weight: 760;
+        }
+        .release-highlights li.headline .lead {
+            color: var(--orange-2);
+        }
+
+        /* ── Two-column layout (slides 4 & 5) ───────── */
+        .two-col-bg {
+            position: absolute; inset: 0;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px; padding: 6vh 4vw 8vh 4vw;
+        }
+        .two-col-bg .screenshot {
+            position: relative;
+            border: 1px solid var(--line); border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 26px 80px rgba(0,0,0,0.58);
+            background: #0d1017;
+        }
+        .two-col-bg .screenshot img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .two-col-bg.contain-images .screenshot img {
+            object-fit: contain; background: #000;
+        }
+        .two-col-bg .screenshot .label {
+            position: absolute; left: 14px; top: 14px; z-index: 2;
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12px; font-weight: 800; letter-spacing: 0.08em;
+            padding: 6px 12px; border-radius: 3px;
+            background: rgba(6,8,13,0.78); border: 1px solid var(--line);
+            color: var(--orange-2); backdrop-filter: blur(10px);
+        }
+
+        /* ── Logo / CTA slide ───────────────────────── */
+        .slide.logo-slide {
+            display: flex; align-items: center; justify-content: center;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,122,26,0.20), transparent 34%),
+                radial-gradient(circle at 88% 16%, rgba(91,160,255,0.16), transparent 30%),
+                #07080d;
+        }
+        .logo-mark-inline {
+            width: min(180px, 22vw); height: auto;
+            filter: drop-shadow(0 18px 50px rgba(255,122,26,0.30));
+        }
+        .cta-content { max-width: 960px; text-align: center; z-index: 2; padding: 0 32px; }
+        .cta-content h1 { font-size: clamp(42px,6vw,86px); margin: 36px 0 20px; }
+        .cta-content .subtitle { font-size: clamp(18px,1.8vw,28px); color: var(--muted); margin-bottom: 32px; }
+        .cta-content .version {
+            display: inline-block;
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: clamp(13px, 0.9vw, 15px); font-weight: 800;
+            letter-spacing: 0.08em; color: var(--orange-2);
+            padding: 8px 18px; border: 1px solid rgba(255,122,26,0.36);
+            border-radius: 4px; background: rgba(255,122,26,0.08);
+            margin-bottom: 22px;
+        }
+        .cta-group { display: flex; justify-content: center; gap: 20px; margin-top: 36px; flex-wrap: wrap; }
+        .cta-button {
+            padding: 16px 32px; border-radius: 4px; font-size: 18px; font-weight: 800;
+            background: rgba(255,255,255,0.08); border: 1px solid var(--line); color: #fff;
+            backdrop-filter: blur(10px); transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .cta-button.primary {
+            background: linear-gradient(90deg, var(--orange), var(--orange-2));
+            border-color: transparent; box-shadow: 0 10px 30px rgba(255,122,26,0.35);
+        }
+
+        @media (max-width:900px) {
+            .content, .content.right { left: 24px; right: 24px; bottom: 70px; width: auto; padding: 24px; }
+            .intro-inner { grid-template-columns: 1fr; }
+            .hero-screenshot { display: none; }
+            .two-col-bg { grid-template-columns: 1fr; padding: 3vh 4vw 10vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="slide-counter" id="slideNumber">1 / 12</div>
+
+    <main class="deck" id="deck">
+
+        <!-- SLIDE 1: Hook / Hero -->
+        <section class="slide active intro-slide">
+            <div class="intro-inner">
+                <div class="copy">
+                    <div class="eyebrow">Release 1.6.1 · Milestone Update</div>
+                    <span class="big-hook"><span class="q">The Workflow Release</span> — 12 shipped improvements, one headline feature</span>
+                    <h1>Rosetta DBT Studio<br><span class="accent">1.6.1 is here.</span></h1>
+                    <p class="subtitle">A major update featuring native Query Results and Run History in the bottom panel, alongside new AI tools, cloud downloads, and workflow improvements.</p>
+                    <ul class="release-highlights">
+                        <li class="headline"><span class="lead">Headline · Query Results &amp; Run History (#327)</span> — native bottom-panel tabs with Preview, SQL, History, Bookmarks, and full dbt command tracking.</li>
+                        <li><span class="lead">AI Agent in Terminal (#348)</span> — one-click assist action, right where your command output lands.</li>
+                        <li><span class="lead">HTML Viewer in Editor (#352)</span> — rendered output alongside your source, native in the editor pane.</li>
+                        <li><span class="lead">Cloud Explorer downloads (#318)</span> — pull cloud objects directly into the app, no browser detour.</li>
+                        <li><span class="lead">Pipelines Getting Started tab + Cloud Logs (#349)</span> — auto-expanding logs, built-in onboarding.</li>
+                        <li><span class="lead">Secrets loading &amp; Push to Cloud recovery (#350)</span> — reliable config, smoother deploys.</li>
+                        <li><span class="lead">Saved Queries one-click open + SQL dirty indicator (#351)</span> — less clicking, better editor feedback.</li>
+                        <li><span class="lead">Quality sweep</span> — pie chart labels, Cloud Logs fullscreen landing, Run History loading-state recovery (#353, #357, #359).</li>
+                    </ul>
+                </div>
+                <div class="hero-screenshot">
+                    <img src="001a-query-result-tab-02.png" alt="Rosetta DBT Studio with QUERY RESULTS and RUN HISTORY bottom tabs">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Two new tabs in the bottom panel -->
+        <section class="slide">
+            <div class="shade"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">QUERY RESULTS</span>
+                    <img src="001a-query-result-tab-preview.png" alt="QUERY RESULTS tab">
+                </div>
+                <div class="screenshot">
+                    <span class="label">RUN HISTORY</span>
+                    <img src="001c-run-history-tab-error-view1.png" alt="RUN HISTORY tab">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">The Layout</div>
+                <h2>Two new tabs.<br><span class="accent">One bottom panel.</span></h2>
+                <p class="subtitle">Right next to <span class="mono">TERMINAL</span> and <span class="mono">LINEAGE</span> live two new neighbors — <span class="mono">QUERY RESULTS</span> for SQL output and <span class="mono">RUN HISTORY</span> for every dbt command.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Auto-switches on query start</span>
+                    <span class="callout-chip">Auto-switches on dbt run</span>
+                    <span class="callout-chip">Fullscreen toggle on both</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Preview — rows in a grid -->
+        <section class="slide">
+            <img class="bg" src="001a-query-result-tab-01.png" alt="QUERY RESULTS Preview tab showing 500 rows in 8.40s">
+            <div class="content right">
+                <div class="eyebrow">Query Results · Preview</div>
+                <h2>Your rows.<br><span class="accent">Right there.</span></h2>
+                <p class="subtitle">Run a model. The grid lands in <span class="mono">Preview</span>. Row count, elapsed time, pagination, export. Not a modal. Not scrollback. Just a result where you expect it.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Limit input (default 500)</span>
+                    <span class="callout-chip">Run · Clear · Fullscreen</span>
+                    <span class="callout-chip">Export left of pagination</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Compiled vs Raw SQL (two-up) -->
+        <section class="slide">
+            <div class="shade"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">COMPILED SQL</span>
+                    <img src="001a-query-result-tab-compiled-sql.png" alt="SQL tab: Compiled SQL sub-view">
+                </div>
+                <div class="screenshot">
+                    <span class="label">RAW SQL</span>
+                    <img src="001a-query-result-tab-raw-sql.png" alt="SQL tab: Raw SQL sub-view">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Query Results · SQL</div>
+                <h2>Two views of<br><span class="accent">the same query.</span></h2>
+                <p class="subtitle">Because dbt compiles Jinja, you get both: <span class="mono">Compiled SQL</span> — the text that actually hit your warehouse — and <span class="mono">Raw SQL</span> — the source you wrote. Either one, one-click copy.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Monospace code blocks</span>
+                    <span class="callout-chip">Copy button per tab</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: History & Bookmarks (two-up) -->
+        <section class="slide">
+            <div class="shade right"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">HISTORY</span>
+                    <img src="001a-query-result-tab-history.png" alt="History tab: flat list of prior queries">
+                </div>
+                <div class="screenshot">
+                    <span class="label">BOOKMARKS</span>
+                    <img src="001a-query-result-tab-bookmarks.png" alt="Bookmarks tab: saved query entry">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Query Results · History & Bookmarks</div>
+                <h2>Yesterday's query.<br><span class="accent">One click away.</span></h2>
+                <p class="subtitle"><span class="mono">History</span> remembers every execution: green <span class="mono">&lt;&gt;</span> icon, truncated SQL, timestamp. Hover for <span class="mono">▶ Run</span> or <span class="mono">☆ Bookmark</span>. Bookmark the keepers with a name and tags — persisted per project.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Capped at 50 (FIFO)</span>
+                    <span class="callout-chip">Persists across sessions</span>
+                    <span class="callout-chip">Storage-safe: trimmed previews only</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Run History (two-up: parents + expanded children) -->
+        <section class="slide">
+            <div class="shade"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">RUN HISTORY · OVERVIEW</span>
+                    <img src="001b-run-history-tab-results.png" alt="RUN HISTORY parent rows with status and summary">
+                </div>
+                <div class="screenshot">
+                    <span class="label">RUN HISTORY · EXPANDED</span>
+                    <img src="001b-run-history-tab-detailed-view.png" alt="RUN HISTORY expanded: per-model per-test child rows">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Run History · Tab #2</div>
+                <h2>Every dbt command.<br><span class="accent">Remembered.</span></h2>
+                <p class="subtitle"><span class="mono">dbt run</span>, <span class="mono">test</span>, <span class="mono">build</span>, <span class="mono">compile</span>, <span class="mono">seed</span>, <span class="mono">snapshot</span>, <span class="mono">deps</span>, <span class="mono">debug</span> — all of it. Parent row: status, counts, duration, invocation id, copy-command. Expand: every model, every test.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">target/run_results.json parsed</span>
+                    <span class="callout-chip">Deduped by invocation_id</span>
+                    <span class="callout-chip">Cancelled-run recovery</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: When things break -->
+        <section class="slide">
+            <div class="shade right"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">TERMINAL ERROR</span>
+                    <img src="001c-run-history-tab-error-terminal-dbt.png" alt="Terminal showing compilation error">
+                </div>
+                <div class="screenshot">
+                    <span class="label">RUN HISTORY ERROR</span>
+                    <img src="001c-run-history-tab-error-view1.png" alt="Run History showing failed model">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Run History · Failures</div>
+                <h2>When things break.<br><span class="accent">See exactly where.</span></h2>
+                <p class="subtitle">When a run fails, you don't have to scroll through the terminal logs. The failed model is highlighted right there in the history. No digging required.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Error status icon</span>
+                    <span class="callout-chip">Pinpoint failed model</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Fix with AI -->
+        <section class="slide">
+            <div class="shade"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">AI DIAGNOSIS</span>
+                    <img src="001c-run-history-tab-error-ai-assistant.png" alt="AI Agent explaining failure">
+                </div>
+                <div class="screenshot">
+                    <span class="label">AI FIX PROPOSAL</span>
+                    <img src="001c-run-history-tab-error-ai-assistant-keep-changes.png" alt="AI Agent proposing a fix">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Run History · AI Assistant</div>
+                <h2>Fix with AI.<br><span class="accent">Review and apply.</span></h2>
+                <p class="subtitle">Click <span class="mono">Explain failure</span>, and the AI Agent reads the error, diagnoses the problem, and proposes a fix. You just review and apply the changes directly to your code.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">One-click 'Explain failure'</span>
+                    <span class="callout-chip">Agent writes the fix</span>
+                    <span class="callout-chip">Review and apply inline</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Autocomplete and Git -->
+        <section class="slide">
+            <div class="shade right"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">MONACO EDITOR</span>
+                    <img src="004-monaco-editor-autocomplete.png" alt="Monaco Editor with SQL autocomplete">
+                </div>
+                <div class="screenshot">
+                    <span class="label">BUILT-IN GIT</span>
+                    <img src="002-dbt-screen-with-git-UI.png" alt="Explorer with Git integration">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">The IDE Experience</div>
+                <h2>The IDE you expect.<br><span class="accent">Built right in.</span></h2>
+                <p class="subtitle">This completes the workflow. The Monaco editor gives you full Jinja and SQL autocomplete, sitting right next to a built-in visual Git interface for version control.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Jinja & SQL autocomplete</span>
+                    <span class="callout-chip">Visual Git staging</span>
+                    <span class="callout-chip">Familiar VS Code feel</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Visual Commands -->
+        <section class="slide">
+            <div class="shade"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">PROJECT RUNS</span>
+                    <img src="005-run-dbt-comands-from-UI.png" alt="Project-level dbt commands dropdown">
+                </div>
+                <div class="screenshot">
+                    <span class="label">MODEL RUNS</span>
+                    <img src="006-run-model-dbt0comands-from-UI.png" alt="Model-level dbt commands dropdown">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Visual Commands</div>
+                <h2>Run anything.<br><span class="accent">Visually.</span></h2>
+                <p class="subtitle">Visual dropdowns let you trigger any dbt command without touching the CLI. Run the whole project, or just run upstream and downstream from one specific model.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">No CLI required</span>
+                    <span class="callout-chip">Upstream & downstream execution</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Lineage -->
+        <section class="slide">
+            <div class="shade right"></div>
+            <div class="two-col-bg contain-images">
+                <div class="screenshot">
+                    <span class="label">FULLSCREEN DAG</span>
+                    <img src="008-model-lineage-full-screen.png" alt="Fullscreen lineage view">
+                </div>
+                <div class="screenshot">
+                    <span class="label">INLINE LINEAGE</span>
+                    <img src="007-model-lineage.png" alt="Lineage inside the bottom panel">
+                </div>
+            </div>
+            <div class="content centered-bottom">
+                <div class="eyebrow">Interactive DAGs</div>
+                <h2>Lineage that<br><span class="accent">actually works.</span></h2>
+                <p class="subtitle">An interactive lineage graph that updates as you type, right there in the bottom panel alongside your query results, or toggle it to fullscreen when you need the big picture.</p>
+                <div class="chips-row">
+                    <span class="callout-chip">Auto-updating DAGs</span>
+                    <span class="callout-chip">Inline or fullscreen</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: Closing / CTA -->
+        <section class="slide logo-slide">
+            <div class="cta-content">
+                <span class="version">RELEASE 1.6.1</span>
+                <div>
+                    <img class="logo-mark-inline" src="../what-is-dbt/logo_hero.svg" alt="Rosetta DBT Studio logo" onerror="this.style.display='none'">
+                </div>
+                <h1>All of it.<br><span class="accent">In one window.</span></h1>
+                <p class="subtitle">The rows. The runs. The history. The bookmarks.<br>Query Results and Run History in DBT Studio 1.6.1.</p>
+                <div class="chips-row" style="justify-content:center; display:flex; flex-wrap:wrap;">
+                    <span class="callout-chip">Capped · Deduped · Persisted</span>
+                    <span class="callout-chip">localStorage, per project</span>
+                    <span class="callout-chip">Open source</span>
+                </div>
+                <div class="cta-group">
+                    <div class="cta-button primary">macOS</div>
+                    <div class="cta-button">Windows</div>
+                    <div class="cta-button">Linux</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        const progressFill = document.getElementById("progressFill");
+        const slideNumber  = document.getElementById("slideNumber");
+        let currentSlide = 0;
+
+        function updateDeck() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove("active", "prev");
+                if (index === currentSlide)        slide.classList.add("active");
+                else if (index < currentSlide)     slide.classList.add("prev");
+            });
+            if (progressFill) progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            if (slideNumber)  slideNumber.textContent  = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function nextSlide()     { currentSlide = Math.min(currentSlide + 1, slides.length - 1); updateDeck(); }
+        function previousSlide() { currentSlide = Math.max(currentSlide - 1, 0);                 updateDeck(); }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+            else                             document.exitFullscreen?.();
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") { e.preventDefault(); nextSlide(); }
+            if (e.key === "ArrowLeft"  || e.key === "Backspace")              { e.preventDefault(); previousSlide(); }
+            if (e.key.toLowerCase() === "f")  toggleFullscreen();
+            if (e.key === "Home") { currentSlide = 0;                updateDeck(); }
+            if (e.key === "End")  { currentSlide = slides.length - 1; updateDeck(); }
+        });
+
+        document.getElementById("deck").addEventListener("click", (e) => {
+            if (e.clientX > window.innerWidth / 2) nextSlide(); else previousSlide();
+        });
+
+        updateDeck();
+    </script>
+</body>
+</html>
