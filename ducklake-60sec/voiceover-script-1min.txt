@@ -1,0 +1,65 @@
+VOICEOVER SCRIPT + SLIDE CUES — Rosetta DBT Studio: DuckLake Explained (~60 sec)
+======================================================================================
+5 slides. Switch to the next slide at each [SLIDE X] marker.
+Press the right arrow key or spacebar in the HTML presentation to advance.
+======================================================================================
+
+[SLIDE 1 — "Your Data Lake, Without the Mess" — DuckLake icon]
+
+DuckLake is getting a lot of attention right now, and it is a brand new open standard for lakehouse storage,
+and Rosetta DBT Studio is [the](-1) first desktop app that lets you manage DuckLake visually.
+
+No command line. No configuration files. No guessing.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 2 — "A Lakehouse Built on DuckDB" — ducklake_overview.png]
+
+So what exactly is DuckLake?
+
+DuckLake stores your data as Parquet files in cloud object storage, such as Amazon S3, Azure Blob Storage, or Google Cloud Storage, while using a SQL catalog to organize everything.
+
+No proprietary formats. No vendor lock-in.
+
+Just open data that you truly own.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 3 — "Browse Tables, Manage Schema" — tables_and_views.png]
+
+Once your DuckLake instance is running, Rosetta gives you a complete visual control center.
+
+You can browse every table and view, inspect columns and data types, explore the underlying Parquet files and partitions, update rows, and even view the complete snapshot history.
+
+And the best part? You can do it all without writing a single command.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 4 — "Query DuckLake Directly" — sql-editor-query-data.png]
+
+When you are ready to query your data, [the](-1) SQL Editor connects directly to any DuckLake instance.
+
+Browse your schema on [the](-1) side and get autocomplete as you type,
+work with large result sets through automatic pagination,
+and export your results to csv, json or parquet with just one click.
+
+─────────────────────────────────────────────────────────────────────────
+
+[SLIDE 5 — Closing CTA — logo_new_05.png]
+
+DuckLake is the future of open lakehouse storage, and now you have a desktop app built for it.
+
+Download Rosetta DBT Studio, star us on GitHub, and start building today.
+We cannot wait to see what you will build next.
+
+======================================================================================
+END OF SCRIPT — ~60 seconds at natural speaking pace (130 wpm)
+======================================================================================
+
+SCREENSHOTS USED — all already exist, no new screenshots needed:
+──────────────────────────────────────────────────────
+ducklake_overview.png      → ../ducklake-ui-and-sql-editor-presenation/ducklake_overview.png
+tables_and_views.png       → ../ducklake-ui-and-sql-editor-presenation/tables_and_views.png
+sql-editor-query-data.png  → ../ducklake-ui-and-sql-editor-presenation/sql-editor-query-data.png
+logo_new_05.png            → ../ducklake-ui-and-sql-editor-presenation/logo_new_05.png
+──────────────────────────────────────────────────────
