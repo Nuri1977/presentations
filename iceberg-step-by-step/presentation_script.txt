@@ -1,0 +1,71 @@
+[Slide 1: Title]
+Speaker: Hello everyone, and welcome. Today, I'm thrilled to talk to you about a massive leap forward for our platform: the integration of Apache Iceberg into the Rosetta DBT Studio App. If you work with data at scale, you're going to love this step-by-step guide.
+
+[Slide 2: Agenda]
+Speaker: Here is what we will cover today. We'll start with the fundamentals of Apache Iceberg and why it was created. Then, we will walk through a live demo of setting up a new DataLake in Rosetta, explore catalogs, time travel, run AI-powered SQL imports, and finally, look at the underlying PyIceberg and DuckDB architecture.
+
+[Slide 3: The Old Way]
+Speaker: Let's take a quick look back. For years, data lakes were just raw Parquet files dumped into S3 directories. It was efficient to scan, but processing them meant writing fragile Java MapReduce jobs. Partitions were hard-coded and concurrent writing often corrupted data.
+
+[Slide 4: 2008 The Hive Era]
+Speaker: Hive changed the game in 2008 by bringing a SQL interface to the data lake. You could query with standard SQL. But as data grew, Hive showed its limits. Changing a schema meant rewriting the whole table. And without proper ACID guarantees initially, you were constantly battling delta files and compactions.
+
+[Slide 5: 2017 Enter Apache Iceberg]
+Speaker: In 2017, Netflix engineers decided to fix this from the ground up and built Apache Iceberg. Iceberg treats your data lake files like actual database tables. It gives you real ACID transactions, true schema evolution, hidden partitioning, and time travel. The secret sauce? It stores all metadata right alongside the data in the lake.
+
+[Slide 6: Inside Iceberg - The Layers]
+Speaker: Let's break down how this works. At the bottom, you have immutable Parquet Data Files. Above that, Manifest Files track these data files. Then, Manifest Lists organize those manifests. Finally, the Metadata File ties it all together. Because everything is immutable, adding data simply means writing new files and a new snapshot.
+
+[Slide 7: Architecture - The Catalog]
+Speaker: To find these metadata files, Iceberg uses a Catalog. The Catalog maps a table name to the current metadata file in storage. It acts as the atomic pointer swap that makes safe concurrent writes possible. This open standard allows for various implementations, which we'll see shortly.
+
+[Slide 8: Rosetta DataLake Dashboard]
+Speaker: And that brings us to the Rosetta DBT Studio App. We've built a first-class, native Iceberg integration. From the DataLake Dashboard, you get an immediate overview of all your connected open-format lakes, whether they are Iceberg, DuckDB, or others.
+
+[Slide 9: All Instances]
+Speaker: In our single instances list, you can manage all your catalog types in one place. Here we have a mix of local DuckDB, Project Nessie, Lakekeeper, Hive Metastores, and Polaris catalogs. They all live seamlessly side-by-side.
+
+[Slide 10: Create a New DataLake]
+Speaker: To set up a new connection, we've built a 4-step wizard. Step 1 is selecting your type. We'll select Apache Iceberg, which is currently in Beta, to get access to ACID transactions and time travel. 
+
+[Slide 11: Prerequisites - Docker Services]
+Speaker: Before configuring a REST catalog, you'll want to ensure your services are running. In this example, we have our Lakekeeper catalog and Keycloak OAuth server running in Docker Desktop. If you choose the local SQLite catalog, no Docker is needed!
+
+[Slide 12: Wizard - Choose Catalog Type]
+Speaker: Step 2 of the wizard asks for your catalog type. We support the entire ecosystem: Local SQLite for zero-config, PostgreSQL, and enterprise REST standards like Apache Polaris, Lakekeeper, and Nessie.
+
+[Slide 13: Catalog Config - Lakekeeper]
+Speaker: We'll select Lakekeeper. The wizard intelligently provides exactly the fields you need, like the REST endpoint and the OAuth2 Client Credentials. And importantly, your secrets are stored securely in your OS keychain via keytar—never in plain text.
+
+[Slide 14: Storage Config]
+Speaker: In Step 3, we configure Storage. We can let the REST catalog manage the warehouse path, and enable the SQL Editor. This actually attaches DuckDB directly to the object store so you can query your data at lightning speed.
+
+[Slide 15: Review and Save]
+Speaker: Finally, Step 4 is Review. Rosetta will test the object storage connection and confirm that DuckDB is properly attached. Once verified, click save, and the instance is immediately ready to use.
+
+[Slide 16: Browse Iceberg Tables]
+Speaker: Once connected, the app provides a dense, searchable view of your namespaces, tables, and views. You see live row counts and sizing metrics directly from the catalog metadata.
+
+[Slide 17: Inspect the Schema]
+Speaker: Click into any table, like this Titanic dataset, and the Schema tab gives you the exact Iceberg field IDs, data types, and nullability flags. Because Iceberg uses IDs, renaming columns never breaks your data.
+
+[Slide 18: Live Data Preview]
+Speaker: The Data tab gives you a live preview without writing any SQL. Using our PyIceberg bridge, you can apply row filters, adjust limits, and instantly scan the object store to preview or export your data.
+
+[Slide 19: Time Travel and History]
+Speaker: My favorite feature is native Time Travel. The History tab shows you every single snapshot committed to this table—like a Git log. You can see when data was appended, overwritten, or deleted, and you can query any of these historical states instantly.
+
+[Slide 20: Query with DuckDB SQL]
+Speaker: But we didn't stop at management. We've integrated Iceberg directly into our multi-tabbed SQL Editor. You can run incredibly fast queries leveraging DuckDB's Iceberg extension.
+
+[Slide 21: AI-Powered Import]
+Speaker: We've also added an AI Agent to make importing data frictionless. Select a local CSV or Parquet file, and the agent uses Gemini to automatically generate a precise DuckDB CTAS statement to ingest the data into Iceberg.
+
+[Slide 22: Import Result]
+Speaker: You review the query, hit execute, and in seconds, your CSV is a fully registered Iceberg table. The AI even runs a verification query to confirm the exact number of rows were successfully imported.
+
+[Slide 23: Architecture Under the Hood]
+Speaker: Under the hood, we use a dual-path architecture. Path A uses an IPC bridge to our PyIceberg Python layer for rapid metadata operations. Path B uses DuckDB Node for blistering fast SQL execution directly against your S3 buckets. It's secure, robust, and highly scalable.
+
+[Slide 24: Thank You]
+Speaker: Thank you so much for your time. Apache Iceberg is now a first-class citizen in Rosetta DBT Studio, and we are incredibly excited for you to try it out. I’ll now open the floor for any questions.
