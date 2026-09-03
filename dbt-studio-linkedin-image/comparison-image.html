@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>dbt Wizard vs Rosetta DBT Studio</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 1200px; height: 630px;
+    overflow: hidden;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+  }
+
+  .canvas {
+    width: 1200px; height: 630px;
+    background: #f0f2f5;
+    display: grid;
+    grid-template-rows: 72px 1fr 64px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* ── TOP HEADER ── */
+  .header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e5ea;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+  }
+
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-box {
+    width: 36px; height: 36px; border-radius: 9px; overflow: hidden;
+    border: 1.5px solid rgba(255,116,22,0.55);
+    box-shadow: 0 2px 10px rgba(255,116,22,0.20);
+    display: grid; place-items: center;
+    background: #fff8f4;
+  }
+  .logo-box img { width: 26px; height: 26px; object-fit: contain; }
+  .brand-name { font-size: 16px; font-weight: 800; color: #111827; }
+  .brand-name em { font-style: normal; color: #ff7416; }
+
+  .header-center {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #9ca3af;
+  }
+
+  .header-badge {
+    padding: 5px 14px; border-radius: 100px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: #6b7280;
+  }
+
+  /* ── CARDS AREA ── */
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 56px 1fr;
+    padding: 20px 40px;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  /* ── CARD ── */
+  .card {
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.06);
+  }
+
+  .card-left {
+    background: #ffffff;
+  }
+
+  .card-right {
+    background: #ffffff;
+    box-shadow: 0 2px 20px rgba(255,116,22,0.14), 0 0 0 2px #ff7416;
+  }
+
+  /* card header */
+  .card-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .card-head.left-head  { background: #fafafa; }
+  .card-head.right-head { background: #fff8f3; border-bottom: 1px solid #ffe8d6; }
+
+  .ch-logo {
+    display: flex; align-items: center;
+  }
+  .ch-logo .dbt-pill {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    padding: 4px 10px;
+    height: 34px;
+    display: flex; align-items: center;
+  }
+  .ch-logo .dbt-pill img { height: 20px; width: auto; }
+
+  .ch-logo .rosetta-icon {
+    width: 36px; height: 36px; border-radius: 9px; overflow: hidden;
+    border: 2px solid #ff7416;
+    box-shadow: 0 2px 10px rgba(255,116,22,0.25);
+    display: grid; place-items: center; background: #fff8f4;
+  }
+  .ch-logo .rosetta-icon img { width: 26px; height: 26px; object-fit: contain; }
+
+  .ch-text {}
+  .ch-name { font-size: 15px; font-weight: 800; color: #111827; }
+  .ch-name.orange { color: #ff7416; }
+  .ch-sub  { font-size: 11px; color: #9ca3af; font-weight: 500; margin-top: 1px; }
+
+  /* rows */
+  .card-rows {
+    display: flex; flex-direction: column;
+    padding: 10px 16px 12px;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+
+  /* left card rows — neutral gray */
+  .card-left .row          { background: #f9fafb; border: 1px solid #f3f4f6; }
+  .card-left .row.negative { background: #fff5f5; border: 1px solid #fee2e2; }
+  .card-left .row.neutral  { background: #f0f9ff; border: 1px solid #dbeafe; }
+
+  /* right card rows */
+  .card-right .row          { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .card-right .row.special  { background: #fff8f3; border: 1px solid #fed7aa; }
+
+  .row-icon { width: 18px; height: 18px; flex-shrink: 0; display: grid; place-items: center; }
+
+  .row-body { flex: 1; }
+  .row-cat  { font-size: 9.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; margin-bottom: 2px; }
+  .row-val  { font-size: 13px; font-weight: 600; color: #1f2937; line-height: 1.25; }
+  .row-val b { font-weight: 800; }
+
+  .t-red    { color: #dc2626; }
+  .t-amber  { color: #d97706; }
+  .t-green  { color: #16a34a; }
+  .t-orange { color: #ff7416; }
+  .t-blue   { color: #2563eb; }
+
+  /* ── VS ── */
+  .vs-col {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .vs-line { flex: 1; width: 1px; background: #e5e7eb; }
+  .vs-badge {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 900; color: #9ca3af;
+    letter-spacing: 0.5px; flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: #ffffff;
+    border-top: 1px solid #e2e5ea;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; gap: 20px;
+  }
+
+  .verdict {
+    display: flex; align-items: center; gap: 10px; flex: 1;
+  }
+  .v-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #16a34a; flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.15);
+  }
+  .v-text { font-size: 12px; font-weight: 600; color: #374151; }
+  .v-text strong { color: #111827; font-weight: 800; }
+
+  .footer-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  .pill-oss {
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 14px; border-radius: 8px;
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    font-size: 12px; font-weight: 700; color: #15803d;
+  }
+
+  .btn-gh {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 16px; border-radius: 9px;
+    background: #ff7416; border: none;
+    box-shadow: 0 2px 12px rgba(255,116,22,0.30);
+  }
+  .gh-c { width: 24px; height: 24px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+  .gh-c svg { width: 15px; height: 15px; }
+  .btn-gh-t span   { display:block; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.70); }
+  .btn-gh-t strong { display:block; font-size:12.5px; font-weight:800; color:#fff; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="brand">
+      <div class="logo-box"><img src="../../dbt-studio/assets/icon.png" alt="logo"></div>
+      <span class="brand-name">Rosetta <em>DBT Studio</em></span>
+    </div>
+    <div class="header-center">AI-Powered dbt Development — Compared</div>
+    <div class="header-badge">2026 Edition</div>
+  </header>
+
+  <!-- CARDS -->
+  <div class="cards">
+
+    <!-- LEFT: dbt Wizard -->
+    <div class="card card-left">
+      <div class="card-head left-head">
+        <div class="ch-logo">
+          <div class="dbt-pill"><img src="./dbt-wizzard.svg" alt="dbt Wizard"></div>
+        </div>
+        <div class="ch-text">
+          <div class="ch-sub">by dbt Labs · requires dbt Cloud subscription</div>
+        </div>
+      </div>
+      <div class="card-rows">
+
+        <div class="row negative">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Pricing</div>
+            <div class="row-val"><b class="t-red">$100 / user / month</b> — Starter plan minimum</div>
+          </div>
+        </div>
+
+        <div class="row negative">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Where it runs</div>
+            <div class="row-val"><b class="t-red">dbt Cloud only</b> — browser, their servers</div>
+          </div>
+        </div>
+
+        <div class="row negative">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Data privacy</div>
+            <div class="row-val">Your data processed on <b class="t-red">dbt Labs servers</b></div>
+          </div>
+        </div>
+
+        <div class="row neutral">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">AI Model</div>
+            <div class="row-val">dbt Labs managed — <b class="t-blue">no model choice</b></div>
+          </div>
+        </div>
+
+        <div class="row neutral">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">dbt model generation</div>
+            <div class="row-val"><b class="t-blue">✓</b> Deep dbt metadata integration</div>
+          </div>
+        </div>
+
+        <div class="row negative">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Notebooks / DuckDB / Cloud Explorer</div>
+            <div class="row-val"><b class="t-red">Not available</b></div>
+          </div>
+        </div>
+
+        <div class="row negative">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Offline / local use</div>
+            <div class="row-val"><b class="t-red">Requires internet</b> — cloud dependent</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VS -->
+    <div class="vs-col">
+      <div class="vs-line"></div>
+      <div class="vs-badge">VS</div>
+      <div class="vs-line"></div>
+    </div>
+
+    <!-- RIGHT: Rosetta dbt Studio -->
+    <div class="card card-right">
+      <div class="card-head right-head">
+        <div class="ch-logo">
+          <div class="rosetta-icon"><img src="../../dbt-studio/assets/icon.png" alt="Rosetta"></div>
+        </div>
+        <div class="ch-text">
+          <div class="ch-name orange">Rosetta DBT Studio</div>
+          <div class="ch-sub">open source · free · local-first desktop app</div>
+        </div>
+      </div>
+      <div class="card-rows">
+
+        <div class="row">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Pricing</div>
+            <div class="row-val"><b class="t-green">Free. Forever.</b> 100% open source, no subscription</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Where it runs</div>
+            <div class="row-val"><b class="t-green">Your machine.</b> Local-first Electron desktop app</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Data privacy</div>
+            <div class="row-val"><b class="t-green">Stays on your machine.</b> Zero data exfiltration</div>
+          </div>
+        </div>
+
+        <div class="row special">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff7416" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">AI Model</div>
+            <div class="row-val"><b class="t-orange">Your choice</b> — OpenAI, Anthropic, Gemini, Ollama, LM Studio</div>
+          </div>
+        </div>
+
+        <div class="row special">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff7416" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">dbt model generation</div>
+            <div class="row-val"><b class="t-orange">✓</b> AI agent · SQL editor · visual lineage DAG</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Notebooks / DuckDB / Cloud Explorer</div>
+            <div class="row-val"><b class="t-green">All included</b> — S3, GCS, Azure, DuckLake &amp; more</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="row-body">
+            <div class="row-cat">Offline / local use</div>
+            <div class="row-val"><b class="t-green">Works fully offline.</b> No internet required</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="verdict">
+      <div class="v-dot"></div>
+      <div class="v-text">dbt Wizard is great — <strong>if you're already paying $100/mo per dev.</strong> We built Rosetta dbt Studio for everyone else.</div>
+    </div>
+    <div class="footer-right">
+      <div class="pill-oss">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#15803d"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Open Source · Free
+      </div>
+      <div class="btn-gh">
+        <div class="gh-c">
+          <svg viewBox="0 0 24 24" fill="#111827"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </div>
+        <div class="btn-gh-t">
+          <span>Star on GitHub</span>
+          <strong>rosettadb/dbt-studio</strong>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

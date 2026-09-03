@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>dbt Studio – NL to dbt Model</title>
+    <style>
+        :root {
+            --orange:    #ff7416;
+            --orange-2:  #ff9d3b;
+            --orange-dim: rgba(255,116,22,0.18);
+            --green:     #61d26f;
+            --blue:      #62b8ff;
+            --bg:        #05070b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            width: 1200px;
+            height: 630px;
+            overflow: hidden;
+            background: var(--bg);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+        }
+
+        /* ─── CANVAS ─── */
+        .canvas {
+            position: relative;
+            width: 1200px;
+            height: 630px;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 50% 70% at  8% 12%, rgba(255,116,22,0.20), transparent),
+                radial-gradient(ellipse 40% 55% at 92%  8%, rgba(98,184,255,0.13), transparent),
+                radial-gradient(ellipse 55% 45% at 80% 92%, rgba(255,116,22,0.12), transparent),
+                linear-gradient(160deg, #0d1018 0%, #070a10 50%, #030508 100%);
+        }
+
+        /* dot-grid */
+        .canvas::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 75%);
+            pointer-events: none;
+        }
+
+        /* edge vignette */
+        .canvas::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(0,0,0,0.55) 0%,   transparent 18%, transparent 82%, rgba(0,0,0,0.55) 100%),
+                linear-gradient(0deg,  rgba(0,0,0,0.60) 0%,   transparent 18%, transparent 86%, rgba(0,0,0,0.32) 100%);
+            pointer-events: none;
+        }
+
+        /* ─── GLOW ORBS ─── */
+        .orb { position:absolute; border-radius:50%; filter:blur(72px); pointer-events:none; z-index:1; }
+        .orb-tl  { width:320px; height:320px; background:rgba(255,116,22,0.16); top:-100px;  left:-80px; }
+        .orb-tr  { width:240px; height:240px; background:rgba(98,184,255,0.11); top:-60px;   right:60px; }
+        .orb-br  { width:260px; height:260px; background:rgba(255,116,22,0.11); bottom:-80px;right:160px;}
+
+        /* ─── LAYOUT ─── */
+        .layout {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            grid-template-rows: 56px 1fr 52px;
+        }
+
+        /* ── TOP-LEFT: brand ── */
+        .brand {
+            grid-column: 1; grid-row: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 36px;
+            border-bottom: 1px solid rgba(255,116,22,0.20);
+        }
+
+        .logo-box {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255,116,22,0.55);
+            background: rgba(255,116,22,0.10);
+            box-shadow: 0 0 16px rgba(255,116,22,0.30);
+            display: grid; place-items: center;
+            overflow: hidden;
+        }
+        .logo-box img { width: 24px; height: 24px; object-fit: contain; }
+
+        .brand-label {
+            font-size: 17px;
+            font-weight: 820;
+            color: #fff;
+            letter-spacing: -0.2px;
+        }
+        .brand-label em {
+            font-style: normal;
+            background: linear-gradient(90deg, #ffb054, #ff7317);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── TOP-RIGHT: feature pill ── */
+        .feature-pill {
+            grid-column: 2; grid-row: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 36px;
+            border-bottom: 1px solid rgba(255,116,22,0.20);
+            gap: 10px;
+        }
+
+        .pill-tag {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 16px;
+            border-radius: 100px;
+            border: 1px solid rgba(255,116,22,0.40);
+            background: rgba(255,116,22,0.08);
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--orange-2);
+        }
+        .dot-live {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--orange-2);
+            box-shadow: 0 0 8px var(--orange-2);
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%,100% { opacity:1; } 50% { opacity:0.3; }
+        }
+
+        /* ── LEFT COLUMN: hero copy ── */
+        .hero-col {
+            grid-column: 1; grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 36px;
+            gap: 10px;
+        }
+
+        .eyebrow {
+            font-size: 10.5px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--orange-2);
+            opacity: 0.85;
+        }
+
+        h1 {
+            font-size: 40px;
+            font-weight: 960;
+            line-height: 1.0;
+            letter-spacing: -1.5px;
+            color: #fff;
+        }
+
+        h1 .accent {
+            display: block;
+            background: linear-gradient(90deg, #ffb054 0%, #ff7317 55%, #df4c08 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 34px;
+        }
+
+        .sub {
+            font-size: 13.5px;
+            color: #8e9aac;
+            line-height: 1.55;
+            font-weight: 420;
+            max-width: 340px;
+        }
+
+        /* flow steps */
+        .flow {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 2px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-num {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,116,22,0.55);
+            background: rgba(255,116,22,0.10);
+            color: var(--orange-2);
+            font-size: 11px;
+            font-weight: 800;
+            display: grid; place-items: center;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: 13px;
+            color: #c8d0dc;
+            font-weight: 560;
+        }
+
+        .step-text strong {
+            color: #fff;
+            font-weight: 780;
+        }
+
+        .arrow-down {
+            margin-left: 10px;
+            width: 1.5px;
+            height: 7px;
+            background: rgba(255,116,22,0.38);
+        }
+
+        /* ── RIGHT COLUMN: "terminal" mock ── */
+        .terminal-col {
+            grid-column: 2; grid-row: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 32px 10px 12px;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,116,22,0.35);
+            background: rgba(8,11,18,0.92);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04) inset,
+                0 24px 64px rgba(0,0,0,0.55),
+                0 0 40px rgba(255,116,22,0.12);
+            overflow: hidden;
+        }
+
+        /* titlebar */
+        .term-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .term-dot { width:10px; height:10px; border-radius:50%; }
+        .td-red    { background:#ff5f56; }
+        .td-yellow { background:#ffbd2e; }
+        .td-green  { background:#27c93f; }
+
+        .term-title {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 650;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.3px;
+        }
+
+        /* body */
+        .term-body {
+            padding: 12px 16px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* ── INPUT BUBBLE ── */
+        .input-bubble {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .avatar {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,116,22,0.55);
+            background: radial-gradient(circle, rgba(255,116,22,0.25), rgba(255,116,22,0.05));
+            display: grid; place-items: center;
+            font-size: 11px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .bubble-text {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 4px 12px 12px 12px;
+            padding: 7px 12px;
+            font-size: 12px;
+            color: #d4dbe6;
+            line-height: 1.45;
+            font-weight: 460;
+        }
+
+        .bubble-text strong {
+            color: #fff;
+            font-weight: 720;
+        }
+
+        /* ── DIVIDER ── */
+        .term-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .term-divider-line { flex:1; height:1px; background:rgba(255,255,255,0.07); }
+        .term-divider-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--green);
+            opacity: 0.8;
+        }
+
+        /* ── OUTPUT FILES ── */
+        .output-files {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .file-card {
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.09);
+            background: rgba(255,255,255,0.03);
+            overflow: hidden;
+        }
+
+        .file-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .file-icon { font-size: 13px; }
+
+        .file-name {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--orange-2);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        .file-badge {
+            margin-left: auto;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .fb-new   { background: rgba(97,210,111,0.15); color: var(--green);   border: 1px solid rgba(97,210,111,0.3);  }
+        .fb-tests { background: rgba(98,184,255,0.15); color: var(--blue);    border: 1px solid rgba(98,184,255,0.3);  }
+
+        .file-body {
+            padding: 8px 10px;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 9.5px;
+            line-height: 1.55;
+            color: #7a8799;
+        }
+
+        .code-comment { color: #4a5568; }
+        .code-kw      { color: #c792ea; }
+        .code-fn      { color: #82aaff; }
+        .code-str     { color: #c3e88d; }
+        .code-ref     { color: var(--orange-2); }
+        .code-key     { color: var(--blue); }
+        .code-val     { color: var(--green); }
+        .code-white   { color: #d4dbe6; }
+
+        /* ── BOTTOM BAR ── */
+        .bottombar {
+            grid-column: 1 / -1; grid-row: 3;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 36px;
+            border-top: 1px solid rgba(255,116,22,0.18);
+            gap: 16px;
+        }
+
+        .oss {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 650;
+            color: rgba(255,255,255,0.55);
+        }
+        .oss .heart { color: var(--green); font-size:14px; filter: drop-shadow(0 0 5px var(--green)); }
+
+        .hashtags {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.28);
+        }
+
+        .github-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,116,22,0.50);
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255,184,80,0.20), transparent 55%),
+                linear-gradient(180deg, rgba(178,56,12,0.68), rgba(83,23,12,0.68));
+            box-shadow: 0 0 18px rgba(255,91,15,0.22);
+        }
+
+        .gh-mark {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            display: grid; place-items: center;
+        }
+        .gh-mark svg { width:15px; height:15px; }
+
+        .github-btn-text span   { display:block; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.55); }
+        .github-btn-text strong { display:block; font-size:12px; font-weight:780; color:#fff; }
+    </style>
+</head>
+<body>
+<div class="canvas">
+    <div class="orb orb-tl"></div>
+    <div class="orb orb-tr"></div>
+    <div class="orb orb-br"></div>
+
+    <div class="layout">
+
+        <!-- BRAND -->
+        <div class="brand">
+            <div class="logo-box">
+                <img src="../../dbt-studio/assets/icon.png" alt="logo">
+            </div>
+            <div class="brand-label">Rosetta <em>DBT Studio</em></div>
+        </div>
+
+        <!-- FEATURE PILL -->
+        <div class="feature-pill">
+            <div class="pill-tag">
+                <div class="dot-live"></div>
+                AI Feature
+            </div>
+        </div>
+
+        <!-- HERO COPY -->
+        <div class="hero-col">
+            <div class="eyebrow">Natural Language → dbt Model</div>
+            <h1>
+                Just describe<br>what you need.
+                <span class="accent">Rosetta dbt Studio<br>does the rest.</span>
+            </h1>
+            <p class="sub">
+                Type a business question in plain English. The AI Agent writes the SQL model, creates the schema YAML, and adds tests — in one shot.
+            </p>
+
+            <div class="flow">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>You type</strong> a business question</div>
+                </div>
+                <div class="arrow-down"></div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">Agent <strong>reads your schema</strong> & project</div>
+                </div>
+                <div class="arrow-down"></div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>SQL model + YAML tests</strong> generated instantly</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TERMINAL MOCK -->
+        <div class="terminal-col">
+            <div class="terminal">
+                <div class="term-bar">
+                    
+                    <div class="term-title">Rosetta AI Agent · jaffle_shop</div>
+                </div>
+                <div class="term-body">
+
+                    <!-- user prompt -->
+                    <div class="input-bubble">
+                        <div class="avatar">
+                            <!-- person/user SVG -->
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,157,59,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="4"/>
+                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                            </svg>
+                        </div>
+                        <div class="bubble-text">
+                            <strong>"Show monthly revenue by customer segment</strong> — only paying customers with at least one order in the last 12 months."
+                        </div>
+                    </div>
+
+                    <!-- divider -->
+                    <div class="term-divider">
+                        <div class="term-divider-line"></div>
+                        <div class="term-divider-label">✓ Generated in 4s</div>
+                        <div class="term-divider-line"></div>
+                    </div>
+
+                    <!-- output files -->
+                    <div class="output-files">
+
+                        <!-- SQL model -->
+                        <div class="file-card">
+                            <div class="file-header">
+                                <span class="file-icon">
+                                    <!-- SQL file SVG -->
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff9d3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                    </svg>
+                                </span>
+                                <span class="file-name">monthly_revenue_by_segment.sql</span>
+                                <span class="file-badge fb-new">New</span>
+                            </div>
+                            <div class="file-body">
+<span class="code-kw">with</span> <span class="code-white">paying_customers</span> <span class="code-kw">as</span> (<br>
+&nbsp;&nbsp;<span class="code-kw">select</span> <span class="code-white">customer_id</span><br>
+&nbsp;&nbsp;<span class="code-kw">from</span> <span class="code-fn">{{ ref(</span><span class="code-str">'orders'</span><span class="code-fn">) }}</span><br>
+&nbsp;&nbsp;<span class="code-kw">where</span> <span class="code-white">status</span> = <span class="code-str">'completed'</span><br>
+&nbsp;&nbsp;<span class="code-kw">and</span> <span class="code-white">order_date</span> &gt;= <span class="code-fn">dateadd</span>(<span class="code-str">'month'</span>,<span class="code-white">-12</span>,<span class="code-fn">current_date</span>())<br>
+&nbsp;&nbsp;<span class="code-kw">group by</span> <span class="code-white">1</span><br>
+)<br>
+<span class="code-kw">select</span><br>
+&nbsp;&nbsp;<span class="code-fn">date_trunc</span>(<span class="code-str">'month'</span>, <span class="code-white">o.order_date</span>) <span class="code-kw">as</span> <span class="code-ref">order_month</span>,<br>
+&nbsp;&nbsp;<span class="code-white">c.segment</span> <span class="code-kw">as</span> <span class="code-ref">segment</span>,<br>
+&nbsp;&nbsp;<span class="code-fn">sum</span>(<span class="code-white">o.amount</span>) <span class="code-kw">as</span> <span class="code-ref">total_revenue</span><br>
+<span class="code-kw">from</span> <span class="code-fn">{{ ref(</span><span class="code-str">'orders'</span><span class="code-fn">) }}</span> <span class="code-white">o</span><br>
+<span class="code-kw">join</span> <span class="code-fn">{{ ref(</span><span class="code-str">'customers'</span><span class="code-fn">) }}</span> <span class="code-white">c</span> <span class="code-kw">using</span>(<span class="code-white">customer_id</span>)<br>
+<span class="code-kw">join</span> <span class="code-white">paying_customers</span> <span class="code-white">pc</span> <span class="code-kw">using</span>(<span class="code-white">customer_id</span>)<br>
+<span class="code-kw">group by</span> <span class="code-white">1, 2</span>
+                            </div>
+                        </div>
+
+                        <!-- YAML schema -->
+                        <div class="file-card">
+                            <div class="file-header">
+                                <span class="file-icon">
+                                    <!-- test/beaker SVG -->
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#62b8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 3h6M9 3v8l-4 9h14l-4-9V3"/>
+                                        <line x1="9" y1="12" x2="15" y2="12"/>
+                                    </svg>
+                                </span>
+                                <span class="file-name">schema.yml</span>
+                                <span class="file-badge fb-tests">+ Tests</span>
+                            </div>
+                            <div class="file-body">
+<span class="code-key">models</span>:<br>
+&nbsp;&nbsp;- <span class="code-key">name</span>: <span class="code-str">monthly_revenue_by_segment</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">description</span>: <span class="code-str">Monthly revenue</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">by customer segment</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">columns</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-key">name</span>: <span class="code-ref">order_month</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">tests</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-val">not_null</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-key">name</span>: <span class="code-ref">segment</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">tests</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-val">not_null</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-key">name</span>: <span class="code-ref">total_revenue</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">tests</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-val">not_null</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="code-val">dbt_utils.expression_is_true</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-key">expression</span>: <span class="code-str">&gt;= 0</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM BAR -->
+        <div class="bottombar">
+            <div class="oss">
+                <span class="heart">♥</span>
+                100% open source · Free to use
+            </div>
+            <div class="hashtags">
+                <span>#dbt</span>
+                <span>#DataEngineering</span>
+                <span>#AI</span>
+                <span>#AnalyticsEngineering</span>
+                <span>#SQL</span>
+                <span>#OpenSource</span>
+            </div>
+            <div class="github-btn">
+                <div class="gh-mark">
+                    <svg viewBox="0 0 24 24" fill="#05070b">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                </div>
+                <div class="github-btn-text">
+                    <span>Star us on GitHub</span>
+                    <strong>rosettadb/dbt-studio</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
