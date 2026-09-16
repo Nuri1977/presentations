@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apache Iceberg in Rosetta DBT Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #f97316;
+      --orange-dark: #ea580c;
+      --orange-light: #fff7ed;
+      --orange-border: #fed7aa;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --emerald: #10b981;
+      --emerald-light: #f0fdf4;
+      --emerald-border: #bbf7d0;
+      --emerald-text: #15803d;
+      --red: #ef4444;
+      --red-light: #fef2f2;
+      --red-border: #fecaca;
+      --red-text: #b91c1c;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #ffffff;
+      background-image: url('assets/linear-white-bg.svg');
+      background-repeat: repeat;
+      background-size: 120px 120px;
+      color: var(--slate-800);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--orange);
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+    #section-label {
+      position: fixed;
+      top: 20px;
+      left: 28px;
+      z-index: 100;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      background: #ffffff;
+      border: 1px solid var(--orange-border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    #nav {
+      position: fixed;
+      bottom: 20px;
+      right: 28px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 100;
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 4px 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    #nav button {
+      width: 26px;
+      height: 26px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--slate-700);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    #nav button:hover:not(:disabled) {
+      background: var(--slate-100);
+      color: var(--orange-dark);
+      border-color: var(--slate-200);
+    }
+    #nav button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    #slide-counter {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-600);
+      padding: 0 6px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.02em;
+    }
+
+    #slides-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 50px 84px;
+      opacity: 0;
+      transform: translateX(40px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      overflow-y: auto;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+    }
+    .si {
+      width: 100%;
+      max-width: 1120px;
+    }
+
+    /* Typography */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      background: var(--orange-light);
+      border: 1px solid var(--orange-border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      margin-bottom: 14px;
+      width: fit-content;
+    }
+    h1.t {
+      font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      color: var(--slate-900);
+      margin-bottom: 14px;
+    }
+    h2.h {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      color: var(--slate-900);
+      margin-bottom: 8px;
+    }
+    .orange-text {
+      color: var(--orange);
+    }
+    .sub {
+      font-size: clamp(0.9rem, 1.5vw, 1.08rem);
+      color: var(--slate-600);
+      line-height: 1.6;
+      font-weight: 400;
+      max-width: 680px;
+    }
+
+    /* Cards */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 20px -4px rgba(0, 0, 0, 0.03);
+    }
+    .cg {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .ci {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+    }
+    .ci:hover {
+      border-color: var(--orange-border);
+      box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
+      transform: translateY(-2px);
+    }
+    .ci h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ci p {
+      font-size: 11.5px;
+      color: var(--slate-500);
+      line-height: 1.45;
+    }
+    .ci .ico {
+      font-size: 20px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Two-column */
+    .tc {
+      display: grid;
+      grid-template-columns: 1fr 1.45fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .ts {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Screenshot frame */
+    .sf {
+      position: relative;
+      border-radius: 10px;
+      box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+      background: #0f172a;
+    }
+    .sf::before {
+      content: '';
+      display: block;
+      height: 4px;
+      background: var(--orange);
+    }
+    .sf img {
+      display: block;
+      width: 100%;
+      max-height: 56vh;
+      object-fit: contain;
+      background: #0f172a;
+    }
+    .sf .lbl {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+    .sf-full {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+      background: #0f172a;
+    }
+    .sf-full::before {
+      content: '';
+      display: block;
+      height: 4px;
+      background: var(--orange);
+    }
+    .sf-full img {
+      display: block;
+      width: 100%;
+      max-height: 58vh;
+      object-fit: contain;
+      background: #0f172a;
+    }
+
+    /* Bullet list */
+    .bl {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .bl li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--slate-700);
+      line-height: 1.45;
+    }
+    .bl li .bi {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      margin-top: 1px;
+      background: var(--orange-light);
+      border: 1px solid var(--orange-border);
+      color: var(--orange-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .bl li strong {
+      color: var(--slate-900);
+      font-weight: 600;
+    }
+
+    /* Layer diagram */
+    .ld {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .layer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+    .layer:hover {
+      transform: translateX(4px);
+      border-color: var(--orange-border);
+    }
+    .ldot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ln {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--slate-900);
+      min-width: 155px;
+    }
+    .ldesc {
+      font-size: 11.5px;
+      color: var(--slate-600);
+      line-height: 1.4;
+    }
+    .la {
+      font-size: 16px;
+      color: var(--slate-400);
+      text-align: center;
+      line-height: 1;
+    }
+
+    /* Stats row */
+    .sr {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .sb {
+      flex: 1;
+      min-width: 100px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px 12px;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      text-align: center;
+    }
+    .sn {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--orange);
+      line-height: 1;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .sl {
+      font-size: 10.5px;
+      color: var(--slate-500);
+      font-weight: 600;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Arch */
+    .ar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+    .ab {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      color: var(--slate-800);
+    }
+    .aar {
+      font-size: 15px;
+      color: var(--orange);
+      flex-shrink: 0;
+    }
+
+    /* Wizard steps */
+    .ws {
+      display: flex;
+      gap: 0;
+      margin-top: 16px;
+    }
+    .wst {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      padding: 0 4px;
+    }
+    .wst::after {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--slate-200);
+      z-index: 0;
+    }
+    .wst:last-child::after {
+      display: none;
+    }
+    .wsc {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 6px;
+    }
+    .wsc.done {
+      background: var(--emerald);
+      color: #fff;
+    }
+    .wsc.cur {
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 0 0 3px var(--orange-border);
+    }
+    .wsc.pend {
+      background: var(--slate-100);
+      color: var(--slate-500);
+      border: 1px solid var(--slate-200);
+    }
+    .wsl {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--slate-600);
+    }
+
+    /* Callout */
+    .co {
+      background: var(--orange-light);
+      border-left: 3px solid var(--orange);
+      border-radius: 0 8px 8px 0;
+      padding: 11px 15px;
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: var(--slate-700);
+      line-height: 1.45;
+    }
+    .co strong {
+      color: var(--orange-dark);
+    }
+
+    /* Code block */
+    .cb {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.65;
+      margin-top: 12px;
+      border: 1px solid var(--slate-700);
+    }
+    .cb .kw { color: #f97316; }
+    .cb .s { color: #34d399; }
+    .cb .cm { color: #64748b; }
+
+    /* Title logo */
+    .logo {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--slate-900);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--slate-600);
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 18px;
+    }
+    .dlive {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* Thank you */
+    .tyg {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .tyc {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px 16px;
+      text-align: center;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .tyc .tyi {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+    .tyc h3 {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 4px;
+    }
+    .tyc p {
+      font-size: 11px;
+      color: var(--slate-500);
+      line-height: 1.45;
+    }
+
+    /* Row item */
+    .ri {
+      padding: 8px 12px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .ri strong {
+      font-size: 12.5px;
+      color: var(--slate-900);
+    }
+    .ri span {
+      font-size: 11px;
+      color: var(--slate-500);
+    }
+
+    /* info box */
+    .ib {
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .ib-green {
+      background: var(--emerald-light);
+      border: 1px solid var(--emerald-border);
+      color: var(--emerald-text);
+    }
+    .ib-red {
+      background: var(--red-light);
+      border: 1px solid var(--red-border);
+      color: var(--red-text);
+    }
+    .ib-orange {
+      background: var(--orange-light);
+      border-left: 3px solid var(--orange);
+      border-radius: 0 8px 8px 0;
+      color: var(--slate-700);
+    }
+
+    /* field row */
+    .fr {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--slate-100);
+      font-size: 12.5px;
+    }
+    .fr:last-child {
+      border-bottom: none;
+    }
+    .fr span {
+      color: var(--slate-500);
+    }
+    .fr strong {
+      color: var(--slate-900);
+    }
+
+    .icon-img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      vertical-align: middle;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<div id="section-label"></div>
+<div id="slides-wrapper">
+
+<!-- SLIDE 01: TITLE -->
+<div class="slide active" data-section="Rosetta DBT Studio">
+<div class="si">
+  <div class="logo"><img src="assets/icons/rosetta_logo.png" alt="Rosetta"> Rosetta DBT Studio</div>
+  <div class="tag"><span class="dlive"></span> Live Demo &amp; Tutorial</div>
+  <h1 class="t">Apache Iceberg<br><span class="orange-text">in Rosetta DBT Studio</span></h1>
+  <p class="sub">A step-by-step guide to connecting, managing, and querying Apache Iceberg data lakes directly from the Rosetta DBT Studio application.</p>
+  <div class="sr">
+    <div class="sb"><div class="sn">7</div><div class="sl">Catalog Types</div></div>
+    <div class="sb"><div class="sn">4</div><div class="sl">Setup Steps</div></div>
+    <div class="sb"><div class="sn">∞</div><div class="sl">Time Travel</div></div>
+    <div class="sb"><div class="sn">2</div><div class="sl">Data Paths</div></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 02: AGENDA -->
+<div class="slide" data-section="Overview">
+<div class="si">
+  <div class="badge">📋 Agenda</div>
+  <h2 class="h">What we'll cover today</h2>
+  <div class="cg" style="grid-template-columns:repeat(3,1fr);">
+    <div class="ci"><div class="ico">🏔️</div><h3>Iceberg Fundamentals</h3><p>Why Iceberg exists, how it's structured, and what makes it revolutionary</p></div>
+    <div class="ci"><div class="ico">⚙️</div><h3>Setting Up a DataLake</h3><p>4-step wizard to connect any Iceberg catalog — from SQLite to Lakekeeper</p></div>
+    <div class="ci"><div class="ico">🔍</div><h3>Exploring &amp; Querying</h3><p>Browse namespaces, inspect schemas, time travel, and run SQL</p></div>
+    <div class="ci"><div class="ico"><img src="assets/icons/ducklake.png" class="icon-img" style="width:20px;height:20px;"></div><h3>Catalog Types</h3><p>SQLite · SQL · Polaris · Nessie · Lakekeeper · Hive · DuckLake</p></div>
+    <div class="ci"><div class="ico">🤖</div><h3>AI-Powered SQL</h3><p>Import CSV/Parquet data using the AI agent with natural language</p></div>
+    <div class="ci"><div class="ico">🏗️</div><h3>Architecture</h3><p>PyIceberg bridge, DuckDB extension, and object-store integration</p></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 03: THE OLD WAY -->
+<div class="slide" data-section="Iceberg · Background">
+<div class="si">
+  <div class="badge">🏔️ Apache Iceberg · Background</div>
+  <h2 class="h">The <span class="orange-text">old way</span> was painful</h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;">For years, data lakes were raw Parquet files dumped into S3 directories — fast to scan, painful to manage.</p>
+      <ul class="bl">
+        <li><span class="bi">📁</span><span><strong>Hard-coded partition paths</strong> — wrong at creation time, stuck forever</span></li>
+        <li><span class="bi">💀</span><span><strong>200-line Java MapReduce</strong> to read what SQL does in one line</span></li>
+        <li><span class="bi">⚡</span><span><strong>No transactions</strong> — concurrent writes silently corrupted data</span></li>
+        <li><span class="bi">🔀</span><span><strong>Schema changes broke pipelines</strong> — rename = full table rewrite</span></li>
+      </ul>
+      <div class="co"><strong>It worked, kind of.</strong> But fragile, error-prone — you could never guarantee correctness.</div>
+    </div>
+    <div>
+      <div class="card" style="background:#0f172a;border-color:#1e293b;">
+        <p style="color:#f97316;font-size:11px;font-weight:700;letter-spacing:0.1em;margin-bottom:10px;">THE OLD WAY</p>
+        <div class="cb" style="background:rgba(0,0,0,0.4);border:none;margin-top:0;"><span class="cm"># Hadoop MapReduce (Java) circa 2010</span>
+<span class="kw">public class</span> SalesAggregator {
+  <span class="kw">void</span> map(Text key, Text val) {
+    <span class="cm">// parse s3://bucket/year=2024/...</span>
+    <span class="cm">// hope nobody else is writing</span>
+    <span class="cm">// pray schema didn't change</span>
+  }
+}</div>
+        <div class="ib ib-red" style="margin-top:14px;">✕ Result: Corrupted data, broken pipelines, sleepless nights</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 04: HIVE ERA -->
+<div class="slide" data-section="Iceberg · Background">
+<div class="si">
+  <div class="badge">📅 2008 · The Hive Era</div>
+  <h2 class="h">Hive changed the game — <span class="orange-text">then hit its limits</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <div class="card" style="background:var(--emerald-light);border-color:var(--emerald-border);">
+        <p style="font-size:12px;font-weight:700;color:var(--emerald-text);margin-bottom:10px;">✅ WHAT HIVE BROUGHT</p>
+        <ul class="bl">
+          <li><span class="bi" style="background:#dcfce7;border-color:#86efac;color:#15803d;">✓</span><span>SQL interface — <strong>SELECT * FROM sales</strong></span></li>
+          <li><span class="bi" style="background:#dcfce7;border-color:#86efac;color:#15803d;">✓</span><span>Table schemas and partitions</span></li>
+          <li><span class="bi" style="background:#dcfce7;border-color:#86efac;color:#15803d;">✓</span><span>Centralized Metastore</span></li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--red-light);border-color:var(--red-border);margin-top:14px;">
+        <p style="font-size:12px;font-weight:700;color:var(--red-text);margin-bottom:10px;">✕ BUT THE PROBLEMS</p>
+        <ul class="bl">
+          <li><span class="bi" style="background:#fee2e2;border-color:#fca5a5;color:#b91c1c;">!</span><span><strong>Schema evolution</strong> — rename/drop = full table rewrite</span></li>
+          <li><span class="bi" style="background:#fee2e2;border-color:#fca5a5;color:#b91c1c;">!</span><span><strong>Partitions hard-coded</strong> — wrong choice, stuck forever</span></li>
+          <li><span class="bi" style="background:#fee2e2;border-color:#fca5a5;color:#b91c1c;">!</span><span><strong>No ACID until 2014</strong> — ORC only, constant compaction needed</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;font-weight:700;color:var(--orange-dark);margin-bottom:12px;">Real-world pain points</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="padding:10px 12px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;color:var(--slate-700);"><strong>Concurrent writes</strong> → silent data corruption</div>
+        <div style="padding:10px 12px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;color:var(--slate-700);"><strong>ACID (2014)</strong> → delta files requiring constant compaction</div>
+        <div style="padding:10px 12px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;color:var(--slate-700);"><strong>Metadata outside the lake</strong> → syncing nightmares across engines</div>
+        <div style="padding:10px 12px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;color:var(--slate-700);"><strong>Other engines</strong> (Spark, Trino) → never seamless</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 05: ENTER ICEBERG -->
+<div class="slide" data-section="Iceberg · Background">
+<div class="si">
+  <div class="badge">🚀 2017 · Enter Apache Iceberg</div>
+  <h2 class="h">Netflix started over. <span class="orange-text">They built it right.</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">Engineers at Netflix designed an open table format that treats data lake files like actual database tables — with all the guarantees of a transactional database.</p>
+      <div class="cg" style="grid-template-columns:1fr 1fr;margin-top:14px;">
+        <div class="ci" style="padding:14px;"><div class="ico" style="font-size:17px;">⚡</div><h3>Real ACID</h3><p>True transactions with safe concurrent writes</p></div>
+        <div class="ci" style="padding:14px;"><div class="ico" style="font-size:17px;">🔄</div><h3>Schema Evolution</h3><p>Add, rename, drop columns safely</p></div>
+        <div class="ci" style="padding:14px;"><div class="ico" style="font-size:17px;">⏪</div><h3>Time Travel</h3><p>Query any historical snapshot like Git commits</p></div>
+        <div class="ci" style="padding:14px;"><div class="ico" style="font-size:17px;">🗂️</div><h3>Hidden Partitioning</h3><p>Partition scheme evolves as queries change</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="background:#0f172a;border-color:#1e293b;padding:22px;">
+        <p style="color:#f97316;font-size:11px;font-weight:700;letter-spacing:0.1em;margin-bottom:12px;">THE ICEBERG WAY</p>
+        <div class="cb" style="background:rgba(0,0,0,0.4);border:none;margin-top:0;"><span class="cm">-- Just SQL. No Java. No tears.</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> iceberg.sales <span class="kw">LIMIT</span> 100;
+
+<span class="cm">-- Time travel: query yesterday</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> iceberg.sales
+<span class="kw">FOR VERSION AS OF</span> <span class="s">43782831</span>;
+
+<span class="cm">-- Safe rename, no rewrite</span>
+<span class="kw">ALTER TABLE</span> iceberg.sales
+<span class="kw">RENAME COLUMN</span> rev <span class="kw">TO</span> revenue;</div>
+        <div class="ib ib-green" style="margin-top:12px;">✅ Metadata lives in the lake. Everything is immutable. Time travel is free.</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 06: ICEBERG LAYERS -->
+<div class="slide" data-section="Iceberg · Architecture">
+<div class="si">
+  <div class="badge">🏗️ Architecture · The Iceberg Layers</div>
+  <h2 class="h">Inside Iceberg: <span class="orange-text">a metadata tree</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <div class="ld">
+        <div class="layer"><div class="ldot" style="background:#f59e0b;"></div><div><div class="ln">📄 Metadata File</div><div class="ldesc">Schema · Partitioning · <strong>Snapshot history</strong> — the single source of truth. Like a Git repo root.</div></div></div>
+        <div class="la">↕</div>
+        <div class="layer"><div class="ldot" style="background:#10b981;"></div><div><div class="ln">📋 Manifest Lists</div><div class="ldesc">Lists of manifests with rolled-up stats. Enables skipping entire partitions without opening files.</div></div></div>
+        <div class="la">↕</div>
+        <div class="layer"><div class="ldot" style="background:#8b5cf6;"></div><div><div class="ln">📑 Manifest Files</div><div class="ldesc">Tracks data files + stats (row count, min/max). Query engines skip files without scanning.</div></div></div>
+        <div class="la">↕</div>
+        <div class="layer"><div class="ldot" style="background:#3b82f6;"></div><div><div class="ln">🗄️ Data Files</div><div class="ldesc"><strong>Immutable Parquet/ORC/Avro</strong>. New data = new files at every level.</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;font-weight:700;color:var(--orange-dark);margin-bottom:12px;">🔑 The Key Insight: Everything is Immutable</p>
+      <ul class="bl">
+        <li><span class="bi">📸</span><span>A <strong>Snapshot</strong> = frozen table state — like a Git commit</span></li>
+        <li><span class="bi">➕</span><span>Adding data = <strong>new files at every level</strong> — old files untouched</span></li>
+        <li><span class="bi">⏪</span><span>Old snapshots remain → <strong>time travel is free</strong></span></li>
+        <li><span class="bi">🛡️</span><span>Immutability enables ACID, schema evolution, concurrent writes</span></li>
+      </ul>
+      <div class="co" style="margin-top:16px;"><strong>Snapshot S0 →</strong> Manifest List → Manifests → Data Files<br><strong>Snapshot S1 →</strong> New Manifest List → Old + New Manifests → All Files</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 07: THE CATALOG -->
+<div class="slide" data-section="Iceberg · Architecture">
+<div class="si">
+  <div class="badge">🗺️ Architecture · The Catalog</div>
+  <h2 class="h">The Catalog: <span class="orange-text">the missing glue</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">How does a query engine find a table's metadata file? You can't hard-code an S3 path — it changes with every snapshot.</p>
+      <div class="card" style="margin-top:14px;">
+        <p style="font-size:12px;font-weight:700;color:var(--orange-dark);margin-bottom:8px;">The Catalog does 3 things:</p>
+        <ul class="bl">
+          <li><span class="bi">🗺️</span><span><strong>Maps table names</strong> → metadata file location in object storage</span></li>
+          <li><span class="bi">⚛️</span><span><strong>Atomic pointer swap</strong> — one atomic operation. Safe concurrent writes.</span></li>
+          <li><span class="bi">🤝</span><span><strong>Coordinates, never writes</strong> — your engine writes files. Catalog tracks current version.</span></li>
+        </ul>
+      </div>
+      <div class="co"><strong>The Iceberg REST Catalog spec</strong> is an open standard — Polaris, Lakekeeper, Nessie all implement it.</div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;font-weight:700;color:var(--slate-900);margin-bottom:12px;">Supported catalogs in Rosetta:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="padding:10px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);"><p style="font-size:12.5px;font-weight:700;color:var(--slate-900);"><img src="assets/icons/sqlite.png" class="icon-img"> SQLite (Local)</p><p style="font-size:11px;color:var(--slate-500);margin-top:2px;">Zero-config local dev</p></div>
+        <div style="padding:10px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);"><p style="font-size:12.5px;font-weight:700;color:var(--slate-900);"><img src="assets/icons/postgresql.png" class="icon-img"> PostgreSQL / Neon</p><p style="font-size:11px;color:var(--slate-500);margin-top:2px;">SQL-based catalog</p></div>
+        <div style="padding:10px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);"><p style="font-size:12.5px;font-weight:700;color:var(--slate-900);"><img src="assets/icons/polaris.png" class="icon-img"> Apache Polaris</p><p style="font-size:11px;color:var(--slate-500);margin-top:2px;">REST catalog standard</p></div>
+        <div style="padding:10px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);"><p style="font-size:12.5px;font-weight:700;color:var(--slate-900);"><img src="assets/icons/lakekeeper.png" class="icon-img"> Lakekeeper</p><p style="font-size:11px;color:var(--slate-500);margin-top:2px;">REST + OAuth2 + MinIO</p></div>
+        <div style="padding:10px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);"><p style="font-size:12.5px;font-weight:700;color:var(--slate-900);"><img src="assets/icons/nessie.png" class="icon-img"> Project Nessie</p><p style="font-size:11px;color:var(--slate-500);margin-top:2px;">Git-like branching</p></div>
+        <div style="padding:10px;background:var(--slate-50);border-radius:8px;border:1px solid var(--slate-200);"><p style="font-size:12.5px;font-weight:700;color:var(--slate-900);"><img src="assets/icons/hive.png" class="icon-img"> Hive Metastore</p><p style="font-size:11px;color:var(--slate-500);margin-top:2px;">Legacy compatibility</p></div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 08: DATALAKE DASHBOARD -->
+<div class="slide" data-section="Rosetta App · DataLake">
+<div class="si">
+  <div class="badge"><img src="assets/icons/rosetta_logo.png" class="icon-img"> Rosetta DBT Studio · DataLake</div>
+  <h2 class="h">The <span class="orange-text">DataLake Dashboard</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <ul class="bl">
+        <li><span class="bi">📊</span><span><strong>Total DataLakes</strong> — overview card showing all connected instances</span></li>
+        <li><span class="bi">🗂️</span><span><strong>Catalog Types breakdown</strong> — DuckDB, Iceberg, Delta, Hudi at a glance</span></li>
+        <li><span class="bi">🕐</span><span><strong>Recent DataLakes</strong> — quickly return to recently accessed instances</span></li>
+        <li><span class="bi">➕</span><span><strong>New DataLake</strong> — launches the 4-step connection wizard</span></li>
+      </ul>
+      <div class="co"><strong>In this demo:</strong> 7 DataLakes — 1 DuckLake + <strong>6 Apache Iceberg</strong> instances across all catalog types.</div>
+    </div>
+    <div class="sf"><img src="assets/04-datalake-dashboard-overview.png" alt="DataLake Dashboard"><span class="lbl">DataLake Dashboard</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 09: ALL INSTANCES -->
+<div class="slide" data-section="Rosetta App · DataLake">
+<div class="si">
+  <div class="badge"><img src="assets/icons/rosetta_logo.png" class="icon-img"> Rosetta DBT Studio · All Instances</div>
+  <h2 class="h">All catalog types — <span class="orange-text">one place</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">Every DataLake instance listed with catalog type, storage location, and timestamps. Edit or delete from the Actions column.</p>
+      <div style="margin-top:14px;">
+        <div class="ri"><img src="assets/icons/duckdb.png" class="icon-img"><strong>test</strong><span>— DuckLake · DuckDB catalog</span></div>
+        <div class="ri"><img src="assets/icons/polaris.png" class="icon-img"><strong>test_polaris</strong><span>— Apache Iceberg · POLARIS</span></div>
+        <div class="ri" style="background:var(--orange-light);border-color:var(--orange-border);"><img src="assets/icons/nessie.png" class="icon-img"><strong>nessie-icebrg</strong><span>— Apache Iceberg · NESSIE</span></div>
+        <div class="ri"><img src="assets/icons/lakekeeper.png" class="icon-img"><strong>lakekeeper-001</strong><span>— Apache Iceberg · LAKEKEEPER</span></div>
+        <div class="ri"><img src="assets/icons/hive.png" class="icon-img"><strong>hive-metastore-01</strong><span>— Apache Iceberg · HIVE</span></div>
+      </div>
+    </div>
+    <div class="sf"><img src="assets/05-datalake-instances-list-all-catalogs.png" alt="All Instances"><span class="lbl">DataLake Instances</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 10: CREATE NEW DATALAKE -->
+<div class="slide" data-section="Rosetta App · Setup">
+<div class="si">
+  <div class="badge">⚙️ Setup · Step 1 of 4 · Select Type</div>
+  <h2 class="h">Create a <span class="orange-text">New DataLake</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">Click <strong>"+ New DataLake"</strong> and choose your data lake type. Rosetta supports four open-format technologies.</p>
+      <div class="cg" style="grid-template-columns:1fr 1fr;margin-top:14px;">
+        <div class="ci"><div class="ico"><img src="assets/icons/ducklake.png" class="icon-img" style="width:20px;height:20px;"></div><h3>DuckLake</h3><p>Local analytical powerhouse — no server needed</p></div>
+        <div class="ci" style="background:var(--orange-light);border-color:var(--orange);"><div class="ico">🏔️</div><h3>Apache Iceberg <span style="background:var(--orange);color:#fff;font-size:8px;padding:2px 5px;border-radius:3px;vertical-align:middle;">BETA</span></h3><p style="color:var(--orange-dark);font-weight:500;">ACID, time travel, any catalog type</p></div>
+        <div class="ci" style="opacity:0.6;"><div class="ico">🏔️</div><h3>Delta Lake <span style="background:var(--slate-200);color:var(--slate-600);font-size:8px;padding:2px 5px;border-radius:3px;vertical-align:middle;">Soon</span></h3><p>Linux Foundation open format</p></div>
+        <div class="ci" style="opacity:0.6;"><div class="ico">🦅</div><h3>Apache Hudi <span style="background:var(--slate-200);color:var(--slate-600);font-size:8px;padding:2px 5px;border-radius:3px;vertical-align:middle;">Soon</span></h3><p>Streaming upserts at data lake scale</p></div>
+      </div>
+    </div>
+    <div class="sf"><img src="assets/07-docker-desktop-containers-iceberg-services.png" alt="Create New DataLake"><span class="lbl">Type Selector</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 11: DOCKER -->
+<div class="slide" data-section="Rosetta App · Setup">
+<div class="si">
+  <div class="badge">🐳 Prerequisites · Docker Services</div>
+  <h2 class="h">Start your <span class="orange-text">catalog services</span> first</h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">Before connecting, ensure catalog server containers are running in Docker Desktop.</p>
+      <ul class="bl" style="margin-top:14px;">
+        <li><span class="bi" style="background:#dcfce7;border-color:#86efac;color:#15803d;">🟢</span><span><strong>nessie-netns</strong> — Nessie REST catalog on port 19120</span></li>
+        <li><span class="bi" style="background:#dcfce7;border-color:#86efac;color:#15803d;">🟢</span><span><strong>lakekeeper-netns</strong> — Lakekeeper catalog on port 8181</span></li>
+        <li><span class="bi" style="background:#dcfce7;border-color:#86efac;color:#15803d;">🟢</span><span><strong>keycloak-lakekeeper</strong> — OAuth2 server on port 8080</span></li>
+        <li><span class="bi" style="background:var(--slate-100);border-color:var(--slate-200);color:var(--slate-500);">⚪</span><span><strong>polaris-acceptance, hive-metastore-acceptance</strong> — stopped</span></li>
+      </ul>
+      <div class="co"><strong>For SQLite catalog</strong> — no Docker needed. Rosetta creates the catalog file locally. Perfect for getting started.</div>
+    </div>
+    <div class="sf"><img src="assets/06-create-new-datalake-type-selector.png" alt="Docker Desktop"><span class="lbl">Docker Desktop · Containers</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 12: WIZARD CATALOG TYPE -->
+<div class="slide" data-section="Rosetta App · Setup">
+<div class="si">
+  <div class="badge">⚙️ Setup · Step 2 of 4 · Catalog Config</div>
+  <h2 class="h">Wizard: <span class="orange-text">Choose your catalog type</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <div class="ws">
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Basics</div></div>
+        <div class="wst"><div class="wsc cur">2</div><div class="wsl">Catalog</div></div>
+        <div class="wst"><div class="wsc pend">3</div><div class="wsl">Storage</div></div>
+        <div class="wst"><div class="wsc pend">4</div><div class="wsl">Review</div></div>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:6px;">
+        <div style="padding:9px 12px;background:var(--orange-light);border-radius:8px;border:1.5px solid var(--orange);font-size:12.5px;font-weight:600;color:var(--slate-900);"><img src="assets/icons/sqlite.png" class="icon-img"> SQLite (Local) — Zero config</div>
+        <div style="padding:9px 12px;background:#ffffff;border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;font-weight:600;color:var(--slate-700);"><img src="assets/icons/postgresql.png" class="icon-img"> PostgreSQL / Neon</div>
+        <div style="padding:9px 12px;background:#ffffff;border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;font-weight:600;color:var(--slate-700);"><img src="assets/icons/polaris.png" class="icon-img"> Apache Polaris</div>
+        <div style="padding:9px 12px;background:#ffffff;border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;font-weight:600;color:var(--slate-700);"><img src="assets/icons/lakekeeper.png" class="icon-img"> Lakekeeper</div>
+        <div style="padding:9px 12px;background:#ffffff;border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;font-weight:600;color:var(--slate-700);"><img src="assets/icons/nessie.png" class="icon-img"> Project Nessie</div>
+        <div style="padding:9px 12px;background:#ffffff;border-radius:8px;border:1px solid var(--slate-200);font-size:12.5px;font-weight:600;color:var(--slate-700);"><img src="assets/icons/hive.png" class="icon-img"> Hive Metastore</div>
+      </div>
+    </div>
+    <div class="sf"><img src="assets/08-wizard-catalog-type-dropdown-all-options.png" alt="Catalog Types"><span class="lbl">Catalog Type Selector</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 13: LAKEKEEPER CONFIG -->
+<div class="slide" data-section="Rosetta App · Setup">
+<div class="si">
+  <div class="badge">⚙️ Setup · Step 2 of 4 · Lakekeeper</div>
+  <h2 class="h">Catalog config: <span class="orange-text">Lakekeeper + OAuth2</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <div class="ws">
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Basics</div></div>
+        <div class="wst"><div class="wsc cur">2</div><div class="wsl">Catalog</div></div>
+        <div class="wst"><div class="wsc pend">3</div><div class="wsl">Storage</div></div>
+        <div class="wst"><div class="wsc pend">4</div><div class="wsl">Review</div></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <p style="font-size:12px;font-weight:700;color:var(--orange-dark);margin-bottom:10px;">Lakekeeper configuration fields:</p>
+        <ul class="bl">
+          <li><span class="bi">🌐</span><span><strong>REST Endpoint</strong> — <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">http://localhost:8181/catalog</code></span></li>
+          <li><span class="bi">📦</span><span><strong>Catalog / Warehouse</strong> — e.g. <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">minio-warehouse</code></span></li>
+          <li><span class="bi">🔐</span><span><strong>Authentication</strong> — OAuth2 Client Credentials</span></li>
+          <li><span class="bi">🆔</span><span><strong>OAuth Client ID</strong> — <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">dbt-studio</code></span></li>
+          <li><span class="bi">🔑</span><span><strong>Client Secret</strong> — stored securely in OS keychain</span></li>
+          <li><span class="bi">🎫</span><span><strong>Token Endpoint</strong> — Keycloak URL</span></li>
+        </ul>
+      </div>
+      <div class="co"><strong>Security:</strong> Secrets stored in macOS Keychain via <code style="background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:4px;font-size:11px;">keytar</code> and injected securely at runtime.</div>
+    </div>
+    <div class="sf"><img src="assets/09-wizard-catalog-lakekeeper-oauth2.png" alt="Lakekeeper Config"><span class="lbl">Lakekeeper · Catalog Config</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 14: STORAGE CONFIG -->
+<div class="slide" data-section="Rosetta App · Setup">
+<div class="si">
+  <div class="badge">⚙️ Setup · Step 3 of 4 · Storage</div>
+  <h2 class="h">Storage: <span class="orange-text">DuckDB object-store access</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <div class="ws">
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Basics</div></div>
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Catalog</div></div>
+        <div class="wst"><div class="wsc cur">3</div><div class="wsl">Storage</div></div>
+        <div class="wst"><div class="wsc pend">4</div><div class="wsl">Review</div></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <p style="font-size:12px;font-weight:700;color:var(--orange-dark);margin-bottom:10px;">Storage options:</p>
+        <ul class="bl">
+          <li><span class="bi">🏛️</span><span><strong>Catalog-managed warehouse</strong> — catalog server owns warehouse path</span></li>
+          <li><span class="bi"><img src="assets/icons/duckdb.png" class="icon-img"></span><span><strong>Enable SQL Editor &amp; Notebooks</strong> — attaches DuckDB to object store</span></li>
+          <li><span class="bi">☁️</span><span><strong>Cloud Connection</strong> — pick from Cloud Explorer (MinIO, S3, GCS…)</span></li>
+          <li><span class="bi">🪣</span><span><strong>Bucket Name</strong> — exact bucket where Iceberg data files live</span></li>
+        </ul>
+      </div>
+      <div class="ib ib-green" style="margin-top:12px;">✅ <strong>Test Object Storage</strong> — confirms DuckDB can reach the object store before saving</div>
+    </div>
+    <div class="sf"><img src="assets/10-wizard-storage-lakekeeper-duckdb-object-store.png" alt="Storage Config"><span class="lbl">Storage Configuration</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 15: REVIEW & SAVE -->
+<div class="slide" data-section="Rosetta App · Setup">
+<div class="si">
+  <div class="badge">⚙️ Setup · Step 4 of 4 · Review</div>
+  <h2 class="h">Review &amp; <span class="orange-text">Save Changes</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <div class="ws">
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Basics</div></div>
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Catalog</div></div>
+        <div class="wst"><div class="wsc done">✓</div><div class="wsl">Storage</div></div>
+        <div class="wst"><div class="wsc cur">4</div><div class="wsl">Review</div></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <p style="font-size:12px;font-weight:700;color:var(--orange-dark);margin-bottom:10px;">Configuration summary:</p>
+        <div class="fr"><span>Name</span><strong>lakekeeper-001</strong></div>
+        <div class="fr"><span>Catalog Type</span><strong>lakekeeper</strong></div>
+        <div class="fr"><span>Storage</span><strong>Server-managed (REST catalog)</strong></div>
+        <div class="fr"><span>SQL Editor</span><strong>Enabled — DuckDB attached ✅</strong></div>
+      </div>
+      <div class="ib ib-green" style="margin-top:10px;">✅ DuckDB attached to the catalog and cleaned up successfully.</div>
+      <div class="co">Click <strong>Save Changes</strong> to persist. Instance appears immediately in the sidebar.</div>
+    </div>
+    <div class="sf"><img src="assets/11-wizard-review-lakekeeper-sql-access-verified.png" alt="Review"><span class="lbl">Review &amp; Confirm</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 16: TABLES & VIEWS -->
+<div class="slide" data-section="Rosetta App · Explore">
+<div class="si">
+  <div class="badge">🔍 Explore · Tables &amp; Views</div>
+  <h2 class="h">Browse your <span class="orange-text">Iceberg tables</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">Every Iceberg instance shows all tables across all namespaces in a single, searchable view with live metadata.</p>
+      <ul class="bl" style="margin-top:12px;">
+        <li><span class="bi">📁</span><span><strong>Namespace filter</strong> — toggle between namespaces</span></li>
+        <li><span class="bi">📊</span><span><strong>Row count &amp; Size</strong> — live metadata from the catalog</span></li>
+        <li><span class="bi">🕐</span><span><strong>Updated / Created</strong> timestamps per table</span></li>
+        <li><span class="bi">✏️</span><span><strong>Rename, Delete, View</strong> — full CRUD for Iceberg tables</span></li>
+        <li><span class="bi">➕</span><span><strong>Import Data</strong> — load CSV/Parquet/JSON directly into Iceberg</span></li>
+        <li><span class="bi">📂</span><span><strong>New Namespace</strong> — create nested namespaces with dot notation</span></li>
+      </ul>
+    </div>
+    <div class="sf"><img src="assets/12-instance-tables-views-lakekeeper.png" alt="Tables &amp; Views"><span class="lbl">lakekeeper-001 · Tables &amp; Views</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 17: TABLE SCHEMA -->
+<div class="slide" data-section="Rosetta App · Explore">
+<div class="si">
+  <div class="badge">🔍 Explore · Table Schema</div>
+  <h2 class="h">Inspect the <span class="orange-text">Iceberg schema</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">The <strong>Schema</strong> tab shows all columns with their Iceberg field IDs, types, and nullability.</p>
+      <ul class="bl" style="margin-top:12px;">
+        <li><span class="bi">🆔</span><span><strong>Field ID</strong> — Iceberg's stable identifier, survives column renames</span></li>
+        <li><span class="bi">📝</span><span><strong>Name &amp; Type</strong> — native Iceberg types: long, string, double, float</span></li>
+        <li><span class="bi">❓</span><span><strong>Required flag</strong> — optional vs. mandatory fields</span></li>
+      </ul>
+      <div class="card" style="margin-top:12px;">
+        <p style="font-size:11.5px;font-weight:700;color:var(--orange-dark);margin-bottom:8px;">titanic table (12 columns, 891 rows):</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11.5px;color:var(--slate-700);">
+          <span>1 · PassengerId · <em>long</em></span><span>2 · Survived · <em>long</em></span>
+          <span>3 · Pclass · <em>long</em></span><span>4 · Name · <em>string</em></span>
+          <span>5 · Sex · <em>string</em></span><span>6 · Age · <em>double</em></span>
+          <span>7 · SibSp · <em>long</em></span><span>8 · Parch · <em>long</em></span>
+          <span>9 · Ticket · <em>string</em></span><span>10 · Fare · <em>double</em></span>
+          <span>11 · Cabin · <em>string</em></span><span>12 · Embarked · <em>string</em></span>
+        </div>
+      </div>
+    </div>
+    <div class="sf"><img src="assets/21-table-schema-titanic-iceberg.png" alt="Table Schema"><span class="lbl">titanic · Schema Tab</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 18: DATA PREVIEW -->
+<div class="slide" data-section="Rosetta App · Explore">
+<div class="si">
+  <div class="badge">🔍 Explore · Data Preview</div>
+  <h2 class="h">Live <span class="orange-text">data preview</span> — no SQL needed</h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">The <strong>Data</strong> tab reads live data from the Iceberg table via PyIceberg. Apply row filters and set limit.</p>
+      <ul class="bl" style="margin-top:12px;">
+        <li><span class="bi">🔎</span><span><strong>Row filter</strong> — syntax like <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">id &gt;= 2</code></span></li>
+        <li><span class="bi">📏</span><span><strong>Limit control</strong> — default 100 rows, adjustable</span></li>
+        <li><span class="bi">▶️</span><span><strong>Run Preview</strong> — executes scan via Python bridge</span></li>
+        <li><span class="bi">📤</span><span><strong>Export</strong> — download results as CSV or Parquet</span></li>
+      </ul>
+      <div class="co">Data is read through the <strong>PyIceberg Python bridge</strong> — reads directly from the object store using the catalog metadata tree.</div>
+    </div>
+    <div class="sf"><img src="assets/22-table-data-preview-titanic.png" alt="Data Preview"><span class="lbl">titanic · Data Tab</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 19: TIME TRAVEL -->
+<div class="slide" data-section="Rosetta App · Time Travel">
+<div class="si">
+  <div class="badge">⏪ Time Travel · Snapshot History</div>
+  <h2 class="h">Time travel: <span class="orange-text">every commit, forever</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">The <strong>History</strong> tab shows every snapshot committed to this table — your Git log for data.</p>
+      <ul class="bl" style="margin-top:12px;">
+        <li><span class="bi">📸</span><span><strong>Snapshot ID</strong> — unique 64-bit identifier, like a Git hash</span></li>
+        <li><span class="bi">🔧</span><span><strong>Operation</strong> — <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">append</code>, <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">overwrite</code>, <code style="background:var(--slate-100);padding:2px 5px;border-radius:4px;font-size:11px;">delete</code></span></li>
+        <li><span class="bi">📅</span><span><strong>Committed At</strong> — exact timestamp of each write</span></li>
+        <li><span class="bi">➕</span><span><strong>Added Records / Total Records</strong> — per-snapshot row counts</span></li>
+      </ul>
+      <div class="card" style="margin-top:12px;">
+        <p style="font-size:11.5px;font-weight:700;color:var(--orange-dark);margin-bottom:6px;">Query a specific snapshot:</p>
+        <div class="cb" style="margin-top:0;font-size:11px;"><span class="kw">SELECT</span> * <span class="kw">FROM</span> iceberg.test_namespace.titanic
+<span class="kw">FOR VERSION AS OF</span> <span class="s">2652326968643782831</span>;</div>
+      </div>
+    </div>
+    <div class="sf"><img src="assets/23-table-history-snapshot-titanic.png" alt="Snapshot History"><span class="lbl">titanic · History Tab</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 20: SQL EDITOR -->
+<div class="slide" data-section="Rosetta App · SQL Editor">
+<div class="si">
+  <div class="badge">💻 SQL Editor · Query Iceberg</div>
+  <h2 class="h">Query Iceberg with <span class="orange-text">DuckDB SQL</span></h2>
+  <div style="margin-top:14px;">
+    <div class="sf-full"><img src="assets/25-sql-editor-select-from-iceberg-titanic.png" alt="SQL Editor"></div>
+    <div class="cg" style="grid-template-columns:repeat(4,1fr);margin-top:14px;">
+      <div class="ci" style="padding:12px;"><div class="ico" style="font-size:16px;">🔌</div><h3>Multi-Catalog Tabs</h3><p>Open sessions to different catalogs simultaneously</p></div>
+      <div class="ci" style="padding:12px;"><div class="ico" style="font-size:16px;">🌲</div><h3>Schema Tree</h3><p>Browse namespaces, tables and columns in left sidebar</p></div>
+      <div class="ci" style="padding:12px;"><div class="ico" style="font-size:16px;">📋</div><h3>Results Grid</h3><p>Paginated results with Table/JSON views and Export</p></div>
+      <div class="ci" style="padding:12px;"><div class="ico" style="font-size:16px;">📝</div><h3>Queries &amp; Analytics</h3><p>Save queries and build analytics dashboards</p></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 21: AI IMPORT -->
+<div class="slide" data-section="Rosetta App · SQL Editor">
+<div class="si">
+  <div class="badge">🤖 SQL Editor · AI-Powered Import</div>
+  <h2 class="h">Import CSV/Parquet <span class="orange-text">with AI assistance</span></h2>
+  <div class="tc">
+    <div class="ts">
+      <p class="sub" style="max-width:100%;font-size:13.5px;">The AI Agent (Gemini) generates the correct DuckDB CTAS statement to import a local CSV file as a new Iceberg table.</p>
+      <ul class="bl" style="margin-top:12px;">
+        <li><span class="bi">📁</span><span><strong>+ Import Data</strong> — pick Local File (CSV, Parquet, JSON)</span></li>
+        <li><span class="bi">🤖</span><span><strong>AI generates</strong> schema-inferred CTAS statement automatically</span></li>
+        <li><span class="bi">✅</span><span><strong>Allow / Deny</strong> — review and approve before execution</span></li>
+        <li><span class="bi">🔍</span><span><strong>Verify immediately</strong> — agent runs a SELECT to confirm row count</span></li>
+      </ul>
+      <div class="cb" style="margin-top:12px;font-size:11px;"><span class="cm">-- AI-generated import SQL</span>
+<span class="kw">CREATE TABLE</span> <span class="s">"iceberg"."default"."nl_stations"</span>
+<span class="kw">AS SELECT</span> * <span class="kw">FROM</span> read_csv_auto(
+  <span class="s">'/Users/nuri/Documents/csv_lake/nl_stations.csv'</span>,
+  header = <span class="kw">true</span>
+);</div>
+    </div>
+    <div class="sf"><img src="assets/27-sql-editor-ai-agent-create-table-csv-import.png" alt="AI Import"><span class="lbl">AI Agent · CSV Import</span></div>
+  </div>
+</div></div>
+
+<!-- SLIDE 22: IMPORT RESULT -->
+<div class="slide" data-section="Rosetta App · SQL Editor">
+<div class="si">
+  <div class="badge">✅ Import Result · nl_stations table</div>
+  <h2 class="h">New table created: <span class="orange-text">nl_stations</span></h2>
+  <div style="margin-top:12px;">
+    <div class="sf-full"><img src="assets/28-sql-editor-create-table-nl-stations-results.png" alt="Import Result"></div>
+    <div class="tc" style="gap:20px;margin-top:14px;">
+      <div class="ib ib-green">✅ <strong>Import confirmed</strong> — nl_stations.csv imported into <code style="background:rgba(16,185,129,0.15);padding:2px 5px;border-radius:4px;">iceberg.default.nl_stations</code>. Verification confirmed <strong>100 rows</strong> successfully imported.</div>
+      <div class="card" style="padding:16px 20px;">
+        <p style="font-size:11.5px;font-weight:700;color:var(--orange-dark);margin-bottom:6px;">🔄 What happened:</p>
+        <ul class="bl" style="margin-top:6px;gap:6px;font-size:12px;">
+          <li><span class="bi" style="width:16px;height:16px;font-size:10px;">1</span><span>DuckDB read CSV via <code style="background:var(--slate-100);padding:1px 4px;border-radius:3px;">read_csv_auto()</code></span></li>
+          <li><span class="bi" style="width:16px;height:16px;font-size:10px;">2</span><span>Iceberg catalog registered new table in <em>default</em> namespace</span></li>
+          <li><span class="bi" style="width:16px;height:16px;font-size:10px;">3</span><span>First snapshot committed — <strong>578 rows</strong> total in table</span></li>
+          <li><span class="bi" style="width:16px;height:16px;font-size:10px;">4</span><span>Schema tree updated live in left sidebar</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 23: ARCHITECTURE -->
+<div class="slide" data-section="Architecture">
+<div class="si">
+  <div class="badge">🏗️ Under the Hood · Architecture</div>
+  <h2 class="h">How Rosetta connects <span class="orange-text">to Iceberg</span></h2>
+  <div style="margin-top:18px;">
+    <div class="card" style="margin-bottom:12px;padding:16px 20px;">
+      <p style="font-size:11px;font-weight:700;color:var(--orange-dark);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">Path A · Metadata Operations (Browse, Import, Time Travel)</p>
+      <div class="ar">
+        <div class="ab" style="border-color:var(--orange-border);background:var(--orange-light);color:var(--orange-dark);"><img src="assets/icons/rosetta_logo.png" class="icon-img"> DBT Studio<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">Electron App</span></div>
+        <div class="aar">↔</div>
+        <div class="ab">IPC Bridge<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">Electron IPC</span></div>
+        <div class="aar">↔</div>
+        <div class="ab" style="border-color:#fbcfe8;background:#fdf2f8;color:#be185d;">🐍 PyIceberg<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">Python Bridge</span></div>
+        <div class="aar">↔</div>
+        <div class="ab" style="border-color:var(--emerald-border);background:var(--emerald-light);color:var(--emerald-text);">🗺️ Catalog<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">REST/Hive/SQL</span></div>
+        <div class="aar">↔</div>
+        <div class="ab" style="border-color:#bfdbfe;background:#eff6ff;color:#1e40af;">🪣 Object Store<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">S3/MinIO/GCS</span></div>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 20px;">
+      <p style="font-size:11px;font-weight:700;color:var(--slate-900);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">Path B · SQL Queries (SQL Editor, Notebooks)</p>
+      <div class="ar">
+        <div class="ab" style="border-color:var(--orange-border);background:var(--orange-light);color:var(--orange-dark);"><img src="assets/icons/rosetta_logo.png" class="icon-img"> SQL Editor<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">DBT Studio</span></div>
+        <div class="aar">↔</div>
+        <div class="ab">Node.js API<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">DuckDB Node</span></div>
+        <div class="aar">↔</div>
+        <div class="ab" style="border-color:#fde68a;background:#fffbeb;color:#b45309;"><img src="assets/icons/duckdb.png" class="icon-img"> DuckDB<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">Iceberg Ext</span></div>
+        <div class="aar">↔</div>
+        <div class="ab" style="border-color:var(--emerald-border);background:var(--emerald-light);color:var(--emerald-text);">🗺️ Catalog<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">REST API</span></div>
+        <div class="aar">↔</div>
+        <div class="ab" style="border-color:#bfdbfe;background:#eff6ff;color:#1e40af;">🪣 Object Store<br><span style="font-size:9.5px;font-weight:400;color:var(--slate-500);">Direct file read</span></div>
+      </div>
+    </div>
+    <div class="cg" style="grid-template-columns:repeat(4,1fr);margin-top:12px;">
+      <div class="ci" style="padding:10px;"><div class="ico" style="font-size:15px;">🔐</div><h3 style="font-size:11.5px;">OS Keychain</h3><p style="font-size:10.5px;">Secrets via keytar — never plain text</p></div>
+      <div class="ci" style="padding:10px;"><div class="ico" style="font-size:15px;">☁️</div><h3 style="font-size:11.5px;">Cloud Explorer</h3><p style="font-size:10.5px;">Reuses existing cloud connections</p></div>
+      <div class="ci" style="padding:10px;"><div class="ico" style="font-size:15px;">🐍</div><h3 style="font-size:11.5px;">PyIceberg</h3><p style="font-size:10.5px;">Official Python library with native REST</p></div>
+      <div class="ci" style="padding:10px;"><div class="ico" style="font-size:15px;"><img src="assets/icons/duckdb.png" class="icon-img"></div><h3 style="font-size:11.5px;">DuckDB Iceberg</h3><p style="font-size:10.5px;">Direct catalog attachment for fast SQL</p></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SLIDE 24: THANK YOU -->
+<div class="slide" data-section="Wrap-up">
+<div class="si" style="text-align:center;">
+  <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;">
+    <img src="assets/icons/rosetta_logo.png" alt="Rosetta" style="width:30px;height:30px;">
+    <span style="font-size:14px;font-weight:800;color:var(--slate-900);">Rosetta DBT Studio</span>
+  </div>
+  <h1 class="t" style="text-align:center;"><span class="orange-text">Apache Iceberg</span><br>is now first-class.</h1>
+  <p class="sub" style="text-align:center;margin:12px auto 0;">Connect any catalog, browse tables, time-travel through snapshots, and query Iceberg data — all without leaving your studio.</p>
+  <div class="tyg">
+    <div class="tyc"><div class="tyi">📚</div><h3>Documentation</h3><p>Full setup guide and video walkthroughs in the Rosetta docs portal</p></div>
+    <div class="tyc" style="background:var(--orange-light);border-color:var(--orange-border);"><div class="tyi">🚀</div><h3 style="color:var(--orange-dark);">Try it now</h3><p>Click <strong>"+ New DataLake"</strong> and connect your first Iceberg instance in 4 steps</p></div>
+    <div class="tyc"><div class="tyi">💬</div><h3>Questions?</h3><p>Join the Rosetta community on Discord or open an issue on GitHub</p></div>
+  </div>
+  <div style="margin-top:24px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+    <span style="background:var(--orange);color:#fff;padding:6px 16px;border-radius:20px;font-size:11.5px;font-weight:700;">v1.6.7 · Rosetta DBT Studio</span>
+    <span style="background:#ffffff;border:1px solid var(--slate-200);color:var(--slate-700);padding:6px 16px;border-radius:20px;font-size:11.5px;font-weight:600;">Apache Iceberg BETA</span>
+    <span style="background:#ffffff;border:1px solid var(--slate-200);color:var(--slate-700);padding:6px 16px;border-radius:20px;font-size:11.5px;font-weight:600;">PyIceberg · DuckDB</span>
+  </div>
+</div></div>
+
+</div><!-- /slides-wrapper -->
+
+<div id="nav">
+  <button id="btn-prev" onclick="navigate(-1)" title="Previous slide (←)">‹</button>
+  <span id="slide-counter">1 / 24</span>
+  <button id="btn-next" onclick="navigate(1)" title="Next slide (→)">›</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0, animating = false;
+  const pb = document.getElementById('progress-bar');
+  const ctr = document.getElementById('slide-counter');
+  const sl = document.getElementById('section-label');
+  const bp = document.getElementById('btn-prev');
+  const bn = document.getElementById('btn-next');
+  function ui(){
+    pb.style.width=(total>1?cur/(total-1)*100:100)+'%';
+    ctr.textContent=(cur+1)+' / '+total;
+    sl.textContent=slides[cur].dataset.section||'';
+    bp.disabled=cur===0;bn.disabled=cur===total-1;
+  }
+  function goTo(idx){
+    if(animating||idx===cur||idx<0||idx>=total)return;
+    animating=true;
+    const dir=idx>cur?1:-1;
+    slides[cur].style.transform=dir>0?'translateX(-40px)':'translateX(40px)';
+    slides[cur].style.opacity='0';
+    const prev=cur; cur=idx;
+    slides[cur].style.transition='none';
+    slides[cur].style.transform=dir>0?'translateX(40px)':'translateX(-40px)';
+    slides[cur].style.opacity='0';
+    slides[cur].classList.add('active');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      slides[prev].classList.remove('active');
+      slides[prev].style.transform='';slides[prev].style.opacity='';
+      slides[cur].style.transition='';
+      slides[cur].style.transform='translateX(0)';slides[cur].style.opacity='1';
+      ui(); setTimeout(()=>{animating=false;},420);
+    }));
+  }
+  function navigate(d){goTo(cur+d);}
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();navigate(1);}
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();navigate(-1);}
+    if(e.key==='Home')goTo(0);if(e.key==='End')goTo(total-1);
+  });
+  let tx=0;
+  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>55)navigate(dx<0?1:-1);});
+  ui();
+</script>
+</body>
+</html>

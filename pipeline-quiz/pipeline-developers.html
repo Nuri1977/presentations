@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Developer architecture guide for pipelines in Rosetta DBT Studio." />
+  <title>Pipeline Architecture — Rosetta DBT Studio</title>
+  <style>
+    :root {
+      --navy: #16233d; --navy-2: #1d2b48; --paper: #fffdf7; --white: #fff;
+      --ink: #16233d; --muted: #64708a; --line: #ded7c6; --violet: #6d4aff;
+      --cyan: #81bfff; --mint: #7ee0bd; --yellow: #ffd66b; --coral: #ff806e;
+      --code: #0c1427; --shadow: 0 18px 50px rgba(15, 24, 48, .11);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+    body { margin: 0; color: var(--ink); background: radial-gradient(circle at 8% 4%, rgba(255,214,107,.3), transparent 23rem), radial-gradient(circle at 92% 18%, rgba(126,224,189,.2), transparent 26rem), var(--paper); font: 16px/1.65 Inter, ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: inherit; } button { font: inherit; } code { font-family: "SFMono-Regular", Consolas, monospace; }
+    .shell { width: min(1180px, calc(100% - 34px)); margin: auto; }
+    .topbar { position: sticky; top: 0; z-index: 20; color: var(--ink); border-bottom: 1px solid rgba(22,35,61,.08); background: rgba(255,253,247,.86); backdrop-filter: blur(15px); }
+    .nav { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 900; text-decoration: none; letter-spacing: -.03em; }
+    .brand-mark { display: grid; place-items: center; width: 72px; height: 42px; padding: 3px 7px; border-radius: 12px; background: var(--ink); transform: rotate(-2deg); }
+    .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+    .navlinks { display: flex; gap: 5px; }
+    .navlinks a { padding: 8px 12px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: .86rem; font-weight: 750; }
+    .navlinks a:hover, .navlinks a:focus-visible { color: #4b2ed0; background: #eee9ff; outline: none; }
+    .back { color: #fff !important; background: var(--violet) !important; }
+
+    .hero { color: var(--ink); overflow: hidden; }
+    .hero-inner { position: relative; display: grid; grid-template-columns: 1fr .9fr; gap: 55px; align-items: center; min-height: 650px; padding: 86px 0; }
+    .hero-inner::before { content: ""; position: absolute; width: 540px; height: 540px; right: -220px; top: -250px; border: 1px solid rgba(109,74,255,.18); border-radius: 50%; box-shadow: 0 0 0 70px rgba(126,224,189,.07), 0 0 0 140px rgba(255,214,107,.06); }
+    .kicker { display: inline-flex; padding: 8px 12px; border: 1px solid #d8cffc; border-radius: 999px; color: #4b2ed0; background: #f1edff; font: 800 .78rem/1 monospace; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 17px 0 22px; font-size: clamp(3.2rem, 7vw, 6.6rem); line-height: .91; letter-spacing: -.07em; }
+    .hero-copy { max-width: 680px; color: var(--muted); font-size: 1.15rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 27px; }
+    .pill { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: #fff; font: 700 .8rem/1.2 monospace; }
+    .hero-back { display: inline-flex; align-items: center; margin-top: 24px; padding: 12px 18px; border-radius: 14px; color: #fff; background: var(--violet); box-shadow: 0 9px 22px rgba(109,74,255,.24); text-decoration: none; font-weight: 850; }
+    .hero-back:hover { transform: translateY(-2px); }
+    .terminal { position: relative; z-index: 1; border: 1px solid #36435e; border-radius: 18px; background: var(--code); box-shadow: 0 30px 80px rgba(0,0,0,.34); overflow: hidden; transform: rotate(1.5deg); }
+    .terminal-head { display: flex; align-items: center; gap: 7px; padding: 13px 16px; border-bottom: 1px solid #293550; color: #8d99b2; font: .75rem monospace; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--coral); }.dot:nth-child(2){background:var(--yellow)}.dot:nth-child(3){background:var(--mint)}
+    pre { margin: 0; padding: 25px; overflow: auto; color: #cdd6ea; font: .83rem/1.75 "SFMono-Regular", Consolas, monospace; }
+    .c-key { color: #c29cff; }.c-value {color:#83e6bd}.c-comment{color:#65738f}.c-name{color:#79dce5}
+
+    section { padding: 90px 0; }
+    .section-kicker { margin: 0 0 10px; color: var(--violet); font: 900 .75rem/1 monospace; letter-spacing: .15em; text-transform: uppercase; }
+    h2 { max-width: 820px; margin: 0; font-size: clamp(2.2rem, 5vw, 4.2rem); line-height: 1; letter-spacing: -.055em; }
+    .lead { max-width: 780px; color: var(--muted); font-size: 1.1rem; }
+    h3 { letter-spacing: -.025em; }
+
+    .toc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: -32px; position: relative; z-index: 3; }
+    .toc a { padding: 19px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 8px 20px rgba(20,30,55,.06); text-decoration: none; font-weight: 850; }
+    .toc span { display: block; margin-bottom: 6px; color: var(--violet); font: 700 .75rem monospace; }
+
+    .layers { display: grid; gap: 13px; margin-top: 42px; }
+    .layer { display: grid; grid-template-columns: 190px 1fr 250px; gap: 22px; align-items: center; padding: 22px; border: 1px solid var(--line); border-left: 5px solid var(--violet); border-radius: 18px; background: #fff; }
+    .layer:nth-child(2){border-left-color:var(--cyan)}.layer:nth-child(3){border-left-color:var(--yellow)}.layer:nth-child(4){border-left-color:var(--mint)}
+    .layer h3, .layer p { margin: 0; }.layer p { color: var(--muted); }
+    .path { padding: 10px 12px; border-radius: 9px; color: #bfc9dc; background: var(--code); font: .73rem/1.5 monospace; word-break: break-word; }
+
+    .dark { color: var(--ink); background: #f1edff; }
+    .dark .section-kicker { color: var(--violet); }.dark .lead { color: var(--muted); }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 13px; margin-top: 42px; }
+    .flow-card { position: relative; min-height: 185px; padding: 21px; border: 1px solid #d9d0fb; border-radius: 18px; background: #fff; }
+    .flow-card:not(:last-child)::after { content: "→"; position: absolute; right: -13px; top: 46%; z-index: 3; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #fff; background: var(--violet); font-weight: 950; }
+    .flow-num { color: var(--violet); font: 800 .75rem monospace; }.flow-card h3 { margin: 11px 0 6px; font-size: 1.05rem; }.flow-card p { margin: 0; color: var(--muted); font-size: .89rem; }
+
+    .contract-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 42px; }
+    .panel { padding: 28px; border: 1px solid var(--line); border-radius: 22px; background: #fff; }
+    .panel h3 { margin-top: 0; font-size: 1.3rem; }.panel p { color: var(--muted); }
+    .code { border-radius: 14px; background: var(--code); overflow: hidden; }.code pre { padding: 19px; font-size: .78rem; }
+    .checklist { display: grid; gap: 9px; padding: 0; list-style: none; }.checklist li { position: relative; padding-left: 27px; color: var(--muted); }.checklist li::before { content: "✓"; position: absolute; left: 0; color: #087e58; font-weight: 950; }
+    .warning { border-left: 5px solid var(--coral); background: #fff5f2; }
+
+    .switcher { display: inline-flex; gap: 5px; margin-top: 35px; padding: 5px; border-radius: 13px; background: #e8eaf1; }
+    .switcher button { padding: 10px 18px; border: 0; border-radius: 9px; color: var(--muted); background: transparent; font-weight: 850; cursor: pointer; }
+    .switcher button.active { color: #fff; background: var(--violet); box-shadow: 0 5px 15px rgba(121,92,255,.25); }
+    .runtime { display: grid; grid-template-columns: .85fr 1.15fr; gap: 24px; margin-top: 18px; }
+    .runtime-card { min-height: 290px; padding: 28px; border: 1px solid var(--line); border-radius: 22px; background: #fff; }
+    .runtime-card h3 { margin-top: 0; }.runtime-card code { display: inline-block; padding: 3px 7px; border-radius: 6px; color: var(--violet); background: #efecff; font-size: .82rem; }
+    .runtime-diagram { display: grid; gap: 9px; align-content: center; }
+    .runtime-step { padding: 13px 15px; border: 1px solid var(--line); border-radius: 11px; background: #fff; font: 750 .85rem monospace; }
+    .runtime-step::before { content: "↓ "; color: var(--violet); }.runtime-step:first-child::before { content: "● "; }
+
+    .source-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 40px; }
+    .source-card { display: block; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: #fff; text-decoration: none; transition: .18s ease; }
+    .source-card:hover { transform: translateY(-3px); border-color: var(--violet); box-shadow: 0 12px 28px rgba(20,30,55,.08); }
+    .source-card b { display: block; margin-bottom: 7px; }.source-card code { color: var(--violet); font-size: .72rem; word-break: break-word; }.source-card p { margin-bottom: 0; color: var(--muted); font-size: .88rem; }
+
+    .guardrails { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-top: 40px; }
+    .guard { padding: 22px; border-radius: 17px; color: #d9e1f1; background: var(--navy-2); }.guard b { display: block; margin-bottom: 6px; color: var(--yellow); }.guard p { margin: 0; font-size: .9rem; }
+    footer { padding: 36px 0; color: var(--muted); border-top: 1px solid var(--line); background: var(--paper); text-align: center; font-size: .86rem; }
+
+    @media (max-width: 900px) { .hero-inner{grid-template-columns:1fr}.terminal{transform:none}.toc{grid-template-columns:repeat(2,1fr)}.layer{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow-card:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-19px}.contract-grid,.runtime{grid-template-columns:1fr}.source-grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width: 620px) { .navlinks a:not(.back){display:none}.toc,.source-grid,.guardrails{grid-template-columns:1fr}section{padding:68px 0}.hero-inner{min-height:auto;padding:70px 0}.layer{padding:19px}.contract-grid{gap:14px} }
+    @media (prefers-reduced-motion: reduce) { html{scroll-behavior:auto}*{transition:none!important} }
+  </style>
+</head>
+<body>
+  <header class="topbar"><nav class="nav shell" aria-label="Developer guide navigation">
+    <a class="brand" href="./pipeline-quiz.html"><span class="brand-mark"><img src="../../dbt-studio-old-01/assets/logo_new.png" alt="DBT Studio" /></span><span>Pipeline Playground</span></a>
+    <div class="navlinks"><a href="#architecture">Architecture</a><a href="#execution">Execution</a><a href="#sources">Source map</a><a class="back" href="./pipeline-quiz.html">← Beginner guide</a></div>
+  </nav></header>
+
+  <main id="top">
+    <section class="hero"><div class="hero-inner shell">
+      <div><p class="kicker">Developer field guide · current implementation</p><h1>Inside the<br />pipeline system.</h1><p class="hero-copy">How Rosetta DBT Studio discovers, edits, validates, saves, runs, and observes pipeline YAML—traced across the renderer, Electron IPC, main-process services, Local Runner, Cloud, and Project Agent.</p><div class="meta"><span class="pill">SOURCE: dev</span><span class="pill">COMMIT: a229dcf9</span><span class="pill">AUDITED: 2026-09-03</span></div><a class="hero-back" href="./pipeline-quiz.html">← Back to Pipeline Playground</a></div>
+      <div class="terminal" aria-label="Example pipeline YAML"><div class="terminal-head"><i class="dot"></i><i class="dot"></i><i class="dot"></i>&nbsp; rosetta/pipelines/quality/nightly.yml</div><pre><span class="c-key">name:</span> <span class="c-value">"Nightly quality"</span>
+<span class="c-key">jobs:</span>
+  - <span class="c-key">name:</span> <span class="c-value">"build"</span>
+    <span class="c-key">steps:</span>
+      - <span class="c-key">name:</span> <span class="c-value">Run models</span>
+        <span class="c-key">plugin:</span> <span class="c-name">dbt@v1</span>
+        <span class="c-key">command:</span> <span class="c-value">dbt run</span>
+  - <span class="c-key">name:</span> <span class="c-value">"cleanup"</span>
+    <span class="c-key">type:</span> <span class="c-name">cleanup</span></pre></div>
+    </div></section>
+
+    <div class="toc shell"><a href="#architecture"><span>01 / SYSTEM</span>Architecture layers</a><a href="#contract"><span>02 / DATA</span>File contract</a><a href="#execution"><span>03 / RUNTIME</span>Local &amp; Cloud</a><a href="#sources"><span>04 / CODE</span>Source ownership</a></div>
+
+    <section id="architecture"><div class="shell"><p class="section-kicker">System shape</p><h2>Four layers, clear ownership</h2><p class="lead">The renderer owns interaction and transient drafts. Main-process services own trusted filesystem, process, settings, and network work. IPC contracts connect the two.</p>
+      <div class="layers">
+        <article class="layer"><h3>Renderer workspace</h3><p>Virtual tab, React Flow graph, YAML editor, palette, dialogs, runner logs, cloud logs, and save/discard decisions.</p><div class="path">src/renderer/components/pipelineView/</div></article>
+        <article class="layer"><h3>Renderer orchestration</h3><p>Project Details resolves pipeline tabs and run actions. Controllers and services translate UI intent into typed IPC requests.</p><div class="path">screens/projectDetails/index.tsx<br/>services/*.service.ts</div></article>
+        <article class="layer"><h3>Electron boundary</h3><p>Thin handlers receive allowlisted channels, validate request shape where needed, and delegate work to backend services.</p><div class="path">src/main/ipcHandlers/</div></article>
+        <article class="layer"><h3>Main-process services</h3><p>Filesystem discovery, trusted Runner execution, Cloud API orchestration, settings, action mapping, and agent-safe pipeline writes.</p><div class="path">src/main/services/</div></article>
+      </div>
+    </div></section>
+
+    <section class="dark"><div class="shell"><p class="section-kicker">Authoring lifecycle</p><h2>From file click to persisted YAML</h2><p class="lead">A recognized pipeline never opens as an ordinary file tab. It becomes a virtual pipeline workspace that projects one canonical draft into two editing modes.</p>
+      <div class="flow">
+        <article class="flow-card"><span class="flow-num">01</span><h3>Recognize</h3><p>Any nested .yml or .yaml below rosetta/pipelines or legacy .rosetta is treated as a pipeline.</p></article>
+        <article class="flow-card"><span class="flow-num">02</span><h3>Parse</h3><p>js-yaml and Zod check the root, jobs, steps, names, and plugins. Invalid input returns null safely.</p></article>
+        <article class="flow-card"><span class="flow-num">03</span><h3>Project</h3><p>PipelineView turns valid YAML into React Flow nodes and edges. Unsupported fields keep Visual mode read-only.</p></article>
+        <article class="flow-card"><span class="flow-num">04</span><h3>Edit</h3><p>Visual edits serialize back to YAML. YAML mode edits the same draft. Dirty transitions require an explicit decision.</p></article>
+        <article class="flow-card"><span class="flow-num">05</span><h3>Persist</h3><p>The project save path writes the file, then refreshes Explorer, Git status, and clean editor content.</p></article>
+      </div>
+    </div></section>
+
+    <section id="contract"><div class="shell"><p class="section-kicker">Persistence contract</p><h2>Canonical paths and stable identities</h2><div class="contract-grid">
+      <article class="panel"><h3>Discovery rules</h3><ul class="checklist"><li>New files belong under <code>rosetta/pipelines/</code>.</li><li>Legacy <code>.rosetta/</code> remains recursively readable.</li><li>Only <code>.yml</code> and <code>.yaml</code> are included.</li><li><code>main.conf</code> is always excluded.</li><li>Identity is the nested POSIX path without extension.</li><li>Canonical files win over duplicate legacy identities.</li></ul></article>
+      <article class="panel"><h3>Minimum valid shape</h3><div class="code"><pre><span class="c-key">name:</span> <span class="c-value">string</span>
+<span class="c-key">jobs:</span>
+  - <span class="c-key">name:</span> <span class="c-value">string</span>
+    <span class="c-key">steps:</span>
+      - <span class="c-key">name:</span> <span class="c-value">string</span>
+        <span class="c-key">plugin:</span> <span class="c-value">string</span></pre></div><p>Optional fields include job type, command, working directory, and git-clone fields. Unknown fields are preserved in YAML but can disable Visual editing to prevent lossy serialization.</p></article>
+      <article class="panel"><h3>Visual graph semantics</h3><p>Steps within a job are sequential. Dashed edges cross job boundaries. Cleanup comes from <code>job.type: cleanup</code>. Serialization topologically orders connected nodes and uses X position for disconnected nodes.</p><ul class="checklist"><li>Reject empty graphs and cycles</li><li>Require step names and plugin fields</li><li>Snapshot nodes, edges, and name for undo/redo</li></ul></article>
+      <article class="panel warning"><h3>Known edge cases</h3><p>Manual Cloud handoff currently reconstructs a <code>.yml</code> name after stripping either extension, so it does not preserve <code>.yaml</code> exactly. Cloud status maps steps by name, making duplicate step names ambiguous. Action fallback scans only the newest 20 actions.</p></article>
+    </div></div></section>
+
+    <section id="execution"><div class="shell"><p class="section-kicker">Execution paths</p><h2>Same YAML, two different runtimes</h2><p class="lead">Switch the view to compare what the application trusts, checks, sends, and observes.</p>
+      <div class="switcher" role="tablist" aria-label="Execution mode"><button class="active" id="localTab" role="tab" aria-selected="true">Local Runner</button><button id="cloudTab" role="tab" aria-selected="false">Rosetta Cloud</button></div>
+      <div class="runtime">
+        <article class="runtime-card"><h3 id="runtimeTitle">Local Runner</h3><p id="runtimeCopy">Runs the exact local pipeline file through the managed Runner binary. Git is not required.</p><ul class="checklist" id="runtimeList"><li>Binary path comes from trusted Settings</li><li>Dedicated runner:* IPC channels</li><li>Child-only environment</li><li>Run/stop/status owned by RunnerProvider</li><li>Ordered output in Runner Logs</li></ul></article>
+        <div class="runtime-diagram" id="runtimeDiagram"><div class="runtime-step">PipelineView / file action</div><div class="runtime-step">RunnerProvider</div><div class="runtime-step">runner:run IPC</div><div class="runtime-step">runner.ipcHandlers.ts</div><div class="runtime-step">ProcessAdapter + managed binary</div></div>
+      </div>
+    </div></section>
+
+    <section class="dark"><div class="shell"><p class="section-kicker">Safety boundaries</p><h2>Mutation is deliberate</h2><div class="guardrails">
+      <article class="guard"><b>Unsaved UI drafts</b><p>Switching mode or running prompts Save, Discard, or Cancel. Clean disk refreshes never overwrite a dirty draft without a choice.</p></article>
+      <article class="guard"><b>Agent stale-write protection</b><p>Updates require the SHA-256 hash from a preceding read. Writes are contained, reject symlinks/traversal, validate before and after replacement, and never commit or run.</p></article>
+      <article class="guard"><b>Cloud source of truth</b><p>Cloud clones the configured remote branch. Dirty or unpushed selected pipeline files block the Cloud selector because local bytes are not uploaded.</p></article>
+      <article class="guard"><b>Credential ownership</b><p>Secrets and binary paths are resolved by trusted main-process code. The renderer supplies identities and user choices, not arbitrary executables.</p></article>
+    </div></div></section>
+
+    <section id="sources"><div class="shell"><p class="section-kicker">Source map</p><h2>Where to start reading</h2><p class="lead">These are the highest-signal implementation files on <code>dev</code>. Open the primary context document first, then follow the flow you are changing.</p>
+      <div class="source-grid">
+        <a class="source-card" href="./developer-docs/architecture.html"><b>Architecture overview</b><code>HTML CHAPTER 01</code><p>Renderer, IPC, main-process ownership, and end-to-end request paths.</p></a>
+        <a class="source-card" href="./developer-docs/authoring.html"><b>Visual and YAML authoring</b><code>HTML CHAPTER 02</code><p>PipelineView, PipelineGraph, parsing, serialization, validation, and drafts.</p></a>
+        <a class="source-card" href="./developer-docs/file-contract.html"><b>Files and discovery</b><code>HTML CHAPTER 03</code><p>Canonical and legacy roots, nested identity, schema, and creation paths.</p></a>
+        <a class="source-card" href="./developer-docs/local-runner.html"><b>Local Runner</b><code>HTML CHAPTER 04</code><p>Trusted execution, IPC events, process ownership, logs, and cancellation.</p></a>
+        <a class="source-card" href="./developer-docs/cloud.html"><b>Rosetta Cloud</b><code>HTML CHAPTER 05</code><p>Git preconditions, payload, secrets, action mapping, status, and logs.</p></a>
+        <a class="source-card" href="./developer-docs/agent-tools.html"><b>Project Agent tools</b><code>HTML CHAPTER 06</code><p>List/read/generate/update, hashes, containment, rollback, and boundaries.</p></a>
+        <a class="source-card" href="./developer-docs/modules.html"><b>Pipeline modules</b><code>HTML CHAPTER 07</code><p>dbt, Rosetta, Terraform, Shell, S3, Kinetica CLI, and git-clone compatibility.</p></a>
+      </div>
+    </div></section>
+  </main>
+
+  <footer><div class="shell">Developer guide generated from DBT Studio <strong>dev</strong> and the active AI-context tree · 2026-09-03</div></footer>
+  <script>
+    const localTab = document.getElementById('localTab');
+    const cloudTab = document.getElementById('cloudTab');
+    const title = document.getElementById('runtimeTitle');
+    const copy = document.getElementById('runtimeCopy');
+    const list = document.getElementById('runtimeList');
+    const diagram = document.getElementById('runtimeDiagram');
+    const modes = {
+      local: { title: 'Local Runner', copy: 'Runs the exact local pipeline file through the managed Runner binary. Git is not required.', points: ['Binary path comes from trusted Settings','Dedicated runner:* IPC channels','Child-only environment','Run/stop/status owned by RunnerProvider','Ordered output in Runner Logs'], steps: ['PipelineView / file action','RunnerProvider','runner:run IPC','runner.ipcHandlers.ts','ProcessAdapter + managed binary'] },
+      cloud: { title: 'Rosetta Cloud', copy: 'Runs the pipeline from the remote Git branch. The local working tree is never uploaded as the execution source.', points: ['Requires remote URL and remote branch','Blocks dirty or unpushed pipeline file','Sends EXECUTION_MODE and PIPELINE_FILE','Main process uploads selected secrets','Polls action status and logs every 3 seconds'], steps: ['Pipeline UI / PushToCloudModal','renderer service + controller','rosettaCloud:* IPC','RosettaCloudService','Cloud REST API + action mapping'] }
+    };
+    function showMode(name) {
+      const data = modes[name];
+      localTab.classList.toggle('active', name === 'local'); cloudTab.classList.toggle('active', name === 'cloud');
+      localTab.setAttribute('aria-selected', name === 'local'); cloudTab.setAttribute('aria-selected', name === 'cloud');
+      title.textContent = data.title; copy.textContent = data.copy;
+      list.innerHTML = data.points.map(point => `<li>${point}</li>`).join('');
+      diagram.innerHTML = data.steps.map(step => `<div class="runtime-step">${step}</div>`).join('');
+    }
+    localTab.addEventListener('click', () => showMode('local'));
+    cloudTab.addEventListener('click', () => showMode('cloud'));
+  </script>
+</body>
+</html>
