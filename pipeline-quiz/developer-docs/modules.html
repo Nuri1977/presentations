@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pipeline Modules</title><link rel="stylesheet" href="./styles.css"></head><body>
+<header class="top"><nav class="shell"><a class="brand" href="../pipeline-quiz.html"><span class="mark"><img src="../../../dbt-studio-old-01/assets/logo_new.png" alt="DBT Studio"></span><span>Pipeline Playground</span></a><a class="back" href="../pipeline-developers.html#sources">← Developer map</a></nav></header><main class="layout shell"><aside class="side"><small>DEVELOPER CHAPTERS</small><a href="./architecture.html">01 Architecture</a><a href="./authoring.html">02 Authoring</a><a href="./file-contract.html">03 File contract</a><a href="./local-runner.html">04 Local Runner</a><a href="./cloud.html">05 Cloud</a><a href="./agent-tools.html">06 Agent tools</a><a class="active" href="./modules.html">07 Modules</a></aside><article class="content">
+<span class="eyebrow">Chapter 07</span><h1>Pipeline modules</h1><p class="lead">A pipeline step selects a versioned plugin ID and supplies the fields required by that plugin contract. DBT Studio authors and validates these declarations; the selected execution runtime performs them.</p><div class="meta"><span class="pill">6 addable modules</span><span class="pill">1 preserve-only module</span><span class="pill">@v1 contracts</span></div>
+
+<div class="callout"><strong>Terminology:</strong> the UI presents these as palette modules or step types, while the YAML field is named <code>plugin</code>. For example, the dbt module is persisted as <code>plugin: dbt@v1</code>.</div>
+
+<h2>Modules visible in the palette</h2>
+<div class="grid">
+  <section class="card"><h3 class="module-title"><img src="../../../dbt-studio-old-01/assets/icons/dbt-bit_tm.png" alt="">dbt · <code>dbt@v1</code></h3><p>Runs dbt operations such as build, test, compile, debug, seed, or dependencies. The command is required; working directory is optional.</p><pre>- name: Build models
+  plugin: dbt@v1
+  command: dbt run
+  working_dir: dbt</pre><p><strong>Default command:</strong> <code>dbt run</code></p></section>
+  <section class="card"><h3 class="module-title"><img src="../../../dbt-studio-old-01/assets/icons/rosetta.png" alt="">Rosetta · <code>rosetta@v1</code></h3><p>Runs a Rosetta CLI command. It is used for Rosetta-native data engineering work rather than dbt commands.</p><pre>- name: Apply layer
+  plugin: rosetta@v1
+  command: rosetta apply -s bigquery
+  working_dir: rosetta</pre><p><strong>Required:</strong> command. <strong>Optional:</strong> working directory.</p></section>
+  <section class="card"><h3>🟪 Terraform · <code>terraform@v1</code></h3><p>Runs Terraform CLI commands for infrastructure work. Its optional working directory should contain the relevant <code>.tf</code> configuration.</p><pre>- name: Provision
+  plugin: terraform@v1
+  command: terraform init &amp;&amp; terraform apply -auto-approve
+  working_dir: terraform</pre><p>The displayed default initializes and applies with auto-approval.</p></section>
+  <section class="card"><h3>⬛ Shell · <code>command@v1</code></h3><p>Runs a general command when a specialized module is not appropriate. Only the command field belongs to the current editor contract.</p><pre>- name: Announce
+  plugin: command@v1
+  command: echo "pipeline started"</pre><p>Because this is generic execution, authors must review command content carefully.</p></section>
+  <section class="card"><h3>🟡 S3 · <code>s3@v1</code></h3><p>Represents an Amazon S3 command step, commonly used to copy or synchronize pipeline artifacts.</p><pre>- name: Upload results
+  plugin: s3@v1
+  command: aws s3 cp results/ s3://my-bucket/ --recursive</pre><p>The current editor contract requires a command and does not expose a working-directory field.</p></section>
+  <section class="card"><h3 class="module-title"><img src="../../../dbt-studio-old-01/assets/connectionIcons/kinetica.png" alt="">Kinetica CLI · <code>kinetica_cli@v1</code></h3><p>Runs KiSQL commands against Kinetica. Local Runner settings manage the KiSQL CLI dependency used by this kind of step.</p><pre>- name: Check Kinetica
+  plugin: kinetica_cli@v1
+  command: kisql --url http://localhost:9191 --sql "SELECT 1"</pre><p>The command is required. Connection values should come from the intended environment rather than documentation examples.</p></section>
+</div>
+
+<h2>Compatibility-only module</h2>
+<section class="card"><h3>Git clone · <code>git_clone@v1</code></h3><p>The shared contract and serializer understand URL, optional branch, and optional destination fields. However, this module is marked <strong>preserve-only</strong>: it is not shown in the current palette, and Project Agent generate/update must not introduce it.</p><pre>- name: Fetch dependency
+  plugin: git_clone@v1
+  url: https://example.com/repository.git
+  branch: main
+  dest: dependencies/example</pre></section>
+
+<h2>Field contract</h2><table><thead><tr><th>Plugin</th><th>Required fields</th><th>Optional fields</th><th>Palette</th></tr></thead><tbody><tr><td><code>dbt@v1</code></td><td>command</td><td>working_dir</td><td>Addable</td></tr><tr><td><code>rosetta@v1</code></td><td>command</td><td>working_dir</td><td>Addable</td></tr><tr><td><code>terraform@v1</code></td><td>command</td><td>working_dir</td><td>Addable</td></tr><tr><td><code>command@v1</code></td><td>command</td><td>—</td><td>Addable</td></tr><tr><td><code>s3@v1</code></td><td>command</td><td>—</td><td>Addable</td></tr><tr><td><code>kinetica_cli@v1</code></td><td>command</td><td>—</td><td>Addable</td></tr><tr><td><code>git_clone@v1</code></td><td>url</td><td>branch, dest</td><td>Preserve only</td></tr></tbody></table>
+
+<h2>How definitions are split</h2><div class="grid"><section class="card"><h3>Shared catalog</h3><p><code>PIPELINE_PLUGIN_CATALOG</code> is serializable and contains IDs, availability, fields, labels, placeholders, and defaults. Backend Project Agent validation consumes this contract.</p></section><section class="card"><h3>Renderer definitions</h3><p><code>PLUGIN_DEFS</code> adds MUI icons, colors, categories, and fields for the visual palette. It contains only the six addable modules.</p></section></div>
+
+<div class="callout warning"><strong>Important implementation boundary:</strong> DBT Studio's catalog describes how a step is authored and validated. It does not itself implement dbt, Terraform, AWS, KiSQL, or Rosetta command semantics. Local Runner or Rosetta Cloud executes the saved plugin contract and must have the required tools, configuration, and credentials.</div>
+
+<h2>Project Agent behavior</h2><p>The Agent is instructed to use <code>dbt@v1</code> for dbt operations—not invented IDs such as <code>dbt-run</code>. Unknown plugins and <code>git_clone@v1</code> can be preserved when already present but cannot be introduced. For Terraform steps, it inspects the working directory for suitable <code>.tf</code> files before finalizing the pipeline.</p>
+
+<h2>Primary sources</h2><ul class="sources"><li><a href="../../../dbt-studio-old-01/src/shared/pipelinePluginCatalog.ts">src/shared/pipelinePluginCatalog.ts</a></li><li><a href="../../../dbt-studio-old-01/src/renderer/components/pipelineView/pluginDefinitions.ts">src/renderer/components/pipelineView/pluginDefinitions.ts</a></li><li><a href="../../../dbt-studio-old-01/src/renderer/components/pipelineView/StepEditDialog.tsx">src/renderer/components/pipelineView/StepEditDialog.tsx</a></li><li><a href="../../../dbt-studio-old-01/src/main/services/ai/tools/studio/pipeline.tools.ts">src/main/services/ai/tools/studio/pipeline.tools.ts</a></li></ul>
+</article></main><footer>Pipeline developer documentation · Pipeline modules</footer></body></html>
