@@ -1,238 +1,127 @@
-================================================================================
-  ROSETTA DBT STUDIO — ANALYTICS DEEP DIVE
-  Voice-Over Script
-  Presentation: analytics-jaffle-shop-demo/presentation-slides.html
-================================================================================
-
-────────────────────────────────────────────────────────────────────────────────
-SECTION A — HOW ANALYTICS WORKS UNDER THE HOOD
-────────────────────────────────────────────────────────────────────────────────
-
-SLIDE 1 — How Rosetta Analytics Works
-──────────────────────────────────────
-Most analytics setups require a separate BI tool, a data export step, and a
-whole other service to maintain. Rosetta DBT Studio takes a different approach.
-
-Analytics is built directly into the desktop app — no external tool, no extra
-service. You write Markdown, add named SQL blocks, drop in PascalCase
-components, and the engine executes those queries against your live database
-connection and renders charts, tables, and KPI values in real time.
-
-Three things make this work: a Markdown-plus-SQL editor, a live preview that
-updates as you type via IPC, and a one-click static HTML export you can share
-with anyone.
-
-
-SLIDE 1b — SQL on the Left. Charts on the Right.
-─────────────────────────────────────────────────
-Here's what that looks like inside the IDE.
-
-On the left you have the Monaco editor — the same editor that powers VS Code.
-You write a named SQL fence, give it a name like "orders_by_status", and then
-right below it you place a component — say, a BarChart — and pass that query
-name as the data prop.
-
-On the right, the preview panel updates immediately. You can see KPI values,
-bar charts, line charts, and data tables all rendering from the same connection
-your dbt project is already using. Zero extra configuration.
-
-
-SLIDE 1c — The Real Analytics Editor
-──────────────────────────────────────
-This is the actual product. Monaco on the left, live chart preview on the right,
-running against your real database, updating as you type.
-
-No mocks, no screenshots from another tool — this is Rosetta DBT Studio with
-the analytics panel open.
-
-
-SLIDE 2 — From SQL Block to Live Chart
-────────────────────────────────────────
-Let's trace what happens from the moment you write a SQL block to the moment a
-chart appears on screen.
-
-The Monaco editor saves content to SQLite as you type. That content is parsed by
-the analytics Markdown parser, which extracts each named SQL block and builds a
-dependency graph.
-
-From there, the Query Engine handles execution — the renderer sends the query
-over IPC to the main process, which runs it against your database. Six platforms
-are supported: Postgres, Snowflake, BigQuery, Redshift, Databricks, and DuckDB.
-
-Results come back to the preview component, AnalyticsPreview, which has over
-twenty Recharts components ready to render. And when you're done, a single click
-writes a self-contained static HTML file with all query results pre-bundled.
-
-Everything is connection-scoped — the same database connection your dbt project
-already uses.
-
-
-SLIDE 3 — The Agent Reads, Writes & Runs Your Pages
-─────────────────────────────────────────────────────
-Rosetta also ships an AI agent that can build and fix analytics pages for you.
-
-The agent has six tools. On the active-page side: it can read the live Monaco
-content including any unsaved edits, it can write SQL blocks and components
-directly into the editor so the preview updates immediately, it can trigger
-a Run All pass, and it can fetch compact JSON-safe row previews to inspect and
-fix errors.
-
-On the stored-pages side: it can list all analytics pages for the current
-connection from SQLite, and it can read any stored page for full project context.
-
-Effectively the agent can see everything, write everything, run everything, and
-iterate until all queries come back green.
-
-
-SLIDE 4 — 20+ Components. Zero Configuration.
-───────────────────────────────────────────────
-The component system is designed to stay out of your way.
-
-Every component reads from a named SQL block — you just pass "data equals query
-name" as a prop and you're done.
-
-For values you have Value, BigValue, and Delta. For charts: BarChart,
-HorizontalBarChart, LineChart, AreaChart, PieChart, DonutChart, and
-ScatterChart. For layout: DataTable, Grid, Stack, Accordion, and Tabs. And for
-interactivity: Select, DateRange, TextInput, and more.
-
-A concrete example — define a SQL block named "revenue_by_month", then write
-a LineChart with data equals revenue_by_month, x equals month, y equals revenue.
-That's it. The chart renders.
-
-
-SLIDE 4b — Self-Contained Static HTML — Open Anywhere
-───────────────────────────────────────────────────────
-When you export, the output is a completely standalone HTML file. No server, no
-login, no database connection required to view it.
-
-Here you can see what that file looks like in a browser. It has the same KPIs,
-bar charts, line charts, and data tables — but all the query results are
-pre-bundled into the file itself. You can email it, drop it in an S3 bucket,
-or open it directly from disk.
-
-
-SLIDE 4c — The Real Static Report
-────────────────────────────────────
-This is the actual exported HTML opened in a browser. One click in the Build
-dialog, pick a folder, and Rosetta does the rest — runs every query, bundles the
-results, and writes one self-contained file per analytics page.
-
-No server. No login. No database. Just open and share.
-
-
-────────────────────────────────────────────────────────────────────────────────
-SECTION B — JAFFLE SHOP DEMO
-────────────────────────────────────────────────────────────────────────────────
-
-SLIDE 5 — Import the Project, Connect the Database
-────────────────────────────────────────────────────
-Now let's walk through a live demo using the Jaffle Shop — the canonical dbt
-sample project.
-
-We clone it directly inside the app, and then point it at our database. That
-one connection is what Analytics will query later — no second setup, no
-separate credentials.
-
-
-SLIDE 6 — Seed the Data. Run All Models.
-──────────────────────────────────────────
-With the project imported and the connection set, we seed the data and run all
-models.
-
-"dbt seed" loads the CSV fixtures. "dbt run" builds every model in the project
-— staging, intermediates, dimensions, facts. You can see all of them come back
-green in the run panel.
-
-
-SLIDE 7 — Four Layers, One Clean Project
-──────────────────────────────────────────
-The Jaffle Shop is a good example of a well-structured dbt project.
-
-It has four layers. Staging sits on top of the raw source tables — renaming,
-casting, light cleaning. Intermediate builds the business logic between staging
-and the marts. Dimensions hold the descriptive entities — customers, products.
-And Facts hold the measurable events — orders and their amounts.
-
-This layering is what makes the analytics pages meaningful, because we can query
-the fact and dimension tables directly with clean, reliable column names.
-
-
-SLIDE 8 — Describe It. AI Writes SQL + Components.
-────────────────────────────────────────────────────
-Here's where it gets interesting. Instead of writing the analytics pages
-manually, we tell the AI agent what we need.
-
-We describe the reports we want — orders overview, customer analytics, revenue
-trends. The agent reads the fct_orders and dim_customers tables, writes the
-named SQL blocks, and pairs each query with the right chart or table component.
-
-You type a requirement in plain language. The agent writes the page.
-
-
-SLIDE 9 — One Click. Everything Renders.
-──────────────────────────────────────────
-We hit Run All. The queries execute in dependency order, results flow into the
-chart and table components, and the preview panel updates.
-
-Each SQL block gets a green badge showing the row count and execution time. If
-anything fails, the agent can read the error, patch the SQL, and run again.
-
-From a plain-language requirement to a live, rendered dashboard — without
-leaving the IDE.
-
-
-────────────────────────────────────────────────────────────────────────────────
-SECTION C — STATIC REPORTS
-────────────────────────────────────────────────────────────────────────────────
-
-SLIDE 10 — One Click to Static HTML
-──────────────────────────────────────
-Once the pages look right in the live preview, we export them.
-
-Open the Build dialog, pick a destination folder, click Build. Rosetta runs
-every query one final time, bundles all the results, and writes a self-contained
-HTML file per analytics page. The database is no longer needed to view the
-output.
-
-
-SLIDE 11 — Orders Overview (orders-overview.html)
-───────────────────────────────────────────────────
-The first exported report is the Orders Overview.
-
-It shows total orders, total revenue, and average order value as KPI cards at
-the top. Below that, orders broken down by status as a bar chart, monthly
-revenue as a line chart, and a full data table for drill-down.
-
-This file can be opened in any browser — Chrome, Safari, Firefox — with no
-dependencies.
-
-
-SLIDE 12 — Customer Analytics (customer-analytics.html)
-────────────────────────────────────────────────────────
-The second report is Customer Analytics.
-
-This page focuses on the customer dimension — lifetime value distribution,
-top customers by revenue, order frequency, and cohort-style breakdowns. All
-sourced from the dim_customers and fct_orders marts we built in the demo.
-
-Same idea — a single, shareable HTML file. No server, no login.
-
-
-SLIDE 13 — Closing
-────────────────────
-Analytics Built In. Reports Shipped Anywhere.
-
-That's the full picture. From dbt marts to shareable static HTML dashboards —
-no extra BI tool, no server, no extra configuration.
-
-You write the models, you describe what you want to see, the agent builds the
-pages, and you export them in one click.
-
-Rosetta DBT Studio — the whole workflow, in one tool.
-
-================================================================================
-  END OF SCRIPT
-  Total slides: 13 + 3 sub-slides (1b, 1c, 4b, 4c)
-  Sections: A (Architecture), B (Jaffle Shop Demo), C (Static Reports)
-================================================================================
+ROSETTA DBT STUDIO — JAFFLE SHOP ANALYTICS
+PHASE 1 SLIDE NARRATION
+Deck: presentation-slides.html
+
+Audience: people using dbt models to create and share an Analytics page.
+Promise: Show the finished Jaffle Shop report, then how AI assistance in
+Rosetta DBT Studio led to a static site saved inside the dbt project.
+
+Slide 1 — The Jaffle Shop Analytics page
+Visual: slide-01-browser-report-overview.png
+Narration:
+"Here is the finished Jaffle Shop Analytics page. It brings order measures,
+a daily revenue chart, and an orders-by-status chart into one report. The page
+was developed in Rosetta DBT Studio with help from the AI assistant. Now I'll
+show how it was exported into the dbt project."
+
+Slide 2 — The AI assistant helped build and correct the page
+Visual: slide-02-studio-ai-analytics.png
+Narration:
+"Inside the SQL Analytics tab, the page combines named SQL queries with the
+components that display their results. The assistant helped write and run the
+page, then corrected a date display issue visible in the conversation. We
+review the SQL and the rendered charts before publishing."
+
+Slide 3 — Build a static Analytics site
+Visual: slide-03-studio-build-dialog.png
+Narration:
+"Once the page is ready, we open Build Analytics Site. Rosetta runs the page
+queries and includes the returned data in the output. This creates a report
+that can open in a browser without a live database connection. Its values are
+a snapshot from the time of the build."
+
+Slide 4 — Save the export inside the dbt project
+Visual: slide-04-choose-project-folder.png
+Narration:
+"For this demo, we choose the analytics-page folder inside the
+rosetta_studio_analytics_demo project. This is the export destination. The
+editable Analytics page is still stored in Studio; the static website files
+are what we save alongside the dbt project."
+
+Slide 5 — The project contains the exported report
+Visual: slide-05-project-export-preview.png
+Narration:
+"After the build, the project Explorer shows analytics-page with index.html,
+a pages folder, and the site assets. We can open the index in Studio and preview
+the generated site. That gives us a concrete artifact to keep or share with
+the project."
+
+Slide 6 — Verify the browser output
+Visual: slide-06-browser-report-insights.png
+Narration:
+"Finally, we open the generated report in a browser and check more than the
+headline numbers. The page shows the payment-method breakdown and the recent
+orders table, with the query results embedded in the export. That completes
+Phase 1: an AI-assisted Analytics page and a static report saved inside the dbt
+project."
+
+ARCHITECTURE INTERLUDE — BETWEEN PHASE 1 AND THE LIVE VIDEO
+
+Slide 7 — One screen: editor, preview, assistant
+Visual: slide-07-studio-markdown-preview-ai.png
+Narration:
+"Before the live video, let's look behind the Analytics screen. The Markdown
+editor is on the left, the page preview is in the middle, and the AI assistant
+is on the right. We can see the page source, its rendered result, and the
+assistant's work together. The history includes failed query attempts, so we
+check status and results rather than assuming every suggestion worked."
+
+Slide 8 — Write the page yourself or with AI assistance
+Visual: slide-08-studio-markdown-editor-ai.png
+Narration:
+"A page starts as Markdown. We add headings, named SQL blocks, and component
+tags such as BigValue and BarChart. You can write those directly. In Code mode,
+the assistant can inspect the active page, edit it, run queries, and review
+their results. The layout preview responds to editing, but SQL runs when we
+run a query or select Run All."
+
+Slide 9 — From Markdown to a live chart
+Visual: four-step architecture on a light background.
+Narration:
+"The editor content is parsed into text, named queries, and components.
+When we run the page, the query engine orders any dependencies and sends SQL
+to the selected database connection. Results return under their query names;
+the renderer passes those rows to KPI cards, charts, and tables. Studio saves
+the editable page in its application database. A site build separately writes
+HTML with results captured at build time."
+
+Slide 10 — Choose a component, bind a query result
+Visual: named SQL example and selected component groups.
+Narration:
+"Here is the smallest example: a named total-orders query returns a row, and
+BigValue displays its order count. The same page can use LineChart for a trend,
+BarChart or DonutChart for comparisons, and DataTable for details. Layout
+components arrange those views, and input components are available when the
+page needs controls. This is the authoring model behind the report we just
+opened."
+
+Slide 11 — What the Analytics agent can use
+Visual: slide-11-studio-analytics-agent-context.png beside the page, database,
+project, and optional extension context.
+Narration:
+"The Analytics assistant has tools that connect its work to the real page and
+data. It can read the active page, inspect the selected database schema and
+query results, and in Code mode edit and run the page. When a dbt project is
+linked, it can also read its models and files. Imported skills and connected
+MCP servers can add specialized guidance and tools. Agent Memory can provide
+longer-term context when it is enabled and initialized. We still check the
+query output and preview before sharing the result. Next, the separate live
+video will show a new Analytics page being created."
+
+CLOSING CALL TO ACTION — AFTER THE LIVE VIDEO
+
+Slide 12 — Your next Analytics page
+Visual: slide-12-rosetta-logo.png, text, download link, and GitHub link in the
+left column on the light striped background; the right column is reserved for
+the speaking avatar. Use this slide after the separate Phase 2 video.
+Narration:
+"Create your next Analytics page with Rosetta DBT Studio. Start with your dbt
+project, use the AI assistant to help build the report, and share the result.
+Download Studio at rosettadb.io, and star the project on GitHub."
+
+PRODUCTION CHECK
+The displayed revenue and average-order-value numbers are demo output, not
+validated financial measures. Verify the fct_orders calculation before making
+business claims from them. This script covers the Phase 1 slides and the
+architecture interlude, plus the closing call to action. The separate live
+video has no narration here.
