@@ -1,0 +1,231 @@
+1
+00:00:00,700 --> 00:00:04,091
+Welcome to the Rosetta DBT Studio release roundup.
+
+2
+00:00:04,372 --> 00:00:15,102
+In the last three weeks we shipped four releases: 1.6.82, 1.6.83, 1.7.0 and 1.7.1.
+
+3
+00:00:15,382 --> 00:00:24,513
+Let’s walk through what’s new, from a brand-new home dashboard and Python notebooks to MySQL, Snowflake browser login, and images in the AI chat.
+
+4
+00:00:25,613 --> 00:00:26,850
+Here’s the timeline.
+
+5
+00:00:27,130 --> 00:00:34,128
+1.6.82 landed on September 17th with pipeline templates and setup improvements.
+
+6
+00:00:34,408 --> 00:00:40,829
+1.6.83 followed on September 22nd with the dbt-Kinetica adapter.
+
+7
+00:00:41,109 --> 00:00:50,048
+1.7.0, on September 29th, was the big one: a new dashboard, Python notebooks and Snowflake browser authentication.
+
+8
+00:00:50,327 --> 00:00:57,602
+And 1.7.1, on October 2nd, added MySQL, a smarter schema tree and multimodal AI.
+
+9
+00:00:58,702 --> 00:01:03,545
+Starting with 1.7.0, Studio opens on the new Workspace Overview.
+
+10
+00:01:03,825 --> 00:01:13,340
+Every module is one click away: dbt Project, Notebook, SQL Editor, Analytics, Data Lake, Object Explorer, Pipeline and ETL.
+
+11
+00:01:13,620 --> 00:01:21,726
+Below them you’ll find your recent projects and configured connections, and the app navigation has been reorganized around these modules.
+
+12
+00:01:22,826 --> 00:01:24,426
+Notebooks now run Python.
+
+13
+00:01:24,706 --> 00:01:30,616
+Here, a SQL cell queries the connected DuckDB database and saves its result as df.
+
+14
+00:01:30,896 --> 00:01:39,642
+The next Python cell picks it up as a pandas DataFrame and displays it in an interactive table with column types, row filtering and paging.
+
+15
+00:01:40,742 --> 00:01:42,641
+The workflow has three cell types.
+
+16
+00:01:42,921 --> 00:01:48,425
+SQL cells run against the selected connection, and Result as gives the output a name.
+
+17
+00:01:48,705 --> 00:01:51,478
+Python cells use that name as a DataFrame.
+
+18
+00:01:51,758 --> 00:01:53,678
+Text cells add headings and notes.
+
+19
+00:01:53,958 --> 00:02:00,273
+Just run cells from top to bottom: a Python cell can only use df after its SQL cell has run.
+
+20
+00:02:00,553 --> 00:02:04,862
+The toolbar shows the Python version and whether the kernel is idle or busy.
+
+21
+00:02:05,962 --> 00:02:09,696
+Snowflake connections can now sign in through your web browser.
+
+22
+00:02:09,976 --> 00:02:17,890
+Choose Web Browser instead of Password Login, fill in your account, warehouse, role, database and schema, and click Test Connection.
+
+23
+00:02:18,170 --> 00:02:25,445
+Studio opens Snowflake’s login page; finish there and you’re authenticated, without typing a password into Studio.
+
+24
+00:02:25,725 --> 00:02:27,773
+You can revoke the token at any time.
+
+25
+00:02:28,873 --> 00:02:32,969
+1.7.0 also removes some everyday interruptions.
+
+26
+00:02:33,249 --> 00:02:39,372
+The SQL editor no longer crashes when a database returns an error object instead of a message.
+
+27
+00:02:39,652 --> 00:02:44,323
+Unreachable servers no longer trigger repeated Failed to fetch schema alerts.
+
+28
+00:02:44,603 --> 00:02:50,513
+And picking a project from its card or from the top-bar dropdown now takes you straight into that project.
+
+29
+00:02:51,613 --> 00:02:54,642
+Release 1.7.1 adds MySQL.
+
+30
+00:02:54,922 --> 00:03:06,399
+Create a connection with host, port, database, schema, username and password, turn on SSL or TLS if your server needs it, and test the connection before you save.
+
+31
+00:03:07,499 --> 00:03:11,958
+Once connected, MySQL works in the SQL editor like any other source.
+
+32
+00:03:12,238 --> 00:03:17,849
+Browse databases and tables in the schema tree, and run queries or DDL statements.
+
+33
+00:03:18,129 --> 00:03:26,534
+The same release adds dbt-compatibility indicators, so you can see at a glance which connection types work with a dbt project.
+
+34
+00:03:27,634 --> 00:03:32,498
+The schema tree now has a context menu, in both the SQL editor and notebooks.
+
+35
+00:03:32,778 --> 00:03:37,727
+Right-click a table to insert or copy its name, qualified name or column list.
+
+36
+00:03:38,007 --> 00:03:42,317
+Generate SELECT star, SELECT columns, COUNT or an INSERT template.
+
+37
+00:03:42,597 --> 00:03:45,839
+Preview the data, rename the table, or refresh the schema.
+
+38
+00:03:46,119 --> 00:03:49,447
+You can also drag items from the tree straight into your editor.
+
+39
+00:03:50,547 --> 00:03:53,321
+The Rosetta AI agent is now multimodal.
+
+40
+00:03:53,601 --> 00:04:00,129
+Attach a screenshot, a diagram or an error dialog to your chat message, preview it full size, and send it.
+
+41
+00:04:00,409 --> 00:04:05,913
+The agent uses the image together with your project, selected files and the conversation.
+
+42
+00:04:06,193 --> 00:04:08,689
+Just pick a model that supports image input.
+
+43
+00:04:09,789 --> 00:04:12,583
+1.7.1 also brings fixes.
+
+44
+00:04:12,863 --> 00:04:17,322
+The local SQLite catalog for Apache Iceberg now works on Windows.
+
+45
+00:04:17,602 --> 00:04:22,978
+The AI icon in the header renders correctly, and an environment variable issue is fixed.
+
+46
+00:04:23,258 --> 00:04:30,661
+And Playwright for the testing tool now ships inside the image, so it no longer has to be downloaded and installed separately.
+
+47
+00:04:31,761 --> 00:04:36,476
+Back in 1.6.83 we added the dbt-Kinetica adapter.
+
+48
+00:04:36,756 --> 00:04:40,766
+You’ll find it under Settings, dbt Core, Adapter packages.
+
+49
+00:04:41,046 --> 00:04:52,844
+It isn’t published on PyPI, so Studio installs it directly from the rosettadb kinetica-dbt-adapter repository on GitHub, and Update from source pulls new versions.
+
+50
+00:04:53,123 --> 00:04:56,131
+It requires dbt Core 1.8 or newer.
+
+51
+00:04:57,232 --> 00:05:00,154
+And 1.6.82 laid the groundwork.
+
+52
+00:05:00,434 --> 00:05:03,869
+Pipeline Templates can start from a ZIP project template.
+
+53
+00:05:04,149 --> 00:05:07,967
+The Setup Wizard now includes a Local Runner installation step.
+
+54
+00:05:08,248 --> 00:05:12,962
+Duplicate project detection is smarter, and project deletion errors are handled.
+
+55
+00:05:13,242 --> 00:05:18,874
+The Studio database store was refactored, and DuckLake connections now show the right icon.
+
+56
+00:05:19,974 --> 00:05:24,966
+That’s the roundup for 1.6.82 through 1.7.1.
+
+57
+00:05:25,246 --> 00:05:33,545
+Download Rosetta DBT Studio from rosettadb.io, star the project on GitHub, and tell us what you’d like to see next.
+
+58
+00:05:33,825 --> 00:05:35,062
+Thanks for watching.

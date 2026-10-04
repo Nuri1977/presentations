@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rosetta DBT Studio — Releases 1.6.82 to 1.7.1</title>
+  <style>
+    :root {
+      --orange: #f97316;
+      --orange-dark: #ea580c;
+      --orange-light: #fff7ed;
+      --slate-900: #0f172a;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; margin: 0; overflow: hidden;
+      color: var(--slate-900); background: #0b0c0f;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; color: var(--orange-dark); font-size: .9em; }
+
+    /* ---------- Deck + fixed 1920×1080 canvas ---------- */
+    .deck { position: relative; width: 100vw; height: 100vh; }
+    .slide {
+      position: absolute; inset: 0; overflow: hidden;
+      opacity: 0; transition: opacity 320ms ease; pointer-events: none;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+    .stage {
+      position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+      transform: translate(-50%, -50%) scale(var(--scale, 1)); transform-origin: center;
+      overflow: hidden;
+    }
+    .stage.light {
+      background-color: #fff; background-image: url('assets/linear-white-bg.svg');
+      background-size: 120px 120px; padding: 108px 140px 120px;
+      display: flex; flex-direction: column; gap: 22px; justify-content: center;
+    }
+    .slide .stage > * { transition: transform 520ms ease, opacity 520ms ease; }
+    .slide:not(.active) .stage.light > * { transform: translateY(14px); opacity: 0; }
+
+    /* ---------- Type ---------- */
+    .eyebrow { display: flex; align-items: center; gap: 14px; color: var(--orange-dark); font-size: 20px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .ver { display: inline-block; padding: 6px 14px; border-radius: 999px; background: var(--orange); color: #fff; font-size: 18px; font-weight: 800; letter-spacing: .02em; text-transform: none; }
+    .ver.ghost { background: var(--orange-light); color: var(--orange-dark); border: 1px solid #fed7aa; }
+    h1 { margin: 0; font-size: 76px; line-height: 1.04; letter-spacing: -.035em; font-weight: 850; }
+    .lead { margin: 0; font-size: 28px; line-height: 1.42; color: var(--slate-600); max-width: 1400px; }
+    .accent { color: var(--orange-dark); }
+    .takeaway { margin: 0; padding-left: 22px; border-left: 5px solid var(--orange); font-size: 24px; line-height: 1.45; color: var(--slate-700); }
+
+    /* ---------- Screenshot slides ---------- */
+    .stage.shot { background: #0b0c0f; }
+    .shot-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+    .card {
+      position: absolute; z-index: 1; left: 88px; bottom: 104px; width: 640px; padding: 40px 42px;
+      background: rgba(255,255,255,.80); border-left: 6px solid var(--orange);
+      box-shadow: 0 24px 60px rgba(0,0,0,.35); backdrop-filter: blur(16px);
+    }
+    .card.right { left: auto; right: 88px; }
+    .card.top-right { left: auto; right: 88px; bottom: auto; top: 96px; }
+    .card h1 { margin: 16px 0 14px; font-size: 54px; }
+    .card .lead { font-size: 23px; color: var(--slate-700); }
+
+    /* ---------- Title slide ---------- */
+    .title-grid { flex: 1; display: grid; grid-template-columns: 1fr 820px; gap: 80px; align-items: center; }
+    .title-logo { width: 96px; height: 96px; object-fit: contain; }
+    .title-brand { margin: 18px 0 10px; font-size: 26px; font-weight: 800; color: var(--slate-700); }
+    .title-grid h1 { font-size: 96px; }
+    .title-grid .lead { margin-top: 26px; font-size: 32px; }
+    .chips { display: flex; gap: 12px; margin-top: 40px; }
+    .chips .ver { font-size: 22px; padding: 10px 20px; }
+    .frame { margin: 0; border-radius: 16px; overflow: hidden; background: #18181b; box-shadow: 0 30px 80px rgba(15,23,42,.28), 0 0 0 1px rgba(15,23,42,.08); }
+    .frame img { display: block; width: 100%; height: auto; }
+
+    /* ---------- Timeline ---------- */
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px; margin-top: 30px; position: relative; }
+    .timeline::before { content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 3px; background: linear-gradient(90deg, #fed7aa, var(--orange)); }
+    .tl { position: relative; padding-top: 52px; }
+    .tl::before { content: ""; position: absolute; top: 2px; left: 0; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 5px solid var(--orange); }
+    .tl.major::before { background: var(--orange); }
+    .tl .date { color: var(--slate-500); font-size: 22px; font-weight: 700; }
+    .tl h2 { margin: 8px 0 20px; font-size: 54px; letter-spacing: -.03em; }
+    .tl ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .tl li { font-size: 25px; line-height: 1.38; color: var(--slate-700); padding-left: 20px; position: relative; }
+    .tl li::before { content: ""; position: absolute; left: 0; top: 12px; width: 8px; height: 8px; background: var(--orange); }
+
+    /* ---------- Cards / flows ---------- */
+    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; margin: 48px 0 24px; }
+    .step { border-top: 4px solid var(--orange); padding-top: 22px; }
+    .step .n { color: var(--orange-dark); font-size: 19px; font-weight: 850; letter-spacing: .1em; }
+    .step h2 { margin: 14px 0 12px; font-size: 38px; letter-spacing: -.02em; }
+    .step p { margin: 0; color: var(--slate-600); font-size: 26px; line-height: 1.48; }
+    .tiles { display: grid; gap: 32px; margin-top: 44px; }
+    .tiles.c3 { grid-template-columns: repeat(3, 1fr); }
+    .tiles.c2 { grid-template-columns: repeat(2, 1fr); }
+    .tile { padding: 38px 38px 42px; background: rgba(255,255,255,.95); border: 1px solid var(--slate-200); border-top: 4px solid var(--orange); border-radius: 14px; box-shadow: 0 10px 30px rgba(15,23,42,.06); }
+    .tile .tag { color: var(--orange-dark); font-size: 17px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .tile h2 { margin: 14px 0 14px; font-size: 36px; letter-spacing: -.02em; line-height: 1.15; }
+    .tile p { margin: 0; color: var(--slate-600); font-size: 25px; line-height: 1.48; }
+    .tile.wide { grid-column: 1 / -1; }
+
+    /* ---------- Split: text + screenshots ---------- */
+    .split { flex: 1; min-height: 0; display: grid; grid-template-columns: 640px 1fr; gap: 70px; align-items: center; }
+    .split .text { display: flex; flex-direction: column; gap: 22px; }
+    .split .text h1 { font-size: 66px; }
+    .points { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .points li { font-size: 24px; line-height: 1.42; color: var(--slate-700); padding-left: 26px; position: relative; }
+    .points li::before { content: ""; position: absolute; left: 0; top: 13px; width: 10px; height: 10px; background: var(--orange); }
+    .points strong { color: var(--slate-900); }
+    .shots { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; gap: 36px; }
+    .shots .frame { flex: none; }
+    .menu-shot { height: 780px; }
+    .menu-shot img { height: 100%; width: auto; }
+    .caption { margin-top: 12px; text-align: center; color: var(--slate-500); font-size: 18px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .overlay-shot { position: absolute; right: -10px; bottom: 40px; width: 560px; border: 3px solid var(--orange); }
+
+    /* ---------- CTA ---------- */
+    .cta-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; }
+    .cta-content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; }
+    .cta-content h1 { font-size: 80px; }
+    .cta-actions { display: flex; flex-direction: column; gap: 22px; width: 480px; margin-top: 18px; }
+    .cta-action { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .cta-button { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 70px; border: 2px solid var(--slate-900); background: var(--slate-900); color: #fff; font-size: 23px; font-weight: 750; text-decoration: none; }
+    .cta-button.secondary { background: #fff; color: var(--slate-900); }
+    .cta-button:hover { border-color: var(--orange-dark); }
+    .cta-url { color: var(--slate-600); font-size: 19px; }
+
+    /* ---------- Chrome ---------- */
+    .ui-bar { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: rgba(226,232,240,.5); z-index: 10; }
+    .ui-fill { height: 100%; width: 0; background: var(--orange); transition: width 250ms ease; }
+    .controls { position: fixed; bottom: 14px; right: 20px; z-index: 10; display: flex; align-items: center; gap: 8px; transition: opacity 200ms; }
+    .controls button { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; color: var(--slate-700); font: inherit; font-size: 15px; height: 34px; min-width: 36px; padding: 0 10px; cursor: pointer; }
+    .controls button:hover, .controls button:focus-visible { border-color: var(--orange); color: var(--orange-dark); outline: none; }
+    .counter { color: #fff; background: rgba(15,23,42,.7); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 700; min-width: 58px; text-align: center; }
+    body.clean .controls, body.clean .ui-bar { opacity: 0; pointer-events: none; }
+
+    /* ---------- Transcript panel (hidden while recording) ---------- */
+    .transcript {
+      position: fixed; top: 16px; right: 16px; bottom: 64px; width: min(460px, 92vw); z-index: 20;
+      background: #fff; border: 1px solid var(--slate-200); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      display: none; flex-direction: column; overflow: hidden;
+    }
+    body.show-transcript .transcript { display: flex; }
+    .transcript header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--slate-200); }
+    .transcript header strong { font-size: 15px; }
+    .transcript header .tabs { display: flex; gap: 6px; }
+    .transcript header button { border: 1px solid var(--slate-200); background: #fff; border-radius: 7px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; color: var(--slate-700); }
+    .transcript header button:hover { border-color: var(--orange); color: var(--orange-dark); }
+    .transcript header button[aria-pressed="true"] { background: var(--orange-light); border-color: var(--orange); color: var(--orange-dark); }
+    .transcript .body { padding: 16px 18px 22px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--slate-700); }
+    .transcript .item { padding: 12px 0; border-bottom: 1px solid var(--slate-100); }
+    .transcript .item.current { background: var(--orange-light); margin: 0 -18px; padding: 12px 18px; }
+    .transcript .item h3 { margin: 0 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--orange-dark); }
+    .transcript .item p { margin: 0; white-space: pre-wrap; }
+    .transcript .meta { color: var(--slate-500); font-size: 12px; margin-top: 6px; }
+    .help { padding: 10px 16px; border-top: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-500); }
+    @media (prefers-reduced-motion: reduce) { .slide, .slide .stage > *, .ui-fill { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="ui-bar"><div class="ui-fill" id="progress"></div></div>
+  <main class="deck" id="deck">
+
+    <!-- 1 · Title -->
+    <section class="slide active" aria-label="Slide 1: What's new">
+      <div class="stage light">
+        <div class="title-grid">
+          <div>
+            <img class="title-logo" src="assets/slide-15-rosetta-logo.png" alt="Rosetta logo">
+            <p class="title-brand">Rosetta DBT Studio · Release roundup</p>
+            <h1>What’s <span class="accent">new</span> in Studio</h1>
+            <p class="lead">Four releases in three weeks: a new home dashboard, Python notebooks, MySQL, Snowflake browser login, and images in the AI chat.</p>
+            <div class="chips">
+              <span class="ver ghost">1.6.82</span><span class="ver ghost">1.6.83</span><span class="ver">1.7.0</span><span class="ver">1.7.1</span>
+            </div>
+          </div>
+          <figure class="frame"><img src="assets/slide-03-dashboard-home.png" alt="Rosetta DBT Studio Workspace Overview"></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Timeline -->
+    <section class="slide" aria-label="Slide 2: Release timeline">
+      <div class="stage light">
+        <div class="eyebrow">Release timeline · September – October 2026</div>
+        <h1>Four releases, <span class="accent">one direction</span></h1>
+        <div class="timeline">
+          <div class="tl">
+            <div class="date">September 17</div><h2>1.6.82</h2>
+            <ul><li>ZIP project templates in Pipeline Templates</li><li>Local Runner step in the Setup Wizard</li><li>Smarter duplicate-project detection</li></ul>
+          </div>
+          <div class="tl">
+            <div class="date">September 22</div><h2>1.6.83</h2>
+            <ul><li>dbt-Kinetica adapter integration</li></ul>
+          </div>
+          <div class="tl major">
+            <div class="date">September 29</div><h2>1.7.0</h2>
+            <ul><li>New dashboard and app navigation</li><li>Python notebooks</li><li>Snowflake browser OAuth</li><li>SQL editor and schema fixes</li></ul>
+          </div>
+          <div class="tl major">
+            <div class="date">October 2</div><h2>1.7.1</h2>
+            <ul><li>MySQL connections</li><li>Schema tree context menu and drag &amp; drop</li><li>Images in the AI agent chat</li><li>Iceberg on Windows fix</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Dashboard -->
+    <section class="slide" aria-label="Slide 3: New dashboard">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-03-dashboard-home.png" alt="Workspace Overview with eight studio modules, recent projects and configured connections">
+        <div class="card">
+          <div class="eyebrow"><span class="ver">1.7.0</span> Dashboard</div>
+          <h1>A new home for every module</h1>
+          <p class="lead">The Workspace Overview puts dbt, notebooks, SQL, analytics, storage, pipelines and ETL one click away—next to your recent projects and connections.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Python notebooks -->
+    <section class="slide" aria-label="Slide 4: Python notebooks">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-04-python-notebook-dataframe.png" alt="Notebook with a SQL cell saved as df and a Python cell showing a 200-row DataFrame">
+        <div class="card right">
+          <div class="eyebrow"><span class="ver">1.7.0</span> Notebooks</div>
+          <h1>Python notebooks</h1>
+          <p class="lead">Save a SQL result as <code>df</code>, then work with it as a pandas DataFrame in the next Python cell.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Notebook flow -->
+    <section class="slide" aria-label="Slide 5: How notebooks work">
+      <div class="stage light">
+        <div class="eyebrow"><span class="ver">1.7.0</span> Notebooks · How it works</div>
+        <h1>Query in SQL, <span class="accent">analyze in Python</span></h1>
+        <p class="lead">Three cell types share one notebook, connected to the database you select.</p>
+        <div class="flow">
+          <div class="step"><span class="n">01 · SQL</span><h2>Query the connection</h2><p>A SQL cell runs against the selected connection. Use <strong>Result as</strong> to give the result a name, like <code>df</code>.</p></div>
+          <div class="step"><span class="n">02 · PYTHON</span><h2>Use the DataFrame</h2><p>Python cells see the named result as a pandas DataFrame. <code>display(df)</code> renders a filterable, paged table with column types.</p></div>
+          <div class="step"><span class="n">03 · TEXT</span><h2>Explain the work</h2><p>Markdown cells add headings and notes so the analysis reads as a story.</p></div>
+        </div>
+        <p class="takeaway">Run cells from top to bottom: a Python cell can only use <code>df</code> after its SQL cell has run. The toolbar shows the Python version and kernel status.</p>
+      </div>
+    </section>
+
+    <!-- 6 · Snowflake OAuth -->
+    <section class="slide" aria-label="Slide 6: Snowflake browser OAuth">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-06-snowflake-browser-oauth.png" alt="Snowflake connection form with an Authentication Successful dialog">
+        <div class="card">
+          <div class="eyebrow"><span class="ver">1.7.0</span> Connections</div>
+          <h1>Sign in to Snowflake in your browser</h1>
+          <p class="lead">Pick <strong>Web Browser</strong>, test the connection, and finish the login on Snowflake’s own page. Revoke the token any time.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · 1.7.0 fixes -->
+    <section class="slide" aria-label="Slide 7: 1.7.0 fixes">
+      <div class="stage light">
+        <div class="eyebrow"><span class="ver">1.7.0</span> Quality</div>
+        <h1>Smoother <span class="accent">everyday work</span></h1>
+        <p class="lead">Fixes that remove interruptions from the SQL editor and project switching.</p>
+        <div class="tiles c3">
+          <div class="tile"><div class="tag">SQL Editor</div><h2>No more crash on error objects</h2><p>When a database returns an error object instead of a message, the editor shows the error and keeps running.</p></div>
+          <div class="tile"><div class="tag">Schema</div><h2>Quiet when a server is down</h2><p>Unreachable servers no longer trigger repeated “Failed to fetch schema” alerts.</p></div>
+          <div class="tile"><div class="tag">Projects</div><h2>Straight into your project</h2><p>Picking a project from its card or the top-bar dropdown now takes you directly to it.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · MySQL connection -->
+    <section class="slide" aria-label="Slide 8: MySQL connection">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-08-mysql-connection.png" alt="MySQL connection form with host, port, database, schema, username, password and SSL option">
+        <div class="card">
+          <div class="eyebrow"><span class="ver">1.7.1</span> Connections</div>
+          <h1>MySQL is here</h1>
+          <p class="lead">Add host, port, database and credentials, turn on SSL/TLS if you need it, and test before saving.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · MySQL in SQL editor + dbt compatibility -->
+    <section class="slide" aria-label="Slide 9: MySQL in the SQL editor">
+      <div class="stage light">
+        <div class="split">
+          <div class="text">
+            <div class="eyebrow"><span class="ver">1.7.1</span> Connections</div>
+            <h1>MySQL in the <span class="accent">SQL editor</span></h1>
+            <ul class="points">
+              <li><strong>Browse</strong> databases and tables in the schema tree.</li>
+              <li><strong>Run</strong> queries and DDL like any other source.</li>
+              <li><strong>dbt-compatibility indicators</strong> show which connection types work with a dbt project.</li>
+            </ul>
+          </div>
+          <div class="shots">
+            <figure class="frame" style="width: 1000px"><img src="assets/slide-09-mysql-sql-editor.png" alt="SQL editor connected to MySQL with tables in the schema tree and CREATE TABLE statements"></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · Schema tree context menu -->
+    <section class="slide" aria-label="Slide 10: Schema tree context menu">
+      <div class="stage light">
+        <div class="split">
+          <div class="text">
+            <div class="eyebrow"><span class="ver">1.7.1</span> Schema tree</div>
+            <h1>Right-click <span class="accent">any table</span></h1>
+            <ul class="points">
+              <li><strong>Insert or copy</strong> the name, qualified name or column list.</li>
+              <li><strong>Generate SQL:</strong> SELECT *, SELECT columns, COUNT(*) or an INSERT template.</li>
+              <li><strong>Preview data,</strong> rename the table or refresh the schema.</li>
+              <li><strong>Drag &amp; drop</strong> items from the tree into your editor.</li>
+            </ul>
+          </div>
+          <div class="shots">
+            <div><figure class="frame menu-shot"><img src="assets/slide-10-sql-editor-context-menu.png" alt="Schema tree context menu in the SQL editor"></figure><div class="caption">SQL Editor</div></div>
+            <div><figure class="frame menu-shot"><img src="assets/slide-10-notebook-context-menu.png" alt="Schema tree context menu in Notebooks"></figure><div class="caption">Notebooks</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · Multimodal AI -->
+    <section class="slide" aria-label="Slide 11: Images in the AI agent chat">
+      <div class="stage light">
+        <div class="split">
+          <div class="text">
+            <div class="eyebrow"><span class="ver">1.7.1</span> AI agent</div>
+            <h1>Show the agent <span class="accent">an image</span></h1>
+            <ul class="points">
+              <li><strong>Attach</strong> a screenshot, diagram or error dialog to your message.</li>
+              <li><strong>Preview</strong> the attachment full size before you send.</li>
+              <li><strong>Combine</strong> it with project, file and conversation context.</li>
+            </ul>
+            <p class="takeaway">Pick a model that supports image input.</p>
+          </div>
+          <div class="shots">
+            <figure class="frame" style="width: 1000px"><img src="assets/slide-11-ai-image-preview.jpg" alt="Full-size preview of an attached architecture diagram"></figure>
+            <figure class="frame overlay-shot"><img src="assets/slide-11-ai-chat-image-attachment.png" alt="Chat input with an image thumbnail attached and a Gemini model selected"></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · 1.7.1 fixes -->
+    <section class="slide" aria-label="Slide 12: 1.7.1 fixes">
+      <div class="stage light">
+        <div class="eyebrow"><span class="ver">1.7.1</span> Fixes &amp; performance</div>
+        <h1>Also in <span class="accent">1.7.1</span></h1>
+        <div class="tiles c3">
+          <div class="tile"><div class="tag">Apache Iceberg</div><h2>Local SQLite catalog on Windows</h2><p>The local SQLite catalog for Iceberg now works on Windows.</p></div>
+          <div class="tile"><div class="tag">App shell</div><h2>Header AI icon &amp; environment variables</h2><p>The AI icon in the header renders correctly, and an environment variable issue is fixed.</p></div>
+          <div class="tile"><div class="tag">Testing tool</div><h2>Playwright ships in the image</h2><p>Its installation moved into the image, so it no longer downloads and installs separately.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · dbt-Kinetica -->
+    <section class="slide" aria-label="Slide 13: dbt-Kinetica adapter">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-13-dbt-kinetica-adapter.png" alt="Settings, dbt Core adapter packages with dbt-kinetica expanded">
+        <div class="card top-right">
+          <div class="eyebrow"><span class="ver">1.6.83</span> Adapters</div>
+          <h1>dbt-Kinetica adapter</h1>
+          <p class="lead">Installed from GitHub (it isn’t on PyPI), with <strong>Update from source</strong> for new versions. Requires dbt Core 1.8+.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · 1.6.82 -->
+    <section class="slide" aria-label="Slide 14: 1.6.82">
+      <div class="stage light">
+        <div class="eyebrow"><span class="ver">1.6.82</span> Foundations</div>
+        <h1>Where it <span class="accent">started</span></h1>
+        <div class="tiles c3">
+          <div class="tile"><div class="tag">Pipelines</div><h2>ZIP project templates</h2><p>Start a pipeline from a ZIP project template in Pipeline Templates.</p></div>
+          <div class="tile"><div class="tag">Setup</div><h2>Local Runner in the wizard</h2><p>The Setup Wizard now includes a Local Runner installation step.</p></div>
+          <div class="tile"><div class="tag">Projects</div><h2>Duplicate detection</h2><p>Better duplicate-project detection, and clear handling of project deletion errors.</p></div>
+          <div class="tile"><div class="tag">Internals</div><h2>Studio database store</h2><p>The store behind Studio’s app data was refactored.</p></div>
+          <div class="tile"><div class="tag">SQL</div><h2>Correct DuckLake icon</h2><p>DuckLake connections show the DuckLake icon instead of DuckDB’s.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · CTA -->
+    <section class="slide" aria-label="Slide 15: Download">
+      <div class="stage light">
+        <div class="cta-grid">
+          <div class="cta-content">
+            <img class="title-logo" src="assets/slide-15-rosetta-logo.png" alt="Rosetta logo">
+            <p class="title-brand">Rosetta DBT Studio 1.7.1</p>
+            <h1>Try what’s <span class="accent">new</span></h1>
+            <p class="lead">Notebooks, MySQL, browser login and multimodal AI—free and open source.</p>
+            <div class="cta-actions">
+              <div class="cta-action"><a class="cta-button" href="https://rosettadb.io/download-dbtstudio.html" target="_blank" rel="noopener noreferrer">Download Rosetta DBT Studio</a><span class="cta-url">rosettadb.io</span></div>
+              <div class="cta-action"><a class="cta-button secondary" href="https://github.com/rosettadb/dbt-studio" target="_blank" rel="noopener noreferrer">Star on GitHub</a><span class="cta-url">github.com/rosettadb/dbt-studio</span></div>
+            </div>
+          </div>
+          <div aria-hidden="true"><!-- Reserved for the speaking avatar in the video edit. --></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="transcript" id="transcript" aria-label="Transcript">
+    <header>
+      <strong>Transcript</strong>
+      <div class="tabs">
+        <button id="mode-current" aria-pressed="true">This slide</button>
+        <button id="mode-all" aria-pressed="false">All</button>
+        <button id="copy">Copy</button>
+        <button id="close-transcript" aria-label="Close transcript">✕</button>
+      </div>
+    </header>
+    <div class="body" id="transcript-body"></div>
+    <div class="help">← → navigate · T transcript · H hide controls · F fullscreen</div>
+  </aside>
+
+  <div class="controls" aria-label="Slide navigation">
+    <button id="toggle-transcript" title="Transcript (T)">Transcript</button>
+    <button id="previous" aria-label="Previous slide">←</button>
+    <span class="counter" id="counter" aria-live="polite">1 / 15</span>
+    <button id="next" aria-label="Next slide">→</button>
+  </div>
+
+  <script>
+    const NARRATION = [
+      { title: "What’s new in Studio", text: "Welcome to the Rosetta DBT Studio release roundup. In the last three weeks we shipped four releases: 1.6.82, 1.6.83, 1.7.0 and 1.7.1. Let’s walk through what’s new, from a brand-new home dashboard and Python notebooks to MySQL, Snowflake browser login, and images in the AI chat." },
+      { title: "Release timeline", text: "Here’s the timeline. 1.6.82 landed on September 17th with pipeline templates and setup improvements. 1.6.83 followed on September 22nd with the dbt-Kinetica adapter. 1.7.0, on September 29th, was the big one: a new dashboard, Python notebooks and Snowflake browser authentication. And 1.7.1, on October 2nd, added MySQL, a smarter schema tree and multimodal AI." },
+      { title: "A new home for every module", text: "Starting with 1.7.0, Studio opens on the new Workspace Overview. Every module is one click away: dbt Project, Notebook, SQL Editor, Analytics, Data Lake, Object Explorer, Pipeline and ETL. Below them you’ll find your recent projects and configured connections, and the app navigation has been reorganized around these modules." },
+      { title: "Python notebooks", text: "Notebooks now run Python. Here, a SQL cell queries the connected DuckDB database and saves its result as df. The next Python cell picks it up as a pandas DataFrame and displays it in an interactive table with column types, row filtering and paging." },
+      { title: "Query in SQL, analyze in Python", text: "The workflow has three cell types. SQL cells run against the selected connection, and Result as gives the output a name. Python cells use that name as a DataFrame. Text cells add headings and notes. Just run cells from top to bottom: a Python cell can only use df after its SQL cell has run. The toolbar shows the Python version and whether the kernel is idle or busy." },
+      { title: "Sign in to Snowflake in your browser", text: "Snowflake connections can now sign in through your web browser. Choose Web Browser instead of Password Login, fill in your account, warehouse, role, database and schema, and click Test Connection. Studio opens Snowflake’s login page; finish there and you’re authenticated, without typing a password into Studio. You can revoke the token at any time." },
+      { title: "Smoother everyday work", text: "1.7.0 also removes some everyday interruptions. The SQL editor no longer crashes when a database returns an error object instead of a message. Unreachable servers no longer trigger repeated Failed to fetch schema alerts. And picking a project from its card or from the top-bar dropdown now takes you straight into that project." },
+      { title: "MySQL is here", text: "Release 1.7.1 adds MySQL. Create a connection with host, port, database, schema, username and password, turn on SSL or TLS if your server needs it, and test the connection before you save." },
+      { title: "MySQL in the SQL editor", text: "Once connected, MySQL works in the SQL editor like any other source. Browse databases and tables in the schema tree, and run queries or DDL statements. The same release adds dbt-compatibility indicators, so you can see at a glance which connection types work with a dbt project." },
+      { title: "Right-click any table", text: "The schema tree now has a context menu, in both the SQL editor and notebooks. Right-click a table to insert or copy its name, qualified name or column list. Generate SELECT star, SELECT columns, COUNT or an INSERT template. Preview the data, rename the table, or refresh the schema. You can also drag items from the tree straight into your editor." },
+      { title: "Show the agent an image", text: "The Rosetta AI agent is now multimodal. Attach a screenshot, a diagram or an error dialog to your chat message, preview it full size, and send it. The agent uses the image together with your project, selected files and the conversation. Just pick a model that supports image input." },
+      { title: "Also in 1.7.1", text: "1.7.1 also brings fixes. The local SQLite catalog for Apache Iceberg now works on Windows. The AI icon in the header renders correctly, and an environment variable issue is fixed. And Playwright for the testing tool now ships inside the image, so it no longer has to be downloaded and installed separately." },
+      { title: "dbt-Kinetica adapter", text: "Back in 1.6.83 we added the dbt-Kinetica adapter. You’ll find it under Settings, dbt Core, Adapter packages. It isn’t published on PyPI, so Studio installs it directly from the rosettadb kinetica-dbt-adapter repository on GitHub, and Update from source pulls new versions. It requires dbt Core 1.8 or newer." },
+      { title: "Where it started", text: "And 1.6.82 laid the groundwork. Pipeline Templates can start from a ZIP project template. The Setup Wizard now includes a Local Runner installation step. Duplicate project detection is smarter, and project deletion errors are handled. The Studio database store was refactored, and DuckLake connections now show the right icon." },
+      { title: "Try what’s new", text: "That’s the roundup for 1.6.82 through 1.7.1. Download Rosetta DBT Studio from rosettadb.io, star the project on GitHub, and tell us what you’d like to see next. Thanks for watching." }
+    ];
+
+    const deck = document.getElementById('deck');
+    const slides = [...document.querySelectorAll('.slide')];
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    const tBody = document.getElementById('transcript-body');
+    let current = 0, showAll = false;
+
+    function fit() {
+      const s = Math.min(deck.clientWidth / 1920, deck.clientHeight / 1080);
+      deck.style.setProperty('--scale', s);
+    }
+    window.addEventListener('resize', fit); fit();
+
+    const words = t => t.trim().split(/\s+/).length;
+    const secs = t => Math.round(words(t) / 2.5); // ~150 wpm
+
+    function renderTranscript() {
+      const list = showAll ? NARRATION.map((n, i) => [n, i]) : [[NARRATION[current], current]];
+      tBody.innerHTML = list.map(([n, i]) =>
+        `<div class="item${showAll && i === current ? ' current' : ''}" data-i="${i}"><h3>Slide ${i + 1} · ${n.title}</h3><p>${n.text}</p><div class="meta">${words(n.text)} words · ~${secs(n.text)} s</div></div>`
+      ).join('');
+      if (showAll) tBody.querySelector('.current')?.scrollIntoView({ block: 'nearest' });
+      document.getElementById('mode-current').setAttribute('aria-pressed', !showAll);
+      document.getElementById('mode-all').setAttribute('aria-pressed', showAll);
+    }
+
+    function show(i) {
+      current = Math.max(0, Math.min(i, slides.length - 1));
+      slides.forEach((s, k) => { s.classList.toggle('active', k === current); s.inert = k !== current; });
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      history.replaceState(null, '', `#${current + 1}`);
+      renderTranscript();
+    }
+
+    document.getElementById('previous').onclick = () => show(current - 1);
+    document.getElementById('next').onclick = () => show(current + 1);
+    const toggleT = () => document.body.classList.toggle('show-transcript');
+    document.getElementById('toggle-transcript').onclick = toggleT;
+    document.getElementById('close-transcript').onclick = toggleT;
+    document.getElementById('mode-current').onclick = () => { showAll = false; renderTranscript(); };
+    document.getElementById('mode-all').onclick = () => { showAll = true; renderTranscript(); };
+    tBody.addEventListener('click', e => { const it = e.target.closest('.item'); if (it && showAll) show(+it.dataset.i); });
+    document.getElementById('copy').onclick = async e => {
+      const text = showAll
+        ? NARRATION.map((n, i) => `Slide ${i + 1} — ${n.title}\n${n.text}`).join('\n\n')
+        : NARRATION[current].text;
+      try { await navigator.clipboard.writeText(text); e.target.textContent = 'Copied'; }
+      catch { e.target.textContent = 'Copy failed'; }
+      setTimeout(() => (e.target.textContent = 'Copy'), 1400);
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.target.closest && e.target.closest('a, button') && e.key === 'Enter') return;
+      const k = e.key.toLowerCase();
+      if (['arrowright', ' ', 'pagedown'].includes(k)) { e.preventDefault(); show(current + 1); }
+      else if (['arrowleft', 'pageup', 'backspace'].includes(k)) { e.preventDefault(); show(current - 1); }
+      else if (k === 'home') show(0);
+      else if (k === 'end') show(slides.length - 1);
+      else if (k === 't') toggleT();
+      else if (k === 'h') document.body.classList.toggle('clean');
+      else if (k === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+    });
+
+    const start = parseInt(location.hash.slice(1), 10);
+    show(Number.isFinite(start) ? start - 1 : 0);
+  </script>
+</body>
+</html>

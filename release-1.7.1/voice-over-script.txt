@@ -1,0 +1,98 @@
+ROSETTA DBT STUDIO — RELEASE ROUNDUP 1.6.82 → 1.7.1
+SLIDE NARRATION (voice-over for CapCut)
+Deck: presentation-slides.html
+
+Audience: Rosetta DBT Studio users and dbt developers.
+Promise: In about three minutes, show what shipped in 1.6.82, 1.6.83, 1.7.0 and 1.7.1.
+Length: 737 words ≈ 4.9 min at 150 wpm.
+Sources: github.com/rosettadb/dbt-studio/releases (tags 1.6.82, 1.6.83, 1.7.0, 1.7.1)
+
+Slide 1 — What’s new in Studio
+Visual: Native title slide · slide-03-dashboard-home.png (framed)
+Duration: ~18 s (46 words)
+Narration:
+"Welcome to the Rosetta DBT Studio release roundup. In the last three weeks we shipped four releases: 1.6.82, 1.6.83, 1.7.0 and 1.7.1. Let’s walk through what’s new, from a brand-new home dashboard and Python notebooks to MySQL, Snowflake browser login, and images in the AI chat."
+
+Slide 2 — Release timeline
+Visual: Native timeline slide
+Duration: ~22 s (54 words)
+Narration:
+"Here’s the timeline. 1.6.82 landed on September 17th with pipeline templates and setup improvements. 1.6.83 followed on September 22nd with the dbt-Kinetica adapter. 1.7.0, on September 29th, was the big one: a new dashboard, Python notebooks and Snowflake browser authentication. And 1.7.1, on October 2nd, added MySQL, a smarter schema tree and multimodal AI."
+
+Slide 3 — A new home for every module
+Visual: slide-03-dashboard-home.png
+Duration: ~20 s (49 words)
+Narration:
+"Starting with 1.7.0, Studio opens on the new Workspace Overview. Every module is one click away: dbt Project, Notebook, SQL Editor, Analytics, Data Lake, Object Explorer, Pipeline and ETL. Below them you’ll find your recent projects and configured connections, and the app navigation has been reorganized around these modules."
+
+Slide 4 — Python notebooks
+Visual: slide-04-python-notebook-dataframe.png
+Duration: ~18 s (44 words)
+Narration:
+"Notebooks now run Python. Here, a SQL cell queries the connected DuckDB database and saves its result as df. The next Python cell picks it up as a pandas DataFrame and displays it in an interactive table with column types, row filtering and paging."
+
+Slide 5 — Query in SQL, analyze in Python
+Visual: Native slide (three notebook cell types)
+Duration: ~28 s (69 words)
+Narration:
+"The workflow has three cell types. SQL cells run against the selected connection, and Result as gives the output a name. Python cells use that name as a DataFrame. Text cells add headings and notes. Just run cells from top to bottom: a Python cell can only use df after its SQL cell has run. The toolbar shows the Python version and whether the kernel is idle or busy."
+
+Slide 6 — Sign in to Snowflake in your browser
+Visual: slide-06-snowflake-browser-oauth.png
+Duration: ~22 s (54 words)
+Narration:
+"Snowflake connections can now sign in through your web browser. Choose Web Browser instead of Password Login, fill in your account, warehouse, role, database and schema, and click Test Connection. Studio opens Snowflake’s login page; finish there and you’re authenticated, without typing a password into Studio. You can revoke the token at any time."
+
+Slide 7 — Smoother everyday work
+Visual: Native slide (three fix tiles)
+Duration: ~21 s (53 words)
+Narration:
+"1.7.0 also removes some everyday interruptions. The SQL editor no longer crashes when a database returns an error object instead of a message. Unreachable servers no longer trigger repeated Failed to fetch schema alerts. And picking a project from its card or from the top-bar dropdown now takes you straight into that project."
+
+Slide 8 — MySQL is here
+Visual: slide-08-mysql-connection.png
+Duration: ~13 s (32 words)
+Narration:
+"Release 1.7.1 adds MySQL. Create a connection with host, port, database, schema, username and password, turn on SSL or TLS if your server needs it, and test the connection before you save."
+
+Slide 9 — MySQL in the SQL editor
+Visual: Native slide · slide-09-mysql-sql-editor.png
+Duration: ~19 s (47 words)
+Narration:
+"Once connected, MySQL works in the SQL editor like any other source. Browse databases and tables in the schema tree, and run queries or DDL statements. The same release adds dbt-compatibility indicators, so you can see at a glance which connection types work with a dbt project."
+
+Slide 10 — Right-click any table
+Visual: Native slide · slide-10-sql-editor-context-menu.png + slide-10-notebook-context-menu.png
+Duration: ~24 s (61 words)
+Narration:
+"The schema tree now has a context menu, in both the SQL editor and notebooks. Right-click a table to insert or copy its name, qualified name or column list. Generate SELECT star, SELECT columns, COUNT or an INSERT template. Preview the data, rename the table, or refresh the schema. You can also drag items from the tree straight into your editor."
+
+Slide 11 — Show the agent an image
+Visual: Native slide · slide-11-ai-image-preview.jpg + slide-11-ai-chat-image-attachment.png
+Duration: ~20 s (49 words)
+Narration:
+"The Rosetta AI agent is now multimodal. Attach a screenshot, a diagram or an error dialog to your chat message, preview it full size, and send it. The agent uses the image together with your project, selected files and the conversation. Just pick a model that supports image input."
+
+Slide 12 — Also in 1.7.1
+Visual: Native slide (three fix tiles)
+Duration: ~21 s (52 words)
+Narration:
+"1.7.1 also brings fixes. The local SQLite catalog for Apache Iceberg now works on Windows. The AI icon in the header renders correctly, and an environment variable issue is fixed. And Playwright for the testing tool now ships inside the image, so it no longer has to be downloaded and installed separately."
+
+Slide 13 — dbt-Kinetica adapter
+Visual: slide-13-dbt-kinetica-adapter.png
+Duration: ~19 s (48 words)
+Narration:
+"Back in 1.6.83 we added the dbt-Kinetica adapter. You’ll find it under Settings, dbt Core, Adapter packages. It isn’t published on PyPI, so Studio installs it directly from the rosettadb kinetica-dbt-adapter repository on GitHub, and Update from source pulls new versions. It requires dbt Core 1.8 or newer."
+
+Slide 14 — Where it started
+Visual: Native slide (five tiles)
+Duration: ~20 s (49 words)
+Narration:
+"And 1.6.82 laid the groundwork. Pipeline Templates can start from a ZIP project template. The Setup Wizard now includes a Local Runner installation step. Duplicate project detection is smarter, and project deletion errors are handled. The Studio database store was refactored, and DuckLake connections now show the right icon."
+
+Slide 15 — Try what’s new
+Visual: Closing CTA · right half reserved for speaking avatar
+Duration: ~12 s (30 words)
+Narration:
+"That’s the roundup for 1.6.82 through 1.7.1. Download Rosetta DBT Studio from rosettadb.io, star the project on GitHub, and tell us what you’d like to see next. Thanks for watching."

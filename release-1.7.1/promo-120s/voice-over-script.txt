@@ -1,0 +1,33 @@
+ROSETTA DBT STUDIO 1.7 — 120-SECOND PROMO
+Deck: promo-120s.html · Video: promo-120s/rosetta-dbt-studio-1.7-promo-120s.mp4
+Voice: Kokoro af_heart, speed 1.15 · Big features only (no fixes)
+
+Slide 1 — Rosetta DBT Studio 1.7  [0.0s, 10.0s]
+"Rosetta DBT Studio just leveled up. Four releases in three weeks, packed with features for analytics engineers. Here’s what’s new, in two minutes."
+
+Slide 2 — A brand-new home  [9.6s, 15.7s]
+"It starts with a brand-new home. The Workspace Overview puts every module one click away: dbt projects, notebooks, the SQL editor, analytics, data lake, pipelines and ETL, right next to your recent projects and connections."
+
+Slide 3 — Python notebooks  [24.9s, 17.2s]
+"Meet Python notebooks. Query your database in a SQL cell, save the result as a DataFrame, and keep going in pandas in the very next cell. Every result becomes an interactive table you can filter and page through. SQL, Python and notes, together in one notebook."
+
+Slide 4 — Snowflake browser login  [41.8s, 12.3s]
+"Working with Snowflake? Now you can sign in through your browser. Pick Web Browser, test the connection, finish the login on Snowflake’s page, and you’re in, without typing a password into Studio."
+
+Slide 5 — MySQL  [53.6s, 14.2s]
+"MySQL joins the lineup. Connect in seconds with optional SSL, browse your tables in the schema tree, and run queries in the SQL editor. New compatibility indicators show which connections work with dbt."
+
+Slide 6 — Smarter schema tree  [67.4s, 14.4s]
+"The schema tree got smarter too. Right-click any table to generate SELECT, COUNT or INSERT statements, copy column lists, or preview the data. Or just drag it straight into your editor. It works in both the SQL editor and notebooks."
+
+Slide 7 — AI agent sees images  [81.4s, 14.3s]
+"And the AI agent can now see. Attach a screenshot, a diagram or an error dialog, and the agent reasons over the image together with your project, your files and the conversation. Just pick a model that supports images."
+
+Slide 8 — dbt-Kinetica adapter  [95.3s, 8.5s]
+"Plus, a new dbt adapter for Kinetica. Install it, and update it from source, right from the dbt Core settings."
+
+Slide 9 — Download  [103.5s, 15.6s]
+"Rosetta DBT Studio is free, open source, and runs right on your desktop. Download it at rosettadb.io, give us a star on GitHub, and tell us what you want to see next!"
+
+Rebuild:
+python3 ../video/build_video.py --deck promo-120s.html --out promo-120s --voice af_heart --speed 1.15 --lead 0.6 --tail 1.0 --gap 0.22 --xf 0.4 --end-hold 3 --name rosetta-dbt-studio-1.7-promo-120s

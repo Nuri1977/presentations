@@ -1,0 +1,80 @@
+{
+  "voice": "af_heart",
+  "slides": [
+    {
+      "slide": 1,
+      "start": 0.0,
+      "duration": 25.41
+    },
+    {
+      "slide": 2,
+      "start": 24.91,
+      "duration": 33.59
+    },
+    {
+      "slide": 3,
+      "start": 58.0,
+      "duration": 24.62
+    },
+    {
+      "slide": 4,
+      "start": 82.13,
+      "duration": 18.42
+    },
+    {
+      "slide": 5,
+      "start": 100.04,
+      "duration": 25.72
+    },
+    {
+      "slide": 6,
+      "start": 125.26,
+      "duration": 23.41
+    },
+    {
+      "slide": 7,
+      "start": 148.17,
+      "duration": 23.24
+    },
+    {
+      "slide": 8,
+      "start": 170.91,
+      "duration": 16.39
+    },
+    {
+      "slide": 9,
+      "start": 186.8,
+      "duration": 20.63
+    },
+    {
+      "slide": 10,
+      "start": 206.93,
+      "duration": 23.41
+    },
+    {
+      "slide": 11,
+      "start": 229.85,
+      "duration": 19.74
+    },
+    {
+      "slide": 12,
+      "start": 249.09,
+      "duration": 22.47
+    },
+    {
+      "slide": 13,
+      "start": 271.06,
+      "duration": 25.97
+    },
+    {
+      "slide": 14,
+      "start": 296.53,
+      "duration": 23.24
+    },
+    {
+      "slide": 15,
+      "start": 319.27,
+      "duration": 16.69
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "voice": "af_heart",
+  "slides": [
+    {
+      "slide": 1,
+      "start": 0.0,
+      "duration": 10.04
+    },
+    {
+      "slide": 2,
+      "start": 9.64,
+      "duration": 15.69
+    },
+    {
+      "slide": 3,
+      "start": 24.93,
+      "duration": 17.24
+    },
+    {
+      "slide": 4,
+      "start": 41.76,
+      "duration": 12.26
+    },
+    {
+      "slide": 5,
+      "start": 53.62,
+      "duration": 14.2
+    },
+    {
+      "slide": 6,
+      "start": 67.42,
+      "duration": 14.42
+    },
+    {
+      "slide": 7,
+      "start": 81.44,
+      "duration": 14.26
+    },
+    {
+      "slide": 8,
+      "start": 95.31,
+      "duration": 8.54
+    },
+    {
+      "slide": 9,
+      "start": 103.45,
+      "duration": 15.61
+    }
+  ]
+}
