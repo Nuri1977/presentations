@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rosetta DBT Studio 1.7.2 — 60s Promo</title>
+  <style>
+    :root {
+      --orange: #f97316;
+      --orange-dark: #ea580c;
+      --orange-light: #fff7ed;
+      --slate-900: #0f172a;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; margin: 0; overflow: hidden;
+      color: var(--slate-900); background: #0b0c0f;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; color: var(--orange-dark); font-size: .9em; }
+
+    /* ---------- Deck + fixed 1920×1080 canvas ---------- */
+    .deck { position: relative; width: 100vw; height: 100vh; }
+    .slide {
+      position: absolute; inset: 0; overflow: hidden;
+      opacity: 0; transition: opacity 320ms ease; pointer-events: none;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+    .stage {
+      position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+      transform: translate(-50%, -50%) scale(var(--scale, 1)); transform-origin: center;
+      overflow: hidden;
+    }
+    .stage.light {
+      background-color: #fff; background-image: url('assets/linear-white-bg.svg');
+      background-size: 120px 120px; padding: 108px 140px 120px;
+      display: flex; flex-direction: column; gap: 22px; justify-content: center;
+    }
+    .slide .stage > * { transition: transform 520ms ease, opacity 520ms ease; }
+    .slide:not(.active) .stage.light > * { transform: translateY(14px); opacity: 0; }
+
+    /* ---------- Type ---------- */
+    .eyebrow { display: flex; align-items: center; gap: 14px; color: var(--orange-dark); font-size: 20px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .ver { display: inline-block; padding: 6px 14px; border-radius: 999px; background: var(--orange); color: #fff; font-size: 18px; font-weight: 800; letter-spacing: .02em; text-transform: none; }
+    .ver.ghost { background: var(--orange-light); color: var(--orange-dark); border: 1px solid #fed7aa; }
+    h1 { margin: 0; font-size: 76px; line-height: 1.04; letter-spacing: -.035em; font-weight: 850; }
+    .lead { margin: 0; font-size: 28px; line-height: 1.42; color: var(--slate-600); max-width: 1400px; }
+    .accent { color: var(--orange-dark); }
+
+    /* ---------- Screenshot slides ---------- */
+    .stage.shot { background: #0b0c0f; }
+    .shot-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+    .card {
+      position: absolute; z-index: 1; left: 88px; bottom: 104px; width: 700px; padding: 44px 48px;
+      background: rgba(255,255,255,.86); border-left: 6px solid var(--orange);
+      box-shadow: 0 24px 60px rgba(0,0,0,.35); backdrop-filter: blur(16px);
+    }
+    .card.right { left: auto; right: 64px; width: 520px; padding: 40px 40px; }
+    .card h1 { margin: 16px 0 14px; font-size: 64px; }
+    .card.right h1 { font-size: 56px; }
+    .card .lead { font-size: 27px; color: var(--slate-700); }
+    .card.right .lead { font-size: 25px; }
+    .card .chips { margin-top: 22px; }
+    .ring {
+      position: absolute; z-index: 1; border: 4px solid var(--orange); border-radius: 10px;
+      box-shadow: 0 0 0 8px rgba(249,115,22,.22), 0 0 40px rgba(249,115,22,.35);
+    }
+
+    /* ---------- Title slide ---------- */
+    .title-grid { flex: 1; display: grid; grid-template-columns: 1fr 760px; gap: 80px; align-items: center; }
+    .title-logo { width: 96px; height: 96px; object-fit: contain; }
+    .title-brand { margin: 18px 0 10px; font-size: 26px; font-weight: 800; color: var(--slate-700); }
+    .title-grid h1 { font-size: 100px; }
+    .title-grid .lead { margin-top: 28px; font-size: 34px; }
+    .chips { display: flex; gap: 12px; margin-top: 40px; }
+    .chips .ver { font-size: 22px; padding: 10px 20px; }
+    .card .chips .ver { font-size: 18px; padding: 7px 16px; }
+    .frame { margin: 0; border-radius: 16px; overflow: hidden; background: #18181b; box-shadow: 0 30px 80px rgba(15,23,42,.28), 0 0 0 1px rgba(15,23,42,.08); }
+    .frame img { display: block; width: 100%; height: auto; }
+    .hero { width: 658px; justify-self: center; position: relative; overflow: visible; background: none; box-shadow: none; }
+    .hero img { border-radius: 16px; box-shadow: 0 30px 80px rgba(15,23,42,.30), 0 0 0 1px rgba(15,23,42,.08); }
+    .hero .badge { position: absolute; left: -44px; top: -30px; padding: 14px 22px; background: var(--slate-900); color: #fff; border-radius: 12px; font-size: 22px; font-weight: 800; box-shadow: 0 14px 34px rgba(15,23,42,.3); }
+    .hero .badge span { color: var(--orange); }
+
+    /* ---------- Split: text + screenshots ---------- */
+    .split { flex: 1; min-height: 0; display: grid; grid-template-columns: 640px 1fr; gap: 70px; align-items: center; }
+    .split .text { display: flex; flex-direction: column; gap: 22px; }
+    .split .text h1 { font-size: 72px; }
+    .points { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 18px; }
+    .points li { font-size: 27px; line-height: 1.42; color: var(--slate-700); padding-left: 26px; position: relative; }
+    .points li::before { content: ""; position: absolute; left: 0; top: 14px; width: 10px; height: 10px; background: var(--orange); }
+    .points strong { color: var(--slate-900); }
+    .shots { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; gap: 36px; }
+    .shots .frame { flex: none; }
+    .overlay-shot { position: absolute; left: -60px; bottom: 36px; width: 600px; border: 3px solid var(--orange); }
+    .caption { margin-top: 18px; color: var(--slate-600); font-size: 24px; font-weight: 600; }
+    .caption strong { color: var(--slate-900); }
+
+    /* ---------- Duo: two features side by side ---------- */
+    .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 34px; align-items: start; }
+    .duo .frame { height: 500px; display: flex; align-items: center; justify-content: center; }
+    .duo .frame img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+
+    /* ---------- CTA ---------- */
+    .cta-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; }
+    .cta-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; text-align: center; }
+    .cta-content h1 { font-size: 100px; }
+    .cta-content .title-brand { margin: 0; }
+    .cta-actions { display: flex; flex-direction: column; gap: 22px; width: 560px; margin-top: 18px; }
+    .cta-action { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .cta-button { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 70px; border: 2px solid var(--slate-900); background: var(--slate-900); color: #fff; font-size: 23px; font-weight: 750; text-decoration: none; }
+    .cta-button.secondary { background: #fff; color: var(--slate-900); }
+    .cta-button:hover { border-color: var(--orange-dark); }
+    .cta-url { color: var(--slate-600); font-size: 19px; }
+
+    /* ---------- Chrome ---------- */
+    .ui-bar { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: rgba(226,232,240,.5); z-index: 10; }
+    .ui-fill { height: 100%; width: 0; background: var(--orange); transition: width 250ms ease; }
+    .controls { position: fixed; bottom: 14px; right: 20px; z-index: 10; display: flex; align-items: center; gap: 8px; transition: opacity 200ms; }
+    .controls button { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; color: var(--slate-700); font: inherit; font-size: 15px; height: 34px; min-width: 36px; padding: 0 10px; cursor: pointer; }
+    .controls button:hover, .controls button:focus-visible { border-color: var(--orange); color: var(--orange-dark); outline: none; }
+    .counter { color: #fff; background: rgba(15,23,42,.7); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 700; min-width: 58px; text-align: center; }
+    body.clean .controls, body.clean .ui-bar { opacity: 0; pointer-events: none; }
+
+    /* ---------- Transcript panel (hidden while recording) ---------- */
+    .transcript {
+      position: fixed; top: 16px; right: 16px; bottom: 64px; width: min(460px, 92vw); z-index: 20;
+      background: #fff; border: 1px solid var(--slate-200); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      display: none; flex-direction: column; overflow: hidden;
+    }
+    body.show-transcript .transcript { display: flex; }
+    .transcript header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--slate-200); }
+    .transcript header strong { font-size: 15px; }
+    .transcript header .tabs { display: flex; gap: 6px; }
+    .transcript header button { border: 1px solid var(--slate-200); background: #fff; border-radius: 7px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; color: var(--slate-700); }
+    .transcript header button:hover { border-color: var(--orange); color: var(--orange-dark); }
+    .transcript header button[aria-pressed="true"] { background: var(--orange-light); border-color: var(--orange); color: var(--orange-dark); }
+    .transcript .body { padding: 16px 18px 22px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--slate-700); }
+    .transcript .item { padding: 12px 0; border-bottom: 1px solid var(--slate-100); }
+    .transcript .item.current { background: var(--orange-light); margin: 0 -18px; padding: 12px 18px; }
+    .transcript .item h3 { margin: 0 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--orange-dark); }
+    .transcript .item p { margin: 0; white-space: pre-wrap; }
+    .transcript .meta { color: var(--slate-500); font-size: 12px; margin-top: 6px; }
+    .help { padding: 10px 16px; border-top: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-500); }
+    @media (prefers-reduced-motion: reduce) { .slide, .slide .stage > *, .ui-fill { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="ui-bar"><div class="ui-fill" id="progress"></div></div>
+  <main class="deck" id="deck">
+
+    <!-- 1 · Hook -->
+    <section class="slide active" aria-label="Frontier models on your ChatGPT plan">
+      <div class="stage light">
+        <div class="title-grid">
+          <div>
+            <img class="title-logo" src="assets/slide-06-rosetta-logo.png" alt="Rosetta logo">
+            <p class="title-brand">Rosetta DBT Studio 1.7.2</p>
+            <h1>Frontier models, <span class="accent">on your ChatGPT plan</span></h1>
+            <p class="lead">No API key. No per-token bill. Just sign in.</p>
+            <div class="chips"><span class="ver">New in 1.7.2</span><span class="ver ghost">Free</span><span class="ver ghost">Open source</span></div>
+          </div>
+          <figure class="frame hero">
+            <img src="assets/slide-01-chatgpt-model-list.png" alt="Edit AI Provider dialog with the ChatGPT model list">
+            <div class="badge">ChatGPT <span>Plus / Pro</span></div>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Set it up -->
+    <section class="slide" aria-label="Sign in and pick a model">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-02-chatgpt-provider.png" alt="Edit AI Provider: ChatGPT subscription">
+        <div class="ring" style="left: 640px; top: 560px; width: 640px; height: 56px;"></div>
+        <div class="card right">
+          <div class="eyebrow"><span class="ver">1.7.2</span> New · ChatGPT</div>
+          <h1>Sign in. Pick a model.</h1>
+          <p class="lead">Your ChatGPT Plus or Pro plan replaces the API key. Plan usage limits apply.</p>
+          <div class="chips"><span class="ver ghost">Experimental</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Agent on your plan -->
+    <section class="slide" aria-label="The agent runs on your plan">
+      <div class="stage shot">
+        <img class="shot-bg" src="assets/slide-03-agent-notebook-ai-chat.png" alt="AI agent fixing a notebook cell with gpt-6-luna">
+        <div class="ring" style="left: 1510px; top: 1004px; width: 112px; height: 44px;"></div>
+        <div class="card">
+          <div class="eyebrow"><span class="ver">1.7.2</span> ChatGPT · in action</div>
+          <h1>The agent runs on your plan</h1>
+          <p class="lead">It reads the failing cell, installs packages, updates the code and runs it again.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Public S3 -->
+    <section class="slide" aria-label="Public S3 buckets">
+      <div class="stage light">
+        <div class="split">
+          <div class="text">
+            <div class="eyebrow"><span class="ver">1.7.2</span> New · Cloud Explorer</div>
+            <h1>Public S3 buckets, <span class="accent">no keys</span></h1>
+            <ul class="points">
+              <li><strong>Tick</strong> Public bucket (no credentials).</li>
+              <li><strong>Add</strong> the bucket name and region.</li>
+              <li><strong>Browse and preview</strong> files, schema and statistics.</li>
+            </ul>
+          </div>
+          <div class="shots">
+            <figure class="frame" style="width: 1000px"><img src="assets/slide-04-s3-csv-preview.png" alt="Cloud Explorer previewing a CSV from a public S3 bucket"></figure>
+            <figure class="frame overlay-shot"><img src="assets/slide-04-s3-public-bucket-detail.png" alt="Public bucket (no credentials) option"></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Also new -->
+    <section class="slide" aria-label="Notebook tables and Settings">
+      <div class="stage light">
+        <div class="eyebrow"><span class="ver">1.7.2</span> Also new</div>
+        <h1>Plus, <span class="accent">polish everywhere</span></h1>
+        <div class="duo">
+          <div>
+            <figure class="frame"><img src="assets/slide-05-notebook-cell-output.png" alt="Notebook output table with filter, pagination and full-screen menu"></figure>
+            <p class="caption"><strong>Notebook tables</strong> · filter, page through, open full screen</p>
+          </div>
+          <div>
+            <figure class="frame"><img src="assets/slide-05-settings-dbt-core-detail.png" alt="Redesigned dbt Core settings page"></figure>
+            <p class="caption"><strong>Settings</strong> · one compact design on every page</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · CTA -->
+    <section class="slide" aria-label="Download">
+      <div class="stage light">
+        <div class="cta-content">
+            <img class="title-logo" src="assets/slide-06-rosetta-logo.png" alt="Rosetta logo">
+            <p class="title-brand">Rosetta DBT Studio 1.7.2</p>
+            <h1>Free &amp; <span class="accent">open source</span></h1>
+            <div class="cta-actions">
+              <div class="cta-action"><a class="cta-button" href="https://rosettadb.io/download-dbtstudio.html" target="_blank" rel="noopener noreferrer">Download Rosetta DBT Studio</a><span class="cta-url">rosettadb.io</span></div>
+              <div class="cta-action"><a class="cta-button secondary" href="https://github.com/rosettadb/dbt-studio" target="_blank" rel="noopener noreferrer">Star on GitHub</a><span class="cta-url">github.com/rosettadb/dbt-studio</span></div>
+            </div>
+          </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="transcript" id="transcript" aria-label="Transcript">
+    <header>
+      <strong>Transcript</strong>
+      <div class="tabs">
+        <button id="mode-current" aria-pressed="true">This slide</button>
+        <button id="mode-all" aria-pressed="false">All</button>
+        <button id="copy">Copy</button>
+        <button id="close-transcript" aria-label="Close transcript">✕</button>
+      </div>
+    </header>
+    <div class="body" id="transcript-body"></div>
+    <div class="help">← → navigate · T transcript · H hide controls · F fullscreen</div>
+  </aside>
+
+  <div class="controls" aria-label="Slide navigation">
+    <button id="toggle-transcript" title="Transcript (T)">Transcript</button>
+    <button id="previous" aria-label="Previous slide">←</button>
+    <span class="counter" id="counter" aria-live="polite">1 / 6</span>
+    <button id="next" aria-label="Next slide">→</button>
+  </div>
+
+  <script>
+    const NARRATION = [
+      { title: "Frontier models on your ChatGPT plan", text: "Rosetta DBT Studio 1.7.2 puts frontier AI models in your editor, on the ChatGPT plan you already pay for." },
+      { title: "Sign in and pick a model", text: "Add ChatGPT as a provider and sign in with your Plus or Pro account. Pick a model, from GPT-5.5 to GPT-6. No API key, and no per-token bill." },
+      { title: "The agent runs on your plan", text: "The AI assistant now runs on your plan. Here it reads a failing cell, installs packages, updates the code and reruns it." },
+      { title: "Public S3 buckets", text: "Also new: public S3 buckets. Tick Public bucket, add the name and region, and browse files with no credentials." },
+      { title: "Notebook tables and Settings", text: "Plus, notebook tables you can filter, page and open full screen, and a compact new design for every Settings page." },
+      { title: "Download", text: "Rosetta DBT Studio is free and open source. Download it at rosettadb.io, and star us on GitHub!" }
+    ];
+
+    const deck = document.getElementById('deck');
+    const slides = [...document.querySelectorAll('.slide')];
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    const tBody = document.getElementById('transcript-body');
+    let current = 0, showAll = false;
+
+    function fit() {
+      const s = Math.min(deck.clientWidth / 1920, deck.clientHeight / 1080);
+      deck.style.setProperty('--scale', s);
+    }
+    window.addEventListener('resize', fit); fit();
+
+    const words = t => t.trim().split(/\s+/).length;
+    const secs = t => Math.round(words(t) / 2.5); // ~150 wpm
+
+    function renderTranscript() {
+      const list = showAll ? NARRATION.map((n, i) => [n, i]) : [[NARRATION[current], current]];
+      tBody.innerHTML = list.map(([n, i]) =>
+        `<div class="item${showAll && i === current ? ' current' : ''}" data-i="${i}"><h3>Slide ${i + 1} · ${n.title}</h3><p>${n.text}</p><div class="meta">${words(n.text)} words · ~${secs(n.text)} s</div></div>`
+      ).join('');
+      if (showAll) tBody.querySelector('.current')?.scrollIntoView({ block: 'nearest' });
+      document.getElementById('mode-current').setAttribute('aria-pressed', !showAll);
+      document.getElementById('mode-all').setAttribute('aria-pressed', showAll);
+    }
+
+    function show(i) {
+      current = Math.max(0, Math.min(i, slides.length - 1));
+      slides.forEach((s, k) => { s.classList.toggle('active', k === current); s.inert = k !== current; });
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      history.replaceState(null, '', `#${current + 1}`);
+      renderTranscript();
+    }
+
+    document.getElementById('previous').onclick = () => show(current - 1);
+    document.getElementById('next').onclick = () => show(current + 1);
+    const toggleT = () => document.body.classList.toggle('show-transcript');
+    document.getElementById('toggle-transcript').onclick = toggleT;
+    document.getElementById('close-transcript').onclick = toggleT;
+    document.getElementById('mode-current').onclick = () => { showAll = false; renderTranscript(); };
+    document.getElementById('mode-all').onclick = () => { showAll = true; renderTranscript(); };
+    tBody.addEventListener('click', e => { const it = e.target.closest('.item'); if (it && showAll) show(+it.dataset.i); });
+    document.getElementById('copy').onclick = async e => {
+      const text = showAll
+        ? NARRATION.map((n, i) => `Slide ${i + 1} — ${n.title}\n${n.text}`).join('\n\n')
+        : NARRATION[current].text;
+      try { await navigator.clipboard.writeText(text); e.target.textContent = 'Copied'; }
+      catch { e.target.textContent = 'Copy failed'; }
+      setTimeout(() => (e.target.textContent = 'Copy'), 1400);
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.target.closest && e.target.closest('a, button') && e.key === 'Enter') return;
+      const k = e.key.toLowerCase();
+      if (['arrowright', ' ', 'pagedown'].includes(k)) { e.preventDefault(); show(current + 1); }
+      else if (['arrowleft', 'pageup', 'backspace'].includes(k)) { e.preventDefault(); show(current - 1); }
+      else if (k === 'home') show(0);
+      else if (k === 'end') show(slides.length - 1);
+      else if (k === 't') toggleT();
+      else if (k === 'h') document.body.classList.toggle('clean');
+      else if (k === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+    });
+
+    const start = parseInt(location.hash.slice(1), 10);
+    show(Number.isFinite(start) ? start - 1 : 0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "voice": "af_heart+af_bella",
+  "speed": 1.05,
+  "slides": [
+    {
+      "slide": 1,
+      "start": 0.0,
+      "duration": 10.84
+    },
+    {
+      "slide": 2,
+      "start": 10.44,
+      "duration": 13.52
+    },
+    {
+      "slide": 3,
+      "start": 23.57,
+      "duration": 8.91
+    },
+    {
+      "slide": 4,
+      "start": 32.08,
+      "duration": 8.85
+    },
+    {
+      "slide": 5,
+      "start": 40.52,
+      "duration": 8.92
+    },
+    {
+      "slide": 6,
+      "start": 49.05,
+      "duration": 10.85
+    }
+  ]
+}

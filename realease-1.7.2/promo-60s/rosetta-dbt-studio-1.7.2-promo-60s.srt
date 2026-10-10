@@ -1,0 +1,43 @@
+1
+00:00:00,600 --> 00:00:09,943
+Rosetta DBT Studio 1.7.2 puts frontier AI models in your editor, on the ChatGPT plan you already pay for.
+
+2
+00:00:11,043 --> 00:00:15,843
+Add ChatGPT as a provider and sign in with your Plus or Pro account.
+
+3
+00:00:16,064 --> 00:00:20,394
+Pick a model, from GPT-5.5 to GPT-6.
+
+4
+00:00:20,614 --> 00:00:23,067
+No API key, and no per-token bill.
+
+5
+00:00:24,168 --> 00:00:26,557
+The AI assistant now runs on your plan.
+
+6
+00:00:26,777 --> 00:00:31,577
+Here it reads a failing cell, installs packages, updates the code and reruns it.
+
+7
+00:00:32,677 --> 00:00:34,874
+Also new: public S3 buckets.
+
+8
+00:00:35,094 --> 00:00:40,022
+Tick Public bucket, add the name and region, and browse files with no credentials.
+
+9
+00:00:41,122 --> 00:00:48,546
+Plus, notebook tables you can filter, page and open full screen, and a compact new design for every Settings page.
+
+10
+00:00:49,646 --> 00:00:52,803
+Rosetta DBT Studio is free and open source.
+
+11
+00:00:53,023 --> 00:00:56,992
+Download it at rosettadb.io, and star us on GitHub!

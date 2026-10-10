@@ -1,0 +1,33 @@
+ROSETTA DBT STUDIO 1.7.2 — 60-SECOND PROMO
+Deck: promo-60s.html · Video: promo-60s/rosetta-dbt-studio-1.7.2-promo-60s.mp4 (1080p) and -4k.mp4 (3840x2160)
+Voice: Kokoro blend af_heart + af_bella, speed 1.05, loudness -16 LUFS · ChatGPT subscription first
+Total: 125 words · 59.9 s
+
+Slide 1 — Frontier models on your ChatGPT plan  [0.0s, 10.8s · 19 words]
+Visual: Title: "Frontier models, on your ChatGPT plan" + ChatGPT model list (Edit AI Provider)
+"Rosetta DBT Studio 1.7.2 puts frontier AI models in your editor, on the ChatGPT plan you already pay for."
+
+Slide 2 — Sign in and pick a model  [10.4s, 13.5s · 28 words]
+Visual: Full-bleed Edit AI Provider (ChatGPT subscription), ring on the "Plus/Pro plan instead of an API key" line
+"Add ChatGPT as a provider and sign in with your Plus or Pro account. Pick a model, from GPT-5.5 to GPT-6. No API key, and no per-token bill."
+
+Slide 3 — The agent runs on your plan  [23.6s, 8.9s · 22 words]
+Visual: Full-bleed notebook with the AI agent fixing cell 7, ring on the gpt-6-luna model chip
+"The AI assistant now runs on your plan. Here it reads a failing cell, installs packages, updates the code and reruns it."
+
+Slide 4 — Public S3 buckets  [32.1s, 8.8s · 19 words]
+Visual: Split: Cloud Explorer CSV preview + "Public bucket (no credentials)" form detail
+"Also new: public S3 buckets. Tick Public bucket, add the name and region, and browse files with no credentials."
+
+Slide 5 — Notebook tables and Settings  [40.5s, 8.9s · 20 words]
+Visual: Two frames: notebook output table + redesigned dbt Core settings page
+"Plus, notebook tables you can filter, page and open full screen, and a compact new design for every Settings page."
+
+Slide 6 — Download  [49.0s, 10.8s · 17 words]
+Visual: CTA, centered: download at rosettadb.io, star on GitHub
+"Rosetta DBT Studio is free and open source. Download it at rosettadb.io, and star us on GitHub!"
+
+Rebuild (from this folder, with kokoro-v1.0.onnx + voices-v1.0.bin next to build_video.py):
+python3 promo-60s/build_video.py --deck promo-60s.html --out promo-60s --voice af_heart+af_bella --speed 1.05 --lead 0.6 --tail 0.9 --gap 0.22 --xf 0.4 --end-hold 2 --name rosetta-dbt-studio-1.7.2-promo-60s-4k
+Then loudness-normalize: ffmpeg -i narration.wav -af loudnorm=I=-16:TP=-1.5:LRA=11 ... and remux; make the 1080p copy with scale=1920:1080, -level 4.0.
+Add --measure to check the length before rendering.
