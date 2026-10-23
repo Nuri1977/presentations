@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:01,937
+That is section two.
+
+2
+00:00:02,217 --> 00:00:09,171
+We know the building blocks, we configured the project file, we know the three layers, and the agent has a skill with our rules.
+
+3
+00:00:09,452 --> 00:00:11,436
+Next: our first block, sources.

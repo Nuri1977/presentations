@@ -1,0 +1,131 @@
+1
+00:00:00,700 --> 00:00:02,577
+Section eleven: snapshots.
+
+2
+00:00:02,857 --> 00:00:04,862
+Trips never change once they happen.
+
+3
+00:00:05,142 --> 00:00:09,985
+But some data is updated in place, and when that happens, the old value is gone.
+
+4
+00:00:10,265 --> 00:00:11,502
+Snapshots keep it.
+
+5
+00:00:12,602 --> 00:00:15,184
+Think of an address, a price, or a vendor name.
+
+6
+00:00:15,463 --> 00:00:23,656
+The source system overwrites it, and yesterday's value is lost, unless we keep one row per version, with the dates each version was valid.
+
+7
+00:00:23,936 --> 00:00:26,581
+That is a slowly changing dimension, type two.
+
+8
+00:00:27,681 --> 00:00:29,387
+This really happened in our data.
+
+9
+00:00:29,668 --> 00:00:34,190
+Older versions of the taxi data dictionary say vendor two is VeriFone.
+
+10
+00:00:34,470 --> 00:00:36,369
+The current one says Curb Mobility.
+
+11
+00:00:36,649 --> 00:00:39,273
+And two new vendors appeared, Myle and Helix.
+
+12
+00:00:40,373 --> 00:00:42,378
+The snapshots page, version one.
+
+13
+00:00:42,658 --> 00:00:48,504
+Since dbt one point nine, a snapshot is a YAML file pointing at a source or model.
+
+14
+00:00:48,784 --> 00:00:58,768
+It needs a unique key and a strategy. dbt adds valid from and valid to columns, and snapshots ignore full refresh, so history is never wiped.
+
+15
+00:00:59,867 --> 00:01:00,998
+Two strategies.
+
+16
+00:01:01,278 --> 00:01:05,780
+Timestamp compares an updated at column, when the source has a reliable one.
+
+17
+00:01:06,060 --> 00:01:09,174
+Check compares the actual values of the columns you list.
+
+18
+00:01:09,454 --> 00:01:12,868
+Our vendor list has no timestamp, so we check the vendor name.
+
+19
+00:01:13,967 --> 00:01:16,399
+First we need a source system that changes.
+
+20
+00:01:16,679 --> 00:01:24,573
+In the demo, the agent creates a small vendor registry table with the old list: Creative Mobile Technologies, and VeriFone.
+
+21
+00:01:25,673 --> 00:01:33,609
+Then the agent adds the table to our source, creates the snapshot in YAML with the check strategy, and runs dbt snapshot.
+
+22
+00:01:33,889 --> 00:01:36,641
+Many examples online use an older syntax.
+
+23
+00:01:36,921 --> 00:01:38,222
+Our skill says YAML.
+
+24
+00:01:39,322 --> 00:01:45,231
+Seven lines: a name, the source it reads, a unique key, the check strategy, and the column to check.
+
+25
+00:01:45,511 --> 00:01:50,141
+If the agent writes the old syntax, we discard it, and add the rule to the skill.
+
+26
+00:01:51,241 --> 00:01:56,318
+After the first snapshot, both vendors are current, and their valid to column is empty.
+
+27
+00:01:57,418 --> 00:01:59,615
+Then someone updates the vendor system.
+
+28
+00:01:59,895 --> 00:02:06,679
+Vendor two becomes Curb Mobility, and vendors six and seven are added, exactly as in the real dictionary.
+
+29
+00:02:06,959 --> 00:02:09,029
+We run dbt snapshot again.
+
+30
+00:02:10,129 --> 00:02:11,217
+History, kept.
+
+31
+00:02:11,497 --> 00:02:18,259
+Vendor two now has two rows: VeriFone, valid until the second run, and Curb Mobility, valid from then on.
+
+32
+00:02:18,539 --> 00:02:22,443
+Any report can now ask what a vendor was called at the time of a trip.
+
+33
+00:02:23,543 --> 00:02:29,688
+On the graph: the new source, the snapshot, and a vendor dimension built from the current rows of the snapshot.

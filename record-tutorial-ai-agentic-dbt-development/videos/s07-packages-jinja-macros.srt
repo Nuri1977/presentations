@@ -1,0 +1,179 @@
+1
+00:00:00,700 --> 00:00:01,745
+Section seven.
+
+2
+00:00:02,025 --> 00:00:03,924
+So far our SQL has been plain.
+
+3
+00:00:04,204 --> 00:00:09,835
+Now we make it smarter: we install a package, use Jinja, write a macro, and meet analyses.
+
+4
+00:00:10,935 --> 00:00:14,050
+A real problem: taxi trips have no trip ID.
+
+5
+00:00:14,330 --> 00:00:16,122
+Nothing identifies one trip.
+
+6
+00:00:16,402 --> 00:00:22,695
+We need a primary key to test uniqueness, and later so an incremental model knows which rows to replace.
+
+7
+00:00:22,976 --> 00:00:24,981
+We will build one from several columns.
+
+8
+00:00:26,081 --> 00:00:27,339
+The packages page.
+
+9
+00:00:27,619 --> 00:00:33,785
+A package is another dbt project you install into yours, usually for its macros and tests.
+
+10
+00:00:34,065 --> 00:00:37,756
+You list packages in a YAML file and run dbt deps.
+
+11
+00:00:38,036 --> 00:00:41,897
+The most used one is dbt utils, from dbt Labs.
+
+12
+00:00:42,997 --> 00:00:49,909
+In the demo, the agent adds dbt utils with the latest compatible version and runs dbt deps.
+
+13
+00:00:50,189 --> 00:00:54,349
+Afterwards we check the version on the dbt package hub ourselves.
+
+14
+00:00:54,629 --> 00:00:58,213
+Version numbers are exactly what an AI can get slightly wrong.
+
+15
+00:00:59,313 --> 00:01:00,316
+Three lines.
+
+16
+00:01:00,596 --> 00:01:04,094
+Notice the version range: at least one point three, below two.
+
+17
+00:01:04,374 --> 00:01:06,657
+We get fixes, but nothing that breaks us.
+
+18
+00:01:07,757 --> 00:01:09,656
+Before using it, we understand it.
+
+19
+00:01:09,936 --> 00:01:15,312
+In Ask mode: what does the surrogate key macro do, and which columns could identify a trip?
+
+20
+00:01:15,592 --> 00:01:22,717
+It hashes several columns into one ID, and identical rows get the same key, which is how we will find duplicates.
+
+21
+00:01:23,817 --> 00:01:26,633
+dbt models are SQL plus Jinja.
+
+22
+00:01:26,913 --> 00:01:30,284
+Double curly braces print something, like ref and source.
+
+23
+00:01:30,564 --> 00:01:34,937
+Curly brace and percent sign is logic: loops, ifs, and macros.
+
+24
+00:01:35,217 --> 00:01:42,513
+Curly brace and hash is a comment. dbt renders the Jinja first, and the database only sees plain SQL.
+
+25
+00:01:43,613 --> 00:01:45,277
+The Jinja and macros page.
+
+26
+00:01:45,557 --> 00:01:48,842
+Jinja adds loops, variables and functions to SQL.
+
+27
+00:01:49,122 --> 00:01:52,642
+A macro is a reusable function in the macros folder.
+
+28
+00:01:52,922 --> 00:01:56,271
+And always check the compiled SQL to see what you produced.
+
+29
+00:01:57,372 --> 00:01:59,185
+Our own macro, safe divide.
+
+30
+00:01:59,465 --> 00:02:01,428
+Remember the trips with zero distance?
+
+31
+00:02:01,708 --> 00:02:03,926
+Fare per mile would divide by zero.
+
+32
+00:02:04,206 --> 00:02:08,388
+This macro returns empty instead of an error, and every model can use it.
+
+33
+00:02:09,488 --> 00:02:11,962
+On the left, how we call the macro in a model.
+
+34
+00:02:12,242 --> 00:02:16,488
+On the right, what dbt compiles it into: a plain case expression.
+
+35
+00:02:16,768 --> 00:02:18,816
+The database never sees Jinja.
+
+36
+00:02:19,916 --> 00:02:22,774
+Analyses are another block from the projects page.
+
+37
+00:02:23,054 --> 00:02:29,091
+An analysis is a SQL file that dbt compiles but never runs, so no table is built.
+
+38
+00:02:29,372 --> 00:02:33,916
+They are great for queries you want to keep in git, and for experimenting with Jinja.
+
+39
+00:02:35,016 --> 00:02:36,466
+An analysis with a loop.
+
+40
+00:02:36,746 --> 00:02:40,138
+For each payment type in the list, it writes one count column.
+
+41
+00:02:40,418 --> 00:02:43,576
+Compile it, and the loop is replaced by real columns.
+
+42
+00:02:43,856 --> 00:02:46,543
+But the list is hard-coded, which is not great.
+
+43
+00:02:47,644 --> 00:02:50,268
+In the demo, the agent makes it data-driven.
+
+44
+00:02:50,548 --> 00:02:55,668
+A dbt utils macro reads the payment types from the seed at compile time.
+
+45
+00:02:55,948 --> 00:02:59,852
+Add a code to the CSV, and the SQL follows automatically.

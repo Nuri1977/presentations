@@ -1,0 +1,195 @@
+1
+00:00:00,700 --> 00:00:01,702
+Section one.
+
+2
+00:00:01,982 --> 00:00:07,572
+Before writing any dbt model, we need data in the database, and we need to understand it.
+
+3
+00:00:07,852 --> 00:00:14,700
+We load two months of real taxi trips into DuckDB with the agent, and then we find out what is wrong with the data.
+
+4
+00:00:15,799 --> 00:00:20,663
+Here is something that surprises many beginners. dbt does not load data.
+
+5
+00:00:20,944 --> 00:00:23,653
+It does not download files or call APIs.
+
+6
+00:00:23,933 --> 00:00:26,984
+It transforms data that is already in your database.
+
+7
+00:00:27,263 --> 00:00:30,741
+Loading is done by other tools, before dbt starts.
+
+8
+00:00:31,841 --> 00:00:35,105
+Extract: the Taxi Commission publishes Parquet files.
+
+9
+00:00:35,385 --> 00:00:38,585
+Load: DuckDB reads them into a schema called raw.
+
+10
+00:00:38,865 --> 00:00:42,257
+Transform: that is dbt, and the rest of this course.
+
+11
+00:00:42,537 --> 00:00:48,553
+We keep the loading SQL in a script, outside dbt, so we can run it again when a new month arrives.
+
+12
+00:00:49,653 --> 00:00:52,319
+The dbt introduction says the same thing.
+
+13
+00:00:52,599 --> 00:01:01,303
+Data is extracted and loaded by other tools. dbt handles the transformation: modelling, cleaning, testing and documenting.
+
+14
+00:01:01,583 --> 00:01:06,618
+And because dbt only writes select statements, the database does the heavy work.
+
+15
+00:01:07,718 --> 00:01:08,721
+The dataset.
+
+16
+00:01:09,001 --> 00:01:13,054
+Parquet files, one per month, around three to four million trips each.
+
+17
+00:01:13,334 --> 00:01:19,777
+We start with November and December twenty twenty-four, and add January twenty twenty-five later, on purpose.
+
+18
+00:01:20,057 --> 00:01:23,812
+There is also a zone lookup file and an official data dictionary.
+
+19
+00:01:24,911 --> 00:01:26,661
+Each row is one taxi trip.
+
+20
+00:01:26,941 --> 00:01:31,592
+When and where: pickup and dropoff times and zones, distance and passengers.
+
+21
+00:01:31,871 --> 00:01:36,330
+Codes, like rate code and payment type, that only make sense with the dictionary.
+
+22
+00:01:36,610 --> 00:01:37,762
+And money columns.
+
+23
+00:01:38,042 --> 00:01:43,034
+The last one, the congestion fee, only exists from January twenty twenty-five.
+
+24
+00:01:44,134 --> 00:01:45,649
+Our first habit in action.
+
+25
+00:01:45,929 --> 00:01:51,262
+We transcribe the official data dictionary into a Markdown file inside the project.
+
+26
+00:01:51,542 --> 00:01:59,371
+From now on, the agent reads code lists and descriptions from that file, not from memory, because lists like these change over time.
+
+27
+00:02:00,472 --> 00:02:02,370
+This is the first prompt for the demo.
+
+28
+00:02:02,650 --> 00:02:11,269
+In the SQL editor, the agent creates a raw schema and loads both monthly files into one table, keeping the file name on every row.
+
+29
+00:02:11,549 --> 00:02:16,797
+We ask to see the SQL first, and Rosetta stops at an approval gate before anything runs.
+
+30
+00:02:17,897 --> 00:02:22,398
+This is roughly the SQL the agent writes, and we save it as the load script.
+
+31
+00:02:22,678 --> 00:02:26,305
+One create table statement that reads both Parquet files.
+
+32
+00:02:26,585 --> 00:02:32,942
+Union by name lets files with different columns combine, which matters later when a new column arrives.
+
+33
+00:02:34,042 --> 00:02:42,639
+Next, in Ask mode, the agent profiles the table: rows per file, the date range, empty values per column, and three suspicious things.
+
+34
+00:02:42,919 --> 00:02:47,719
+Negative fares, trips with zero distance, and trips that end before they start.
+
+35
+00:02:47,999 --> 00:02:50,517
+We look at the data before we write rules about it.
+
+36
+00:02:51,617 --> 00:02:53,579
+Here is what real data looks like.
+
+37
+00:02:53,859 --> 00:02:56,164
+Trips picked up outside the month of their file.
+
+38
+00:02:56,443 --> 00:02:57,531
+Negative fares.
+
+39
+00:02:57,811 --> 00:02:59,326
+Trips with zero distance.
+
+40
+00:02:59,606 --> 00:03:01,910
+A block of rows with no passenger count.
+
+41
+00:03:02,190 --> 00:03:04,131
+And trips that end before they start.
+
+42
+00:03:04,411 --> 00:03:05,734
+This is not our bug.
+
+43
+00:03:06,014 --> 00:03:07,145
+This is the source.
+
+44
+00:03:08,245 --> 00:03:11,082
+Every one of these problems has a home in this course.
+
+45
+00:03:11,362 --> 00:03:13,197
+Guessed tests in the sources section.
+
+46
+00:03:13,477 --> 00:03:15,183
+Changed code lists in seeds.
+
+47
+00:03:15,463 --> 00:03:17,213
+Backwards trips in data tests.
+
+48
+00:03:17,493 --> 00:03:20,949
+Zero distance and invalid trips in the intermediate model.
+
+49
+00:03:21,229 --> 00:03:24,194
+And the new January column in incremental models.

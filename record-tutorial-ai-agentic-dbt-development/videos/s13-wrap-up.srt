@@ -1,0 +1,75 @@
+1
+00:00:00,700 --> 00:00:01,894
+The final section.
+
+2
+00:00:02,174 --> 00:00:05,140
+Let's look back at what we built, and where you can go next.
+
+3
+00:00:06,240 --> 00:00:07,520
+This is your project.
+
+4
+00:00:07,800 --> 00:00:17,954
+Sources and seeds, staging, an intermediate model with tested business rules, marts, a snapshot keeping history, and an exposure for a real analysis.
+
+5
+00:00:18,234 --> 00:00:21,072
+Real data, real problems, real decisions.
+
+6
+00:00:22,172 --> 00:00:23,921
+Remember the map from section two?
+
+7
+00:00:24,201 --> 00:00:31,646
+Every planned block is ticked: models, sources, seeds, tests, macros, analyses, snapshots, docs and exposures.
+
+8
+00:00:31,926 --> 00:00:36,022
+The dashed ones, like metrics and the semantic layer, are your next steps.
+
+9
+00:00:37,122 --> 00:00:41,197
+If you keep only three habits: give the agent context, not memory.
+
+10
+00:00:41,477 --> 00:00:43,440
+Read every diff before you keep it.
+
+11
+00:00:43,720 --> 00:00:45,490
+And let dbt be the judge.
+
+12
+00:00:45,770 --> 00:00:49,909
+The agent made us faster, but every decision in this project was ours.
+
+13
+00:00:51,009 --> 00:00:59,265
+The dbt commands we used, all from version one: debug, seed, run and build, test, compile, deps, snapshot, and docs.
+
+14
+00:00:59,545 --> 00:01:03,534
+In Rosetta most of them are buttons, and now you know what each one does.
+
+15
+00:01:04,634 --> 00:01:05,722
+Where to go next.
+
+16
+00:01:06,002 --> 00:01:09,416
+The semantic layer, to define metrics like revenue once.
+
+17
+00:01:09,696 --> 00:01:12,981
+Contracts and groups, when other teams depend on your models.
+
+18
+00:01:13,261 --> 00:01:15,864
+Python models, which DuckDB supports.
+
+19
+00:01:16,144 --> 00:01:19,600
+And automatic builds on every change, with Rosetta Cloud.

@@ -1,0 +1,15 @@
+1
+00:00:00,700 --> 00:00:01,980
+That is section nine.
+
+2
+00:00:02,260 --> 00:00:04,564
+Unit tests lock our business logic.
+
+3
+00:00:04,844 --> 00:00:09,771
+We chose the cases, the agent wrote the YAML, and we watched a test fail on purpose.
+
+4
+00:00:10,052 --> 00:00:11,758
+Next: incremental models.

@@ -1,0 +1,175 @@
+1
+00:00:00,700 --> 00:00:02,513
+Section six: data tests.
+
+2
+00:00:02,793 --> 00:00:07,508
+A test is how we write down an assumption, so dbt checks it on every run.
+
+3
+00:00:07,788 --> 00:00:10,284
+With real data, some assumptions will be wrong.
+
+4
+00:00:10,564 --> 00:00:11,630
+That is the point.
+
+5
+00:00:12,730 --> 00:00:16,314
+Every dbt test is a query that looks for bad rows.
+
+6
+00:00:16,594 --> 00:00:18,664
+Zero rows means the test passes.
+
+7
+00:00:18,944 --> 00:00:22,826
+Any rows means it fails, and the failing rows are right there to look at.
+
+8
+00:00:23,926 --> 00:00:26,166
+dbt ships four generic tests.
+
+9
+00:00:26,446 --> 00:00:29,945
+Unique and not null, usually together on a primary key.
+
+10
+00:00:30,225 --> 00:00:34,022
+Accepted values, for columns with a known list, like payment types.
+
+11
+00:00:34,302 --> 00:00:39,828
+And relationships, which checks that every value exists in another model, like a foreign key.
+
+12
+00:00:40,928 --> 00:00:42,144
+Two kinds of test.
+
+13
+00:00:42,424 --> 00:00:46,541
+Generic tests are reusable, and you list them under a column in YAML.
+
+14
+00:00:46,821 --> 00:00:50,042
+Singular tests are one SQL file in the tests folder.
+
+15
+00:00:50,322 --> 00:00:53,074
+This one returns trips that end before they start.
+
+16
+00:00:54,174 --> 00:00:56,286
+The data tests page, version one.
+
+17
+00:00:56,566 --> 00:00:59,574
+Generic tests go under the data tests key in YAML.
+
+18
+00:00:59,854 --> 00:01:01,796
+Singular tests are SQL files.
+
+19
+00:01:02,076 --> 00:01:08,134
+You can set severity to error or warn, test only some rows, and store failing rows in a table.
+
+20
+00:01:09,234 --> 00:01:14,461
+First, by hand: the zone ID is our primary key, so it gets unique and not null.
+
+21
+00:01:14,741 --> 00:01:17,130
+Two lines, and the official lookup passes.
+
+22
+00:01:18,230 --> 00:01:31,521
+In the demo, the agent adds the rest: not null on the timestamps, accepted values on payment type from the seed, relationships from both location columns to the zones, and the singular test for backwards trips.
+
+23
+00:01:31,801 --> 00:01:33,764
+Then it runs the tests for this model.
+
+24
+00:01:34,863 --> 00:01:35,823
+What we review.
+
+25
+00:01:36,103 --> 00:01:39,368
+Accepted values zero to six, taken from the seed.
+
+26
+00:01:39,648 --> 00:01:44,469
+In recent dbt version one, the values sit under a key called arguments.
+
+27
+00:01:44,749 --> 00:01:47,138
+Quote is false, because the codes are numbers.
+
+28
+00:01:47,418 --> 00:01:50,042
+And the relationships test points at the zones model.
+
+29
+00:01:51,142 --> 00:01:56,518
+The singular test is a plain query for the rows that break our rule: dropoff before pickup.
+
+30
+00:01:56,798 --> 00:02:01,278
+It returns the source file too, so we can see which month the bad rows came from.
+
+31
+00:02:02,378 --> 00:02:03,893
+And real data says no.
+
+32
+00:02:04,173 --> 00:02:08,162
+The singular test fails: some trips really do end before they start.
+
+33
+00:02:08,442 --> 00:02:12,346
+The accepted values test passes, because we used the current code list.
+
+34
+00:02:12,626 --> 00:02:14,205
+Now we decide what to do.
+
+35
+00:02:15,305 --> 00:02:17,566
+Rosetta has a shortcut for this moment.
+
+36
+00:02:17,846 --> 00:02:22,796
+In Run History, open the failed test, and the error view offers an AI assistant.
+
+37
+00:02:23,076 --> 00:02:26,212
+We let it propose a fix, and we read it before deciding.
+
+38
+00:02:27,311 --> 00:02:28,378
+Three options.
+
+39
+00:02:28,658 --> 00:02:32,306
+Deleting the rows in staging hides a real problem, so no.
+
+40
+00:02:32,586 --> 00:02:38,559
+Making the test a warning and storing the failing rows keeps them visible without blocking every build.
+
+41
+00:02:38,839 --> 00:02:42,829
+And in section eight, we flag invalid trips in the intermediate layer.
+
+42
+00:02:43,109 --> 00:02:44,901
+A failing test is a decision.
+
+43
+00:02:46,001 --> 00:02:49,414
+One line at the top: severity warn, and store failures.
+
+44
+00:02:49,694 --> 00:02:54,814
+The build continues with a warning, and the failing rows are saved in a table we can query.

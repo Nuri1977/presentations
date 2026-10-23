@@ -1,0 +1,131 @@
+1
+00:00:00,700 --> 00:00:03,195
+Welcome to part two: production patterns.
+
+2
+00:00:03,476 --> 00:00:05,012
+We start with unit tests.
+
+3
+00:00:05,292 --> 00:00:11,798
+Our tests so far check the data, but our business logic could have a bug that today's data simply does not show.
+
+4
+00:00:12,078 --> 00:00:13,486
+Unit tests catch that.
+
+5
+00:00:14,586 --> 00:00:15,866
+Two different questions.
+
+6
+00:00:16,146 --> 00:00:20,477
+A data test runs on the real tables and asks: is this data right?
+
+7
+00:00:20,757 --> 00:00:26,474
+A unit test feeds a model a few rows that we invent, and asks: does my SQL do what I meant?
+
+8
+00:00:27,574 --> 00:00:32,374
+The unit tests page, version one, available since dbt one point eight.
+
+9
+00:00:32,654 --> 00:00:34,404
+A unit test lives in YAML.
+
+10
+00:00:34,684 --> 00:00:38,737
+Given: fake input rows for every model the tested model reads.
+
+11
+00:00:39,017 --> 00:00:41,001
+Expect: the rows that should come out.
+
+12
+00:00:41,281 --> 00:00:43,180
+You only list the columns that matter.
+
+13
+00:00:44,280 --> 00:00:45,432
+One unit test.
+
+14
+00:00:45,712 --> 00:00:48,720
+The model under test is the intermediate trips model.
+
+15
+00:00:49,000 --> 00:00:55,592
+Given one fake trip with zero distance, and empty inputs for the two seeds, because every input must be mocked.
+
+16
+00:00:55,872 --> 00:01:01,056
+We expect fare per mile to be empty, the trip invalid, and the reason zero distance.
+
+17
+00:01:02,156 --> 00:01:04,673
+Deciding what to test is the human part.
+
+18
+00:01:04,953 --> 00:01:07,214
+Four cases from the problems we found.
+
+19
+00:01:07,494 --> 00:01:08,604
+Zero distance.
+
+20
+00:01:08,884 --> 00:01:10,825
+A trip that ends before it starts.
+
+21
+00:01:11,105 --> 00:01:16,758
+A normal trip, two and a half miles for fifteen dollars, which must be valid at six dollars a mile.
+
+22
+00:01:17,038 --> 00:01:18,382
+And a negative total.
+
+23
+00:01:19,482 --> 00:01:28,229
+In the demo, we describe the four cases in plain English, and the agent writes the YAML, mocks every input, and runs only the unit tests.
+
+24
+00:01:28,509 --> 00:01:30,984
+Verbose YAML is perfect agent work.
+
+25
+00:01:31,264 --> 00:01:32,586
+The cases are ours.
+
+26
+00:01:33,686 --> 00:01:36,225
+We run only the unit tests, and four pass.
+
+27
+00:01:36,505 --> 00:01:40,665
+If one fails, ask the honest question: is the test wrong, or the model?
+
+28
+00:01:41,765 --> 00:01:45,135
+A test you have never seen fail is a test you cannot trust.
+
+29
+00:01:45,415 --> 00:01:47,207
+So we break the model on purpose.
+
+30
+00:01:48,307 --> 00:01:53,043
+We change one character: less than or equal to zero becomes less than zero.
+
+31
+00:01:53,323 --> 00:01:55,329
+Now zero-distance trips are valid.
+
+32
+00:01:55,609 --> 00:02:00,793
+The first unit test turns red, and dbt shows what we expected and what we got.
+
+33
+00:02:01,073 --> 00:02:03,547
+We undo the change, and it is green again.

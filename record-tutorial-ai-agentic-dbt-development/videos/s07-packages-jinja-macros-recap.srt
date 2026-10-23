@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,044
+That is section seven.
+
+2
+00:00:02,324 --> 00:00:07,913
+A package with a version range, Jinja expressions and loops, our own macro, and an analysis.
+
+3
+00:00:08,193 --> 00:00:11,692
+Next: we put it all together into intermediate and mart models.

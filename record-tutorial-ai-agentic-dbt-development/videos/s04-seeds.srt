@@ -1,0 +1,127 @@
+1
+00:00:00,700 --> 00:00:02,278
+Section four: seeds.
+
+2
+00:00:02,558 --> 00:00:04,926
+Some data is not in any source system.
+
+3
+00:00:05,206 --> 00:00:09,067
+It is a small list we maintain ourselves, like codes and their names.
+
+4
+00:00:09,347 --> 00:00:10,883
+That is what seeds are for.
+
+5
+00:00:11,983 --> 00:00:13,797
+The seeds page, version one.
+
+6
+00:00:14,077 --> 00:00:19,432
+A seed is a CSV file in the project. dbt seed loads it as a table.
+
+7
+00:00:19,711 --> 00:00:23,872
+Because it is a file in the project, it is version controlled and reviewed.
+
+8
+00:00:24,151 --> 00:00:27,223
+Seeds are best for static data that changes rarely.
+
+9
+00:00:28,323 --> 00:00:33,806
+Good seeds are small, static lists: code mappings, regions, test accounts to exclude.
+
+10
+00:00:34,086 --> 00:00:41,532
+Bad seeds are raw data exported to CSV, anything large or sensitive, and anything that changes every day.
+
+11
+00:00:42,632 --> 00:00:43,976
+We need three seeds.
+
+12
+00:00:44,256 --> 00:00:48,992
+The official zone lookup from the Taxi Commission, with two hundred sixty-five zones.
+
+13
+00:00:49,272 --> 00:00:53,410
+And two lists we create from the dictionary: payment types and rate codes.
+
+14
+00:00:53,690 --> 00:00:56,848
+They turn numbers in the trip data into readable names.
+
+15
+00:00:57,948 --> 00:01:01,084
+On the graph, three new nodes on the left, next to the source.
+
+16
+00:01:01,364 --> 00:01:04,436
+Like sources, seeds are where data enters the project.
+
+17
+00:01:05,536 --> 00:01:09,098
+The zone lookup is an official file, so nobody should retype it.
+
+18
+00:01:09,378 --> 00:01:14,562
+In the demo, we download it from the Taxi Commission page and drop it into the seeds folder.
+
+19
+00:01:14,842 --> 00:01:17,744
+Notice the column names are not snake case yet.
+
+20
+00:01:18,024 --> 00:01:19,496
+We fix that in staging.
+
+21
+00:01:20,596 --> 00:01:31,092
+The other two seeds, the agent creates from the dictionary file: every payment type, every rate code, a YAML file with descriptions, and integer types for the IDs.
+
+22
+00:01:31,372 --> 00:01:35,148
+Then it asks to run dbt seed, and waits for our approval.
+
+23
+00:01:36,248 --> 00:01:37,101
+The review.
+
+24
+00:01:37,381 --> 00:01:41,904
+Payment types must start at zero, Flex Fare, and include six, voided trip.
+
+25
+00:01:42,184 --> 00:01:44,914
+Rate codes must include ninety-nine, unknown.
+
+26
+00:01:45,194 --> 00:01:49,973
+Older versions of the dictionary did not have these, so a list from memory would be wrong.
+
+27
+00:01:50,253 --> 00:01:53,197
+We gave the agent the file, so it got the current list.
+
+28
+00:01:54,297 --> 00:01:56,302
+Seeds get YAML just like models.
+
+29
+00:01:56,582 --> 00:02:01,638
+Descriptions, and column types, so the IDs are integers instead of guessed types.
+
+30
+00:02:01,918 --> 00:02:04,670
+Even a small lookup gets a primary key test.
+
+31
+00:02:05,770 --> 00:02:10,464
+We load the seeds with dbt seed and look at the table in the SQL editor.
+
+32
+00:02:10,744 --> 00:02:13,496
+Seven payment types, built from a file in git.

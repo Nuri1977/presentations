@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:04,284
+That is section one. dbt is the T in E L T.
+
+2
+00:00:04,564 --> 00:00:10,814
+Two months of real trips are loaded, the data dictionary is in the project, and we know what is wrong with the data.
+
+3
+00:00:11,094 --> 00:00:16,065
+Next: what a dbt project is made of, and how we teach the agent our rules.

@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,065
+That is section eleven.
+
+2
+00:00:02,345 --> 00:00:07,785
+Snapshots keep history, and we used one on a real change from the taxi data dictionary.
+
+3
+00:00:08,065 --> 00:00:11,265
+Next: documentation, lineage, and a real answer.

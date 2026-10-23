@@ -1,0 +1,195 @@
+1
+00:00:00,700 --> 00:00:01,724
+Section ten.
+
+2
+00:00:02,004 --> 00:00:06,505
+Today the fact table is rebuilt from all trips on every run, and that gets slow.
+
+3
+00:00:06,785 --> 00:00:10,091
+We make it incremental, so only new trips are processed.
+
+4
+00:00:10,372 --> 00:00:12,548
+Then a new month arrives, with a surprise.
+
+5
+00:00:13,648 --> 00:00:16,613
+A table is thrown away and rebuilt on every run.
+
+6
+00:00:16,893 --> 00:00:25,192
+An incremental model keeps the existing table and processes only new rows, inserting them, or replacing rows with the same key.
+
+7
+00:00:26,291 --> 00:00:28,787
+The incremental models page, version one.
+
+8
+00:00:29,067 --> 00:00:34,230
+The is incremental function is true only on a normal run against an existing table.
+
+9
+00:00:34,510 --> 00:00:37,049
+The word this refers to the existing table.
+
+10
+00:00:37,329 --> 00:00:40,102
+A unique key lets dbt replace rows.
+
+11
+00:00:40,382 --> 00:00:44,030
+And on schema change decides what happens when columns change.
+
+12
+00:00:45,130 --> 00:00:46,154
+The whole pattern.
+
+13
+00:00:46,434 --> 00:00:48,546
+A config block that says incremental.
+
+14
+00:00:48,826 --> 00:00:50,832
+Then an if block that adds a filter.
+
+15
+00:00:51,112 --> 00:00:54,141
+On the first run, or a full refresh, everything loads.
+
+16
+00:00:54,421 --> 00:00:58,197
+On later runs, only rows newer than what is already in the table.
+
+17
+00:00:59,297 --> 00:01:00,641
+How are new rows written?
+
+18
+00:01:00,921 --> 00:01:03,822
+The DuckDB configs page lists four strategies.
+
+19
+00:01:04,102 --> 00:01:07,260
+Append, delete and insert, merge, and microbatch.
+
+20
+00:01:07,540 --> 00:01:13,406
+We use delete and insert with our trip ID: simple, and safe when the same trip arrives twice.
+
+21
+00:01:14,506 --> 00:01:18,346
+Before changing anything, we ask in Ask mode how this would behave.
+
+22
+00:01:18,626 --> 00:01:26,456
+A trip from the last days of the previous month could be missed, so we look back a few days, and the unique key replaces anything we see twice.
+
+23
+00:01:27,556 --> 00:01:29,902
+How many days back is a setting, not code.
+
+24
+00:01:30,182 --> 00:01:33,916
+So it becomes a project variable, the vars key from section two.
+
+25
+00:01:34,196 --> 00:01:37,332
+We can override it on the command line for a single run.
+
+26
+00:01:38,432 --> 00:01:47,520
+In the demo, the agent makes the fact table incremental: the trip ID as unique key, delete and insert, and a filter that uses our lookback variable.
+
+27
+00:01:47,800 --> 00:01:52,258
+We leave on schema change at its default, and run it once with a full refresh.
+
+28
+00:01:53,358 --> 00:01:54,318
+We review it.
+
+29
+00:01:54,598 --> 00:02:01,212
+The folder says table, but the config in the file says incremental, and the file wins because it is more specific.
+
+30
+00:02:01,492 --> 00:02:06,121
+The validity filter, the lookback from the variable, and no on schema change yet.
+
+31
+00:02:07,221 --> 00:02:08,650
+Now real life happens.
+
+32
+00:02:08,930 --> 00:02:11,234
+January twenty twenty-five is published.
+
+33
+00:02:11,514 --> 00:02:14,288
+We add the file to our load script and run it again.
+
+34
+00:02:14,568 --> 00:02:21,650
+Then dbt build for staging and everything downstream, and Run History shows that only the new rows were processed.
+
+35
+00:02:22,750 --> 00:02:23,753
+The surprise.
+
+36
+00:02:24,033 --> 00:02:32,652
+January brings a new column: the C B D congestion fee, for the Manhattan Congestion Relief Zone that started on January fifth.
+
+37
+00:02:32,932 --> 00:02:36,537
+It is in the raw table, but not in staging or the fact table.
+
+38
+00:02:36,817 --> 00:02:39,612
+Nothing changes downstream without our decision.
+
+39
+00:02:40,712 --> 00:02:41,842
+Back to the docs.
+
+40
+00:02:42,122 --> 00:02:44,810
+The default, ignore, does not add new columns.
+
+41
+00:02:45,090 --> 00:02:46,754
+Append new columns adds them.
+
+42
+00:02:47,034 --> 00:02:49,232
+And none of the options fill in old rows.
+
+43
+00:02:49,512 --> 00:02:50,962
+That needs a full refresh.
+
+44
+00:02:52,062 --> 00:03:05,417
+In the demo, the agent carries the new column through every layer: the dictionary file, the source, staging, intermediate and the fact table, and sets on schema change so the column is added without a full refresh.
+
+45
+00:03:05,697 --> 00:03:09,110
+Updating the dictionary keeps the agent's context current.
+
+46
+00:03:10,210 --> 00:03:11,362
+The column appears.
+
+47
+00:03:11,642 --> 00:03:17,167
+January rows have values, November and December are empty, exactly as the docs said.
+
+48
+00:03:17,447 --> 00:03:22,119
+Here empty is actually correct, because the fee did not exist before January.
+
+49
+00:03:22,399 --> 00:03:24,128
+Know which option you are choosing.

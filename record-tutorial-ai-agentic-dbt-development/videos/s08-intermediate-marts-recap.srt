@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,278
+That is the end of part one.
+
+2
+00:00:02,558 --> 00:00:11,070
+A complete, tested dbt project, from raw files to a fact table and a daily summary, with our business rules in one reviewed place.
+
+3
+00:00:11,350 --> 00:00:13,654
+In part two we make it production-ready.

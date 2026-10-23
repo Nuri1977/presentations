@@ -1,0 +1,15 @@
+1
+00:00:00,700 --> 00:00:01,958
+That is section three.
+
+2
+00:00:02,238 --> 00:00:07,892
+Our raw table is now a documented source, and its tests describe reality instead of a guess.
+
+3
+00:00:08,172 --> 00:00:10,113
+First block ticked: sources.
+
+4
+00:00:10,393 --> 00:00:11,545
+Next: seeds.

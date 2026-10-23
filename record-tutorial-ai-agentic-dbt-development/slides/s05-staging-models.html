@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S05 · Staging models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A1020; --bg2:#0F1830; --panel:rgba(255,255,255,.045); --panel2:rgba(255,255,255,.075);
+  --line:rgba(255,255,255,.11); --text:#E8EEF8; --muted:#9AA8BF; --dim:#5E6E89;
+  --accent:#38BDF8; --accent2:#FBBF24; --good:#34D399; --bad:#F87171; --violet:#C084FC;
+  --orange:#FB923C; --teal:#2DD4BF; --blue:#60A5FA; --pink:#F472B6;
+  --code-bg:#060B16; --code-text:#D7E1F0; --glow:rgba(56,189,248,.35);
+  --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#F6F8FC; --bg2:#EAF0F8; --panel:#FFFFFF; --panel2:#F1F5FB;
+  --line:rgba(15,23,42,.13); --text:#0D1526; --muted:#4A5872; --dim:#8A97AD;
+  --accent:#0278B8; --accent2:#B45309; --good:#059669; --bad:#DC2626; --violet:#7C3AED;
+  --orange:#EA580C; --teal:#0D9488; --blue:#2563EB; --pink:#DB2777;
+  --code-bg:#0D1526; --code-text:#E2E8F0; --glow:rgba(2,120,184,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:var(--text);font-family:var(--font)}
+:root[data-theme="light"] body{background:#CBD5E1}
+code{font-family:var(--mono);font-size:.86em;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:.04em .32em;color:var(--accent);white-space:nowrap}
+strong{font-weight:700;color:var(--text)}
+em{font-style:normal;color:var(--accent2)}
+mark{background:none;color:var(--accent2);font-weight:700}
+
+/* ---------- stage ---------- */
+#stage{position:fixed;inset:0;overflow:hidden}
+#canvas{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;padding:92px 120px 118px;display:flex;flex-direction:column;
+  background:radial-gradient(1200px 700px at 88% -10%,rgba(56,189,248,.13),transparent 60%),
+             radial-gradient(900px 600px at -10% 110%,rgba(251,191,36,.08),transparent 60%),var(--bg);
+  color:var(--text);font-size:36px;line-height:1.42;opacity:0;pointer-events:none;transition:opacity .18s ease;overflow:hidden}
+:root[data-theme="light"] .slide{background:radial-gradient(1200px 700px at 88% -10%,rgba(2,120,184,.10),transparent 60%),
+             radial-gradient(900px 600px at -10% 110%,rgba(180,83,9,.06),transparent 60%),var(--bg)}
+.slide.active{opacity:1;pointer-events:auto}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:96px 96px;opacity:.18;mask-image:linear-gradient(180deg,rgba(0,0,0,.7),transparent 70%)}
+.content{position:relative;flex:1;min-height:0;overflow:hidden}
+.inner{transform-origin:top left;min-height:100%;display:flex;flex-direction:column}
+.footer{position:absolute;left:120px;right:120px;bottom:38px;display:flex;align-items:center;justify-content:space-between;font-size:21px;color:var(--dim);letter-spacing:.02em}
+.footer .brand{opacity:.85}
+.v1b{display:inline-block;border:1px solid var(--line);color:var(--accent);border-radius:999px;padding:1px 12px;margin-right:14px;font-weight:600;font-size:18px}
+#progress{position:fixed;left:0;right:0;top:0;height:3px;z-index:5;pointer-events:none}
+#progress i{display:block;height:100%;width:0;background:var(--accent);opacity:.55;transition:width .25s}
+
+/* ---------- common ---------- */
+.kicker{font-size:23px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.kicker::before{content:"";width:34px;height:3px;background:currentColor;border-radius:3px}
+.kicker.k-real{color:var(--accent2)}
+.kicker.k-ai{color:var(--violet)}
+h1,h2{margin:0;font-weight:800;letter-spacing:-.025em}
+h2{font-size:62px;line-height:1.08;margin-bottom:44px;max-width:1600px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:30px 34px}
+.foot{margin-top:auto;padding-top:26px;font-size:28px;color:var(--muted)}
+.foot strong{color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:14px}
+.chip{font-size:24px;padding:8px 20px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-weight:600}
+.chip.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.logo{position:absolute;right:120px;top:84px;height:64px;opacity:.95}
+
+/* vertical rhythm: centre the main block in the space under the title */
+.inner > :last-child:not(.foot){margin-bottom:auto}
+.flow,.cols,.dag,.stats,.habits,.code-row,.blocks,.steps,.recap{margin-top:auto}
+.t-flow .caption,.t-columns .verdict{margin-bottom:auto}
+
+/* ---------- title ---------- */
+.t-title .inner{justify-content:center}
+.t-title .inner > :last-child{margin-bottom:0}
+.title-num{position:absolute;right:60px;bottom:30px;font-size:560px;font-weight:800;line-height:.8;letter-spacing:-.06em;
+  color:transparent;-webkit-text-stroke:2px var(--line);pointer-events:none;user-select:none}
+.t-title h1{font-size:112px;line-height:1.02;max-width:1450px;margin:6px 0 34px}
+.t-title .subtitle{font-size:40px;color:var(--muted);max-width:1300px;margin:0 0 48px;line-height:1.35}
+.t-title .chip{font-size:26px}
+
+/* ---------- statement ---------- */
+.statement{flex:1;display:flex;flex-direction:column;justify-content:center}
+.statement .big{font-size:92px;line-height:1.08;font-weight:800;letter-spacing:-.03em;max-width:1580px}
+.statement .big em{color:var(--accent)}
+.statement .sub{font-size:38px;color:var(--muted);margin-top:40px;max-width:1400px;line-height:1.4}
+
+/* ---------- bullets ---------- */
+.bl{list-style:none;margin:0;padding:0;display:grid;gap:26px}
+.bl.two{grid-template-columns:1fr 1fr;column-gap:56px}
+.bl li{display:flex;gap:26px;align-items:flex-start;font-size:36px}
+.bl li::before{content:"";flex:none;width:12px;height:12px;margin-top:20px;border-radius:3px;background:var(--accent);transform:rotate(45deg)}
+.bl.num li::before{display:none}
+.bl .n{flex:none;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-weight:800;font-size:28px;background:var(--panel2);border:1px solid var(--line);color:var(--accent)}
+.bl strong{display:block;font-size:38px;line-height:1.25}
+.bl .d{display:block;color:var(--muted);font-size:30px;margin-top:6px;line-height:1.38}
+
+/* ---------- flow ---------- */
+.flow{display:flex;align-items:stretch;gap:0;margin-top:10px}
+.flow .step{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:30px 28px;position:relative;border-top:5px solid var(--c,var(--accent))}
+.flow .step.hl{box-shadow:0 0 0 2px var(--c,var(--accent)),0 0 60px var(--glow);background:var(--panel2)}
+.flow .step.dim{opacity:.42}
+.flow .tag{font-size:21px;text-transform:uppercase;letter-spacing:.12em;color:var(--c,var(--accent));font-weight:700;margin-bottom:12px}
+.flow .lbl{font-size:40px;font-weight:800;line-height:1.12;letter-spacing:-.015em}
+.flow .sub code,.bubble code,.aside code,.watch code,.stat .lab code{white-space:normal;overflow-wrap:anywhere}
+.bl li > div{flex:1;min-width:0}
+.flow .sub{font-size:26px;color:var(--muted);margin-top:14px;line-height:1.35}
+.flow .arrow{flex:none;width:58px;display:grid;place-items:center;color:var(--dim);font-size:44px}
+.flow.n5 .lbl,.flow.n6 .lbl{font-size:32px}
+.flow.n5 .sub,.flow.n6 .sub{font-size:23px}
+.flow.n6 .step{padding:26px 20px}
+.flow.n6 .arrow{width:38px;font-size:34px}
+.caption{margin-top:38px;font-size:30px;color:var(--muted);max-width:1600px}
+
+/* ---------- columns / compare ---------- */
+.cols{display:grid;gap:30px;align-items:stretch}
+.cols.c2{grid-template-columns:1fr 1fr}.cols.c3{grid-template-columns:repeat(3,1fr)}.cols.c4{grid-template-columns:repeat(4,1fr)}
+.col{border-top:5px solid var(--c,var(--accent));display:flex;flex-direction:column}
+.col-t{font-size:36px;font-weight:800;color:var(--c,var(--accent));letter-spacing:-.01em}
+.col-s{font-size:24px;color:var(--muted);margin-top:4px}
+.col ul{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:14px}
+.col li{font-size:29px;line-height:1.35;padding-left:30px;position:relative}
+.col li::before{content:"";position:absolute;left:4px;top:15px;width:9px;height:9px;border-radius:50%;background:var(--c,var(--accent));opacity:.85}
+.col.bad li::before{content:"✕";background:none;color:var(--bad);font-size:24px;top:0;left:0;width:auto;height:auto;font-weight:800}
+.col.good li::before{content:"✓";background:none;color:var(--good);font-size:26px;top:-1px;left:0;width:auto;height:auto;font-weight:800}
+.col-f{margin-top:auto;padding-top:22px;font-size:25px;color:var(--muted)}
+.col pre{margin:20px 0 0;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:22px 24px;font-family:var(--mono);line-height:1.5;white-space:pre;overflow:hidden}
+.verdict{margin-top:30px;font-size:31px;padding:22px 30px;border-radius:18px;background:var(--panel2);border-left:6px solid var(--accent2)}
+
+/* ---------- code ---------- */
+.code-row{display:flex;gap:40px;align-items:flex-start}
+.codebox{flex:1;min-width:0;background:var(--code-bg);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.code-h{display:flex;align-items:center;gap:20px;padding:16px 26px;border-bottom:1px solid rgba(255,255,255,.08);font-size:22px;color:#8FA0BA;font-family:var(--mono)}
+.dots{display:flex;gap:9px}.dots i{width:14px;height:14px;border-radius:50%;background:#33415A;display:block}
+.dots i:nth-child(1){background:#F87171}.dots i:nth-child(2){background:#FBBF24}.dots i:nth-child(3){background:#34D399}
+.code-h .fname{color:#E2E8F0;font-weight:600}
+.code-h .lang{margin-left:auto;text-transform:uppercase;letter-spacing:.12em;font-size:18px}
+.codebox pre{margin:0;padding:28px 34px;font-family:var(--mono);color:var(--code-text);line-height:1.5;white-space:pre;overflow:hidden}
+.aside{flex:none;width:520px}
+.aside-t{font-size:22px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent2);font-weight:700;margin-bottom:18px}
+.aside ul,.watch ul{margin:0;padding:0;list-style:none;display:grid;gap:18px}
+.aside li,.watch li{font-size:28px;line-height:1.38;padding-left:30px;position:relative;color:var(--text)}
+.aside li::before,.watch li::before{content:"→";position:absolute;left:0;color:var(--accent2);font-weight:700}
+.tk-k{color:#7DD3FC;font-weight:600}.tk-s{color:#FCD34D}.tk-c{color:#64748B;font-style:italic}.tk-n{color:#FDA4AF}
+.tk-j{color:#C4B5FD}.tk-y{color:#86EFAC}.tk-h{color:#F9A8D4;font-weight:700}.tk-m{color:#64748B}
+
+/* ---------- docs ---------- */
+.browser{background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.browser .bar{display:flex;align-items:center;gap:22px;padding:16px 24px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.browser .url{flex:1;font-family:var(--mono);font-size:23px;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.browser .v1{font-weight:800;font-size:20px;color:var(--bg);background:var(--accent);border-radius:999px;padding:4px 14px}
+.browser .page{padding:36px 48px 40px}
+.page-t{font-size:50px;font-weight:800;letter-spacing:-.02em;margin-bottom:26px}
+.pts{margin:0;padding:0;list-style:none;counter-reset:p;display:grid;gap:20px}
+.pts li{counter-increment:p;display:flex;gap:22px;font-size:31px;line-height:1.38}
+.pts li::before{content:counter(p);flex:none;width:44px;height:44px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font-size:22px;font-weight:800;color:var(--accent);margin-top:2px}
+.browser blockquote{margin:28px 0 0;padding:18px 28px;border-left:5px solid var(--accent);background:var(--panel2);border-radius:0 14px 14px 0;font-size:29px;color:var(--muted);font-style:italic}
+
+/* ---------- prompt ---------- */
+.prompt-head{display:flex;align-items:center;gap:18px;margin-bottom:26px}
+.where{font-size:26px;font-weight:700;color:var(--text);padding:10px 22px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.mode{font-size:22px;font-weight:800;padding:8px 18px;border-radius:999px;text-transform:uppercase;letter-spacing:.1em}
+.mode.m-code{background:color-mix(in srgb,var(--violet) 22%,transparent);color:var(--violet)}
+.mode.m-ask{background:color-mix(in srgb,var(--teal) 22%,transparent);color:var(--teal)}
+.mode.m-sql{background:color-mix(in srgb,var(--accent2) 22%,transparent);color:var(--accent2)}
+.prompt-row{display:flex;gap:40px;align-items:flex-start}
+.bubble{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:28px 28px 28px 8px;padding:38px 44px;line-height:1.45;position:relative;font-weight:500}
+.bubble::before{content:"You";position:absolute;top:-16px;left:34px;font-size:18px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;background:var(--violet);color:#0B1020;border-radius:999px;padding:3px 14px}
+.watch{flex:none;width:500px}
+.habit-strip{margin-top:auto;padding-top:30px;display:flex;gap:12px;flex-wrap:wrap}
+.habit-strip span{font-size:19px;padding:7px 15px;border-radius:999px;border:1px solid var(--line);color:var(--dim);font-weight:600}
+.habit-strip span.on{color:var(--accent2);border-color:color-mix(in srgb,var(--accent2) 55%,transparent);background:color-mix(in srgb,var(--accent2) 10%,transparent)}
+
+/* ---------- table ---------- */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.tbl th{text-align:left;font-size:.78em;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);padding:18px 26px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.tbl td{padding:15px 26px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.hl td{background:color-mix(in srgb,var(--accent2) 12%,transparent)}
+.tbl td:first-child{font-weight:600}
+
+/* ---------- real data ---------- */
+.stats{display:grid;gap:26px}
+.stats.c1{grid-template-columns:1fr}.stats.c2{grid-template-columns:1fr 1fr}.stats.c3{grid-template-columns:repeat(3,1fr)}.stats.c4{grid-template-columns:repeat(4,1fr)}.stats.c5{grid-template-columns:repeat(3,1fr)}.stats.c6{grid-template-columns:repeat(3,1fr)}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:30px 32px;border-top:5px solid var(--accent2)}
+.stat .val{font-size:64px;font-weight:800;letter-spacing:-.03em;color:var(--accent2);line-height:1.05}
+.stat .lab{font-size:28px;color:var(--muted);margin-top:12px;line-height:1.3}
+.editable{outline:none;border-radius:10px;padding:0 6px;margin:0 -6px}
+.editable[contenteditable="true"]:hover{background:var(--panel2)}
+.editable[contenteditable="true"]:focus{box-shadow:0 0 0 2px var(--accent2)}
+
+/* ---------- dag ---------- */
+.dag svg{width:100%;height:auto;display:block}
+.dag .edge{fill:none;stroke:var(--dim);stroke-width:2.4;opacity:.75}
+.dag .edge.future{stroke-dasharray:8 8;opacity:.25}
+.dag .edge.new{stroke:var(--accent);opacity:1;stroke-width:3.2}
+.dag .node rect{stroke-width:2.4}
+.dag .node text{font-family:var(--mono);font-size:21px;font-weight:600;fill:var(--text)}
+.dag .node.future{opacity:.22}
+.dag .node.future rect{stroke-dasharray:7 6}
+.dag .node.new rect{stroke-width:4.5;filter:drop-shadow(0 0 14px var(--glow))}
+.dag .node.new text{font-weight:800}
+.dag-legend{display:flex;gap:30px;flex-wrap:wrap;margin-top:22px;font-size:23px;color:var(--muted);align-items:center}
+.dag-legend span{display:flex;align-items:center;gap:10px}
+.dag-legend i{width:18px;height:18px;border-radius:5px;display:block;border:2px solid currentColor}
+.files{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.file{font-family:var(--mono);font-size:21px;padding:7px 16px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.blocks{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.blk{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 24px;display:flex;flex-direction:column;gap:10px;min-height:118px}
+.blk .bn{font-size:30px;font-weight:800;display:flex;align-items:center;gap:12px}
+.blk .bs{display:flex;gap:8px;flex-wrap:wrap}
+.blk .bs span{font-size:19px;font-weight:700;padding:3px 11px;border-radius:999px;background:var(--panel2);color:var(--accent);border:1px solid var(--line)}
+.blk.out{opacity:.45;border-style:dashed}
+.blk.out .bs span{color:var(--dim)}
+.blk.done .bn::after{content:"✓";color:var(--good);margin-left:auto;font-size:30px}
+.blk.cur{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent2),0 0 40px rgba(251,191,36,.18)}
+.blk.cur .bn{color:var(--accent2)}
+
+/* ---------- recap ---------- */
+.recap{display:grid;grid-template-columns:1.35fr 1fr;gap:44px;align-items:start}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:20px}
+.checks li{font-size:32px;line-height:1.36;padding-left:54px;position:relative}
+.checks li::before{content:"✓";position:absolute;left:0;top:2px;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good);font-weight:800;font-size:24px}
+.recap-side{display:grid;gap:22px}
+.cp-t{font-size:21px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:700;margin-bottom:14px}
+.cp-c{display:block;font-size:30px;color:var(--good);background:var(--code-bg);border:none;padding:18px 22px;border-radius:14px;white-space:nowrap}
+.next-t{font-size:32px;font-weight:800;line-height:1.25}
+
+/* ---------- habits ---------- */
+.habits{display:grid;grid-template-columns:1fr 1fr;gap:24px 34px}
+.habit{display:flex;gap:24px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px 28px}
+.habit .hn{flex:none;width:60px;height:60px;border-radius:16px;display:grid;place-items:center;font-size:30px;font-weight:800;background:var(--panel2);color:var(--accent2);border:1px solid var(--line)}
+.habit .ht{font-size:33px;font-weight:800;line-height:1.2}
+.habit .hd{font-size:25px;color:var(--muted);margin-top:6px;line-height:1.35}
+.habit.hl{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent2)}
+
+/* ---------- steps ---------- */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:22px;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:26px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px 28px}
+.steps li::before{content:counter(s);flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:26px;background:var(--accent);color:var(--bg)}
+.steps .st{font-size:32px;line-height:1.35}
+.steps .cmd{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:25px;color:var(--good);background:var(--code-bg);padding:8px 16px;border-radius:10px}
+
+/* ---------- notes drawer (main) ---------- */
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;z-index:20;background:rgba(8,12,24,.96);color:#E2E8F0;border-top:2px solid var(--accent);padding:18px 28px 22px;font-size:17px;line-height:1.55;backdrop-filter:blur(8px)}
+#notes.hidden,#help.hidden{display:none}
+.nt-h{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7DD3FC;font-weight:700;margin:4px 0 8px}
+.nt-say p{margin:0 0 10px;max-width:1100px}
+.nt-do ul{margin:0;padding-left:20px}.nt-do li{margin:4px 0;color:#FCD34D}
+#notes code,.pv code,.script code{font-size:.9em;color:#7DD3FC;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+#help{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(0,0,0,.6)}
+#help .box{background:#0F172A;color:#E2E8F0;border:1px solid #334155;border-radius:16px;padding:26px 32px;font-size:16px;min-width:440px}
+#help h3{margin:0 0 14px;font-size:18px}
+#help td{padding:4px 14px 4px 0}#help kbd{font-family:var(--mono);background:#1E293B;border:1px solid #334155;border-radius:6px;padding:1px 8px}
+
+/* ---------- presenter ---------- */
+body.presenter{background:#0B1120;color:#E2E8F0;overflow:hidden}
+.pv{display:flex;flex-direction:column;height:100vh}
+.pv header{display:flex;align-items:center;gap:16px;padding:10px 16px;border-bottom:1px solid #1E293B;font-size:15px}
+.pv-title{font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv button{background:#1E293B;color:#E2E8F0;border:1px solid #334155;border-radius:8px;padding:6px 14px;font-size:15px;cursor:pointer;font-family:var(--font)}
+.pv button:hover{background:#273449}
+#pv-timer{font-family:var(--mono);font-size:18px;color:#FBBF24}
+.pv-count{font-family:var(--mono);color:#94A3B8}
+.pv-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;padding:14px 16px}
+.pv-left{display:flex;flex-direction:column;gap:12px;min-height:0}
+.pv-lab{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#64748B;margin-bottom:6px}
+.pv-next-wrap{width:62%}
+.thumb{position:relative;overflow:hidden;border-radius:10px;border:1px solid #1E293B;background:#000}
+.thumb-inner{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:top left}
+.thumb .slide{opacity:1;transition:none}
+.thumb .end{position:absolute;inset:0;display:grid;place-items:center;color:#64748B;font-size:16px}
+.pv-notes{overflow:auto;font-size:19px;line-height:1.6;padding:6px 10px 30px}
+.pv-notes .nt-say p{margin:0 0 14px}
+.pv-notes .nt-do li{margin:6px 0}
+
+/* ---------- script ---------- */
+body.script{background:#fff;color:#0F172A;overflow:auto}
+.script .sc-h{padding:28px 40px 8px}.script .sc-h h1{font-size:28px;margin:0 0 6px}.script .sc-h p{margin:0;color:#475569}
+.sc-row{display:grid;grid-template-columns:640px 1fr;gap:28px;padding:22px 40px;border-bottom:1px solid #E2E8F0;break-inside:avoid;page-break-inside:avoid}
+.sc-thumb{width:640px}
+.sc-n{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#64748B;font-weight:700;margin-bottom:6px}
+.sc-notes{font-size:16px;line-height:1.6}
+.sc-notes .nt-h{color:#0369A1}.sc-notes .nt-do li{color:#92400E}
+.script code{color:#0369A1;background:#F1F5F9;border-color:#E2E8F0}
+@media print{.sc-row{grid-template-columns:420px 1fr;padding:14px 20px}.sc-thumb{width:420px}}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="application/json" id="deck-data">{"id": "s05", "num": "05", "code": "S05", "title": "Staging models", "short": "Staging models", "part": "Part 1 · Core", "minutes": 12, "blocks": [{"name": "models", "sections": [5, 8, 10]}, {"name": "sources", "sections": [3]}, {"name": "seeds", "sections": [4]}, {"name": "data tests", "sections": [6, 9]}, {"name": "macros", "sections": [7]}, {"name": "analysis", "sections": [7]}, {"name": "snapshots", "sections": [11]}, {"name": "docs", "sections": [12]}, {"name": "exposures", "sections": [12]}, {"name": "metrics", "sections": null}, {"name": "semantic models", "sections": null}, {"name": "saved queries", "sections": null}, {"name": "groups", "sections": null}, {"name": "user-defined functions", "sections": null}], "slides": [{"type": "title", "title": "Staging models", "subtitle": "Our first models: clean, renamed, typed building blocks, one per source table.", "chips": ["SQL models", "ref()", "Preview", "Compiled SQL", "stg_ naming"], "kicker": null, "notes": {"say": ["Section five. We finally write models. Staging models are the first layer: they take a source and make it clean and consistent, nothing more.", "I write the first one by hand so you see exactly what a model is. Then the agent writes the big one, and we review it."], "do": []}}, {"type": "statement", "text": "A model is just<br>a <em>select<\/em> statement.", "sub": "One <code>.sql<\/code> file, one <code>select<\/code>. The file name is the model name. dbt writes the <code>create view<\/code> or <code>create table<\/code> for you.", "kicker": "Key idea", "kclass": null, "notes": {"say": ["If you remember one thing from this section: a dbt model is just a select statement in a file.", "You never write <code>create table<\/code> or <code>insert<\/code>. The file name becomes the model name, and dbt wraps your select in the right DDL, depending on the materialization."], "do": []}}, {"type": "docs", "page": "SQL models", "url": "https://docs.getdbt.com/docs/build/sql-models?version=1", "urlShow": "docs.getdbt.com/docs/build/sql-models?version=1", "points": ["A SQL model is a <code>select<\/code> statement in a <code>.sql<\/code> file inside <code>models/<\/code>.", "The <strong>file name<\/strong> becomes the <strong>name<\/strong> of the view or table dbt builds.", "Use <code>{{ ref('model_name') }}<\/code> to select from another model; dbt builds them in the right order.", "The default materialization is a <strong>view<\/strong>; change it with configs."], "quote": null, "kicker": null, "foot": null, "notes": {"say": ["The SQL models page, version one. A model is one select statement in a <code>.sql<\/code> file in your models folder. The file name becomes the name of the object in the database.", "To use another model, you never type its table name. You use <code>ref<\/code>, and dbt works out the dependency and the build order.", "And by default, a model becomes a view. We already changed that per folder in <code>dbt_project.yml<\/code>."], "do": ["Open docs.getdbt.com/docs/build/sql-models?version=1."]}}, {"type": "columns", "title": "What you write vs what dbt runs", "cols": [{"title": "You write", "color": "accent", "size": 25, "codeHtml": "<span class=\"tk-k\">select<\/span>\n    <span class=\"tk-s\">\"LocationID\"<\/span> <span class=\"tk-k\">as<\/span> location_id,\n    <span class=\"tk-s\">\"Borough\"<\/span>    <span class=\"tk-k\">as<\/span> borough\n<span class=\"tk-k\">from<\/span> <span class=\"tk-j\">{{ ref('taxi_zone_lookup') }}<\/span>"}, {"title": "dbt runs", "color": "good", "size": 22, "codeHtml": "<span class=\"tk-k\">create<\/span> <span class=\"tk-k\">view<\/span> <span class=\"tk-s\">\"nyc_taxi\"<\/span>.<span class=\"tk-s\">\"main\"<\/span>.<span class=\"tk-s\">\"stg_tlc__taxi_zones\"<\/span> <span class=\"tk-k\">as<\/span> (\n  <span class=\"tk-k\">select<\/span>\n    <span class=\"tk-s\">\"LocationID\"<\/span> <span class=\"tk-k\">as<\/span> location_id,\n    <span class=\"tk-s\">\"Borough\"<\/span>    <span class=\"tk-k\">as<\/span> borough\n  <span class=\"tk-k\">from<\/span> <span class=\"tk-s\">\"nyc_taxi\"<\/span>.<span class=\"tk-s\">\"main\"<\/span>.<span class=\"tk-s\">\"taxi_zone_lookup\"<\/span>\n)"}], "kicker": "Compiled SQL", "verdict": "The <strong>Compiled SQL<\/strong> tab in Rosetta shows the right-hand side for any model.", "foot": null, "notes": {"say": ["On the left, what we write: a select, with <code>ref<\/code> to the seed. On the right, roughly what dbt sends to DuckDB: a <code>create view<\/code>, with <code>ref<\/code> replaced by the real table name.", "You never need to guess what dbt does. The Compiled SQL tab in Rosetta shows you the compiled version of any model."], "do": ["Exact database/schema names depend on your profile; point at the ref being replaced."]}}, {"type": "flow", "title": "ref() builds the DAG", "steps": [{"label": "taxi_zone_lookup", "sub": "seed", "tag": "Input", "color": "teal"}, {"label": "stg_tlc__taxi_zones", "sub": "<code>ref('taxi_zone_lookup')<\/code>", "tag": "Model", "color": "blue", "hl": true}, {"label": "dim_zones", "sub": "<code>ref('stg_tlc__taxi_zones')<\/code>", "tag": "Model · later", "color": "blue", "dim": true}], "kicker": "Dependencies", "caption": "Every <code>ref()<\/code> and <code>source()<\/code> is an arrow in the lineage graph. dbt builds from left to right.", "foot": null, "notes": {"say": ["Each <code>ref<\/code> is an arrow. Our staging model refs the seed, so the seed must exist first. Later, a dimension will ref the staging model.", "dbt reads all these references, draws the graph, and builds things from left to right. That is why you never manage the order yourself."], "do": []}}, {"type": "docs", "page": "How we structure: Staging", "url": "https://docs.getdbt.com/best-practices/how-we-structure/2-staging?version=1", "urlShow": "docs.getdbt.com/best-practices/how-we-structure/2-staging?version=1", "points": ["Name files <code>stg_[source]__[entity]s.sql<\/code>: the double underscore separates source and entity.", "Do: <strong>renaming<\/strong>, <strong>type casting<\/strong>, basic computations, categorizing with <code>case when<\/code>.", "Don't: <strong>joins<\/strong> or <strong>aggregations<\/strong>. Staging stays one-to-one with the source.", "Materialize staging models as <strong>views<\/strong>."], "quote": null, "kicker": null, "foot": null, "notes": {"say": ["The staging page of the structure guide. The naming: <code>stg_<\/code>, the source name, two underscores, the entity in plural. So: <code>stg_tlc__yellow_trips<\/code>.", "What belongs here: renaming, casting types, small computations, and categorizing with case-when. What does not: joins and aggregations. A staging model has the same rows as its source.", "And they are views, which is exactly what we configured for the staging folder."], "do": ["Open the staging page (v1), scroll to the naming and \"do / don't\" parts."]}}, {"type": "columns", "title": "Staging: do and don't", "cols": [{"title": "Do", "color": "good", "mark": "good", "items": ["Rename to snake_case", "Cast types (money → decimal)", "Turn Y/N into a boolean", "Keep every row, keep lineage columns"]}, {"title": "Don't", "color": "bad", "mark": "bad", "items": ["Join to other tables", "Aggregate or group", "Filter out \"bad\" rows", "Add business rules"]}], "kicker": "Rules we follow", "verdict": "Dirty rows stay in staging for now. We <strong>flag<\/strong> them later, in the intermediate layer.", "foot": null, "notes": {"say": ["Our rules, as a checklist. Rename, cast, turn the Y/N flag into a real boolean, keep every row.", "No joins, no aggregations, and, important with our messy data: <strong>no filtering<\/strong>. We do not delete the strange trips here. We flag them later, where the business rule belongs."], "do": []}}, {"type": "code", "title": "By hand: the zones model", "file": "models/staging/tlc/stg_tlc__taxi_zones.sql", "lang": "sql", "codeHtml": "<span class=\"tk-k\">with<\/span> source <span class=\"tk-k\">as<\/span> (\n\n    <span class=\"tk-k\">select<\/span> * <span class=\"tk-k\">from<\/span> <span class=\"tk-j\">{{ ref('taxi_zone_lookup') }}<\/span>\n\n),\n\nrenamed <span class=\"tk-k\">as<\/span> (\n\n    <span class=\"tk-k\">select<\/span>\n        <span class=\"tk-s\">\"LocationID\"<\/span>   <span class=\"tk-k\">as<\/span> location_id,\n        <span class=\"tk-s\">\"Borough\"<\/span>      <span class=\"tk-k\">as<\/span> borough,\n        <span class=\"tk-s\">\"Zone\"<\/span>         <span class=\"tk-k\">as<\/span> zone_name,\n        service_zone\n    <span class=\"tk-k\">from<\/span> source\n\n)\n\n<span class=\"tk-k\">select<\/span> * <span class=\"tk-k\">from<\/span> renamed", "size": 22, "kicker": "Hands on", "aside": ["<code>ref()<\/code> to the seed, never a table name", "CTEs: <code>source<\/code> → <code>renamed<\/code> → final select", "Only renaming: one row in, one row out"], "asideTitle": null, "foot": null, "notes": {"say": ["Here is my first model, typed by hand. Two CTEs. <code>source<\/code> selects everything from the seed, with <code>ref<\/code>. <code>renamed<\/code> gives each column a clean snake-case name.", "And a final <code>select *<\/code>. This CTE pattern, import first, then transform, then a final select, is what the skill tells the agent to follow too."], "do": ["Create models/staging/tlc/stg_tlc__taxi_zones.sql and type it."]}}, {"type": "steps", "title": "Run it, preview it, read the compiled SQL", "items": [{"t": "Run the model with the model button", "cmd": "dbt run --select stg_tlc__taxi_zones"}, {"t": "<strong>Preview<\/strong> tab: the first rows, renamed", "cmd": null}, {"t": "<strong>Compiled SQL<\/strong> tab: <code>ref<\/code> became the real table", "cmd": null}, {"t": "No <code>config()<\/code> in the file: it is a <strong>view<\/strong> because of its folder", "cmd": null}], "kicker": "Verify", "foot": null, "notes": {"say": ["Run it with the model button. Then the Preview tab: there are the zones, with clean names.", "Then the Compiled SQL tab: <code>ref<\/code> has become the full table name.", "Notice I never wrote \"view\" in this file. It is a view because it lives in the staging folder. The config we set in section two is doing its job."], "do": ["Click Run on the model, then Preview, then Compiled SQL."]}}, {"type": "table", "title": "The big one: how trip columns get renamed", "headers": ["Raw column", "Staging column", "Change"], "rows": [{"cells": ["<code>VendorID<\/code>", "<code>vendor_id<\/code>", "rename"], "hl": false}, {"cells": ["<code>tpep_pickup_datetime<\/code> · <code>tpep_dropoff_datetime<\/code>", "<code>pickup_at<\/code> · <code>dropoff_at<\/code>", "rename, <code>_at<\/code> suffix"], "hl": false}, {"cells": ["<code>trip_distance<\/code>", "<code>trip_distance_miles<\/code>", "rename, unit in the name"], "hl": false}, {"cells": ["<code>RatecodeID<\/code> · <code>payment_type<\/code>", "<code>rate_code_id<\/code> · <code>payment_type_id<\/code>", "rename"], "hl": false}, {"cells": ["<code>PULocationID<\/code> · <code>DOLocationID<\/code>", "<code>pickup_location_id<\/code> · <code>dropoff_location_id<\/code>", "rename"], "hl": false}, {"cells": ["<code>store_and_fwd_flag<\/code>", "<code>is_store_and_forward<\/code>", "Y/N → boolean"], "hl": false}, {"cells": ["<code>fare_amount<\/code> … <code>total_amount<\/code>", "same names", "cast to <code>decimal(10,2)<\/code>"], "hl": false}, {"cells": ["<code>filename<\/code>", "<code>source_file<\/code>", "keep for lineage"], "hl": false}], "kicker": "stg_tlc__yellow_trips", "size": 26, "foot": null, "notes": {"say": ["The trips staging model is bigger: twenty columns. Here is what should happen to them.", "Timestamps get the <code>_at<\/code> suffix. Distance gets its unit in the name. The ID columns become snake case. The Y/N flag becomes a real boolean called <code>is_store_and_forward<\/code>. Money becomes a decimal. And <code>filename<\/code> becomes <code>source_file<\/code>, so we always know which monthly file a row came from.", "This is repetitive work. A perfect job for the agent, with the skill telling it our conventions."], "do": []}}, {"type": "prompt", "text": "Following the nyc-taxi-dbt-conventions skill, create stg_tlc__yellow_trips from source('tlc', 'yellow_trips'). Rename every column to snake_case, timestamps end in _at, store_and_fwd_flag becomes a boolean, money columns are decimal(10,2), and keep the source filename as source_file. No filters, no joins. Add stg_tlc__yellow_trips.yml with descriptions taken from the source YAML. Then build only this model.", "where": "AI chat · dbt project", "mode": "Code mode", "modeKey": "code", "watch": ["It loads the <strong>skill<\/strong> and reads the source YAML", "Two files open as tabs: SQL and YAML", "Terminal confirm: <code>dbt build --select stg_tlc__yellow_trips<\/code>"], "habits": [1, 4, 5], "size": 36, "kicker": "Prompt", "notes": {"say": ["The prompt. Code mode, new chat. I name the skill explicitly, then give the rules: snake case, <code>_at<\/code>, boolean, decimals, keep <code>source_file<\/code>. No filters, no joins. A YAML file with descriptions copied from the source. And build only this model.", "Watch the tool calls. It should load the skill, read the source YAML, write two files, and then ask to run <code>dbt build<\/code> for just this model."], "do": ["New chat, Code mode, paste the prompt.", "Allow the dbt build when asked."]}}, {"type": "code", "title": "What good looks like", "file": "models/staging/tlc/stg_tlc__yellow_trips.sql", "lang": "sql", "codeHtml": "<span class=\"tk-k\">with<\/span> source <span class=\"tk-k\">as<\/span> (\n    <span class=\"tk-k\">select<\/span> * <span class=\"tk-k\">from<\/span> <span class=\"tk-j\">{{ source('tlc', 'yellow_trips') }}<\/span>\n),\nrenamed <span class=\"tk-k\">as<\/span> (\n    <span class=\"tk-k\">select<\/span>\n        <span class=\"tk-s\">\"VendorID\"<\/span>                          <span class=\"tk-k\">as<\/span> vendor_id,\n        tpep_pickup_datetime                <span class=\"tk-k\">as<\/span> pickup_at,\n        tpep_dropoff_datetime               <span class=\"tk-k\">as<\/span> dropoff_at,\n        passenger_count,\n        trip_distance                       <span class=\"tk-k\">as<\/span> trip_distance_miles,\n        <span class=\"tk-s\">\"RatecodeID\"<\/span>                        <span class=\"tk-k\">as<\/span> rate_code_id,\n        store_and_fwd_flag = <span class=\"tk-s\">'Y'<\/span>            <span class=\"tk-k\">as<\/span> is_store_and_forward,\n        <span class=\"tk-s\">\"PULocationID\"<\/span>                      <span class=\"tk-k\">as<\/span> pickup_location_id,\n        <span class=\"tk-s\">\"DOLocationID\"<\/span>                      <span class=\"tk-k\">as<\/span> dropoff_location_id,\n        payment_type                        <span class=\"tk-k\">as<\/span> payment_type_id,\n        <span class=\"tk-k\">cast<\/span>(fare_amount <span class=\"tk-k\">as<\/span> <span class=\"tk-k\">decimal<\/span>(<span class=\"tk-n\">10<\/span>,<span class=\"tk-n\">2<\/span>))  <span class=\"tk-k\">as<\/span> fare_amount,\n        <span class=\"tk-c\">-- ... other money columns cast the same way ...<\/span>\n        <span class=\"tk-k\">cast<\/span>(total_amount <span class=\"tk-k\">as<\/span> <span class=\"tk-k\">decimal<\/span>(<span class=\"tk-n\">10<\/span>,<span class=\"tk-n\">2<\/span>)) <span class=\"tk-k\">as<\/span> total_amount,\n        filename                            <span class=\"tk-k\">as<\/span> source_file\n    <span class=\"tk-k\">from<\/span> source\n)\n<span class=\"tk-k\">select<\/span> * <span class=\"tk-k\">from<\/span> renamed", "size": 18, "kicker": "Review before Keep", "aside": ["<code>source()<\/code>, not a table name", "Casts on every money column", "<strong>No<\/strong> <code>where<\/code> clause", "No <code>config()<\/code>: the folder makes it a view"], "asideTitle": "Check", "foot": null, "notes": {"say": ["This is the shape I expect, shortened in the middle. Read it like a reviewer.", "<code>source<\/code>, not a hard-coded table. Every money column cast to a decimal. The flag compared to <code>'Y'<\/code>, which gives a boolean. <code>source_file<\/code> at the end.", "And the two things that must <strong>not<\/strong> be there: no <code>where<\/code> clause, and no <code>config<\/code> block. If the agent added either, I ask it to remove them before I keep the file."], "do": ["Scroll through the agent's file. Check the four points on the right, then Keep both files."]}}, {"type": "dag", "title": "Staging in the DAG", "new": ["stg_trips", "stg_zones"], "built": ["src_trips", "seed_zones", "seed_pay", "seed_rate"], "kicker": null, "files": ["stg_tlc__yellow_trips.sql", "stg_tlc__yellow_trips.yml", "stg_tlc__taxi_zones.sql"], "foot": null, "notes": {"say": ["Two new nodes: our staging models, each fed by exactly one input. One-to-one, just as the guide says.", "Open the lineage view in Rosetta and you will see the same picture."], "do": ["Open the lineage view for stg_tlc__yellow_trips."]}}, {"type": "recap", "title": "Section 05 done", "items": ["A model is a select; the folder decided it is a view", "<code>ref()<\/code> and <code>source()<\/code> create the arrows in the DAG", "One staging model by hand, one by the agent, both reviewed", "Dirty rows kept on purpose: we flag them later"], "tag": "s05-end", "blocks": ["sources", "seeds", "models"], "next": "S06 · Data tests", "notes": {"say": ["Recap. Models are select statements. <code>ref<\/code> and <code>source<\/code> build the graph. We wrote one staging model ourselves and had the agent write the big one, following our skill, and we reviewed it.", "Third block: <strong>models<\/strong>, at least the first layer. Tag <code>s05-end<\/code>. Next: we write down what we expect from the data, with <strong>tests<\/strong>."], "do": []}}]}</script>
+<script>
+(function () {
+  'use strict';
+  var DECK = JSON.parse(document.getElementById('deck-data').textContent);
+  var SLIDES = DECK.slides;
+  var N = SLIDES.length;
+  var qs = new URLSearchParams(location.search);
+  var MODE = qs.has('presenter') ? 'presenter' : (qs.has('script') ? 'script' : 'main');
+  var app = document.getElementById('app');
+  var cur = 0;
+  var peer = null;
+
+  /* ---------- storage (best effort) ---------- */
+  function sget(k) { try { return localStorage.getItem('aidbt:' + k); } catch (e) { return null; } }
+  function sset(k, v) { try { localStorage.setItem('aidbt:' + k, v); } catch (e) { /* ignore */ } }
+  function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); }
+  applyTheme(sget('theme') || 'dark');
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  var HABITS = [
+    ['Context over memory', 'Give the agent files: the data dictionary, the skill, the docs.'],
+    ['Plan before act', 'For multi-file work, ask for the plan first and approve it.'],
+    ['One task per chat', 'Start a new chat each section. Watch the context ring.'],
+    ['Read every diff', 'Before you click Keep. The review is the lesson.'],
+    ['dbt is the judge', 'Run, test, look at rows. "Done" is a claim, not proof.'],
+    ['Correct twice → skill', 'If you fix the same thing twice, write it into the skill.']
+  ];
+
+  /* ---------- DAG ---------- */
+  var NW = 300, NH = 58, COLX = [10, 360, 710, 1060, 1410];
+  function nd(label, type, c, y) { return { label: label, type: type, x: COLX[c], y: y }; }
+  var NODES = {
+    src_trips: nd('tlc.yellow_trips', 'source', 0, 10),
+    seed_pay: nd('payment_types', 'seed', 0, 120),
+    seed_rate: nd('rate_codes', 'seed', 0, 230),
+    seed_zones: nd('taxi_zone_lookup', 'seed', 0, 340),
+    src_vendors: nd('tlc.vendor_registry', 'source', 0, 450),
+    stg_trips: nd('stg_tlc__yellow_trips', 'model', 1, 10),
+    stg_zones: nd('stg_tlc__taxi_zones', 'model', 1, 340),
+    snap: nd('snap_tlc__vendors', 'snapshot', 1, 450),
+    int: nd('int_trips__enriched', 'model', 2, 65),
+    fct: nd('fct_trips', 'model', 3, 10),
+    dim_zones: nd('dim_zones', 'model', 3, 340),
+    dim_vendors: nd('dim_vendors', 'model', 3, 450),
+    agg: nd('agg_zone_daily', 'model', 4, 120),
+    exp: nd('CBD fee analysis', 'exposure', 4, 285)
+  };
+  var EDGES = [['src_trips', 'stg_trips'], ['seed_zones', 'stg_zones'], ['src_vendors', 'snap'], ['stg_trips', 'int'],
+    ['seed_pay', 'int'], ['seed_rate', 'int'], ['int', 'fct'], ['stg_zones', 'dim_zones'], ['snap', 'dim_vendors'],
+    ['fct', 'agg'], ['dim_zones', 'agg'], ['fct', 'exp'], ['dim_zones', 'exp']];
+  var TCOL = { source: 'var(--good)', seed: 'var(--teal)', model: 'var(--blue)', snapshot: 'var(--violet)', exposure: 'var(--orange)' };
+
+  function dagSVG(newIds, builtIds) {
+    var state = function (id) { return newIds.indexOf(id) >= 0 ? 'new' : (builtIds.indexOf(id) >= 0 ? 'built' : 'future'); };
+    var out = '<svg viewBox="0 0 1720 520" xmlns="http://www.w3.org/2000/svg">';
+    out += '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--dim)"/></marker>' +
+      '<marker id="ahn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/></marker></defs>';
+    EDGES.forEach(function (e) {
+      var a = NODES[e[0]], b = NODES[e[1]];
+      var sa = state(e[0]), sb = state(e[1]);
+      var cls = (sb === 'new') ? 'new' : ((sa === 'future' || sb === 'future') ? 'future' : '');
+      var x1 = a.x + NW, y1 = a.y + NH / 2, x2 = b.x - 6, y2 = b.y + NH / 2, mx = (x1 + x2) / 2;
+      out += '<path class="edge ' + cls + '" marker-end="url(#' + (cls === 'new' ? 'ahn' : 'ah') + ')" d="M' + x1 + ',' + y1 + ' C' + mx + ',' + y1 + ' ' + mx + ',' + y2 + ' ' + x2 + ',' + y2 + '"/>';
+    });
+    Object.keys(NODES).forEach(function (id) {
+      var n = NODES[id], st = state(id), c = TCOL[n.type];
+      out += '<g class="node ' + st + '"><rect x="' + n.x + '" y="' + n.y + '" width="' + NW + '" height="' + NH + '" rx="14" style="fill:color-mix(in srgb,' + c + ' 16%, transparent);stroke:' + c + '"/>' +
+        '<text x="' + (n.x + NW / 2) + '" y="' + (n.y + NH / 2 + 7) + '" text-anchor="middle">' + esc(n.label) + '</text></g>';
+    });
+    return out + '</svg>';
+  }
+  function dagLegend() {
+    var t = [['source', 'Source'], ['seed', 'Seed'], ['model', 'Model'], ['snapshot', 'Snapshot'], ['exposure', 'Exposure']];
+    return '<div class="dag-legend">' + t.map(function (x) { return '<span style="color:' + TCOL[x[0]] + '"><i></i><b style="color:var(--muted);font-weight:500">' + x[1] + '</b></span>'; }).join('') +
+      '<span style="color:var(--accent)"><i style="box-shadow:0 0 10px var(--glow);border-width:3px"></i><b style="color:var(--muted);font-weight:500">New in this section</b></span>' +
+      '<span style="color:var(--dim)"><i style="border-style:dashed;opacity:.5"></i><b style="color:var(--muted);font-weight:500">Comes later</b></span></div>';
+  }
+
+  /* ---------- renderers ---------- */
+  function kick(s, cls) { return s.kicker ? '<div class="kicker ' + (cls || '') + '">' + s.kicker + '</div>' : ''; }
+  function h2(s) { return s.title ? '<h2>' + s.title + '</h2>' : ''; }
+  function head(s, cls) { return kick(s, cls) + h2(s); }
+  function foot(s) { return s.foot ? '<div class="foot">' + s.foot + '</div>' : ''; }
+  function list(items) { return items.map(function (x) { return '<li>' + x + '</li>'; }).join(''); }
+  function editable(k, def) {
+    var v = sget(DECK.id + ':' + k);
+    var shown = (v !== null && v !== '') ? esc(v) : def;
+    return '<span class="editable" data-k="' + esc(k) + '"' + (MODE === 'main' ? ' contenteditable="true" spellcheck="false"' : '') + '>' + shown + '</span>';
+  }
+  function habitStrip(on) {
+    on = on || [];
+    return '<div class="habit-strip">' + HABITS.map(function (h, i) { return '<span class="' + (on.indexOf(i + 1) >= 0 ? 'on' : '') + '">' + (i + 1) + ' · ' + h[0] + '</span>'; }).join('') + '</div>';
+  }
+
+  var R = {
+    title: function (s) {
+      return '<img class="logo" src="logo_hero.svg" alt="" onerror="this.remove()">' +
+        '<div class="title-num">' + DECK.num + '</div>' +
+        '<div class="kicker">' + (s.kicker || DECK.part) + '</div><h1>' + s.title + '</h1>' +
+        (s.subtitle ? '<p class="subtitle">' + s.subtitle + '</p>' : '') +
+        (s.chips ? '<div class="chips">' + s.chips.map(function (c) { return '<span class="chip">' + c + '</span>'; }).join('') + '</div>' : '');
+    },
+    statement: function (s) {
+      return kick(s, s.kclass) + '<div class="statement"><div class="big">' + s.text + '</div>' + (s.sub ? '<div class="sub">' + s.sub + '</div>' : '') + '</div>';
+    },
+    bullets: function (s) {
+      return head(s) + '<ul class="bl ' + (s.cols === 2 ? 'two ' : '') + (s.numbered ? 'num' : '') + '">' + s.items.map(function (it, i) {
+        var body = (typeof it === 'string') ? it : ('<strong>' + it.t + '</strong>' + (it.d ? '<span class="d">' + it.d + '</span>' : ''));
+        return '<li>' + (s.numbered ? '<span class="n">' + (i + 1) + '</span>' : '') + '<div>' + body + '</div></li>';
+      }).join('') + '</ul>' + foot(s);
+    },
+    flow: function (s) {
+      return head(s) + '<div class="flow n' + s.steps.length + '">' + s.steps.map(function (st, i) {
+        return (i ? '<div class="arrow">→</div>' : '') + '<div class="step ' + (st.hl ? 'hl ' : '') + (st.dim ? 'dim' : '') + '"' + (st.color ? ' style="--c:var(--' + st.color + ')"' : '') + '>' +
+          (st.tag ? '<div class="tag">' + st.tag + '</div>' : '') + '<div class="lbl">' + st.label + '</div>' + (st.sub ? '<div class="sub">' + st.sub + '</div>' : '') + '</div>';
+      }).join('') + '</div>' + (s.caption ? '<div class="caption">' + s.caption + '</div>' : '') + foot(s);
+    },
+    columns: function (s) {
+      return head(s) + '<div class="cols c' + s.cols.length + '">' + s.cols.map(function (c) {
+        return '<div class="card col ' + (c.mark || '') + '" style="--c:var(--' + (c.color || 'accent') + ')"><div class="col-t">' + c.title + '</div>' +
+          (c.sub ? '<div class="col-s">' + c.sub + '</div>' : '') +
+          (c.items ? '<ul>' + list(c.items) + '</ul>' : '') +
+          (c.codeHtml ? '<pre style="font-size:' + (c.size || 24) + 'px">' + c.codeHtml + '</pre>' : '') +
+          (c.foot ? '<div class="col-f">' + c.foot + '</div>' : '') + '</div>';
+      }).join('') + '</div>' + (s.verdict ? '<div class="verdict">' + s.verdict + '</div>' : '') + foot(s);
+    },
+    code: function (s) {
+      return head(s) + '<div class="code-row"><div class="codebox"><div class="code-h"><span class="dots"><i></i><i></i><i></i></span><span class="fname">' + (s.file || '') + '</span><span class="lang">' + (s.lang || '') + '</span></div>' +
+        '<pre style="font-size:' + s.size + 'px">' + s.codeHtml + '</pre></div>' +
+        (s.aside ? '<div class="aside">' + (s.asideTitle ? '<div class="aside-t">' + s.asideTitle + '</div>' : '') + '<ul>' + list(s.aside) + '</ul></div>' : '') + '</div>' + foot(s);
+    },
+    docs: function (s) {
+      return '<div class="kicker">' + (s.kicker || 'The docs say') + '</div><div class="browser"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">' + s.urlShow + '</span><span class="v1">v1</span></div>' +
+        '<div class="page"><div class="page-t">' + s.page + '</div><ol class="pts">' + s.points.map(function (p) { return '<li><span>' + p + '</span></li>'; }).join('') + '</ol>' + (s.quote ? '<blockquote>' + s.quote + '</blockquote>' : '') + '</div></div>' + foot(s);
+    },
+    prompt: function (s) {
+      return kick(s, 'k-ai') + '<div class="prompt-head"><span class="where">' + s.where + '</span><span class="mode m-' + s.modeKey + '">' + s.mode + '</span></div>' +
+        '<div class="prompt-row"><div class="bubble" style="font-size:' + s.size + 'px">' + s.text + '</div>' +
+        (s.watch ? '<div class="watch"><div class="aside-t">Watch for</div><ul>' + list(s.watch) + '</ul></div>' : '') + '</div>' + habitStrip(s.habits);
+    },
+    table: function (s) {
+      return head(s) + '<table class="tbl" style="font-size:' + (s.size || 28) + 'px"><thead><tr>' + s.headers.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        s.rows.map(function (r) { var cells = r.cells || r; return '<tr class="' + (r.hl ? 'hl' : '') + '">' + cells.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') +
+        '</tbody></table>' + foot(s);
+    },
+    realdata: function (s) {
+      return '<div class="kicker k-real">' + (s.kicker || 'Real-data moment') + '</div>' + h2(s) + '<div class="stats c' + s.stats.length + '">' + s.stats.map(function (st) {
+        return '<div class="stat"><div class="val">' + (st.edit ? editable(st.edit, st.v) : st.v) + '</div><div class="lab">' + st.label + '</div></div>';
+      }).join('') + '</div>' + foot(s);
+    },
+    dag: function (s) {
+      return head(s) + '<div class="dag">' + dagSVG(s.new || [], s.built || []) + '</div>' + dagLegend() +
+        (s.files ? '<div class="files">' + s.files.map(function (f) { return '<span class="file">' + f + '</span>'; }).join('') + '</div>' : '') + foot(s);
+    },
+    blocks: function (s) {
+      var curB = s.current || [], upto = (s.upto == null ? -1 : s.upto);
+      return head(s) + '<div class="blocks">' + DECK.blocks.map(function (b) {
+        var cls = 'blk';
+        if (!b.sections) cls += ' out';
+        else if (curB.indexOf(b.name) >= 0) cls += ' cur';
+        else if (Math.min.apply(null, b.sections) <= upto) cls += ' done';
+        var secs = b.sections ? b.sections.map(function (n) { return '<span>S' + (n < 10 ? '0' : '') + n + '</span>'; }).join('') : '<span>Part 3?</span>';
+        return '<div class="' + cls + '"><div class="bn">' + b.name + '</div><div class="bs">' + secs + '</div></div>';
+      }).join('') + '</div>' + foot(s);
+    },
+    recap: function (s) {
+      return '<div class="kicker">Recap</div>' + h2(s) + '<div class="recap"><ul class="checks">' + list(s.items) + '</ul><div class="recap-side">' +
+        '<div class="card"><div class="cp-t">Checkpoint</div><code class="cp-c">git tag ' + s.tag + '</code></div>' +
+        (s.blocks && s.blocks.length ? '<div class="card"><div class="cp-t">Blocks covered</div><div class="chips">' + s.blocks.map(function (b) { return '<span class="chip ok">✓ ' + b + '</span>'; }).join('') + '</div></div>' : '') +
+        (s.next ? '<div class="card"><div class="cp-t">Next</div><div class="next-t">' + s.next + '</div></div>' : '') + '</div></div>';
+    },
+    habits: function (s) {
+      return head(s) + '<div class="habits">' + HABITS.map(function (h, i) {
+        return '<div class="habit ' + (s.hl && s.hl.indexOf(i + 1) >= 0 ? 'hl' : '') + '"><div class="hn">' + (i + 1) + '</div><div><div class="ht">' + h[0] + '</div><div class="hd">' + h[1] + '</div></div></div>';
+      }).join('') + '</div>' + foot(s);
+    },
+    steps: function (s) {
+      return head(s) + '<ol class="steps">' + s.items.map(function (it) {
+        return '<li><div><div class="st">' + it.t + '</div>' + (it.cmd ? '<span class="cmd">' + it.cmd + '</span>' : '') + '</div></li>';
+      }).join('') + '</ol>' + foot(s);
+    }
+  };
+
+  function footerHTML(i) {
+    return '<div class="footer"><span>' + DECK.code + ' · ' + DECK.short + '</span><span class="brand">AI Agentic dbt Development · Rosetta dbt Studio</span><span><span class="v1b">dbt v1</span>' + (i + 1) + ' / ' + N + '</span></div>';
+  }
+  function slideHTML(s, i, active) {
+    var body = R[s.type] ? R[s.type](s) : '<h2>Unknown slide type ' + esc(s.type) + '</h2>';
+    return '<section class="slide t-' + s.type + (active ? ' active' : '') + '" data-i="' + i + '"><div class="content"><div class="inner">' + body + '</div></div>' + footerHTML(i) + '</section>';
+  }
+  function notesHTML(s) {
+    var n = s.notes || { say: [], do: [] };
+    var h = '';
+    if (n.say && n.say.length) h += '<div class="nt-h">Say</div><div class="nt-say">' + n.say.map(function (p) { return '<p>' + p + '</p>'; }).join('') + '</div>';
+    if (n.do && n.do.length) h += '<div class="nt-h">On screen</div><div class="nt-do"><ul>' + list(n.do) + '</ul></div>';
+    return h || '<div class="nt-say"><p>No notes.</p></div>';
+  }
+
+  /* ---------- fit content into the slide ---------- */
+  function fit(slide) {
+    var c = slide.querySelector('.content'), inner = c && c.firstElementChild;
+    if (!inner) return;
+    inner.style.transform = ''; inner.style.width = '';
+    var k = 1;
+    for (var t = 0; t < 6; t++) {
+      var h = inner.scrollHeight, H = c.clientHeight;
+      if (h <= H + 1) break;
+      k = Math.max(0.55, k * (H / h) * 0.995);
+      inner.style.width = (100 / k) + '%';
+      inner.style.transform = 'scale(' + k + ')';
+    }
+    slide.setAttribute('data-fit', k.toFixed(3));
+  }
+
+  /* ---------- thumbnails ---------- */
+  function thumb(el, i) {
+    if (i >= N) { el.innerHTML = '<div class="end">End of section</div>'; el.style.height = (el.clientWidth * 1080 / 1920) + 'px'; return; }
+    el.innerHTML = '<div class="thumb-inner">' + slideHTML(SLIDES[i], i, true) + '</div>';
+    var w = el.clientWidth;
+    el.style.height = (w * 1080 / 1920) + 'px';
+    el.firstElementChild.style.transform = 'scale(' + (w / 1920) + ')';
+    fit(el.querySelector('.slide'));
+  }
+
+  /* ---------- sync between main and presenter ---------- */
+  function send(i) { try { if (peer && !peer.closed) peer.postMessage({ aidbt: DECK.id, i: i }, '*'); } catch (e) { /* ignore */ } }
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (d && d.aidbt === DECK.id && typeof d.i === 'number' && d.i !== cur) go(d.i, true);
+  });
+
+  var go = function () {};
+
+  /* ---------- MAIN ---------- */
+  function mountMain() {
+    document.title = DECK.code + ' · ' + DECK.title;
+    app.innerHTML = '<div id="stage"><div id="canvas">' + SLIDES.map(function (s, i) { return slideHTML(s, i, false); }).join('') + '</div></div>' +
+      '<div id="progress"><i></i></div><div id="notes" class="hidden"></div>' +
+      '<div id="help" class="hidden"><div class="box"><h3>Keyboard</h3><table>' +
+      '<tr><td><kbd>→</kbd> <kbd>Space</kbd></td><td>Next slide</td></tr><tr><td><kbd>←</kbd></td><td>Previous slide</td></tr>' +
+      '<tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>First / last</td></tr><tr><td><kbd>P</kbd></td><td>Presenter window (notes, next slide, timer)</td></tr>' +
+      '<tr><td><kbd>N</kbd></td><td>Notes drawer in this window</td></tr><tr><td><kbd>S</kbd></td><td>Script: all slides + notes (printable)</td></tr>' +
+      '<tr><td><kbd>T</kbd></td><td>Light / dark theme</td></tr><tr><td><kbd>F</kbd></td><td>Fullscreen</td></tr>' +
+      '<tr><td><kbd>?</kbd></td><td>This help</td></tr></table><p style="color:#94A3B8;margin:14px 0 0">Amber numbers on real-data slides are editable: click, type, press Esc.</p></div></div>';
+    var canvas = document.getElementById('canvas');
+    var slides = Array.prototype.slice.call(canvas.querySelectorAll('.slide'));
+    function scale() { var s = Math.min(innerWidth / 1920, innerHeight / 1080); canvas.style.transform = 'translate(-50%,-50%) scale(' + s + ')'; }
+    scale(); window.addEventListener('resize', scale);
+    function fitAll() { slides.forEach(fit); }
+    fitAll();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+    window.addEventListener('load', fitAll);
+
+    canvas.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t.classList && t.classList.contains('editable')) sset(DECK.id + ':' + t.getAttribute('data-k'), t.textContent.trim());
+    });
+
+    var notes = document.getElementById('notes');
+    go = function (i, fromPeer) {
+      i = Math.max(0, Math.min(N - 1, i));
+      slides[cur].classList.remove('active');
+      cur = i;
+      slides[cur].classList.add('active');
+      document.querySelector('#progress i').style.width = ((cur + 1) / N * 100) + '%';
+      notes.innerHTML = '<div class="nt-h">Slide ' + (cur + 1) + ' / ' + N + '</div>' + notesHTML(SLIDES[cur]);
+      try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) { /* ignore */ }
+      if (!fromPeer) send(cur);
+    };
+    var start = parseInt((location.hash || '').slice(1), 10);
+    slides[0].classList.add('active');
+    go(isNaN(start) ? 0 : start - 1, true);
+
+    document.addEventListener('keydown', function (e) {
+      var t = e.target;
+      if (t && t.isContentEditable) { if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); t.blur(); } return; }
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var k = e.key;
+      if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'ArrowDown') { e.preventDefault(); go(cur + 1); }
+      else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'ArrowUp' || k === 'Backspace') { e.preventDefault(); go(cur - 1); }
+      else if (k === 'Home') go(0);
+      else if (k === 'End') go(N - 1);
+      else if (k === 'n' || k === 'N') notes.classList.toggle('hidden');
+      else if (k === 'p' || k === 'P') {
+        peer = window.open(location.pathname + '?presenter#' + (cur + 1), 'aidbt-presenter-' + DECK.id, 'width=1280,height=860');
+        setTimeout(function () { send(cur); }, 600);
+      }
+      else if (k === 's' || k === 'S') window.open(location.pathname + '?script', '_blank');
+      else if (k === 't' || k === 'T') { var nt = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; applyTheme(nt); sset('theme', nt); fitAll(); }
+      else if (k === 'f' || k === 'F') { if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } else { document.exitFullscreen && document.exitFullscreen(); } }
+      else if (k === '?' || k === 'h' || k === 'H') document.getElementById('help').classList.toggle('hidden');
+      else if (k === 'Escape') { document.getElementById('help').classList.add('hidden'); }
+    });
+    document.getElementById('help').addEventListener('click', function () { this.classList.add('hidden'); });
+  }
+
+  /* ---------- PRESENTER ---------- */
+  function mountPresenter() {
+    document.body.classList.add('presenter');
+    document.title = 'Presenter · ' + DECK.code + ' · ' + DECK.short;
+    peer = window.opener || null;
+    app.innerHTML = '<div class="pv"><header><div class="pv-title">' + DECK.code + ' · ' + DECK.title + '</div><span class="pv-count"></span>' +
+      '<button id="pv-timer" title="Click to reset">00:00</button><button data-a="prev">◀ Prev</button><button data-a="next">Next ▶</button></header>' +
+      '<div class="pv-main"><div class="pv-left"><div><div class="pv-lab">Now</div><div class="pv-cur thumb"></div></div>' +
+      '<div class="pv-next-wrap"><div class="pv-lab">Next</div><div class="pv-next thumb"></div></div></div><div class="pv-notes"></div></div></div>';
+    var t0 = Date.now(), timer = document.getElementById('pv-timer');
+    setInterval(function () { var s = Math.floor((Date.now() - t0) / 1000); timer.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 500);
+    timer.addEventListener('click', function () { t0 = Date.now(); });
+    var curEl = app.querySelector('.pv-cur'), nextEl = app.querySelector('.pv-next'), notesEl = app.querySelector('.pv-notes'), countEl = app.querySelector('.pv-count');
+    go = function (i, fromPeer) {
+      cur = Math.max(0, Math.min(N - 1, i));
+      thumb(curEl, cur); thumb(nextEl, cur + 1);
+      notesEl.innerHTML = notesHTML(SLIDES[cur]); notesEl.scrollTop = 0;
+      countEl.textContent = (cur + 1) + ' / ' + N;
+      if (!fromPeer) send(cur);
+    };
+    app.querySelector('[data-a=prev]').addEventListener('click', function () { go(cur - 1); });
+    app.querySelector('[data-a=next]').addEventListener('click', function () { go(cur + 1); });
+    document.addEventListener('keydown', function (e) {
+      var k = e.key;
+      if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(cur + 1); }
+      else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); go(cur - 1); }
+    });
+    var start = parseInt((location.hash || '').slice(1), 10);
+    go(isNaN(start) ? 0 : start - 1, true);
+    window.addEventListener('resize', function () { go(cur, true); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { go(cur, true); });
+  }
+
+  /* ---------- SCRIPT ---------- */
+  function mountScript() {
+    document.body.classList.add('script');
+    document.title = 'Script · ' + DECK.code + ' · ' + DECK.short;
+    app.innerHTML = '<header class="sc-h"><h1>' + DECK.code + ' · ' + DECK.title + '</h1><p>' + N + ' slides · talk track (Say) and actions (On screen) · print with Ctrl/Cmd + P</p></header>' +
+      SLIDES.map(function (s, i) { return '<div class="sc-row"><div class="sc-thumb thumb" data-i="' + i + '"></div><div class="sc-notes"><div class="sc-n">Slide ' + (i + 1) + '</div>' + notesHTML(s) + '</div></div>'; }).join('');
+    function all() { Array.prototype.forEach.call(app.querySelectorAll('.sc-thumb'), function (el) { thumb(el, +el.getAttribute('data-i')); }); }
+    all();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
+    window.addEventListener('beforeprint', all);
+    window.addEventListener('afterprint', all);
+  }
+
+  if (MODE === 'presenter') mountPresenter();
+  else if (MODE === 'script') mountScript();
+  else mountMain();
+})();
+
+</script>
+</body>
+</html>

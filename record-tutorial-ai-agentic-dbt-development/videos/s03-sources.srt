@@ -1,0 +1,175 @@
+1
+00:00:00,700 --> 00:00:02,364
+Section three: sources.
+
+2
+00:00:02,644 --> 00:00:09,748
+This is how we tell dbt about data that already exists in the database, data that dbt did not build.
+
+3
+00:00:10,847 --> 00:00:13,877
+One rule: never hard-code a table name in a model.
+
+4
+00:00:14,157 --> 00:00:17,101
+It works, but dbt cannot see the dependency.
+
+5
+00:00:17,381 --> 00:00:23,653
+It cannot draw it in the lineage, test it, or document it, and if the schema changes, every model breaks.
+
+6
+00:00:24,753 --> 00:00:26,758
+On the left, a hard-coded table.
+
+7
+00:00:27,038 --> 00:00:30,772
+On the right, the source function, with the source name and the table name.
+
+8
+00:00:31,052 --> 00:00:38,284
+Both compile to the same SQL, but only the right one appears in the lineage graph, with tests and descriptions attached.
+
+9
+00:00:39,384 --> 00:00:41,261
+The sources page, version one.
+
+10
+00:00:41,541 --> 00:00:45,360
+Declare sources in YAML, with a name, the schema, and the tables.
+
+11
+00:00:45,640 --> 00:00:47,752
+Select from them with the source function.
+
+12
+00:00:48,032 --> 00:00:50,528
+Add tests and descriptions to source columns.
+
+13
+00:00:50,808 --> 00:00:54,349
+And freshness can warn you when a loader stops delivering data.
+
+14
+00:00:55,449 --> 00:01:00,057
+On our lineage graph, the first node lights up: the source for yellow taxi trips.
+
+15
+00:01:00,337 --> 00:01:03,238
+Everything else in the project will be built on top of it.
+
+16
+00:01:04,338 --> 00:01:06,898
+Rosetta can generate the source file for us.
+
+17
+00:01:07,178 --> 00:01:12,170
+The Raw Layer option reads the database and writes a YAML file with every column.
+
+18
+00:01:12,450 --> 00:01:13,666
+No AI involved.
+
+19
+00:01:13,946 --> 00:01:16,677
+It also adds a not null test to every column.
+
+20
+00:01:16,957 --> 00:01:19,410
+That is a guess, and real data will test it.
+
+21
+00:01:20,510 --> 00:01:29,833
+In the demo, the agent moves that file into our staging folder, names the source T L C, and adds a description to every column from the dictionary file.
+
+22
+00:01:30,113 --> 00:01:32,182
+We tell it not to change the tests yet.
+
+23
+00:01:33,282 --> 00:01:35,501
+This is what we review before keeping it.
+
+24
+00:01:35,781 --> 00:01:37,317
+The source name and schema.
+
+25
+00:01:37,597 --> 00:01:39,688
+Descriptions that match the dictionary.
+
+26
+00:01:39,968 --> 00:01:44,234
+Notice payment type starts at zero, Flex Fare, from the current dictionary.
+
+27
+00:01:44,514 --> 00:01:46,861
+And the tests are still the generated guesses.
+
+28
+00:01:47,961 --> 00:01:49,476
+Then we run the source tests.
+
+29
+00:01:49,756 --> 00:01:56,348
+Several not null tests fail: passenger count, rate code, the store and forward flag, and some surcharges.
+
+30
+00:01:56,628 --> 00:01:59,038
+That is real data pushing back on a guess.
+
+31
+00:02:00,138 --> 00:02:02,506
+Instead of deleting the tests, we ask why.
+
+32
+00:02:02,786 --> 00:02:06,285
+In Ask mode: which rows fail, and what do they have in common?
+
+33
+00:02:07,385 --> 00:02:14,852
+In our data, the rows with an empty passenger count are the rows with payment type zero, which the dictionary calls Flex Fare.
+
+34
+00:02:15,132 --> 00:02:16,796
+So these are not broken rows.
+
+35
+00:02:17,076 --> 00:02:20,532
+They are a different kind of trip, where some fields are not recorded.
+
+36
+00:02:21,632 --> 00:02:22,720
+So we decide.
+
+37
+00:02:23,000 --> 00:02:28,930
+We keep not null where a trip cannot exist without a value: the times, the locations and the total.
+
+38
+00:02:29,210 --> 00:02:32,602
+We drop it where the source legitimately leaves values empty.
+
+39
+00:02:32,882 --> 00:02:35,293
+A failing test is a decision, not a bug.
+
+40
+00:02:36,393 --> 00:02:37,993
+One last thing: freshness.
+
+41
+00:02:38,273 --> 00:02:40,662
+It compares a timestamp with the current time.
+
+42
+00:02:40,942 --> 00:02:44,846
+Our data is historical, so it would always look stale, and we skip it.
+
+43
+00:02:45,126 --> 00:02:48,006
+In a real project with daily data, you turn it on.
+
+44
+00:02:48,286 --> 00:02:50,505
+It tells you when a loader stopped working.

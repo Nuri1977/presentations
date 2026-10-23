@@ -1,0 +1,219 @@
+1
+00:00:00,700 --> 00:00:02,705
+Section eight, the end of part one.
+
+2
+00:00:02,985 --> 00:00:10,643
+We build the layers that turn clean data into answers: an intermediate model with our business rules, and the marts analysts use.
+
+3
+00:00:10,924 --> 00:00:14,358
+The biggest agent task so far, so we plan before we act.
+
+4
+00:00:15,458 --> 00:00:16,653
+Staging is done.
+
+5
+00:00:16,933 --> 00:00:25,978
+The intermediate layer adds a trip ID, removes exact duplicates, and adds trip duration, fare per mile, and the valid trip flag we promised.
+
+6
+00:00:26,258 --> 00:00:32,104
+The marts are a fact table of valid trips, a zone dimension, and a daily summary per pickup zone.
+
+7
+00:00:33,204 --> 00:00:35,593
+The structure guide on intermediate models.
+
+8
+00:00:35,873 --> 00:00:41,420
+Each one has a specific purpose, like isolating complex logic so the marts stay simple.
+
+9
+00:00:41,700 --> 00:00:43,492
+End users never query them.
+
+10
+00:00:43,772 --> 00:00:45,414
+They are views or ephemeral.
+
+11
+00:00:46,514 --> 00:00:47,709
+The guide on marts.
+
+12
+00:00:47,989 --> 00:00:53,216
+A mart is something the business understands: here, a trip, a zone, and a zone per day.
+
+13
+00:00:53,496 --> 00:00:56,738
+Marts are wide, and they are tables, so queries are fast.
+
+14
+00:00:57,838 --> 00:01:01,145
+Materialization means how dbt builds a model.
+
+15
+00:01:01,425 --> 00:01:03,110
+A view stores only the query.
+
+16
+00:01:03,390 --> 00:01:05,012
+A table stores the result.
+
+17
+00:01:05,292 --> 00:01:08,300
+Incremental adds only new rows, in section ten.
+
+18
+00:01:08,580 --> 00:01:10,905
+Ephemeral builds nothing and is inlined.
+
+19
+00:01:11,185 --> 00:01:14,662
+A materialized view is kept up to date by the database.
+
+20
+00:01:15,762 --> 00:01:17,469
+The materializations page.
+
+21
+00:01:17,749 --> 00:01:23,701
+You can set them in the project file, in YAML, or in the model itself, and the most specific setting wins.
+
+22
+00:01:23,981 --> 00:01:28,717
+We set them per folder, and in section ten, one model will override its folder.
+
+23
+00:01:29,817 --> 00:01:32,569
+This task touches four models and several files.
+
+24
+00:01:32,849 --> 00:01:37,606
+If the agent starts writing and gets the grain wrong, we review a lot of wrong code.
+
+25
+00:01:37,886 --> 00:01:40,681
+So first, we ask for a plan, and we fix the plan.
+
+26
+00:01:41,781 --> 00:01:51,189
+In the demo, the first prompt asks for the plan only: which intermediate and mart models, the grain of each one, its inputs and its materialization.
+
+27
+00:01:51,469 --> 00:01:54,690
+And it must wait for our OK, without writing any files.
+
+28
+00:01:55,790 --> 00:01:57,348
+This is the plan we approve.
+
+29
+00:01:57,628 --> 00:02:00,166
+One intermediate model, one row per trip.
+
+30
+00:02:00,446 --> 00:02:02,836
+A fact table, one row per valid trip.
+
+31
+00:02:03,116 --> 00:02:04,289
+A zone dimension.
+
+32
+00:02:04,569 --> 00:02:07,300
+And a daily summary, one row per zone per day.
+
+33
+00:02:07,580 --> 00:02:10,246
+Fixing a plan is much cheaper than fixing code.
+
+34
+00:02:11,346 --> 00:02:12,477
+Then: go ahead.
+
+35
+00:02:12,757 --> 00:02:22,122
+The agent builds the trip ID, removes duplicates, adds duration and fare per mile with our macro, the validity flag with a reason, and the code names.
+
+36
+00:02:22,402 --> 00:02:26,839
+Then the marts, YAML with tests for every model, and one dbt build.
+
+37
+00:02:27,939 --> 00:02:29,411
+The heart of the project.
+
+38
+00:02:29,691 --> 00:02:32,017
+The surrogate key from dbt utils.
+
+39
+00:02:32,297 --> 00:02:33,641
+Duration in minutes.
+
+40
+00:02:33,921 --> 00:02:35,947
+Fare per mile with our safe divide.
+
+41
+00:02:36,227 --> 00:02:37,806
+One row per trip ID.
+
+42
+00:02:38,086 --> 00:02:46,257
+And a reason for every invalid trip: ends before it starts, zero distance, negative total, or a pickup outside its file month.
+
+43
+00:02:47,357 --> 00:02:48,445
+Four new nodes.
+
+44
+00:02:48,725 --> 00:02:51,989
+The intermediate model, fed by staging and two seeds.
+
+45
+00:02:52,269 --> 00:02:56,557
+Then the fact table, the zone dimension, and the daily summary that uses both.
+
+46
+00:02:57,657 --> 00:02:59,364
+A word on selecting models.
+
+47
+00:02:59,644 --> 00:03:01,222
+A name selects one model.
+
+48
+00:03:01,502 --> 00:03:03,763
+A plus before it adds everything upstream.
+
+49
+00:03:04,043 --> 00:03:06,369
+A plus after it adds everything downstream.
+
+50
+00:03:06,649 --> 00:03:10,297
+You can also select by folder, by source, or by test type.
+
+51
+00:03:11,397 --> 00:03:20,058
+We run dbt build for everything up to the daily summary: seeds, staging, intermediate, marts, and every test, in the right order.
+
+52
+00:03:20,338 --> 00:03:24,754
+Then we look at the lineage, the timings in Run History, and preview the result.
+
+53
+00:03:25,854 --> 00:03:31,230
+We ask the data why trips are invalid, by reason, and how many duplicates were removed.
+
+54
+00:03:31,510 --> 00:03:36,140
+Every problem we found in section one now has a rule, a name, and a count.
+
+55
+00:03:36,420 --> 00:03:38,916
+The fact table only contains valid trips.

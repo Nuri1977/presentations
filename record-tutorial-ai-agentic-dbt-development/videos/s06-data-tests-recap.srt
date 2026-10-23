@@ -1,0 +1,15 @@
+1
+00:00:00,700 --> 00:00:02,022
+That is section six.
+
+2
+00:00:02,302 --> 00:00:04,137
+Tests are queries for bad rows.
+
+3
+00:00:04,417 --> 00:00:09,153
+Real data failed one, the AI assistant made a suggestion, and we made the call.
+
+4
+00:00:09,433 --> 00:00:13,038
+Next: reusing code with packages, Jinja and macros.

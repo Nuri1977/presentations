@@ -1,0 +1,215 @@
+1
+00:00:00,700 --> 00:00:02,748
+Section five: staging models.
+
+2
+00:00:03,028 --> 00:00:05,865
+They take a source and make it clean and consistent.
+
+3
+00:00:06,145 --> 00:00:11,862
+We write the first one by hand, so you see exactly what a model is, and the agent writes the big one.
+
+4
+00:00:12,962 --> 00:00:18,061
+If you remember one thing: a dbt model is just a select statement in a file.
+
+5
+00:00:18,341 --> 00:00:19,877
+You never write create table.
+
+6
+00:00:20,157 --> 00:00:25,448
+The file name becomes the model name, and dbt adds the right create statement for you.
+
+7
+00:00:26,548 --> 00:00:28,745
+The SQL models page, version one.
+
+8
+00:00:29,025 --> 00:00:31,350
+A model is one select in a SQL file.
+
+9
+00:00:31,630 --> 00:00:34,275
+The file name is the name of the view or table.
+
+10
+00:00:34,556 --> 00:00:38,652
+To use another model, you use ref, and dbt works out the order.
+
+11
+00:00:38,932 --> 00:00:40,275
+The default is a view.
+
+12
+00:00:41,376 --> 00:00:44,810
+On the left, what we write: a select, with ref to the zone seed.
+
+13
+00:00:45,090 --> 00:00:51,917
+On the right, what dbt sends to the database: a create view, with ref replaced by the real table name.
+
+14
+00:00:52,197 --> 00:00:55,781
+The Compiled SQL tab in Rosetta shows this for any model.
+
+15
+00:00:56,881 --> 00:00:59,228
+Every ref is an arrow in the lineage graph.
+
+16
+00:00:59,508 --> 00:01:03,092
+The staging model uses the seed, so the seed is built first.
+
+17
+00:01:03,372 --> 00:01:10,561
+Later, a dimension uses the staging model. dbt reads all these references and builds from left to right.
+
+18
+00:01:11,661 --> 00:01:13,389
+The structure guide on staging.
+
+19
+00:01:13,669 --> 00:01:17,893
+Name files S T G, then the source, two underscores, then the entity.
+
+20
+00:01:18,173 --> 00:01:21,373
+Do renaming, type casting and simple calculations.
+
+21
+00:01:21,653 --> 00:01:23,317
+Do not join or aggregate.
+
+22
+00:01:23,597 --> 00:01:25,154
+Staging models are views.
+
+23
+00:01:26,254 --> 00:01:27,257
+Our checklist.
+
+24
+00:01:27,537 --> 00:01:33,212
+Rename to snake case, cast types, turn the yes or no flag into a boolean, and keep every row.
+
+25
+00:01:33,492 --> 00:01:36,585
+No joins, no aggregations, and no filtering.
+
+26
+00:01:36,865 --> 00:01:38,721
+The strange trips stay in staging.
+
+27
+00:01:39,001 --> 00:01:41,689
+We flag them later, where the business rule belongs.
+
+28
+00:01:42,789 --> 00:01:44,794
+Our first model, written by hand.
+
+29
+00:01:45,074 --> 00:01:47,655
+A source step that selects from the seed with ref.
+
+30
+00:01:47,936 --> 00:01:50,837
+A renamed step that gives every column a clean name.
+
+31
+00:01:51,117 --> 00:01:52,397
+And a final select.
+
+32
+00:01:52,677 --> 00:01:54,874
+The agent will follow the same pattern.
+
+33
+00:01:55,974 --> 00:02:03,697
+We run it with the model button, open Preview to see the renamed zones, and open Compiled SQL to see ref replaced by the table.
+
+34
+00:02:03,977 --> 00:02:05,491
+We never wrote view in the file.
+
+35
+00:02:05,771 --> 00:02:08,417
+The folder setting from section two decided it.
+
+36
+00:02:09,517 --> 00:02:11,970
+The trips model is bigger: twenty columns.
+
+37
+00:02:12,250 --> 00:02:13,786
+Timestamps end in at.
+
+38
+00:02:14,066 --> 00:02:15,623
+Distance gets its unit.
+
+39
+00:02:15,903 --> 00:02:17,631
+IDs become snake case.
+
+40
+00:02:17,911 --> 00:02:19,533
+The flag becomes a boolean.
+
+41
+00:02:19,813 --> 00:02:21,285
+Money becomes a decimal.
+
+42
+00:02:21,565 --> 00:02:23,634
+And the file name is kept as source file.
+
+43
+00:02:23,914 --> 00:02:26,325
+Repetitive work, perfect for the agent.
+
+44
+00:02:27,425 --> 00:02:36,769
+In the demo, the agent creates the staging model for yellow trips, following our skill: snake case, the at suffix, a boolean, decimals, and source file.
+
+45
+00:02:37,049 --> 00:02:38,670
+No filters, no joins.
+
+46
+00:02:38,950 --> 00:02:40,977
+Plus a YAML file with descriptions.
+
+47
+00:02:41,257 --> 00:02:42,942
+Then it builds only this model.
+
+48
+00:02:44,042 --> 00:02:46,815
+This is the shape we expect, and how we review it.
+
+49
+00:02:47,095 --> 00:02:49,165
+It uses source, not a table name.
+
+50
+00:02:49,445 --> 00:02:51,066
+Every money column is cast.
+
+51
+00:02:51,346 --> 00:02:55,207
+And two things must not be there: a where clause, and a config block.
+
+52
+00:02:55,487 --> 00:02:59,733
+If either appears, we ask the agent to remove it before keeping the file.
+
+53
+00:03:00,833 --> 00:03:05,953
+Two new nodes in the lineage: our staging models, each fed by exactly one input.
+
+54
+00:03:06,233 --> 00:03:08,366
+One to one, just as the guide says.

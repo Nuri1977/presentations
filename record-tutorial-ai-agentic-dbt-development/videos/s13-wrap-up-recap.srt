@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,385
+Thank you for building this with us.
+
+2
+00:00:02,665 --> 00:00:08,318
+The project, every checkpoint, and every prompt from this course are in the companion repository.
+
+3
+00:00:08,598 --> 00:00:11,478
+Clone it, try the prompts, and let us know what you build.

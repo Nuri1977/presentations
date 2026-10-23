@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:01,958
+That is section ten.
+
+2
+00:00:02,238 --> 00:00:09,620
+The fact table is incremental, with a lookback variable, and a real schema change arrived and was carried through on purpose.
+
+3
+00:00:09,899 --> 00:00:11,222
+Next: snapshots.

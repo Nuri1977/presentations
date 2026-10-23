@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,022
+That is section zero.
+
+2
+00:00:02,302 --> 00:00:09,748
+We know what we are building, the agentic loop, and the six habits, and we have an empty project that passes dbt debug.
+
+3
+00:00:10,027 --> 00:00:11,798
+Next, we load the real data.

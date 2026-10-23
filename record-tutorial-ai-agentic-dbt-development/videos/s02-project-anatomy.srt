@@ -1,0 +1,187 @@
+1
+00:00:00,700 --> 00:00:01,681
+Section two.
+
+2
+00:00:01,961 --> 00:00:10,793
+We look inside a dbt project: its building blocks, the one configuration file every project has, and the folder structure we follow.
+
+3
+00:00:11,073 --> 00:00:13,675
+Then we teach the agent those rules with a skill.
+
+4
+00:00:14,776 --> 00:00:17,250
+A dbt project is just a folder.
+
+5
+00:00:17,530 --> 00:00:21,349
+The only required file is dbt project dot yml.
+
+6
+00:00:21,629 --> 00:00:26,301
+Models live in the models folder, with YAML files that describe and test them.
+
+7
+00:00:26,581 --> 00:00:31,274
+Seeds, snapshots, tests, macros and analyses each have their own folder.
+
+8
+00:00:31,554 --> 00:00:33,666
+A connection profile says where to build.
+
+9
+00:00:34,766 --> 00:00:39,140
+The page About dbt projects, version one, is the map of this course.
+
+10
+00:00:39,420 --> 00:00:43,452
+Its resources table lists every building block a project can have.
+
+11
+00:00:43,732 --> 00:00:49,684
+Its project configuration table lists the settings we put in dbt project dot yml.
+
+12
+00:00:50,784 --> 00:00:54,282
+Here is every block from that page, with the section that builds it.
+
+13
+00:00:54,562 --> 00:01:00,280
+Models, sources, seeds, tests, macros, analyses, snapshots, docs and exposures.
+
+14
+00:01:00,560 --> 00:01:05,168
+The dashed blocks, like metrics and the semantic layer, are beyond this crash course.
+
+15
+00:01:06,268 --> 00:01:07,484
+The settings we use.
+
+16
+00:01:07,764 --> 00:01:08,894
+The project name.
+
+17
+00:01:09,174 --> 00:01:10,518
+Our own version number.
+
+18
+00:01:10,798 --> 00:01:16,665
+A required dbt version range, so the project only runs on dbt version one.
+
+19
+00:01:16,945 --> 00:01:18,268
+The connection profile.
+
+20
+00:01:18,548 --> 00:01:21,278
+And the folder paths, which we keep at their defaults.
+
+21
+00:01:21,558 --> 00:01:23,798
+Variables come later, in section ten.
+
+22
+00:01:24,898 --> 00:01:26,541
+We write this file by hand.
+
+23
+00:01:26,821 --> 00:01:30,085
+The interesting part is at the bottom: settings per folder.
+
+24
+00:01:30,365 --> 00:01:33,010
+Staging and intermediate models become views.
+
+25
+00:01:33,290 --> 00:01:34,677
+Marts become tables.
+
+26
+00:01:34,957 --> 00:01:38,093
+The plus sign means this is a setting, not a folder name.
+
+27
+00:01:38,373 --> 00:01:41,402
+From now on, the folder decides how a model is built.
+
+28
+00:01:42,502 --> 00:01:44,806
+dbt Labs recommends three layers.
+
+29
+00:01:45,086 --> 00:01:49,673
+Staging is shaped like the source: one model per table, renamed and typed.
+
+30
+00:01:49,953 --> 00:01:52,108
+Intermediate holds business logic.
+
+31
+00:01:52,388 --> 00:01:56,036
+Marts are shaped like the business, and they are what analysts query.
+
+32
+00:01:57,136 --> 00:02:02,490
+The structure guide puts it simply: move data from source-conformed to business-conformed.
+
+33
+00:02:02,770 --> 00:02:07,613
+And the goal is consistency, so nobody wastes time deciding names and folders.
+
+34
+00:02:07,893 --> 00:02:10,709
+That is exactly what we want the agent to follow.
+
+35
+00:02:11,809 --> 00:02:13,622
+How does the agent learn these rules?
+
+36
+00:02:13,902 --> 00:02:18,041
+With a skill: a Markdown file of instructions with a short description.
+
+37
+00:02:18,321 --> 00:02:23,697
+What we read in the docs, we write into the skill, and the agent loads it whenever a task matches.
+
+38
+00:02:24,797 --> 00:02:26,440
+This is our skill, shortened.
+
+39
+00:02:26,720 --> 00:02:28,170
+The dbt version.
+
+40
+00:02:28,450 --> 00:02:29,816
+Naming for each layer.
+
+41
+00:02:30,096 --> 00:02:34,853
+Column conventions, like timestamps ending in at, and booleans starting with is.
+
+42
+00:02:35,133 --> 00:02:39,741
+And the key rule: code values come from the dictionary file, never from memory.
+
+43
+00:02:40,841 --> 00:02:43,892
+Skills are app-wide, so every project can use them.
+
+44
+00:02:44,172 --> 00:02:51,361
+M C P servers give the agent extra knowledge, like the dbt, DuckDB and Rosetta documentation.
+
+45
+00:02:51,641 --> 00:02:56,292
+You can add your own with one link, for example the dbt documentation site.
+
+46
+00:02:57,392 --> 00:03:06,266
+In the demo, we test the setup with an Ask mode question: what is the difference between a source and a seed, using the dbt version one docs.
+
+47
+00:03:06,546 --> 00:03:09,640
+The agent should look it up, and tell us which page it used.

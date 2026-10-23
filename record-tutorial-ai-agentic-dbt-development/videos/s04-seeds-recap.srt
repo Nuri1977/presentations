@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:01,980
+That is section four.
+
+2
+00:00:02,260 --> 00:00:07,188
+Three seeds: one official file, two created from the dictionary, checked and loaded.
+
+3
+00:00:07,468 --> 00:00:09,622
+Next, our first models: staging.

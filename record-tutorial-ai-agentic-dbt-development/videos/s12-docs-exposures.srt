@@ -1,0 +1,135 @@
+1
+00:00:00,700 --> 00:00:02,300
+Section twelve, the capstone.
+
+2
+00:00:02,580 --> 00:00:10,857
+We make the project explain itself, ask it questions, answer a real question about congestion pricing, and declare who uses our work.
+
+3
+00:00:11,957 --> 00:00:14,218
+Documentation in a wiki goes stale.
+
+4
+00:00:14,498 --> 00:00:24,461
+In dbt, it lives in the same YAML files as the tests, in the same change as the code, and dbt turns it into a website with a lineage graph.
+
+5
+00:00:25,561 --> 00:00:27,908
+The documentation page, version one.
+
+6
+00:00:28,188 --> 00:00:29,745
+Descriptions go in YAML.
+
+7
+00:00:30,025 --> 00:00:42,100
+Text needed in many places goes in a doc block, written once and used everywhere. dbt docs generate builds the documentation, and dbt docs serve opens it as a website.
+
+8
+00:00:43,200 --> 00:00:46,976
+A doc block in a Markdown file explains payment types once.
+
+9
+00:00:47,256 --> 00:00:50,818
+Every YAML file that has a payment type column points to it.
+
+10
+00:00:51,098 --> 00:00:53,850
+One text, four columns, always consistent.
+
+11
+00:00:54,950 --> 00:01:05,041
+In the demo, the agent creates doc blocks for payment type, rate code and trip validity, uses them everywhere, and makes sure every model and column has a description.
+
+12
+00:01:05,321 --> 00:01:08,649
+Tedious work across many files, perfect for an agent.
+
+13
+00:01:09,749 --> 00:01:12,010
+Then we generate the docs and open the site.
+
+14
+00:01:12,290 --> 00:01:18,349
+Every model, column, test and query is there, with a lineage graph that matches the one in Rosetta.
+
+15
+00:01:19,449 --> 00:01:21,433
+Now the project explains itself.
+
+16
+00:01:21,713 --> 00:01:28,006
+In Ask mode, we ask the agent to trace the congestion fee from the source to every model that uses it.
+
+17
+00:01:28,286 --> 00:01:30,377
+It reads the files and gives the path.
+
+18
+00:01:31,477 --> 00:01:39,242
+Another good question before any join: what is the grain of the daily summary, and can we join it to trips without multiplying rows?
+
+19
+00:01:39,522 --> 00:01:43,426
+One row per zone per day, so joining it to trips repeats rows.
+
+20
+00:01:43,706 --> 00:01:45,114
+The agent should warn us.
+
+21
+00:01:46,214 --> 00:01:49,500
+And now the question the whole project was building towards.
+
+22
+00:01:49,780 --> 00:01:54,772
+January twenty twenty-five was the first month of congestion pricing in New York.
+
+23
+00:01:55,052 --> 00:01:56,993
+How much fee was collected, and where?
+
+24
+00:01:58,093 --> 00:02:01,421
+We ask it in Rosetta's analytics, on top of our marts.
+
+25
+00:02:01,701 --> 00:02:05,349
+Only valid trips count, and we see boroughs instead of IDs.
+
+26
+00:02:05,629 --> 00:02:08,018
+Everything we built is inside this answer.
+
+27
+00:02:09,118 --> 00:02:17,417
+Here is the answer on screen: the total fee collected in January, the share of valid trips that paid it, and the borough that collected the most.
+
+28
+00:02:17,697 --> 00:02:20,577
+From raw files to a tested, documented answer.
+
+29
+00:02:21,677 --> 00:02:23,597
+The last block: exposures.
+
+30
+00:02:23,877 --> 00:02:29,786
+An exposure tells dbt that something downstream depends on our models, like this analysis.
+
+31
+00:02:30,066 --> 00:02:34,738
+If someone changes the fact table tomorrow, they see the analysis in the lineage.
+
+32
+00:02:35,838 --> 00:02:42,025
+The agent declares it: a name, a label, the type analysis, an owner, and the two marts it depends on.
+
+33
+00:02:43,125 --> 00:02:48,224
+And here is the complete project, every node built, with our analysis on the far right.
+
+34
+00:02:48,504 --> 00:02:50,317
+From two Parquet files to this.

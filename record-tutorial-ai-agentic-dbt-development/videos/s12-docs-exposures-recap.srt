@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,022
+That is section twelve.
+
+2
+00:00:02,302 --> 00:00:09,299
+Fully documented, a docs website, a project that explains itself, and a real answer, declared as an exposure.
+
+3
+00:00:09,580 --> 00:00:11,030
+One short section left.

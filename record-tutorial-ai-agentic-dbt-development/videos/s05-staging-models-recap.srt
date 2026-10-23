@@ -1,0 +1,11 @@
+1
+00:00:00,700 --> 00:00:02,022
+That is section five.
+
+2
+00:00:02,302 --> 00:00:10,089
+Models are select statements, ref and source build the graph, and we have two staging models, one by hand and one by the agent.
+
+3
+00:00:10,369 --> 00:00:13,739
+Next: we write down what we expect from the data, with tests.
