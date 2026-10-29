@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flying Car Thumbnail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  #thumb {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden; color: #f4f2ef; background: #0b0b0e;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  /* thumbnail-car.png: the video's own frame at 2.6 s with its text hidden, moved up to make room for the payoff */
+  #car { position: absolute; left: 0; top: -300px; width: 1080px; height: 1920px; }
+  #fade { position: absolute; left: 0; right: 0; top: 1520px; height: 400px; background: linear-gradient(180deg, rgba(11,11,14,0), #0b0b0e 70%); }
+  .grad { background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hl { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; letter-spacing: -0.045em; line-height: 1; white-space: nowrap; }
+
+  #brand { position: absolute; left: 0; right: 0; top: 96px; display: flex; justify-content: center; align-items: center; gap: 16px; font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+  #brand svg { width: 64px; height: 64px; overflow: visible; }
+  #h1 { top: 210px; font-size: 150px; }
+  #h2 { top: 370px; font-size: 176px; }
+  #p1 { top: 1400px; font-size: 118px; }
+  #p2 { top: 1520px; font-size: 270px; filter: drop-shadow(0 0 60px rgba(255,116,22,0.45)); }
+</style>
+</head>
+<body>
+<div id="thumb">
+  <img id="car" src="thumbnail-car.png" alt="">
+  <div id="fade"></div>
+  <div id="brand"></div>
+  <div id="h1" class="hl">CARS CAN</div>
+  <div id="h2" class="hl"><span class="grad">FLY</span> NOW.</div>
+  <div id="p1" class="hl">SO CAN YOUR</div>
+  <div id="p2" class="hl grad">DATA.</div>
+</div>
+<script>
+// the Rosetta DBT Studio logo (same drawing as motion.html)
+const f = (pts, c) => `<polygon points="${pts}" fill="${c}" stroke="${c}" stroke-width="9" stroke-linejoin="round"/>`;
+document.getElementById('brand').innerHTML = `<svg viewBox="-40 -40 560 560">
+  <defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb054"/><stop offset="1" stop-color="#f0600e"/></linearGradient></defs>
+  <path d="M420 262 V50 A70 70 0 0 0 350 -20 H50 A70 70 0 0 0 -20 50 V350 A70 70 0 0 0 50 420 H262" fill="none" stroke="#ff7a1f" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>${f('46,263 198,331 198,384 46,317', '#fb9145')}${f('198,331 346,263 346,317 198,384', '#f7641f')}</g>
+  <g>${f('46,182 198,249 198,304 46,236', '#fc8939')}${f('198,249 346,182 346,236 198,304', '#f7641f')}<circle cx="236" cy="259" r="11.5" fill="#07090d"/></g>
+  <g>${f('198,22 346,88 198,156 46,88', '#fc7927')}${f('46,88 198,156 198,222 46,154', '#fd8a37')}${f('198,156 346,88 346,154 198,222', '#f5621f')}</g>
+  <path d="M400 306 C409 372 428 391 494 400 C428 409 409 428 400 494 C391 428 372 409 306 400 C372 391 391 372 400 306 Z" fill="url(#spg)"/>
+</svg><span>Rosetta DBT <span class="grad">Studio</span></span>`;
+</script>
+</body>
+</html>

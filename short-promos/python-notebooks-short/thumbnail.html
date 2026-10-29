@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Notebooks Thumbnail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  #thumb {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden; color: #f4f6fa; background: #07080b;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  /* thumbnail-frame.png is a frame of the video itself: blurred as the backdrop, sharp (from the screenshot card's top edge down) as the hero */
+  #backdrop { position: absolute; left: -10%; top: -10%; width: 120%; height: 120%; object-fit: cover; filter: blur(40px) brightness(0.5) saturate(1.2); }
+  #glow { position: absolute; left: -160px; top: 500px; width: 1400px; height: 1400px; border-radius: 50%; background: radial-gradient(circle, rgba(255,116,22,0.22), rgba(255,116,22,0) 62%); }
+  #hero {
+    position: absolute; left: 43px; top: 168px; width: 994px; height: 1766px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 504px, #000 513px, #000 1430px, transparent 1480px),
+                        linear-gradient(90deg, transparent 0, #000 30px, #000 964px, transparent 994px);
+    -webkit-mask-composite: source-in; mask-composite: intersect;
+  }
+  #hl { position: absolute; left: 40px; right: 40px; top: 70px; height: 520px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .ln { font-weight: 900; letter-spacing: -0.045em; line-height: 1.02; white-space: nowrap; text-shadow: 0 6px 30px rgba(0,0,0,0.5); }
+  .acc { background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; }
+  .grad { background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #brand { position: absolute; left: 0; right: 0; top: 1680px; display: flex; justify-content: center; align-items: center; gap: 22px; font-size: 72px; font-weight: 900; letter-spacing: -0.04em; }
+  #brand svg { width: 104px; height: 104px; overflow: visible; filter: drop-shadow(0 16px 40px rgba(255,116,22,0.35)); }
+</style>
+</head>
+<body>
+<div id="thumb">
+  <img id="backdrop" src="thumbnail-frame.png" alt="">
+  <div id="glow"></div>
+  <img id="hero" src="thumbnail-frame.png" alt="">
+  <div id="hl">
+    <div class="ln" data-max="180">SQL in.</div>
+    <div class="ln acc" data-max="190">Python out.</div>
+  </div>
+  <div id="brand"></div>
+</div>
+<script>
+// each headline line starts at its max size and shrinks until it fits the width
+for (const ln of document.querySelectorAll('.ln')) {
+  let px = Number(ln.dataset.max);
+  ln.style.fontSize = px + 'px';
+  while (ln.scrollWidth > 1000 && px > 40) ln.style.fontSize = (--px) + 'px';
+}
+// the Rosetta DBT Studio logo (same drawing as motion.html)
+const f = (pts, c) => `<polygon points="${pts}" fill="${c}" stroke="${c}" stroke-width="9" stroke-linejoin="round"/>`;
+document.getElementById('brand').innerHTML = `<svg viewBox="-40 -40 560 560">
+  <defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb054"/><stop offset="1" stop-color="#f0600e"/></linearGradient></defs>
+  <path d="M420 262 V50 A70 70 0 0 0 350 -20 H50 A70 70 0 0 0 -20 50 V350 A70 70 0 0 0 50 420 H262" fill="none" stroke="#ff7a1f" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>${f('46,263 198,331 198,384 46,317', '#fb9145')}${f('198,331 346,263 346,317 198,384', '#f7641f')}</g>
+  <g>${f('46,182 198,249 198,304 46,236', '#fc8939')}${f('198,249 346,182 346,236 198,304', '#f7641f')}<circle cx="236" cy="259" r="11.5" fill="#07090d"/></g>
+  <g>${f('198,22 346,88 198,156 46,88', '#fc7927')}${f('46,88 198,156 198,222 46,154', '#fd8a37')}${f('198,156 346,88 346,154 198,222', '#f5621f')}</g>
+  <path d="M400 306 C409 372 428 391 494 400 C428 409 409 428 400 494 C391 428 372 409 306 400 C372 391 391 372 400 306 Z" fill="url(#spg)"/>
+</svg><span>Rosetta DBT <span class="grad">Studio</span></span>`;
+</script>
+</body>
+</html>

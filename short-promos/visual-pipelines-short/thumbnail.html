@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Visual Pipelines Thumbnail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  #thumb {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden; color: #f4f6fa;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    background: radial-gradient(ellipse 120% 70% at 50% 45%, #131720 0%, #0a0c11 58%, #060709 100%);
+  }
+  #dots { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.13) 1.4px, transparent 2px); background-size: 48px 48px; }
+  #glow { position: absolute; left: -110px; top: 520px; width: 1300px; height: 1300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,116,22,0.2), rgba(255,116,22,0) 62%); }
+  #vig { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 70% at 50% 50%, transparent 55%, rgba(0,0,0,0.5) 100%); }
+  .grad { background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* headline: the video's end line */
+  #hl { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-weight: 900; letter-spacing: -0.045em; line-height: 0.98; }
+  #hl .a { font-size: 168px; }
+  #hl .b { font-size: 232px; }
+
+  /* the pipeline: the four real steps from the screenshots, all green */
+  .node {
+    position: absolute; left: 150px; width: 780px; height: 132px; border-radius: 20px; overflow: hidden;
+    background: #2a2a2c; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  }
+  .nh { height: 72px; display: flex; align-items: center; gap: 18px; padding: 0 24px; background: linear-gradient(90deg, #f06c47, #e2563a); font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+  .grey .nh { background: linear-gradient(90deg, #9a9a9a, #858585); }
+  .nh i { width: 44px; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.22); display: inline-block; flex: none; }
+  .nh em { margin-left: auto; font-style: normal; font-size: 22px; padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,0.22); }
+  .nb { height: 60px; display: flex; align-items: center; gap: 16px; padding: 0 24px; font-size: 26px; color: #cfd5df; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+  .nb b { background: #e2563a; color: #fff; border-radius: 999px; padding: 3px 16px; font: 800 22px Inter, sans-serif; }
+  .grey .nb b { background: #8b8b8b; }
+  .ok { margin-left: auto; display: flex; align-items: center; gap: 8px; padding: 4px 16px 4px 10px; border-radius: 999px; background: rgba(95,212,122,0.16); border: 2px solid #5fd47a; color: #8ff0a5; font: 800 22px Inter, sans-serif; }
+  .ok svg { width: 24px; height: 24px; }
+  .edge { position: absolute; left: 538px; width: 4px; height: 38px; border-radius: 2px; background: linear-gradient(180deg, #ff9d3b, #ff7416); box-shadow: 0 0 14px rgba(255,116,22,0.7); }
+
+
+  /* brand */
+  #logo { position: absolute; left: 475px; top: 1478px; width: 130px; height: 130px; }
+  #logo svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 20px 46px rgba(255,116,22,0.35)); }
+  #name { position: absolute; left: 0; right: 0; top: 1630px; text-align: center; }
+  .ros { font-size: 36px; font-weight: 700; letter-spacing: 0.34em; margin-left: 0.34em; color: #ffc08a; }
+  .nm { font-size: 104px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div id="thumb">
+  <div id="dots"></div>
+  <div id="glow"></div>
+
+  <div id="hl">
+    <div class="a">Pipelines</div>
+    <div class="a">you can</div>
+    <div class="b grad">see.</div>
+  </div>
+
+  <div id="pipe"></div>
+
+  <div id="logo"></div>
+  <div id="name"><div class="ros">ROSETTA</div><div class="nm">DBT <span class="grad">Studio</span></div></div>
+  <div id="vig"></div>
+</div>
+<script>
+const CHECK = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.4 14.2L6.3 12l1.4-1.4 2.9 2.8 5.7-5.7 1.4 1.4z"/></svg>';
+const STEPS = [
+  ['Compile and build models', 'dbt', 'dbt build', ''],
+  ['Generate docs', 'dbt', 'dbt docs generate', ''],
+  ['Test staging models', 'dbt', 'dbt test', ''],
+  ['Tear down environment', 'command', 'echo', 'grey'],
+];
+const TOP = 790, GAP = 170;   // node height 132 + edge 38
+document.getElementById('pipe').innerHTML = STEPS.map(([title, kind, cmd, cls], i) =>
+  `<div class="node ${cls}" style="top:${TOP + i * GAP}px"><div class="nh"><i></i>${title}<em>#${i + 1}</em></div>
+     <div class="nb"><b>${kind}</b>${cmd}<span class="ok">${CHECK}Success</span></div></div>`
+  + (i < STEPS.length - 1 ? `<div class="edge" style="top:${TOP + i * GAP + 132}px"></div>` : '')).join('');
+
+// the Rosetta DBT Studio logo (same drawing as motion.html)
+const f = (pts, c) => `<polygon points="${pts}" fill="${c}" stroke="${c}" stroke-width="9" stroke-linejoin="round"/>`;
+document.getElementById('logo').innerHTML = `<svg viewBox="-40 -40 560 560">
+  <defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb054"/><stop offset="1" stop-color="#f0600e"/></linearGradient></defs>
+  <path d="M420 262 V50 A70 70 0 0 0 350 -20 H50 A70 70 0 0 0 -20 50 V350 A70 70 0 0 0 50 420 H262" fill="none" stroke="#ff7a1f" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>${f('46,263 198,331 198,384 46,317', '#fb9145')}${f('198,331 346,263 346,317 198,384', '#f7641f')}</g>
+  <g>${f('46,182 198,249 198,304 46,236', '#fc8939')}${f('198,249 346,182 346,236 198,304', '#f7641f')}<circle cx="236" cy="259" r="11.5" fill="#07090d"/></g>
+  <g>${f('198,22 346,88 198,156 46,88', '#fc7927')}${f('46,88 198,156 198,222 46,154', '#fd8a37')}${f('198,156 346,88 346,154 198,222', '#f5621f')}</g>
+  <path d="M400 306 C409 372 428 391 494 400 C428 409 409 428 400 494 C391 428 372 409 306 400 C372 391 391 372 400 306 Z" fill="url(#spg)"/>
+</svg>`;
+</script>
+</body>
+</html>

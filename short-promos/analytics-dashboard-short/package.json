@@ -1,0 +1,8 @@
+{
+  "name": "analytics-dashboard-short",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "playwright-core": "1.48.2"
+  }
+}

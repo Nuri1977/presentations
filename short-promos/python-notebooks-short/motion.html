@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notebooks Short</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=block" rel="stylesheet">
+<style>
+  :root {
+    --text: #f4f6fa;
+    --muted: #a3acbb;
+    --dim: #5f6878;
+    --o: #ff7416;
+    --o2: #ff9d3b;
+    --green: #5fd47a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+  #stage {
+    position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+    background: #07080b; color: var(--text); transform-origin: 0 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #scene { position: absolute; inset: 0; transform-origin: 540px 960px; }
+  .layer { position: absolute; inset: 0; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
+  .grad {
+    background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .w { display: inline-block; margin: 0 0.035em; }
+  .hl { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; letter-spacing: -0.045em; line-height: 1; white-space: nowrap; }
+
+  /* ---------- background: notebook paper dot grid ---------- */
+  #bg { background: radial-gradient(ellipse 120% 70% at 50% 40%, #121722 0%, #0a0c12 55%, #06070a 100%); }
+  #dots {
+    position: absolute; left: -60px; top: -60px; width: 1200px; height: 2040px;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.11) 1.6px, transparent 2.2px);
+    background-size: 40px 40px;
+  }
+  .glow { position: absolute; left: 0; top: 0; border-radius: 50%; pointer-events: none; }
+  #glowA { width: 1300px; height: 1300px; background: radial-gradient(circle, rgba(255,116,22,0.2), rgba(255,116,22,0) 62%); }
+  #glowB { width: 1100px; height: 1100px; background: radial-gradient(circle, rgba(84,171,255,0.12), rgba(84,171,255,0) 62%); }
+
+  /* ---------- hook ---------- */
+  #hk-cell {
+    position: absolute; left: 90px; top: 1210px; width: 900px; height: 130px; border-radius: 22px;
+    background: rgba(22,25,32,0.95); border: 2px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; gap: 26px; padding: 0 34px; font-size: 44px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+  }
+  #hk-cell::before { content: ''; position: absolute; left: -2px; top: 18px; bottom: 18px; width: 8px; border-radius: 4px; background: var(--o); }
+  #hk-in { color: var(--dim); font-weight: 700; min-width: 150px; }
+  #hk-code { color: #e8edf5; white-space: pre; }
+  #hk-code .k { color: #ff9d3b; }
+  .caret { display: inline-block; width: 4px; height: 52px; background: var(--o2); vertical-align: middle; margin-left: 4px; }
+  #hk1 { top: 470px; font-size: 128px; }
+  #hk2 { top: 610px; font-size: 128px; }
+  #hk3 { top: 760px; font-size: 290px; letter-spacing: -0.06em; filter: drop-shadow(0 0 50px rgba(255,116,22,0.35)); }
+
+  /* ---------- scene headings: In [n]: + headline + sub ---------- */
+  .head { position: absolute; left: 0; right: 0; top: 0; height: 540px; }
+  .head .in { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-size: 40px; font-weight: 700; color: var(--o2); letter-spacing: 0.02em; }
+  .head .h { top: 312px; font-size: 118px; }
+  .head .s { position: absolute; left: 0; right: 0; top: 452px; text-align: center; font-size: 38px; font-weight: 600; color: #c9d0dc; letter-spacing: -0.01em; }
+
+  /* ---------- cards: one notebook cell per scene, a camera inside on the real screenshot ---------- */
+  #ghosts { position: absolute; left: 50px; top: 560px; width: 980px; height: 880px; }
+  .ghost { position: absolute; left: 0; top: 0; width: 980px; height: 880px; border-radius: 26px; background: #121419; border: 2px solid rgba(255,157,59,0.22); transform-origin: 50% 0; }
+  .card {
+    position: absolute; left: 50px; top: 560px; width: 980px; height: 880px; border-radius: 26px; overflow: hidden;
+    background: #1e1e1e; border: 2px solid rgba(255,157,59,0.55);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.65), 0 0 70px rgba(255,116,22,0.18);
+  }
+  .card::after { content: ''; position: absolute; left: 0; top: 22px; bottom: 22px; width: 8px; border-radius: 0 4px 4px 0; background: var(--o); z-index: 3; }
+  .screen { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  .screen img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: block; }
+  .fx { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+  .mask { position: absolute; }
+  .tcaret { position: absolute; width: 2px; background: #ffb46b; box-shadow: 0 0 6px rgba(255,157,59,0.8); }
+  .ring { position: absolute; border: 3px solid #ffa34a; border-radius: 10px; }
+  .pulse { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; border: 3px solid #ffb46b; }
+  .cursor { position: absolute; left: 0; top: 0; width: 26px; height: 38px; transform-origin: 0 0; }
+  .cursor svg { width: 100%; height: 100%; overflow: visible; display: block; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.55)); }
+  .glare { position: absolute; inset: 0; background: linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0) 62%); background-size: 300% 100%; z-index: 2; pointer-events: none; }
+
+  /* ---------- stickers / callouts over the cards ---------- */
+  .sticker {
+    position: absolute; left: 0; top: 0; background: #fff; color: #0a0a0a; font-weight: 900; border-radius: 18px;
+    padding: 14px 26px; box-shadow: 0 18px 44px rgba(0,0,0,0.5); white-space: nowrap; display: flex; align-items: center; gap: 12px;
+    letter-spacing: -0.02em; font-size: 40px;
+  }
+  .sticker svg { width: 34px; height: 34px; color: var(--o); }
+  #overs { z-index: 40; pointer-events: none; }
+  #toast { position: absolute; left: 0; top: 0; width: 640px; height: 96px; border-radius: 12px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+  #df { position: absolute; left: 144px; top: 790px; width: 792px; }
+  #df-chip { display: inline-flex; align-items: center; gap: 14px; height: 60px; padding: 0 24px; border-radius: 14px 14px 0 0; background: #ff7416; color: #120800; font-size: 28px; font-weight: 800; }
+  #df-box { position: relative; border-radius: 0 16px 16px 16px; overflow: hidden; border: 2px solid #ff9d3b; box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 50px rgba(255,116,22,0.25); }
+  #df-box img { display: block; width: 788px; height: auto; }
+
+  /* ---------- progress rail: six cells ---------- */
+  #rail { position: absolute; left: 0; right: 0; top: 1488px; display: flex; justify-content: center; gap: 14px; }
+  .rc { width: 142px; height: 64px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03);
+        display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 24px; font-weight: 700; color: var(--dim); }
+  .rc b { color: inherit; font-weight: 800; }
+
+  /* ---------- end card ---------- */
+  #e2 { top: 350px; font-size: 84px; }
+  #e3 { top: 462px; font-size: 176px; }
+  #e-icon { position: absolute; left: 440px; top: 790px; width: 200px; height: 200px; }
+  .logo-svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 26px 60px rgba(255,116,22,0.35)); }
+  .logo-svg g, .logo-svg path { transform-box: fill-box; transform-origin: center; }
+  #e-name { position: absolute; left: 0; right: 0; top: 1030px; text-align: center; }
+  .ros { font-size: 44px; font-weight: 700; letter-spacing: 0.34em; color: #ffc08a; margin-left: 0.34em; }
+  .nm { font-size: 124px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-top: 10px; white-space: nowrap; }
+  .shine {
+    background: linear-gradient(100deg, #ff7317 0%, #ffb054 40%, #fff3e0 50%, #ffb054 60%, #df4c08 100%);
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #e-pills { position: absolute; left: 0; right: 0; top: 1270px; display: flex; justify-content: center; gap: 16px; }
+  .pill { display: inline-flex; align-items: center; gap: 12px; height: 62px; padding: 0 26px; border-radius: 999px; font-size: 27px; font-weight: 700; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.14); color: #e7ebf2; }
+  .pill svg { width: 24px; height: 24px; color: var(--o2); }
+  #e-url { position: absolute; left: 0; right: 0; top: 1372px; display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 32px; font-weight: 500; color: #ffc08a; }
+  #e-url svg { width: 32px; height: 32px; }
+
+  /* ---------- overlays ---------- */
+  #flash { pointer-events: none; }
+  #vig { pointer-events: none; background: radial-gradient(ellipse 85% 70% at 50% 50%, transparent 55%, rgba(0,0,0,0.5) 100%); }
+  #ctl { position: fixed; left: 12px; bottom: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; color: #8a93a3; z-index: 9; user-select: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="scene">
+    <div id="bg" class="layer">
+      <div id="dots"></div>
+      <div id="glowA" class="glow"></div>
+      <div id="glowB" class="glow"></div>
+    </div>
+
+    <div id="hook" class="layer">
+      <div id="hk1" class="hl"></div>
+      <div id="hk2" class="hl"></div>
+      <div id="hk3" class="hl"><span class="w grad">SQL.</span></div>
+      <div id="hk-cell" class="mono"><span id="hk-in">In [ ]:</span><span id="hk-code"></span></div>
+    </div>
+
+    <div id="heads"></div>
+    <div id="ghosts"></div>
+    <div id="cards"></div>
+    <div id="overs" class="layer"></div>
+    <div id="rail" class="mono"></div>
+
+    <div id="end" class="layer">
+      <div id="e2" class="hl"></div>
+      <div id="e3" class="hl"></div>
+      <div id="e-icon"></div>
+      <div id="e-name">
+        <div class="ros" id="e-ros">ROSETTA</div>
+        <div class="nm" id="e-nm">DBT <span class="shine" id="shine">Studio</span></div>
+      </div>
+      <div id="e-pills"></div>
+      <div id="e-url" class="mono"></div>
+    </div>
+
+    <div id="flash" class="layer"></div>
+    <div id="vig" class="layer"></div>
+  </div>
+</div>
+<div id="ctl"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="rgb" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+    <feOffset in="r" id="rOff" dx="0" dy="0" result="r2" />
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+    <feOffset in="b" id="bOff" dx="0" dy="0" result="b2" />
+    <feBlend in="r2" in2="g" mode="screen" result="rg" />
+    <feBlend in="rg" in2="b2" mode="screen" />
+  </filter>
+</svg>
+
+<script>
+/* =========================================================================
+   Deterministic timeline: everything on screen is a pure function of t (s).
+   Preview: open this file. Capture: ?capture=1 and call window.seek(t).
+   120 BPM: one beat = 0.5 s. Scene starts, clicks and reveals sit on that grid
+   so they land on the beat in score.py.
+   ========================================================================= */
+const DURATION = 22;
+const W = 1080, H = 1920;
+const VW = 980, VH = 880;          // card viewport (the camera's frame)
+const SCN = [2.0, 4.0, 6.5, 10.0, 13.5, 17.5, 19.5];   // scene i runs SCN[i] .. SCN[i+1]; 19.5 = end card
+
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, p) => a + (b - a) * p;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  outCubic: (p) => 1 - Math.pow(1 - p, 3),
+  inCubic: (p) => p * p * p,
+  inOutCubic: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+  outExpo: (p) => (p === 1 ? 1 : 1 - Math.pow(2, -10 * p)),
+  outBack: (p) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function show(e, on) { const v = on ? '' : 'none'; if (e.style.display !== v) e.style.display = v; }
+const words = (s, cls = 'w') => s.split(' ').map((w) => `<span class="${cls}">${w}</span>`).join(' ');
+const blink = (t) => (Math.floor(t * 2.4) % 2 === 0 ? 1 : 0.15);
+
+// a word slamming in: big -> settled, with a quick fade
+function slam(e, t, t0, from = 2.0, dur = 0.24) {
+  const p = P(t, t0, t0 + dur);
+  e.style.opacity = t < t0 ? 0 : clamp(p * 5);
+  e.style.transform = `scale(${lerp(from, 1, E.outExpo(p))})`;
+}
+
+const I = {
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5c.7 5.6 3.4 8.5 9 10.5-5.6 2-8.3 4.9-9 10.5-.7-5.6-3.4-8.5-9-10.5 5.6-2 8.3-4.9 9-10.5z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>',
+  py: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h6a3 3 0 0 1 3 3v4H9a3 3 0 0 0-3 3v2H5a2 2 0 0 1-2-2V9a3 3 0 0 1 3-3h2zM16 21h-6a3 3 0 0 1-3-3v-4h8a3 3 0 0 0 3-3V9h1a2 2 0 0 1 2 2v4a3 3 0 0 1-3 3h-2z"/></svg>',
+  github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>',
+  file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15l3 3 3-3"/></svg>',
+};
+const CURSOR = '<svg viewBox="0 0 26 38"><path d="M2 2 L2 31 L9.5 24 L14.5 35.5 L19.5 33.3 L14.6 22 L24.5 22 Z" fill="#fff" stroke="#111" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+
+/* ---------- logo (same vector rebuild as the earlier promos) ---------- */
+function logoSVG(id) {
+  const f = (pts, c) => `<polygon points="${pts}" fill="${c}" stroke="${c}" stroke-width="9" stroke-linejoin="round"/>`;
+  return `<svg class="logo-svg" viewBox="-40 -40 560 560">
+    <defs><linearGradient id="spg-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb054"/><stop offset="1" stop-color="#f0600e"/></linearGradient></defs>
+    <path class="lg-frame" pathLength="1" d="M420 262 V50 A70 70 0 0 0 350 -20 H50 A70 70 0 0 0 -20 50 V350 A70 70 0 0 0 50 420 H262" fill="none" stroke="#ff7a1f" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/>
+    <g class="lg-b3">${f('46,263 198,331 198,384 46,317', '#fb9145')}${f('198,331 346,263 346,317 198,384', '#f7641f')}</g>
+    <g class="lg-b2">${f('46,182 198,249 198,304 46,236', '#fc8939')}${f('198,249 346,182 346,236 198,304', '#f7641f')}<circle cx="236" cy="259" r="11.5" fill="#07090d"/></g>
+    <g class="lg-b1">${f('198,22 346,88 198,156 46,88', '#fc7927')}${f('46,88 198,156 198,222 46,154', '#fd8a37')}${f('198,156 346,88 346,154 198,222', '#f5621f')}</g>
+    <path class="lg-spark" d="M400 306 C409 372 428 391 494 400 C428 409 409 428 400 494 C391 428 372 409 306 400 C372 391 391 372 400 306 Z" fill="url(#spg-${id})"/>
+  </svg>`;
+}
+function logoParts(root) { return { frame: $('.lg-frame', root), b1: $('.lg-b1', root), b2: $('.lg-b2', root), b3: $('.lg-b3', root), spark: $('.lg-spark', root) }; }
+function animLogo(L, t, t0) {
+  [L.b3, L.b2, L.b1].forEach((g, k) => {
+    const p = P(t, t0 + k * 0.06, t0 + k * 0.06 + 0.3);
+    g.style.transform = `translateY(${(1 - E.outBack(p)) * -380}px)`;
+    g.style.opacity = clamp(p * 3);
+  });
+  const fp = E.inOutCubic(P(t, t0 + 0.12, t0 + 0.5));
+  L.frame.style.strokeDashoffset = 1 - fp;
+  L.frame.style.opacity = fp > 0 ? 1 : 0;
+  const sp = P(t, t0 + 0.3, t0 + 0.62);
+  L.spark.style.transform = `scale(${E.outBack(sp)}) rotate(${(1 - E.outCubic(sp)) * -200}deg)`;
+  L.spark.style.opacity = clamp(sp * 4);
+}
+
+/* =========================================================================
+   Card machinery. Each scene is a notebook "cell" card with a camera on the
+   real 1920x1080 screenshots. Everything inside .screen is in screenshot px.
+   ========================================================================= */
+function makeCard(imgs) {
+  const card = el('div', 'card');
+  const scr = el('div', 'screen');
+  const L = {};
+  for (const [k, src] of Object.entries(imgs)) { const im = el('img'); im.src = `assets/${src}`; scr.appendChild(im); L[k] = im; }
+  const fx = el('div', 'fx');
+  scr.appendChild(fx);
+  card.appendChild(scr);
+  card.appendChild(el('div', 'glare'));
+  $('#cards').appendChild(card);
+  return { card, scr, fx, L, s: 1 };
+}
+function cam(C, cx, cy, s) {
+  C.s = s;
+  C.scr.style.transform = `translate(${VW / 2 - cx * s}px, ${VH / 2 - cy * s}px) scale(${s})`;
+}
+// camera keyframes [[t, cx, cy, s], ...], eased between neighbours
+function camAt(keys, t) {
+  if (t <= keys[0][0]) return keys[0].slice(1);
+  for (let i = 1; i < keys.length; i++) {
+    if (t <= keys[i][0]) {
+      const a = keys[i - 1], b = keys[i], p = E.inOutCubic(P(t, a[0], b[0]));
+      return [lerp(a[1], b[1], p), lerp(a[2], b[2], p), Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), p))];
+    }
+  }
+  return keys[keys.length - 1].slice(1);
+}
+function only(C, key) { for (const [k, im] of Object.entries(C.L)) show(im, k === key); }
+function mask(C, color) { const m = el('div', 'mask'); m.style.background = color; C.fx.appendChild(m); return m; }
+function rect(e, x, y, w, h) {
+  if (w <= 0 || h <= 0) { show(e, false); return; }
+  show(e, true);
+  e.style.left = `${x}px`; e.style.top = `${y}px`; e.style.width = `${w}px`; e.style.height = `${h}px`;
+}
+function clipTo(img, x0, y0, x1, y1) { img.style.clipPath = `inset(${y0}px ${1920 - x1}px ${1080 - y1}px ${x0}px)`; }
+
+// typing: lines [x0, x1, top, height]; masks hide what is not typed yet; quantized to char steps
+function typing(C, key, lines, color, step) {
+  C[key] = { lines, step, masks: lines.map(() => mask(C, color)), caret: (() => { const c = el('div', 'tcaret'); C.fx.appendChild(c); return c; })() };
+}
+// on=false hides the masks entirely (while the card shows a screenshot without this text)
+function typeAt(C, key, t, t0, t1, caretOn = true, on = true) {
+  const T = C[key], total = T.lines.reduce((a, l) => a + (l[1] - l[0]), 0);
+  if (!on) { T.masks.forEach((m) => show(m, false)); show(T.caret, false); return; }
+  let left = P(t, t0, t1) * total, cur = null;
+  T.lines.forEach((l, i) => {
+    const len = l[1] - l[0];
+    let r = clamp(left, 0, len);
+    r = r >= len ? len + 4 : Math.floor(r / T.step) * T.step;
+    left -= len;
+    rect(T.masks[i], l[0] + r - 1, l[2], r > len ? 0 : l[1] + 4 - (l[0] + r - 1), l[3]);
+    if (cur == null && (r < len || i === T.lines.length - 1)) cur = [l[0] + Math.min(r, len + 2), l[2], l[3]];
+  });
+  const c = T.caret, caretVis = caretOn && t >= t0 - 0.3 && t < t1 + 0.4;
+  show(c, caretVis);
+  if (caretVis) { c.style.left = `${cur[0]}px`; c.style.top = `${cur[1] + 1}px`; c.style.height = `${cur[2] - 2}px`; c.style.opacity = t > t0 && t < t1 ? 1 : blink(t); }
+}
+
+function cursor(C) { const c = el('div', 'cursor', CURSOR); C.fx.appendChild(c); C.cur = c; const p = el('div', 'pulse'); C.fx.appendChild(p); C.pls = p; }
+// path: [[t, x, y], ...]; clicks: [t, ...]
+function cursorAt(C, t, path, clicks, vis) {
+  const c = C.cur;
+  show(c, t >= vis[0] && t < vis[1]);
+  let x = path[0][1], y = path[0][2];
+  for (let i = 1; i < path.length; i++) {
+    if (t >= path[i - 1][0]) { const p = E.inOutCubic(P(t, path[i - 1][0], path[i][0])); x = lerp(path[i - 1][1], path[i][1], p); y = lerp(path[i - 1][2], path[i][2], p); }
+  }
+  let press = 0, pl = -1;
+  for (const tc of clicks) { if (t >= tc - 0.06 && t < tc + 0.12) press = 1 - Math.abs(t - tc) / 0.12; if (t >= tc && t < tc + 0.45) pl = (t - tc) / 0.45; }
+  const k = 1.45 / C.s;
+  c.style.opacity = clamp(P(t, vis[0], vis[0] + 0.12)) * (1 - P(t, vis[1] - 0.12, vis[1]));
+  c.style.transform = `translate(${x}px, ${y}px) scale(${k * (1 - 0.18 * clamp(press))})`;
+  show(C.pls, pl >= 0);
+  if (pl >= 0) {
+    const r = lerp(4, 46, E.outCubic(pl)) * k;
+    C.pls.style.left = `${x}px`; C.pls.style.top = `${y}px`;
+    C.pls.style.width = C.pls.style.height = `${r * 2}px`; C.pls.style.margin = `${-r}px 0 0 ${-r}px`;
+    C.pls.style.opacity = 1 - pl; C.pls.style.borderWidth = `${3 * k}px`;
+  }
+}
+// highlight ring in screenshot px; grows in, then breathes
+function ringAt(r, t, t0, x, y, w, h, k) {
+  const p = E.outBack(P(t, t0, t0 + 0.25));
+  show(r, t >= t0);
+  if (t < t0) return;
+  r.style.left = `${x}px`; r.style.top = `${y}px`; r.style.width = `${w}px`; r.style.height = `${h}px`;
+  r.style.opacity = clamp(p * 2);
+  r.style.transform = `scale(${lerp(1.25, 1, p)})`;
+  const g = 0.5 + 0.5 * Math.sin((t - t0) * 12);
+  r.style.borderWidth = `${3 * k}px`;
+  r.style.boxShadow = `0 0 ${(14 + 12 * g) * k}px rgba(255,140,40,${0.55 + 0.3 * g}), inset 0 0 ${12 * k}px rgba(255,140,40,0.3)`;
+}
+
+/* =========================================================================
+   Scenes
+   ========================================================================= */
+const HEADS = [
+  { h: 'Notebooks.', s: 'SQL, Python and text cells in one place.' },
+  { h: 'pip install.', s: 'Packages stay inside that notebook.' },
+  { h: 'SQL in…', s: 'Query your database. Get a DataFrame.' },
+  { h: '…Python out.', s: 'pandas + matplotlib, right next to your SQL.', grad: true },
+  { h: 'Just ask.', s: 'The AI writes the next cell, then runs it.' },
+  { h: 'Bring your .ipynb', s: 'Import Jupyter notebooks in one click.' },
+];
+const RAIL = ['new', 'pip', 'sql', 'py', 'ai', 'ipynb'];
+const C = [];
+
+function buildScenes() {
+  $('#heads').innerHTML = HEADS.map((d, i) => `<div class="head"><div class="in mono">In [${i + 1}]:</div>
+    <div class="hl h">${d.grad ? `<span class="grad">${d.h}</span>` : d.h}</div><div class="s">${d.s}</div></div>`).join('');
+  $('#ghosts').innerHTML = '<div class="ghost"></div><div class="ghost"></div>';
+  $('#rail').innerHTML = RAIL.map((r, i) => `<div class="rc"><b>[${i + 1}]</b>${r}</div>`).join('');
+
+  // 1. create the notebook: name types itself, Create lights up, click
+  const c1 = makeCard({ a: '01a-new-notebook-blank.png', b: '01b-new-notebook-filled.png', n: '01b-new-notebook-filled.png' });
+  cursor(c1);
+  C.push(c1);
+
+  // 2. pip: type packages, Install, Installing..., installed + toast
+  const c2 = makeCard({ a: '02a-packages-pip.png', b: '02b-packages-installing.png', c: '02c-packages-installed.png' });
+  typing(c2, 'ty', [[633, 772, 294, 26]], 'rgb(73,73,74)', 8.6);
+  cursor(c2);
+  C.push(c2);
+
+  // 3. SQL cell: empty -> query types -> Run -> running -> DataFrame
+  const c3 = makeCard({ e: '01c-empty-notebook.png', b: '03b-sql-to-dataframe.png', r: '03a-sql-running.png' });
+  typing(c3, 'ty', [[550, 968, 297, 22], [613, 871, 322, 22], [550, 647, 347, 22], [550, 779, 372, 22], [550, 639, 397, 22], [550, 639, 422, 22]], 'rgb(37,37,38)', 8.9);
+  c3.out = mask(c3, 'rgb(37,37,38)');
+  cursor(c3);
+  C.push(c3);
+
+  // 4. Code cell: empty -> code types -> Run -> chart draws itself
+  const c4 = makeCard({ e: '04a-code-empty.png', b: '04b-python-chart.png' });
+  typing(c4, 'ty', [[550, 826, 248, 22], [550, 790, 298, 22], [550, 977, 323, 22], [550, 799, 348, 22], [550, 754, 373, 22], [550, 638, 398, 22]], 'rgb(37,37,38)', 8.9);
+  c4.out = mask(c4, 'rgb(37,37,38)');
+  c4.plot = mask(c4, '#fff');
+  c4.lab = mask(c4, '#fff');
+  c4.peak = el('div', 'pulse'); c4.fx.appendChild(c4.peak);
+  cursor(c4);
+  C.push(c4);
+
+  // 5. AI: prompt types, sends, three green checks, answer; then the new cell in the notebook
+  const c5 = makeCard({ a: '05a-ai-prompt.png', b: '05b-ai-result.png' });
+  typing(c5, 'ty', [[1535, 1858, 938, 24], [1536, 1593, 962, 22]], 'rgb(37,37,38)', 7.6);
+  c5.rows = [[204, 28], [232, 28], [260, 28], [290, 70], [366, 146]].map(() => mask(c5, 'rgb(37,37,38)'));
+  c5.code = mask(c5, 'rgb(37,37,38)');
+  c5.tbl = mask(c5, 'rgb(37,37,38)');
+  C.push(c5);
+
+  // 6. import: + menu opens, the .ipynb item gets the ring
+  const c6 = makeCard({ b: '05b-ai-result.png', m: '06-import-ipynb.png' });
+  c6.ring = el('div', 'ring'); c6.fx.appendChild(c6.ring);
+  cursor(c6);
+  C.push(c6);
+
+  // callouts that sit over the cards
+  $('#overs').innerHTML = `
+    <img id="toast" src="assets/toast.png" alt="">
+    <div id="df"><div id="df-chip" class="mono">df  →  pandas DataFrame</div><div id="df-box"><img src="assets/df-table.png" alt=""></div></div>
+    <div id="st-peak" class="sticker">${I.py}<span>charts, right in the cell</span></div>
+    <div id="st-ai" class="sticker">${I.check}<span>written + run by AI</span></div>
+    <div id="st-ipynb" class="sticker">${I.file}<span>.ipynb</span></div>`;
+  $('#st-ai svg').style.color = '#2fa84f';
+}
+
+// card i: rises in as a new cell, the previous one gets pushed up into the stack
+function placeCard(i, t) {
+  const C0 = C[i], t0 = SCN[i], t1 = SCN[i + 1];
+  const vis = t >= t0 - 0.01 && t < t1 + 0.36;
+  show(C0.card, vis);
+  if (!vis) return false;
+  const p = E.outExpo(P(t, t0, t0 + 0.42)), q = E.inCubic(P(t, t1, t1 + 0.36));
+  const y = lerp(980, 0, p) + lerp(0, -330, q);
+  const sc = lerp(0.9, 1, p) * lerp(1, 0.86, q);
+  C0.card.style.transform = `translateY(${y}px) scale(${sc})`;
+  C0.card.style.opacity = 1 - q;
+  C0.card.style.filter = q > 0.02 ? `blur(${(10 * q).toFixed(1)}px) brightness(${1 - 0.5 * q})` : 'none';
+  C0.card.style.zIndex = 10 + i;
+  $('.glare', C0.card).style.backgroundPosition = `${lerp(120, -20, E.inOutCubic(P(t, t0 + 0.3, t0 + 1.0)))}% 0`;
+  return true;
+}
+
+function renderScenes(t) {
+  // headings
+  $$('#heads .head').forEach((h, i) => {
+    const t0 = SCN[i], t1 = SCN[i + 1];
+    const vis = t >= t0 && t < t1 + 0.25;
+    show(h, vis);
+    if (!vis) return;
+    const q = P(t, t1, t1 + 0.25);
+    const ip = E.outBack(P(t, t0, t0 + 0.22));
+    const inn = $('.in', h), hh = $('.h', h), ss = $('.s', h);
+    inn.style.opacity = clamp(ip * 2) * (1 - q); inn.style.transform = `translateY(${(1 - ip) * 20 - 60 * q}px)`;
+    slam(hh, t, t0 + 0.06, 1.9, 0.26);
+    hh.style.opacity *= 1 - q; hh.style.transform += ` translateY(${-80 * q}px)`;
+    const sp = E.outCubic(P(t, t0 + 0.18, t0 + 0.45));
+    ss.style.opacity = sp * (1 - q); ss.style.transform = `translateY(${(1 - sp) * 24 - 60 * q}px)`;
+  });
+  // ghost stack behind the live card: one more cell each scene
+  const sIdx = SCN.findIndex((s, i) => t >= s && t < (SCN[i + 1] ?? 99));
+  const gs = $$('#ghosts .ghost');
+  const gOn = t >= SCN[0] + 0.3 && t < SCN[6] + 0.3;
+  show($('#ghosts'), gOn);
+  gs.forEach((g, k) => {
+    const n = clamp(sIdx, 0, 2);
+    const on = k < n;
+    g.style.opacity = on ? [0.55, 0.3][k] * (1 - P(t, SCN[6], SCN[6] + 0.3)) : 0;
+    g.style.transform = `translateY(${-(k + 1) * 22}px) scale(${1 - (k + 1) * 0.04})`;
+  });
+  // rail
+  const railOn = t >= SCN[0] && t < SCN[6] + 0.4;
+  show($('#rail'), railOn);
+  if (railOn) {
+    $('#rail').style.opacity = E.outCubic(P(t, SCN[0], SCN[0] + 0.4)) * (1 - P(t, SCN[6], SCN[6] + 0.4));
+    $('#rail').style.transform = `translateY(${(1 - E.outCubic(P(t, SCN[0], SCN[0] + 0.4))) * 60}px)`;
+    $$('#rail .rc').forEach((r, i) => {
+      const cur = t >= SCN[i] && t < SCN[i + 1], done = t >= SCN[i + 1];
+      const hit = E.outBack(P(t, SCN[i], SCN[i] + 0.25));
+      r.style.borderColor = cur ? '#ff9d3b' : done ? 'rgba(255,157,59,0.4)' : 'rgba(255,255,255,0.14)';
+      r.style.background = cur ? 'rgba(255,116,22,0.22)' : done ? 'rgba(255,116,22,0.08)' : 'rgba(255,255,255,0.03)';
+      r.style.color = cur ? '#ffe2c6' : done ? '#ffb46b' : '#5f6878';
+      r.style.transform = cur ? `scale(${lerp(1.25, 1.06, hit)})` : 'scale(1)';
+    });
+  }
+
+  if (placeCard(0, t)) s1(C[0], t);
+  if (placeCard(1, t)) s2(C[1], t);
+  if (placeCard(2, t)) s3(C[2], t);
+  if (placeCard(3, t)) s4(C[3], t);
+  if (placeCard(4, t)) s5(C[4], t);
+  if (placeCard(5, t)) s6(C[5], t);
+  overs(t);
+}
+
+/* ---------- 1 (2.0 - 4.0) ---------- */
+function s1(c, t) {
+  cam(c, ...camAt([[2.0, 960, 560, 1.22], [3.0, 960, 530, 1.28], [3.3, 962, 590, 1.28], [4.2, 966, 600, 1.3]], t));
+  const done = t >= 3.05;
+  only(c, done ? 'b' : 'a');
+  show(c.L.n, !done);
+  const r = Math.floor(P(t, 2.35, 3.05) * 134 / 8.3) * 8.3;
+  clipTo(c.L.n, 628, 430, 633 + r, 458);
+  cursorAt(c, t, [[3.05, 1120, 690], [3.42, 1282, 756]], [3.5], [3.05, 4.4]);
+}
+
+/* ---------- 2 (4.0 - 6.5) ---------- */
+function s2(c, t) {
+  cam(c, ...camAt([[4.0, 960, 470, 1.24], [4.9, 980, 420, 1.36], [5.25, 960, 520, 1.26], [6.7, 960, 560, 1.32]], t));
+  only(c, t < 5.0 ? 'a' : t < 5.5 ? 'b' : 'c');
+  typeAt(c, 'ty', t < 5.0 ? t : 99, 4.3, 4.82, t < 5.0);
+  cursorAt(c, t, [[4.82, 1140, 380], [4.96, 1264, 300]], [5.0], [4.82, 5.4]);
+}
+
+/* ---------- 3 (6.5 - 10.0) ---------- */
+function s3(c, t) {
+  cam(c, ...camAt([[6.5, 812, 400, 1.42], [7.0, 812, 380, 1.45], [8.4, 800, 360, 1.5], [8.9, 812, 470, 1.4], [10.4, 812, 520, 1.36]], t));
+  only(c, t < 7.0 ? 'e' : t >= 8.5 && t < 9.0 ? 'r' : 'b');
+  typeAt(c, 'ty', t, 7.0, 8.25, t < 8.5, t >= 7.0);
+  rect(c.out, 470, 468, 1420, t >= 7.0 && t < 9.0 ? 600 : 0);
+  cursorAt(c, t, [[8.2, 700, 330], [8.42, 592, 262]], [8.5], [8.2, 8.95]);
+}
+
+/* ---------- 4 (10.0 - 13.5) ---------- */
+function s4(c, t) {
+  cam(c, ...camAt([[10.0, 812, 690, 1.42], [10.5, 812, 330, 1.45], [11.6, 800, 320, 1.5], [12.0, 1112, 610, 0.9], [13.0, 1130, 600, 0.93], [13.9, 1150, 580, 0.98]], t));
+  only(c, t < 10.5 ? 'e' : 'b');
+  typeAt(c, 'ty', t, 10.5, 11.35, t < 11.6, t >= 10.5);
+  rect(c.out, 541, 448, 1116, t >= 10.5 && t < 12.0 ? 512 : 0);
+  // the chart draws itself left -> right inside the axes, ticks follow
+  const wx = lerp(668, 1637, P(t, 12.0, 12.9));
+  const ran = t >= 12.0;
+  rect(c.plot, wx, 488, ran ? 1637 - wx : 0, 385);
+  rect(c.lab, wx - 20, 875, ran ? 1652 - (wx - 20) : 0, 84);
+  const pk = P(t, 12.5, 13.1), pe = c.peak;
+  show(pe, t >= 12.5);
+  if (t >= 12.5) {
+    const r = lerp(8, 70, E.outCubic(pk));
+    pe.style.left = '1194px'; pe.style.top = '500px'; pe.style.width = pe.style.height = `${r * 2}px`; pe.style.margin = `${-r}px 0 0 ${-r}px`;
+    pe.style.opacity = 1 - pk; pe.style.borderWidth = '5px'; pe.style.borderColor = '#ff7416';
+  }
+  cursorAt(c, t, [[11.3, 700, 280], [11.44, 592, 212]], [11.5], [11.3, 11.95]);
+}
+
+/* ---------- 5 (13.5 - 17.5) ---------- */
+function s5(c, t) {
+  cam(c, ...camAt([[13.5, 1614, 712, 1.6], [14.6, 1650, 760, 1.66], [15.0, 1675, 330, 2.0], [16.2, 1675, 350, 2.0], [16.6, 905, 560, 1.25], [17.9, 905, 600, 1.3]], t));
+  only(c, t < 15.0 ? 'a' : 'b');
+  const res = t >= 15.0;   // 05b on screen
+  typeAt(c, 'ty', t, 13.8, 14.6, t < 14.9, !res);
+  // chat: the three tool steps tick in, then the answer and the table
+  const rows = [[204, 28, 15.0], [232, 28, 15.25], [260, 28, 15.5], [290, 70, 15.75], [366, 146, 15.9]];
+  rows.forEach(([y, h, tr], k) => {
+    const w = 380 * (1 - E.outCubic(P(t, tr, tr + 0.14)));
+    rect(c.rows[k], 1525 + 380 - w, y, res ? w : 0, h);
+  });
+  // notebook: the new cell's code then its table appear as the camera arrives
+  const cl = Math.floor(P(t, 16.45, 16.95) * 13);
+  rect(c.code, 545, 283 + cl * 25, 420, res && t < 16.95 ? 603 - (283 + cl * 25) : 0);
+  const tr = Math.floor(P(t, 17.0, 17.25) * 5);
+  rect(c.tbl, 578, 767 + tr * 27.5, 872, res && t < 17.25 ? 905 - (767 + tr * 27.5) : 0);
+}
+
+/* ---------- 6 (17.5 - 19.5) ---------- */
+function s6(c, t) {
+  cam(c, ...camAt([[17.5, 430, 320, 1.4], [18.0, 440, 300, 1.42], [19.8, 470, 290, 1.5]], t));
+  show(c.L.b, true);
+  // the menu grows out of the + button, like the app's own menu animation
+  const mp = E.outCubic(P(t, 18.0, 18.16));
+  show(c.L.m, t >= 18.0);
+  if (t >= 18.0) {
+    clipTo(c.L.m, 385, 215, lerp(420, 762, mp), lerp(232, 392, mp));
+    c.L.m.style.opacity = clamp(mp * 1.6);
+  }
+  ringAt(c.ring, t, 18.5, 404, 324, 334, 36, 1.4 / c.s);
+  cursorAt(c, t, [[17.6, 330, 300], [17.9, 416, 210], [18.2, 416, 210], [18.45, 600, 342]], [18.0], [17.6, 19.6]);
+}
+
+/* ---------- callouts over the cards ---------- */
+function overs(t) {
+  // toast: pops out of the card at "installed"
+  const tp = E.outBack(P(t, 5.5, 5.75)), tq = P(t, 6.5, 6.7);
+  const toast = $('#toast');
+  show(toast, t >= 5.5 && t < 6.7);
+  toast.style.opacity = clamp(tp * 2) * (1 - tq);
+  toast.style.transform = `translate(${330 - 20 * (1 - tp)}px, ${1300 + (1 - tp) * 60 - 200 * tq}px) rotate(${(1 - tp) * 4 - 1.5}deg) scale(${lerp(0.6, 1, tp)})`;
+
+  // DataFrame callout: rows drop in one by one
+  const df = $('#df');
+  const dp = E.outBack(P(t, 9.0, 9.28)), dq = E.inCubic(P(t, 10.0, 10.3));
+  show(df, t >= 9.0 && t < 10.3);
+  df.style.opacity = clamp(dp * 2) * (1 - dq);
+  df.style.transform = `translateY(${(1 - dp) * 80 - 330 * dq}px) scale(${lerp(0.7, 1, dp) * lerp(1, 0.86, dq)}) rotate(${(1 - dp) * -3}deg)`;
+  // the box grows one row at a time (rows are 27.5 px in the 333 px tall source, shown at 788 px wide)
+  const rows = Math.floor(P(t, 9.05, 9.6) * 10);
+  $('#df-box').style.height = `${Math.min(333, 56 + rows * 27.5 + 2) * (788 / 453) + 4}px`;
+
+  sticker($('#st-peak'), t, 12.55, 13.5, 560, 1438, -4);
+  sticker($('#st-ai'), t, 16.0, 17.5, 540, 1438, 3);
+  sticker($('#st-ipynb'), t, 18.55, 19.5, 640, 1180, -5);
+}
+function sticker(e, t, t0, t1, x, y, rot) {
+  const kp = E.outBack(P(t, t0, t0 + 0.25)), q = P(t, t1, t1 + 0.3);
+  show(e, t >= t0 && t < t1 + 0.3);
+  e.style.opacity = clamp(kp * 3) * (1 - q);
+  e.style.transform = `translate(${x}px, ${y - 300 * E.inCubic(q)}px) translate(-50%, -50%) rotate(${rot + (1 - kp) * 14}deg) scale(${lerp(0.3, 1, kp)})`;
+}
+
+/* =========================================================================
+   Hook (0 - 2): a notebook cell types `import pandas as pd`, runs, headline
+   ========================================================================= */
+const HK = 'import pandas as pd';
+function buildHook() {
+  $('#hk1').innerHTML = words('Your notebook');
+  $('#hk2').innerHTML = words('just learned');
+}
+function renderHook(t) {
+  const on = t < 2.3; show($('#hook'), on); if (!on) return;
+  const n = Math.floor(P(t, 0.12, 0.85) * HK.length);
+  const typed = HK.slice(0, n);
+  const hi = typed.replace(/^(import)/, '<span class="k">$1</span>').replace(/ (as)( |$)/, ' <span class="k">$1</span>$2');
+  $('#hk-code').innerHTML = `${hi}<span class="caret" style="opacity:${t < 0.85 ? 1 : blink(t)}"></span>`;
+  $('#hk-in').textContent = t < 1.0 ? 'In [ ]:' : t < 1.12 ? 'In [*]:' : 'In [1]:';
+  $('#hk-in').style.color = t >= 1.12 ? '#ff9d3b' : '#5f6878';
+  const ce = E.outBack(P(t, 0, 0.3));
+  const cell = $('#hk-cell');
+  const out = E.inCubic(P(t, 2.0, 2.3));
+  cell.style.transform = `translateY(${(1 - ce) * 120 + 600 * out}px) scale(${lerp(0.9, 1, ce)})`;
+  cell.style.opacity = clamp(ce * 2) * (1 - out);
+  $$('#hk1 .w').forEach((w, i) => slam(w, t, 1.0 + i * 0.12, 1.8, 0.2));
+  $$('#hk2 .w').forEach((w, i) => slam(w, t, 1.25 + i * 0.12, 1.8, 0.2));
+  slam($('#hk3 .w'), t, 1.5, 3.0, 0.3);
+  if (t > 1.8) $('#hk3 .w').style.transform += ` translateY(${Math.sin((t - 1.8) * 6) * -6}px)`;
+  for (const id of ['#hk1', '#hk2', '#hk3']) {
+    $(id).style.opacity = 1 - out;
+    $(id).style.transform = `translateY(${-500 * out}px)`;
+  }
+}
+
+/* =========================================================================
+   End card (19.5 - 22)
+   ========================================================================= */
+let LE;
+const PILLS = [[I.py, 'SQL + Python + AI'], [I.open, 'Free & open source']];
+function buildEnd() {
+  $('#e2').innerHTML = words('SQL. Python. Text.');
+  $('#e3').innerHTML = `<span class="w grad">Notebooks.</span>`;
+  $('#e-icon').innerHTML = logoSVG('b');
+  LE = logoParts($('#e-icon'));
+  $('#e-pills').innerHTML = PILLS.map(([ic, s]) => `<div class="pill">${ic}<span>${s}</span></div>`).join('');
+  $('#e-url').innerHTML = `${I.github}github.com/rosettadb/dbt-studio`;
+}
+function renderEnd(t) {
+  const on = t >= SCN[6]; show($('#end'), on); if (!on) return;
+  const t0 = SCN[6];
+  $$('#e2 .w').forEach((w, i) => slam(w, t, t0 + 0.1 + i * 0.125, 1.8, 0.22));
+  slam($('#e3 .w'), t, 20.0, 2.6, 0.3);
+  if (t > 20.3) $('#e3 .w').style.transform += ` translateY(${Math.sin((t - 20.3) * 3.2) * -6}px)`;
+  const tl = 20.25;
+  const ip = E.outBack(P(t, tl, tl + 0.4));
+  $('#e-icon').style.transform = `scale(${lerp(0.4, 1, ip)}) translateY(${Math.sin((t - tl) * 2.2) * 4}px)`;
+  $('#e-icon').style.opacity = clamp(ip * 2);
+  animLogo(LE, t, tl);
+  const np = E.outCubic(P(t, tl + 0.18, tl + 0.55));
+  $('#e-name').style.transform = `translateY(${(1 - np) * 50}px)`; $('#e-name').style.opacity = np;
+  $$('#e-pills .pill').forEach((p, i) => {
+    const q = E.outBack(P(t, tl + 0.5 + i * 0.12, tl + 0.82 + i * 0.12));
+    p.style.transform = `translateY(${(1 - q) * 30}px) scale(${lerp(0.7, 1, q)})`; p.style.opacity = clamp(q * 1.5);
+  });
+  const up = E.outCubic(P(t, tl + 0.85, tl + 1.15));
+  $('#e-url').style.transform = `translateY(${(1 - up) * 20}px)`; $('#e-url').style.opacity = up;
+  const sh = E.inOutCubic(P(t, 21.0, 21.6));
+  $('#shine').style.backgroundPosition = `${lerp(100, 0, sh)}% 0`;
+}
+
+/* =========================================================================
+   Background, camera shake, flashes, RGB glitch
+   ========================================================================= */
+const HITS = [[1.5, 14, 0.3], [2.0, 8, 0.2], [4.0, 6, 0.18], [6.5, 6, 0.18], [10.0, 6, 0.18], [12.0, 16, 0.32], [13.5, 10, 0.22], [17.5, 6, 0.18], [19.5, 8, 0.2], [20.0, 16, 0.32]];
+const GLITCH = [[1.5, 12], [2.0, 10], [12.0, 14], [13.5, 10], [20.0, 12]];
+const FLASH = [[1.5, '255,170,90', 0.45, 0.18], [12.0, '255,245,230', 0.5, 0.14], [20.0, '255,170,90', 0.5, 0.25]];
+
+function renderBG(t) {
+  $('#dots').style.transform = `translateY(${-(t * 26) % 40}px)`;
+  const g = (id, x, y, o) => { const e = $(id); e.style.transform = `translate(${x - e.offsetWidth / 2}px, ${y - e.offsetHeight / 2}px)`; e.style.opacity = o; };
+  g('#glowA', 540 + Math.sin(t * 0.6) * 140, 1000 + Math.cos(t * 0.5) * 160, 1);
+  g('#glowB', 320 + Math.sin(t * 0.45 + 1) * 90, 380 + Math.cos(t * 0.55) * 90, 1);
+}
+
+function renderFX(t) {
+  let amp = 0, sx = 0, sy = 0, sr = 0;
+  for (const [th, a, d] of HITS) {
+    if (t < th || t > th + d * 5) continue;
+    const k = a * Math.exp(-(t - th) / d);
+    amp += k;
+    sx += k * Math.sin((t - th) * 83 + th); sy += k * Math.cos((t - th) * 71 + th * 2); sr += k * 0.03 * Math.sin((t - th) * 57);
+  }
+  $('#scene').style.transform = `translate(${sx}px, ${sy}px) rotate(${sr}deg) scale(${1 + amp / 400})`;
+  let gl = 0;
+  for (const [tg, a] of GLITCH) if (t >= tg && t < tg + 0.3) gl += a * Math.exp(-(t - tg) / 0.07);
+  if (gl > 0.6) {
+    $('#rOff').setAttribute('dx', gl.toFixed(1)); $('#bOff').setAttribute('dx', (-gl).toFixed(1));
+    $('#rOff').setAttribute('dy', (gl * 0.3).toFixed(1)); $('#bOff').setAttribute('dy', (-gl * 0.3).toFixed(1));
+    $('#scene').style.filter = 'url(#rgb)';
+  } else $('#scene').style.filter = 'none';
+  let fo = 0, fc = '255,255,255';
+  for (const [tf, c, a, d] of FLASH) {
+    if (t < tf || t > tf + d * 6) continue;
+    const v = a * Math.exp(-(t - tf) / d);
+    if (v > fo) { fo = v; fc = c; }
+  }
+  $('#flash').style.background = `rgb(${fc})`;
+  $('#flash').style.opacity = fo;
+}
+
+/* =========================================================================
+   Frame
+   ========================================================================= */
+function render(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  renderBG(t);
+  renderHook(t);
+  renderScenes(t);
+  renderEnd(t);
+  renderFX(t);
+}
+
+buildHook(); buildScenes(); buildEnd();
+
+const capture = new URLSearchParams(location.search).has('capture');
+window.seek = (t) => render(t);
+window.DURATION = DURATION;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  render(0);
+  return true;
+})();
+
+if (!capture) {
+  const stage = $('#stage');
+  const fit = () => {
+    const s = Math.min(innerWidth / W, innerHeight / H);
+    stage.style.transform = `translate(${(innerWidth - W * s) / 2}px, ${(innerHeight - H * s) / 2}px) scale(${s})`;
+  };
+  addEventListener('resize', fit); fit();
+  let playing = true, tNow = 0, last = null;
+  const ctl = $('#ctl');
+  const loop = (ms) => {
+    if (last != null && playing) tNow = (tNow + (ms - last) / 1000) % DURATION;
+    last = ms;
+    render(tNow);
+    ctl.textContent = `${tNow.toFixed(2)}s / ${DURATION}s   space: pause · ←/→: scrub`;
+    requestAnimationFrame(loop);
+  };
+  window.ready.then(() => requestAnimationFrame(loop));
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { playing = !playing; e.preventDefault(); }
+    if (e.code === 'ArrowRight') tNow = Math.min(DURATION - 0.01, tNow + (e.shiftKey ? 1 : 0.1));
+    if (e.code === 'ArrowLeft') tNow = Math.max(0, tNow - (e.shiftKey ? 1 : 0.1));
+  });
+} else {
+  $('#ctl').remove();
+}
+</script>
+</body>
+</html>
