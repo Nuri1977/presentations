@@ -1,0 +1,8 @@
+{
+  "name": "expectation-vs-reality-20sec",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "playwright-core": "1.48.2"
+  }
+}

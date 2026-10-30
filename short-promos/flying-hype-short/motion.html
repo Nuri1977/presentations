@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Data Can Fly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05070b;
+    --line: rgba(255, 255, 255, 0.08);
+    --line2: rgba(255, 255, 255, 0.14);
+    --text: #f4f6fa;
+    --muted: #a3acbb;
+    --dim: #5f6878;
+    --o: #ff7416;
+    --o2: #ff9d3b;
+    --blue: #62b8ff;
+    --green: #5fd47a;
+    --red: #ff4b40;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+  #stage {
+    position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+    background: #000; color: var(--text); transform-origin: 0 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #scene { position: absolute; inset: 0; transform-origin: 540px 960px; }
+  .layer { position: absolute; inset: 0; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
+  .grad {
+    background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .w { display: inline-block; margin: 0 0.035em; }
+  .hl { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; letter-spacing: -0.045em; line-height: 1; white-space: nowrap; }
+
+  /* ---------- background ---------- */
+  #bg { background: radial-gradient(ellipse 120% 60% at 50% 100%, #0e1426 0%, #070a12 55%, #05070b 100%); }
+  #tintRed { background: radial-gradient(ellipse 130% 55% at 50% 100%, rgba(255,45,30,0.34), rgba(120,12,10,0.16) 55%, rgba(30,0,0,0.1) 100%); }
+  #tintBlue { background: linear-gradient(180deg, #04060f 0%, #081230 50%, #160c22 100%); }
+  .glow { position: absolute; left: 0; top: 0; border-radius: 50%; pointer-events: none; }
+  #glowA { width: 1400px; height: 1400px; background: radial-gradient(circle, rgba(255,116,22,0.24), rgba(255,116,22,0) 62%); }
+  #glowB { width: 1300px; height: 1300px; background: radial-gradient(circle, rgba(84,171,255,0.16), rgba(84,171,255,0) 62%); }
+
+  /* ---------- 1. hook: cars can fly now ---------- */
+  #pill {
+    position: absolute; top: 196px; left: 540px; height: 66px; padding: 0 28px; border-radius: 999px;
+    display: flex; align-items: center; gap: 14px; white-space: nowrap;
+    background: rgba(255,59,48,0.14); border: 2px solid rgba(255,90,80,0.6);
+    color: #ffd9d6; font-size: 28px; font-weight: 800; letter-spacing: 0.16em;
+  }
+  #pill i { width: 15px; height: 15px; border-radius: 50%; background: #ff3b30; box-shadow: 0 0 16px #ff3b30; display: block; }
+  #h1 { top: 310px; font-size: 150px; }
+  #h2 { top: 478px; font-size: 176px; }
+  #car, #car2 { position: absolute; left: 0; top: 0; width: 300px; height: 100px; transform-origin: 150px 100px; }
+  #car svg, #car2 svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  .spokes { transform-box: fill-box; transform-origin: center; }
+
+  /* ---------- 2. stuck ---------- */
+  #st-top { top: 236px; font-size: 92px; }
+  .chip {
+    position: absolute; left: 0; top: 0; max-width: 900px;
+    background: rgba(20, 23, 30, 0.96); border: 1.5px solid rgba(255,90,80,0.45); border-radius: 16px;
+    box-shadow: 0 26px 60px rgba(0,0,0,0.6), 0 0 34px rgba(255,59,48,0.16); overflow: hidden;
+  }
+  .chip-bar { height: 50px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--line); }
+  .chip-bar i { width: 14px; height: 14px; border-radius: 50%; background: #3a404c; display: block; }
+  .chip-bar i:first-child { background: #ff5f57; }
+  .chip-bar span { margin-left: 10px; font-size: 26px; color: var(--muted); font-weight: 700; font-family: Inter, sans-serif; }
+  .chip-body { padding: 16px 26px 18px; font-size: 33px; line-height: 1.5; color: #dfe4ec; white-space: pre; }
+  .chip-body .ps { color: var(--o2); }
+  .chip-body .err { color: var(--red); font-weight: 700; }
+  .chip-body .dim { color: var(--dim); }
+  #st-big {
+    top: 1318px; font-size: 230px; letter-spacing: -0.05em;
+    background: linear-gradient(180deg, #ff9a8c 0%, #ff3b30 55%, #b3140c 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 40px rgba(255,59,48,0.45));
+  }
+  #core { position: absolute; left: 540px; top: 900px; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,240,220,1) 0%, rgba(255,140,40,0.9) 16%, rgba(255,116,22,0.35) 38%, rgba(255,116,22,0) 68%); }
+
+  /* ---------- 3. lift-off ---------- */
+  #lf-ring { position: absolute; left: 540px; top: 780px; width: 420px; height: 420px; margin: -210px 0 0 -210px; border-radius: 50%; border: 6px solid var(--o2); }
+  .ray { position: absolute; left: 540px; top: 780px; width: 300px; height: 5px; margin-top: -2.5px; transform-origin: 0 50%; border-radius: 4px;
+    background: linear-gradient(90deg, rgba(255,157,59,0), #ffb054 60%, #fff); }
+  #lf-top { top: 352px; font-size: 52px; font-weight: 800; letter-spacing: 0.24em; color: #ffc08a; }
+  #lf-icon { position: absolute; left: 369px; top: 560px; width: 400px; height: 400px; }
+  .logo-svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 26px 60px rgba(255,116,22,0.35)); }
+  .logo-svg g, .logo-svg path { transform-box: fill-box; transform-origin: center; }
+  #lf-name { position: absolute; left: 0; right: 0; top: 1000px; text-align: center; }
+  .ros { font-size: 46px; font-weight: 700; letter-spacing: 0.34em; color: #ffc08a; margin-left: 0.34em; }
+  .nm { font-size: 150px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-top: 10px; white-space: nowrap; }
+  .tg { font-size: 34px; font-weight: 500; color: var(--muted); margin-top: 26px; }
+
+  /* ---------- 4. flyover ---------- */
+  .fw { top: 244px; font-size: 176px; letter-spacing: -0.05em; }
+  .fs { top: 452px; font-size: 42px; font-weight: 600; letter-spacing: -0.01em; color: #c9d0dc; }
+  #cards { position: absolute; inset: 0; perspective: 1800px; perspective-origin: 540px 1000px; }
+  .card {
+    position: absolute; left: 50px; top: 616px; width: 980px; height: 824px; border-radius: 28px; overflow: hidden;
+    background: #0d0f14; border: 2px solid rgba(255,157,59,0.5);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.65), 0 0 70px rgba(255,116,22,0.22);
+  }
+  .card .bar { position: absolute; left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; padding: 0 18px; background: #0b0d12; border-bottom: 1px solid var(--line); }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .dots i:nth-child(1) { background: #ff5f57; } .dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
+  .card .tab { margin-left: 22px; font-size: 18px; font-weight: 700; color: #e7ebf2; display: flex; align-items: center; gap: 9px; }
+  .card .tab svg { width: 18px; height: 18px; color: var(--o2); }
+  .card .brand { margin-left: auto; font-size: 15px; font-weight: 700; color: var(--dim); }
+  .card img { position: absolute; left: 0; top: 44px; width: 980px; height: 780px; display: block; }
+  .card .glare { position: absolute; inset: 0; background: linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0) 62%); background-size: 300% 100%; }
+  .card .ring { position: absolute; border: 4px solid #ffa34a; border-radius: 14px; }
+  .sticker {
+    position: absolute; left: 0; top: 0; background: #fff; color: #0a0a0a; font-weight: 900; border-radius: 18px;
+    padding: 14px 26px; box-shadow: 0 18px 44px rgba(0,0,0,0.5); white-space: nowrap; display: flex; align-items: center; gap: 12px;
+    letter-spacing: -0.02em;
+  }
+  .sticker svg { width: 36px; height: 36px; }
+  .fst { font-size: 42px; }
+  #hud { position: absolute; left: 0; right: 0; top: 1508px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  #hud-prog { display: flex; gap: 12px; }
+  #hud-prog div { width: 96px; height: 7px; border-radius: 4px; background: rgba(255,255,255,0.14); overflow: hidden; }
+  #hud-prog div i { display: block; height: 100%; width: 0; background: var(--o); }
+  #hud-alt { font-size: 30px; font-weight: 700; color: #ffc08a; letter-spacing: 0.1em; display: flex; align-items: center; gap: 12px; }
+  #hud-alt svg { width: 26px; height: 26px; }
+
+  /* ---------- 5. end card ---------- */
+  #e1 { top: 300px; font-size: 80px; color: #c9d0dc; letter-spacing: -0.03em; }
+  #e2 { top: 412px; font-size: 124px; }
+  #e3 { top: 536px; font-size: 270px; letter-spacing: -0.055em; filter: drop-shadow(0 0 50px rgba(255,116,22,0.35)); }
+  #e-icon { position: absolute; left: 432px; top: 872px; width: 220px; height: 220px; }
+  #e-name { position: absolute; left: 0; right: 0; top: 1118px; text-align: center; }
+  #e-name .nm { font-size: 128px; }
+  .shine {
+    background: linear-gradient(100deg, #ff7317 0%, #ffb054 40%, #fff3e0 50%, #ffb054 60%, #df4c08 100%);
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #e-pills { position: absolute; left: 0; right: 0; top: 1370px; display: flex; justify-content: center; gap: 16px; }
+  .pill { display: inline-flex; align-items: center; gap: 12px; height: 62px; padding: 0 26px; border-radius: 999px; font-size: 27px; font-weight: 700; background: rgba(255,255,255,0.06); border: 1.5px solid var(--line2); color: #e7ebf2; }
+  .pill svg { width: 24px; height: 24px; color: var(--o2); }
+  #e-url { position: absolute; left: 0; right: 0; top: 1470px; display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 32px; font-weight: 500; color: #ffc08a; }
+  #e-url svg { width: 32px; height: 32px; }
+
+  /* ---------- overlays ---------- */
+  #flash { pointer-events: none; }
+  #vig { pointer-events: none; background: radial-gradient(ellipse 85% 70% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+  #meanwhile { font-size: 92px; font-style: italic; padding: 18px 40px; border-radius: 22px; }
+  #ctl { position: fixed; left: 12px; bottom: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; color: #8a93a3; z-index: 9; user-select: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="scene">
+    <div id="bg" class="layer">
+      <div id="tintBlue" class="layer"></div>
+      <div id="tintRed" class="layer"></div>
+      <div id="glowA" class="glow"></div>
+      <div id="glowB" class="glow"></div>
+    </div>
+    <canvas id="fx" class="layer" width="1080" height="1920"></canvas>
+
+    <div id="hook" class="layer">
+      <svg id="track" class="layer" viewBox="0 0 1080 1920"></svg>
+      <div id="pill"><i></i><span>TRENDING NOW</span></div>
+      <div id="h1" class="hl"></div>
+      <div id="h2" class="hl"></div>
+      <div id="car"></div>
+    </div>
+
+    <div id="stuck" class="layer">
+      <div id="st-top" class="hl"></div>
+      <div id="chips"></div>
+      <div id="st-big" class="hl">STUCK.</div>
+      <div id="core"></div>
+    </div>
+
+    <div id="lift" class="layer">
+      <div id="lf-ring"></div>
+      <div id="lf-rays"></div>
+      <div id="lf-top" class="hl">TAKE OFF WITH</div>
+      <div id="lf-icon"></div>
+      <div id="lf-name">
+        <div class="ros" id="lf-ros">ROSETTA</div>
+        <div class="nm" id="lf-nm">DBT <span class="grad">Studio</span></div>
+        <div class="tg" id="lf-tg">The open-source studio for dbt Core™</div>
+      </div>
+    </div>
+
+    <div id="fly" class="layer">
+      <div id="words"></div>
+      <div id="cards"></div>
+      <div id="stickers"></div>
+      <div id="hud">
+        <div id="hud-prog"></div>
+        <div id="hud-alt" class="mono"></div>
+      </div>
+    </div>
+
+    <div id="end" class="layer">
+      <div id="car2"></div>
+      <div id="e1" class="hl"></div>
+      <div id="e2" class="hl"></div>
+      <div id="e3" class="hl"></div>
+      <div id="e-icon"></div>
+      <div id="e-name">
+        <div class="ros" id="e-ros">ROSETTA</div>
+        <div class="nm" id="e-nm">DBT <span class="shine" id="shine">Studio</span></div>
+      </div>
+      <div id="e-pills"></div>
+      <div id="e-url" class="mono"></div>
+    </div>
+
+    <div id="flash" class="layer"></div>
+    <div id="vig" class="layer"></div>
+  </div>
+  <div id="over" class="layer">
+    <div id="meanwhile" class="sticker">meanwhile…</div>
+  </div>
+</div>
+<div id="ctl"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="rgb" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+    <feOffset in="r" id="rOff" dx="0" dy="0" result="r2" />
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+    <feOffset in="b" id="bOff" dx="0" dy="0" result="b2" />
+    <feBlend in="r2" in2="g" mode="screen" result="rg" />
+    <feBlend in="rg" in2="b2" mode="screen" />
+  </filter>
+</svg>
+
+<script>
+/* =========================================================================
+   Deterministic timeline: everything on screen is a pure function of t (s).
+   Preview: open this file. Capture: ?capture=1 and call window.seek(t).
+   120 BPM: one beat = 0.5 s, one bar = 2 s. Every cue below sits on that grid
+   so the cuts land on the beat in score.py.
+   ========================================================================= */
+const DURATION = 22;
+const T = { launch: 2.0, freeze: 3.5, stuck: 4.0, slam: 6.0, suck: 7.45, drop: 8.0, lift: 9.35, fly: 10.0, D: 2.0, end: 18.0, data: 19.0, lock: 19.25 };
+const W = 1080, H = 1920;
+
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, p) => a + (b - a) * p;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  outCubic: (p) => 1 - Math.pow(1 - p, 3),
+  inCubic: (p) => p * p * p,
+  inOutCubic: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+  outExpo: (p) => (p === 1 ? 1 : 1 - Math.pow(2, -10 * p)),
+  inExpo: (p) => (p === 0 ? 0 : Math.pow(2, 10 * p - 10)),
+  outBack: (p) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function show(e, on) { const v = on ? '' : 'none'; if (e.style.display !== v) e.style.display = v; }
+function mulberry32(a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const words = (s, cls = 'w') => s.split(' ').map((w) => `<span class="${cls}">${w}</span>`).join(' ');
+
+// a word slamming in: big -> settled, with a quick fade
+function slam(e, t, t0, from = 2.0, dur = 0.24) {
+  const p = P(t, t0, t0 + dur);
+  e.style.opacity = t < t0 ? 0 : clamp(p * 5);
+  e.style.transform = `scale(${lerp(from, 1, E.outExpo(p))})`;
+}
+
+/* ---------- icons ---------- */
+const I = {
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5c.7 5.6 3.4 8.5 9 10.5-5.6 2-8.3 4.9-9 10.5-.7-5.6-3.4-8.5-9-10.5 5.6-2 8.3-4.9 9-10.5z"/></svg>',
+  graph: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="12" r="2.5"/><path d="M7.5 6.5c5 0 5 5 9 5.5M7.5 17.5c5 0 5-5 9-5.5"/></svg>',
+  lake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><ellipse cx="12" cy="4.5" rx="7" ry="2.5"/><path d="M5 4.5v7c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-7M2 17c2 0 2 1.5 4 1.5S8 17 10 17s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5M2 21c2 0 2 1.5 4 1.5S8 21 10 21s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5"/></svg>',
+  cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M7 18.5h10.5a4 4 0 0 0 .6-8 6 6 0 0 0-11.5 1.6A3.3 3.3 0 0 0 7 18.5z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l8 10h-5v8H9v-8H4z"/></svg>',
+  open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>',
+  github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="#ff7416"><path d="M13.5 2L4 14h7l-1.5 8L19 10h-7z"/></svg>',
+};
+
+/* ---------- logo (same vector rebuild as rosetta-dbt-studio-15sec) ---------- */
+function logoSVG(id) {
+  const f = (pts, c) => `<polygon points="${pts}" fill="${c}" stroke="${c}" stroke-width="9" stroke-linejoin="round"/>`;
+  return `<svg class="logo-svg" viewBox="-40 -40 560 560">
+    <defs><linearGradient id="spg-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb054"/><stop offset="1" stop-color="#f0600e"/></linearGradient></defs>
+    <path class="lg-frame" pathLength="1" d="M420 262 V50 A70 70 0 0 0 350 -20 H50 A70 70 0 0 0 -20 50 V350 A70 70 0 0 0 50 420 H262" fill="none" stroke="#ff7a1f" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/>
+    <g class="lg-b3">${f('46,263 198,331 198,384 46,317', '#fb9145')}${f('198,331 346,263 346,317 198,384', '#f7641f')}</g>
+    <g class="lg-b2">${f('46,182 198,249 198,304 46,236', '#fc8939')}${f('198,249 346,182 346,236 198,304', '#f7641f')}<circle cx="236" cy="259" r="11.5" fill="#07090d"/></g>
+    <g class="lg-b1">${f('198,22 346,88 198,156 46,88', '#fc7927')}${f('46,88 198,156 198,222 46,154', '#fd8a37')}${f('198,156 346,88 346,154 198,222', '#f5621f')}</g>
+    <path class="lg-spark" d="M400 306 C409 372 428 391 494 400 C428 409 409 428 400 494 C391 428 372 409 306 400 C372 391 391 372 400 306 Z" fill="url(#spg-${id})"/>
+  </svg>`;
+}
+function logoParts(root) { return { frame: $('.lg-frame', root), b1: $('.lg-b1', root), b2: $('.lg-b2', root), b3: $('.lg-b3', root), spark: $('.lg-spark', root) }; }
+function animLogo(L, t, t0, fast) {
+  // slabs drop in bottom -> top, frame draws, sparkle spins in
+  const dur = fast ? 0.3 : 0.38, gap = fast ? 0.06 : 0.1;
+  [L.b3, L.b2, L.b1].forEach((g, k) => {
+    const p = P(t, t0 + k * gap, t0 + k * gap + dur);
+    g.style.transform = `translateY(${(1 - E.outBack(p)) * -380}px)`;
+    g.style.opacity = clamp(p * 3);
+  });
+  const fp = E.inOutCubic(P(t, t0 + (fast ? 0.12 : 0.3), t0 + (fast ? 0.5 : 0.78)));
+  L.frame.style.strokeDashoffset = 1 - fp;
+  L.frame.style.opacity = fp > 0 ? 1 : 0;
+  const sp = P(t, t0 + (fast ? 0.3 : 0.62), t0 + (fast ? 0.62 : 1.0));
+  L.spark.style.transform = `scale(${E.outBack(sp)}) rotate(${(1 - E.outCubic(sp)) * -200}deg)`;
+  L.spark.style.opacity = clamp(sp * 4);
+}
+
+/* ---------- the car: a generic wedge roadster in Rosetta colours (no real brand) ---------- */
+function carSVG(id) {
+  const wheel = (x) => `<g transform="translate(${x},78)"><circle r="22" fill="#0b0c0f" stroke="#2c3038" stroke-width="3"/>
+    <g class="spokes"><circle r="12.5" fill="#1c2027" stroke="#ff7416" stroke-width="2.2"/><path d="M-11 0H11M0-11V11M-7.8-7.8L7.8 7.8M-7.8 7.8L7.8-7.8" stroke="#7b8494" stroke-width="2.2"/></g></g>`;
+  return `<svg viewBox="0 0 300 100">
+    <defs>
+      <linearGradient id="cb-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a616e"/><stop offset="0.42" stop-color="#2a2e37"/><stop offset="1" stop-color="#0e1014"/></linearGradient>
+      <linearGradient id="cg-${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b1220"/><stop offset="0.62" stop-color="#2a4d72"/><stop offset="1" stop-color="#0b1220"/></linearGradient>
+      <radialGradient id="hl-${id}"><stop offset="0" stop-color="#fff"/><stop offset="0.4" stop-color="#bfe3ff" stop-opacity="0.9"/><stop offset="1" stop-color="#62b8ff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="tl-${id}"><stop offset="0" stop-color="#fff2f0"/><stop offset="0.35" stop-color="#ff3b30" stop-opacity="0.95"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></radialGradient>
+      <linearGradient id="bm-${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cfe8ff" stop-opacity="0.45"/><stop offset="1" stop-color="#cfe8ff" stop-opacity="0"/></linearGradient>
+    </defs>
+    <polygon points="294,56 470,26 470,96 294,66" fill="url(#bm-${id})"/>
+    <path d="M8,74 C6,62 14,56 30,54 L92,46 C118,26 150,16 184,16 C214,16 238,26 262,42 L288,52 C296,55 298,62 297,70 L295,80 L262,80 A30,30 0 0 0 202,80 L100,80 A30,30 0 0 0 40,80 L10,80 Z" fill="url(#cb-${id})" stroke="#6a7180" stroke-width="1.2"/>
+    <path d="M100,47 C122,31 150,23 180,23 C205,23 224,30 242,42 L234,46 L108,51 Z" fill="url(#cg-${id})" stroke="#0a0c10" stroke-width="1"/>
+    <path d="M26,63 L286,58" stroke="#ff7416" stroke-width="3.2" stroke-linecap="round"/>
+    <rect x="100" y="79" width="20" height="7" rx="2" fill="#2a2e37"/><rect x="140" y="79" width="20" height="7" rx="2" fill="#2a2e37"/><rect x="180" y="79" width="20" height="7" rx="2" fill="#2a2e37"/>
+    ${wheel(70)}${wheel(232)}
+    <ellipse cx="292" cy="60" rx="22" ry="10" fill="url(#hl-${id})"/>
+    <ellipse cx="9" cy="62" rx="17" ry="9" fill="url(#tl-${id})"/>
+  </svg>`;
+}
+function placeCar(e, x, y, a, spin) {
+  e.style.transform = `translate(${x - 150}px, ${y - 100}px) rotate(${a}deg)`;
+  $$('.spokes', e).forEach((s) => { s.style.transform = `rotate(${spin}deg)`; });
+}
+// car-local point (relative to the bottom-centre pivot) -> world
+function carPt(c, lx, ly) {
+  const th = (c.a * Math.PI) / 180, cs = Math.cos(th), sn = Math.sin(th);
+  return { x: c.x + lx * cs - ly * sn, y: c.y + lx * sn + ly * cs, th };
+}
+
+/* =========================================================================
+   Canvas FX: stars, speed lines, flames, light trails
+   ========================================================================= */
+const ctx = $('#fx').getContext('2d');
+const rnd = mulberry32(19);
+const STARS = Array.from({ length: 170 }, () => ({ x: rnd() * W, y: rnd() * H, r: 0.6 + rnd() * 2, z: 0.2 + rnd() * 0.8, o: 0.2 + rnd() * 0.6, warm: rnd() < 0.4 }));
+const LINES = Array.from({ length: 30 }, () => ({ x: rnd() * (W + 600), y: 1200 + rnd() * 520, l: 120 + rnd() * 320, z: 0.4 + rnd() * 0.6, o: 0.06 + rnd() * 0.2 }));
+const STREAKS = Array.from({ length: 26 }, () => ({ x: 30 + rnd() * (W - 60), y: rnd() * H, l: 260 + rnd() * 520, o: 0.08 + rnd() * 0.22, warm: rnd() < 0.5 }));
+
+// how far "up" the camera has flown (px); stars and streaks scroll by this
+function flightY(t) {
+  let y = 0;
+  if (t > 9.3) y += 700 * Math.pow(Math.min(t, 10) - 9.3, 2);
+  if (t > 10) y += 1400 * (Math.min(t, 18) - 10);
+  y += 700 * E.inOutCubic(P(t, 9.9, 10.3));
+  for (const s of [12, 14, 16]) y += 700 * E.inOutCubic(P(t, s - 0.25, s + 0.3));
+  if (t > 18) y += (1400 * (1 - Math.exp(-(t - 18) * 1.2))) / 1.2;
+  return y;
+}
+
+function flame(x, y, ang, len, wid, t, seed) {
+  const fl = 0.8 + 0.2 * Math.sin(t * 71 + seed * 3.1) * Math.sin(t * 43 + seed);
+  const L = len * fl;
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(ang);
+  ctx.globalCompositeOperation = 'lighter';
+  let g = ctx.createRadialGradient(0, 0, 0, 0, 0, wid * 2.4);
+  g.addColorStop(0, 'rgba(255,150,60,0.55)'); g.addColorStop(1, 'rgba(255,120,40,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, wid * 2.4, 0, Math.PI * 2); ctx.fill();
+  g = ctx.createLinearGradient(0, 0, L, 0);
+  g.addColorStop(0, 'rgba(255,190,90,0.95)'); g.addColorStop(0.35, 'rgba(255,110,20,0.7)'); g.addColorStop(1, 'rgba(255,60,0,0)');
+  ctx.fillStyle = g; ctx.beginPath();
+  ctx.moveTo(0, -wid / 2); ctx.quadraticCurveTo(L * 0.45, -wid * 0.8, L, 0); ctx.quadraticCurveTo(L * 0.45, wid * 0.8, 0, wid / 2); ctx.closePath(); ctx.fill();
+  g = ctx.createLinearGradient(0, 0, L * 0.5, 0);
+  g.addColorStop(0, 'rgba(255,255,240,1)'); g.addColorStop(1, 'rgba(255,220,150,0)');
+  ctx.fillStyle = g; ctx.beginPath();
+  ctx.moveTo(0, -wid * 0.28); ctx.quadraticCurveTo(L * 0.22, -wid * 0.32, L * 0.5, 0); ctx.quadraticCurveTo(L * 0.22, wid * 0.32, 0, wid * 0.28); ctx.closePath(); ctx.fill();
+  for (let i = 0; i < 12; i++) {
+    const age = (t * 2.6 + hash(seed * 17 + i)) % 1;
+    const px = age * L * 1.5, py = (hash(seed * 31 + i) - 0.5) * wid * 1.8 * age;
+    ctx.fillStyle = `rgba(255,${180 + Math.round(60 * (1 - age))},120,${(1 - age) * 0.9})`;
+    ctx.fillRect(px, py, 3.5, 3.5);
+  }
+  ctx.restore();
+}
+
+function drawStars(t, dimBy) {
+  const fy = flightY(t), v = (flightY(t + 0.01) - fy) / 0.01;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.lineCap = 'round';
+  for (const s of STARS) {
+    let y = (s.y + fy * s.z) % H;
+    const a = s.o * (0.65 + 0.35 * Math.sin(t * 2.3 + s.x)) * dimBy;
+    const len = Math.min(170, v * s.z * 0.04);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = ctx.strokeStyle = s.warm ? '#ffbe86' : '#cfe4ff';
+    if (len > 2) { ctx.lineWidth = s.r * 1.3; ctx.beginPath(); ctx.moveTo(s.x, y); ctx.lineTo(s.x, y - len); ctx.stroke(); }
+    else { ctx.beginPath(); ctx.arc(s.x, y, s.r, 0, Math.PI * 2); ctx.fill(); }
+  }
+  // big speed streaks, strongest at each whip between panels
+  let burst = 0;
+  for (const s of [9.7, 10, 12, 14, 16, 18]) burst = Math.max(burst, Math.exp(-(((t - s) / 0.2) ** 2)));
+  const base = t > 9.6 && t < 18.3 ? 0.35 : 0;
+  const amt = Math.max(base, burst);
+  if (amt > 0.01) {
+    for (const s of STREAKS) {
+      const y = (s.y + fy * 1.6) % (H + s.l);
+      ctx.globalAlpha = s.o * amt;
+      ctx.strokeStyle = s.warm ? '#ffb070' : '#bcdcff';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(s.x, y); ctx.lineTo(s.x, y - s.l * (0.5 + amt)); ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* =========================================================================
+   1. Hook (0 - 4): a car drives the loop upside down, fires thrusters, flies
+   ========================================================================= */
+const RY = 1560, LC = { x: 540, y: 1260, r: 300 };
+function carPose(t) {
+  if (t < 1.1) { const e = Math.pow(P(t, 0, 1.1), 1.6); return { x: lerp(-200, LC.x, e), y: RY, a: 0, thrust: 0, phi: 0, dist: 740 * e }; }
+  if (t < 1.95) { const p = P(t, 1.1, 1.95), f = Math.PI * p; return { x: LC.x + LC.r * Math.sin(f), y: LC.y + LC.r * Math.cos(f), a: (-f * 180) / Math.PI, thrust: 0, phi: f, dist: 740 + 942 * p }; }
+  if (t < 2.55) { const p = P(t, 1.95, 2.55); return { x: LC.x, y: lerp(960, 1080, E.outCubic(p)), a: lerp(-180, -360, E.inOutCubic(p)), thrust: clamp(P(t, 1.95, 2.05)), phi: Math.PI, dist: 1682 + 300 * p }; }
+  const p = P(t, 2.55, 3.8);
+  return { x: LC.x + 30 * p, y: lerp(1080, -500, E.inCubic(p)), a: -360 - 6 * E.outCubic(P(t, 2.55, 2.9)), thrust: 1, phi: Math.PI, dist: 1982 + 900 * p };
+}
+const arcPt = (phi, r = LC.r + 7) => [LC.x + r * Math.sin(phi), LC.y + r * Math.cos(phi)];
+const LIGHT_PHI = Array.from({ length: 14 }, (_, i) => 0.18 + i * 0.235);
+
+function buildHook() {
+  const [bx, by] = arcPt(0), [rx, ry] = arcPt(Math.PI / 2), [tx, ty] = arcPt(Math.PI), [ex, ey] = arcPt(Math.PI + 0.35);
+  const loop = `M${bx},${by} A307,307 0 0 0 ${rx},${ry} A307,307 0 0 0 ${tx},${ty} A307,307 0 0 0 ${ex.toFixed(1)},${ey.toFixed(1)}`;
+  $('#track').innerHTML = `
+    <defs>
+      <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121722"/><stop offset="1" stop-color="#05070b"/></linearGradient>
+      <filter id="neon" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+    </defs>
+    <rect x="0" y="${RY}" width="${W}" height="${H - RY}" fill="url(#road)"/>
+    <line x1="0" y1="${RY + 2}" x2="${W}" y2="${RY + 2}" stroke="#ff7416" stroke-width="5" filter="url(#neon)" opacity="0.8"/>
+    <line x1="0" y1="${RY + 2}" x2="${W}" y2="${RY + 2}" stroke="#ffb46b" stroke-width="2.5"/>
+    <g id="dashes">${Array.from({ length: 9 }, (_, i) => `<rect x="${i * 150 - 40}" y="${RY + 78}" width="80" height="8" rx="4" fill="#2a3040"/>`).join('')}</g>
+    <path d="${loop}" fill="none" stroke="#ff7416" stroke-width="22" filter="url(#neon)" opacity="0.7"/>
+    <path d="${loop}" fill="none" stroke="#1b1f28" stroke-width="16" stroke-linecap="round"/>
+    <path d="${loop}" fill="none" stroke="#ffb46b" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+    ${LIGHT_PHI.map((f, i) => { const [x, y] = arcPt(f, LC.r + 22); return `<circle class="tl" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#ffd9a8"/>`; }).join('')}
+  `;
+  $('#h1').innerHTML = words('CARS CAN');
+  $('#h2').innerHTML = `<span class="w grad">FLY</span> <span class="w">NOW.</span>`;
+  $('#car').innerHTML = carSVG('a');
+}
+
+function renderHook(t, th) {
+  const on = t < T.stuck; show($('#hook'), on); if (!on) return;
+  const pp = E.outBack(P(th, 0.05, 0.35));
+  $('#pill').style.transform = `translateX(-50%) scale(${lerp(0.6, 1, pp)})`;
+  $('#pill').style.opacity = clamp(pp * 2);
+  $('#pill i').style.opacity = 0.45 + 0.55 * (Math.sin(th * 9) > 0 ? 1 : 0.2);
+  $$('#h1 .w').forEach((w, i) => slam(w, th, [0.25, 0.5][i], 1.9));
+  $$('#h2 .w').forEach((w, i) => {
+    slam(w, th, [T.launch, T.launch + 0.25][i], 2.6, 0.28);
+    if (th > T.launch + 0.3) w.style.transform += ` translateY(${Math.sin((th - T.launch) * 5 + i) * -6}px)`;
+  });
+
+  const c = carPose(th);
+  placeCar($('#car'), c.x, c.y, c.a, (c.dist / 22) * (180 / Math.PI));
+  $('#car svg').style.filter = c.thrust > 0 ? `drop-shadow(0 0 ${18 * c.thrust}px rgba(255,140,40,0.55))` : 'none';
+  // track lights flare as the car passes them
+  $$('#track .tl').forEach((d, i) => {
+    const f = LIGHT_PHI[i], past = c.phi - f;
+    const lit = past > 0 ? 0.3 + 0.7 * Math.exp(-past * 3) : 0.18;
+    d.style.opacity = lit; d.setAttribute('r', 5 + 6 * Math.max(0, lit - 0.3));
+  });
+
+  // horizontal speed lines while the car is on the road / in the loop
+  const sl = clamp(P(th, 0.2, 1.0)) * (1 - P(th, 1.9, 2.3));
+  if (sl > 0.01) {
+    ctx.lineCap = 'round';
+    for (const s of LINES) {
+      let x = (s.x - th * 2600 * s.z) % (W + 600); if (x < 0) x += W + 600; x -= 300;
+      ctx.globalAlpha = s.o * sl; ctx.strokeStyle = '#dfe9ff'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(x, s.y); ctx.lineTo(x + s.l, s.y); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  // light trails from the tail-light and headlight
+  if (th > 0.7) {
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    for (const [lx, ly, col, w0] of [[-146, -38, '255,70,55', 9], [146, -40, '190,225,255', 6]]) {
+      let prev = null;
+      for (let k = 0; k <= 46; k++) {
+        const tk = th - k * 0.011; if (tk < 0.7) break;
+        const q = carPt(carPose(tk), lx, ly);
+        if (prev) {
+          const a = (1 - k / 46) ** 1.6;
+          ctx.strokeStyle = `rgba(${col},${0.75 * a})`; ctx.lineWidth = w0 * a + 1;
+          ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+        }
+        prev = q;
+      }
+    }
+    ctx.restore();
+  }
+  // thrusters
+  if (c.thrust > 0) {
+    const len = lerp(40, 230, c.thrust) * (th > 2.55 ? 1.25 : 1);
+    [-50, 0, 50].forEach((lx, i) => {
+      const n = carPt(c, lx, -12);
+      flame(n.x, n.y, Math.atan2(Math.cos(n.th), -Math.sin(n.th)), len, 30, th, i + 1);
+    });
+    const r = carPt(c, -148, -40);
+    flame(r.x, r.y, Math.atan2(-Math.sin(r.th), -Math.cos(r.th)), len * 0.7, 26, th, 9);
+  }
+}
+
+/* =========================================================================
+   2. Stuck (4 - 8): meanwhile, your data team is stuck in error traffic
+   ========================================================================= */
+const CHIPS = [
+  { t: 4.5,  x: 400, y: 560,  r: -4,  title: 'terminal', body: '<span class="ps">$</span> dbt run\n<span class="err">Compilation Error</span> in model\n  stg_orders' },
+  { t: 4.75, x: 680, y: 690,  r: 3,   title: 'profiles.yml', body: '<span class="err">Could not find profile</span>\n  named \'prod\'' },
+  { t: 5.0,  x: 380, y: 830,  r: 2,   title: 'terminal', body: '<span class="ps">$</span> pip install dbt-core\n<span class="err">ERROR:</span> dependency conflict' },
+  { t: 5.25, x: 700, y: 960,  r: -3,  title: 'schema.yml', body: '<span class="err">YAML error:</span> mapping values\n  are not allowed here' },
+  { t: 5.5,  x: 420, y: 1090, r: -2,  title: 'python', body: 'Traceback (most recent call last):\n  <span class="dim">File "dbt/main.py", line 42</span>' },
+  { t: 5.75, x: 660, y: 1200, r: 4,   title: '.github/workflows/ci.yml', body: '<span class="err">Process completed</span>\n  <span class="err">with exit code 1</span>' },
+  { t: 6.5,  x: 560, y: 760,  r: -1,  title: 'terminal', body: '<span class="ps">$</span> dbt debug\n  Connection test: <span class="err">FAIL</span>' },
+  { t: 6.75, x: 480, y: 1010, r: 2.5, title: 'run summary', body: '<span class="err">3 models failed</span> <span class="dim">·</span> 12 skipped' },
+];
+const BRAKE = [];
+[[1650, 0.55], [1745, 0.75], [1862, 1.0]].forEach(([y, s], row) => {
+  const gap = 250 * s;
+  for (let x = -60 + (row % 2) * gap * 0.5; x < W + 120; x += gap) BRAKE.push({ x, y, s, k: BRAKE.length });
+});
+
+function buildStuck() {
+  $('#st-top').innerHTML = words('YOUR DATA TEAM:');
+  $('#chips').innerHTML = CHIPS.map((c) => `<div class="chip"><div class="chip-bar"><i></i><i></i><i></i><span>${c.title}</span></div><div class="chip-body mono">${c.body}</div></div>`).join('');
+  $$('#chips .chip').forEach((e, i) => { e.style.left = `${CHIPS[i].x}px`; e.style.top = `${CHIPS[i].y}px`; });
+}
+
+function renderStuck(t) {
+  const on = t >= T.stuck && t < T.drop; show($('#stuck'), on); if (!on) return;
+  $$('#st-top .w').forEach((w, i) => slam(w, t, 4.05 + i * 0.15, 1.7, 0.2));
+  const suck = (i) => E.inCubic(P(t, T.suck + i * 0.02, 7.95));
+  const jit = 2 + 12 * P(t, 7.0, 7.45);
+  $$('#chips .chip').forEach((e, i) => {
+    const c = CHIPS[i];
+    if (t < c.t) { e.style.opacity = 0; return; }
+    const p = E.outBack(P(t, c.t, c.t + 0.2)), s = suck(i);
+    const jx = Math.sin(t * 53 + i * 7) * jit, jy = Math.cos(t * 47 + i * 3) * jit;
+    e.style.opacity = clamp(P(t, c.t, c.t + 0.06));
+    e.style.transform = `translate(-50%, -50%) translate(${(540 - c.x) * s + jx}px, ${(900 - c.y) * s + jy}px) rotate(${c.r * (1 - s)}deg) scale(${lerp(0.4, 1, p) * (1 - s)})`;
+  });
+  const big = $('#st-big');
+  slam(big, t, T.slam, 2.8, 0.3);
+  if (t > T.slam) {
+    const s = suck(3), j = jit * 0.6;
+    big.style.transform += ` translate(${Math.sin(t * 61) * j}px, ${Math.cos(t * 57) * j - 560 * s}px) scale(${1 - s})`;
+  }
+  const cp = P(t, T.suck, 7.98);
+  $('#core').style.transform = `scale(${E.inCubic(cp) * 1.6})`;
+  $('#core').style.opacity = cp > 0 ? 0.4 + 0.6 * cp : 0;
+
+  // brake lights: a traffic jam seen from behind
+  const dim = 1 - P(t, T.suck, 7.9);
+  ctx.save();
+  for (const b of BRAKE) {
+    const tap = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(t * 2.4 + b.k * 1.7));
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = dim;
+    ctx.fillStyle = '#07080b';
+    ctx.beginPath(); ctx.roundRect(b.x - 95 * b.s, b.y - 60 * b.s, 190 * b.s, 96 * b.s, 22 * b.s); ctx.fill();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const dx of [-62, 62]) {
+      const r = 38 * b.s * (0.8 + 0.4 * tap);
+      const g = ctx.createRadialGradient(b.x + dx * b.s, b.y, 0, b.x + dx * b.s, b.y, r);
+      g.addColorStop(0, `rgba(255,235,230,${0.95 * tap * dim})`); g.addColorStop(0.25, `rgba(255,50,35,${0.85 * tap * dim})`); g.addColorStop(1, 'rgba(255,30,20,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x + dx * b.s, b.y, r, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+/* =========================================================================
+   3. Lift-off (8 - 10): the drop. Logo assembles, thrusters fire, it launches
+   ========================================================================= */
+let LL, LE;
+function buildLift() {
+  $('#lf-icon').innerHTML = logoSVG('a');
+  LL = logoParts($('#lf-icon'));
+  $('#lf-rays').innerHTML = Array.from({ length: 14 }, () => '<div class="ray"></div>').join('');
+}
+function renderLift(t) {
+  const on = t >= T.drop && t < 10.4; show($('#lift'), on); if (!on) return;
+  const rp = P(t, T.drop, T.drop + 0.6);
+  $('#lf-ring').style.transform = `scale(${lerp(0.2, 3.4, E.outCubic(rp))})`;
+  $('#lf-ring').style.opacity = rp < 1 ? 1 - rp : 0;
+  $$('#lf-rays .ray').forEach((r, i) => {
+    const p = P(t, T.drop, T.drop + 0.5);
+    r.style.transform = `rotate(${i * (360 / 14) + 8}deg) translateX(${lerp(60, 380, E.outCubic(p))}px) scaleX(${lerp(0.2, 1.2, p) * (1 - p)})`;
+    r.style.opacity = 1 - p;
+  });
+  const lp = E.inExpo(P(t, T.lift, 10.0));          // launch
+  const top = $('#lf-top');
+  const tp = E.outCubic(P(t, 8.12, 8.4));
+  top.style.opacity = tp * (1 - lp); top.style.transform = `translateY(${(1 - tp) * 30 + lp * 500}px)`;
+
+  const ip = E.outBack(P(t, T.drop, T.drop + 0.4));
+  const thrust = clamp(P(t, 8.9, 9.1));
+  const rumble = thrust * (1 - lp) * 5;
+  const iy = Math.sin((t - T.drop) * 2.4) * 6 - lp * 1700 - thrust * 40 * E.outCubic(P(t, 8.9, 9.35));
+  const icon = $('#lf-icon');
+  icon.style.transform = `translate(${Math.sin(t * 67) * rumble}px, ${iy + Math.cos(t * 59) * rumble}px) scale(${lerp(0.5, 1, ip)}) scaleY(${1 + lp * 0.35})`;
+  icon.style.opacity = clamp(ip * 2);
+  animLogo(LL, t, T.drop + 0.02, false);
+  const np = E.outCubic(P(t, 8.35, 8.7)), gp = E.outCubic(P(t, 8.55, 8.9));
+  $('#lf-ros').style.opacity = np * (1 - lp); $('#lf-nm').style.opacity = np * (1 - lp);
+  $('#lf-tg').style.opacity = gp * (1 - lp);
+  $('#lf-name').style.transform = `translateY(${(1 - np) * 50 + lp * 700}px)`;
+  if (thrust > 0) {
+    const base = 875 + iy + 20;
+    [430, 539, 645].forEach((x, i) => flame(x, base, Math.PI / 2, lerp(60, 420, thrust) * (1 + lp), 46, t, i + 3));
+  }
+}
+
+/* =========================================================================
+   4. Flyover (10 - 18): four panels on the beat
+   ========================================================================= */
+const CARDS = [
+  { word: 'ASK.',     sub: 'The AI writes and runs your SQL.',  img: 'assets/ask-ai.png',           tab: 'SQL Editor · AI Agent', icon: I.spark, sticker: 'AI did this',         sIcon: I.spark, ring: [626, 14, 336, 70],  side: 'r' },
+  { word: 'MODEL.',   sub: 'Every dbt model. Full lineage.',    img: 'assets/model-lineage.png',    tab: 'stg_customers.sql · Lineage', icon: I.graph, sticker: 'see the whole DAG', sIcon: I.graph, ring: [340, 578, 136, 66], side: 'l' },
+  { word: 'EXPLORE.', sub: 'Browse your DuckLake. No CLI.',     img: 'assets/explore-ducklake.png', tab: 'DataLake', icon: I.lake, sticker: '0 commands typed',               sIcon: I.lake,  ring: [46, 8, 326, 66],    side: 'r' },
+  { word: 'SHIP.',    sub: 'Run your pipeline in the cloud.',   img: 'assets/ship-cloud.png',       tab: 'Cloud Pipeline', icon: I.cloud, sticker: 'all green',              sIcon: I.check, ring: [84, 30, 78, 34],    side: 'l' },
+];
+const slotT = (i) => T.fly + i * T.D;
+function buildFly() {
+  $('#words').innerHTML = CARDS.map((c) => `<div class="hl fw"><span class="grad">${c.word}</span></div><div class="hl fs">${c.sub}</div>`).join('');
+  $('#cards').innerHTML = CARDS.map((c) => `<div class="card">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="tab">${c.icon}${c.tab}</div><div class="brand">Rosetta DBT Studio</div></div>
+      <img src="${c.img}" alt="">
+      <div class="ring" style="left:${c.ring[0]}px;top:${44 + c.ring[1]}px;width:${c.ring[2]}px;height:${c.ring[3]}px"></div>
+      <div class="glare"></div>
+    </div>`).join('');
+  $('#stickers').innerHTML = CARDS.map((c) => `<div class="sticker fst">${c.sIcon}<span>${c.sticker}</span></div>`).join('');
+  $$('#stickers .sticker').forEach((s, i) => {
+    s.style.left = CARDS[i].side === 'r' ? 'auto' : '70px';
+    s.style.right = CARDS[i].side === 'r' ? '60px' : 'auto';
+    s.style.top = CARDS[i].side === 'r' ? '578px' : '1390px';
+    s.querySelector('svg').style.color = '#ff7416';
+  });
+  $('#hud-prog').innerHTML = CARDS.map(() => '<div><i></i></div>').join('');
+}
+function renderFly(t) {
+  const on = t >= 9.95 && t < 18.2; show($('#fly'), on); if (!on) return;
+  const ws = $$('#words .fw'), ss = $$('#words .fs'), cs = $$('#cards .card'), st = $$('#stickers .sticker');
+  CARDS.forEach((c, i) => {
+    const u = t - slotT(i);
+    const vis = u > -0.01 && u < 2.15;
+    show(cs[i], vis); show(ws[i], vis); show(ss[i], vis); show(st[i], vis);
+    if (!vis) return;
+    const p = E.outCubic(P(u, 0, 0.34)), q = E.inCubic(P(u, 1.78, 2.12));
+    const y = lerp(1500, 0, p) + lerp(0, -1750, q);
+    const rx = lerp(42, 0, p) + lerp(0, -28, q);
+    const sc = lerp(0.82, 1, p) * (1 + 0.035 * P(u, 0.34, 1.8));
+    const blur = 16 * (1 - p) + 16 * q;
+    const card = cs[i];
+    card.style.transform = `translateY(${y}px) rotateX(${rx}deg) rotateZ(${Math.sin(u * 1.7 + i) * 0.6}deg) scale(${sc})`;
+    card.style.filter = blur > 0.3 ? `blur(${blur.toFixed(1)}px)` : 'none';
+    $('.glare', card).style.backgroundPosition = `${lerp(120, -20, E.inOutCubic(P(u, 0.4, 1.1)))}% 0`;
+    const ring = $('.ring', card), rp = E.outBack(P(u, 0.55, 0.8));
+    ring.style.opacity = clamp(rp * 2);
+    ring.style.transform = `scale(${lerp(1.6, 1, rp)})`;
+    const glow = 0.5 + 0.5 * Math.sin(u * 12);
+    ring.style.boxShadow = `0 0 ${18 + 16 * glow}px rgba(255,140,40,${0.55 + 0.3 * glow}), inset 0 0 18px rgba(255,140,40,0.3)`;
+
+    const w = ws[i];
+    slam(w, t, slotT(i), 2.3, 0.26);
+    w.style.transform += ` translateY(${-260 * q}px)`;
+    w.style.opacity *= 1 - q;
+    const sp = E.outCubic(P(u, 0.14, 0.4));
+    ss[i].style.opacity = sp * (1 - q);
+    ss[i].style.transform = `translateY(${(1 - sp) * 24 - 300 * q}px)`;
+
+    const kp = E.outBack(P(u, 0.45, 0.7));
+    const r = c.side === 'r' ? 5 : -4;
+    st[i].style.opacity = clamp(kp * 3) * (1 - q);
+    st[i].style.transform = `translateY(${y}px) rotate(${r + (1 - kp) * 14}deg) scale(${lerp(0.3, 1, kp)})`;
+  });
+  const hp = E.outCubic(P(t, 10.1, 10.4)) * (1 - P(t, 17.8, 18.1));
+  $('#hud').style.opacity = hp;
+  $$('#hud-prog i').forEach((b, i) => { b.style.width = `${P(t, slotT(i), slotT(i) + T.D) * 100}%`; });
+  const alt = Math.round((flightY(t) * 3.2) / 10) * 10;
+  $('#hud-alt').innerHTML = `${I.up}ALTITUDE&nbsp;${alt.toLocaleString('en-US')}&nbsp;FT`;
+}
+
+/* =========================================================================
+   5. End card (18 - 22): cars can fly now. so can your data.
+   ========================================================================= */
+const PILLS = [[I.open, 'Free & open source'], [I.spark, 'AI built in']];
+function buildEnd() {
+  $('#e1').innerHTML = words('CARS CAN FLY NOW.');
+  $('#e2').innerHTML = words('SO CAN YOUR');
+  $('#e3').innerHTML = '<span class="w grad">DATA.</span>';
+  $('#e-icon').innerHTML = logoSVG('b');
+  LE = logoParts($('#e-icon'));
+  $('#e-pills').innerHTML = PILLS.map(([ic, s]) => `<div class="pill">${ic}<span>${s}</span></div>`).join('');
+  $('#e-url').innerHTML = `${I.github}github.com/rosettadb/dbt-studio`;
+  $('#car2').innerHTML = carSVG('b');
+}
+function endCarPose(t) {
+  const p = P(t, 19.35, 20.7);
+  return { x: lerp(-260, 1380, p), y: lerp(1720, 180, E.outCubic(p) * 0.6 + p * 0.4), a: -34, thrust: 1, dist: t * 900 };
+}
+function renderEnd(t) {
+  const on = t >= 17.95; show($('#end'), on); if (!on) return;
+  $$('#e1 .w').forEach((w, i) => slam(w, t, T.end + i * 0.125, 1.6, 0.2));
+  $$('#e2 .w').forEach((w, i) => slam(w, t, 18.5 + i * 0.125, 1.8, 0.2));
+  const d = $('#e3 .w');
+  slam(d, t, T.data, 3.0, 0.3);
+  if (t > T.data + 0.3) d.style.transform += ` translateY(${Math.sin((t - T.data) * 3.2) * -7}px)`;
+
+  // light trails rising behind everything
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+  const ta = P(t, 18.0, 18.6);
+  for (let i = 0; i < 8; i++) {
+    const side = i % 2 ? 1 : -1, lane = i >> 1;
+    const x0 = 540 + side * (260 + 90 * lane), x2 = 540 + side * (30 + 40 * lane);
+    const u = ((t - 18) * 0.7 + i * 0.19) % 1.35;
+    const a0 = Math.max(0, u - 0.35), a1 = Math.min(1, u);
+    if (a1 <= a0) continue;
+    const col = i % 3 === 0 ? '98,184,255' : '255,140,50';
+    const pt = (s) => { const m = 1 - s; return [m * m * x0 + 2 * m * s * (x0 + side * 120) + s * s * x2, m * m * 2050 + 2 * m * s * 1250 + s * s * 820]; };
+    for (const [lw, al] of [[14, 0.12], [4, 0.75]]) {
+      ctx.strokeStyle = `rgba(${col},${al * ta})`; ctx.lineWidth = lw;
+      ctx.beginPath();
+      for (let k = 0; k <= 18; k++) { const [x, y] = pt(a0 + ((a1 - a0) * k) / 18); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // a victory lap: the car flies past behind the lockup
+  const car = $('#car2'), c = endCarPose(t);
+  const flying = t > 19.3 && t < 20.75;
+  show(car, flying);
+  if (flying) {
+    placeCar(car, c.x, c.y, c.a, c.dist);
+    [-50, 0, 50].forEach((lx, i) => { const n = carPt(c, lx, -12); flame(n.x, n.y, Math.atan2(Math.cos(n.th), -Math.sin(n.th)), 150, 24, t, i + 11); });
+    const r = carPt(c, -148, -40);
+    flame(r.x, r.y, Math.atan2(-Math.sin(r.th), -Math.cos(r.th)), 200, 26, t, 15);
+  }
+
+  const t0 = T.lock;
+  const ip = E.outBack(P(t, t0, t0 + 0.4));
+  $('#e-icon').style.transform = `scale(${lerp(0.4, 1, ip)}) translateY(${Math.sin((t - t0) * 2.2) * 4}px)`;
+  $('#e-icon').style.opacity = clamp(ip * 2);
+  animLogo(LE, t, t0, true);
+  const np = E.outCubic(P(t, t0 + 0.18, t0 + 0.55));
+  $('#e-name').style.transform = `translateY(${(1 - np) * 50}px)`; $('#e-name').style.opacity = np;
+  $$('#e-pills .pill').forEach((p, i) => {
+    const q = E.outBack(P(t, t0 + 0.5 + i * 0.12, t0 + 0.82 + i * 0.12));
+    p.style.transform = `translateY(${(1 - q) * 30}px) scale(${lerp(0.7, 1, q)})`; p.style.opacity = clamp(q * 1.5);
+  });
+  const up = E.outCubic(P(t, t0 + 0.85, t0 + 1.15));
+  $('#e-url').style.transform = `translateY(${(1 - up) * 20}px)`; $('#e-url').style.opacity = up;
+  const sh = E.inOutCubic(P(t, 20.5, 21.25));
+  $('#shine').style.backgroundPosition = `${lerp(100, 0, sh)}% 0`;
+}
+
+/* =========================================================================
+   Background, camera shake, flashes, RGB glitch, freeze frame
+   ========================================================================= */
+const HITS = [[2.0, 16, 0.35], [3.5, 6, 0.12], [4.0, 8, 0.2], [6.0, 24, 0.4], [8.0, 26, 0.45], [10, 10, 0.25], [12, 10, 0.25], [14, 10, 0.25], [16, 10, 0.25], [19.0, 18, 0.4]];
+const GLITCH = [[2.0, 14], [4.0, 12], [6.0, 20], [8.0, 22], [10, 16], [12, 16], [14, 16], [16, 16], [18.0, 8], [19.0, 18], ...CHIPS.map((c) => [c.t, 6])];
+const FLASH = [[2.0, '255,150,60', 0.55, 0.25], [3.5, '255,255,255', 0.9, 0.07], [8.0, '255,245,230', 1.0, 0.2], [19.0, '255,170,90', 0.6, 0.3]];
+
+function renderBG(t, ts) {
+  const red = P(t, T.stuck, T.stuck + 0.1) * (1 - P(t, 7.6, 8.0));
+  const blue = P(t, 9.3, 10.2) * (1 - P(t, 18.0, 19.0) * 0.6);
+  $('#tintRed').style.opacity = red;
+  $('#tintBlue').style.opacity = blue;
+  const g = (id, x, y, o) => { const e = $(id); e.style.transform = `translate(${x - e.offsetWidth / 2}px, ${y - e.offsetHeight / 2}px)`; e.style.opacity = o; };
+  g('#glowA', 540 + Math.sin(ts * 0.6) * 120, t < T.stuck ? 1500 : 760 + Math.cos(ts * 0.5) * 120, 1 - red);
+  g('#glowB', 300 + Math.sin(ts * 0.45 + 1) * 90, 420 + Math.cos(ts * 0.55) * 90, 1 - red * 0.7);
+  ctx.clearRect(0, 0, W, H);
+  drawStars(ts, t >= T.stuck && t < T.drop ? 0.25 : 1);
+}
+
+function renderFX(t) {
+  let amp = 0, sx = 0, sy = 0, sr = 0;
+  for (const [th, a, d] of HITS) {
+    if (t < th || t > th + d * 5) continue;
+    const k = a * Math.exp(-(t - th) / d);
+    amp += k;
+    sx += k * Math.sin((t - th) * 83 + th); sy += k * Math.cos((t - th) * 71 + th * 2); sr += k * 0.04 * Math.sin((t - th) * 57);
+  }
+  // build-up rumble before the drop and during the logo's thrusters
+  const rum = 5 * P(t, 7.0, 7.95) * (t < T.drop ? 1 : 0) + 3 * clamp(P(t, 8.9, 9.1)) * (t < 10 ? 1 : 0);
+  sx += rum * Math.sin(t * 91); sy += rum * Math.cos(t * 87); amp += rum;
+  const frozen = t >= T.freeze && t < T.stuck;
+  const fz = frozen ? 0.05 * E.outCubic(P(t, T.freeze, T.freeze + 0.25)) : 0;
+  $('#scene').style.transform = `translate(${sx}px, ${sy}px) rotate(${sr}deg) scale(${1 + amp / 320 + fz})`;
+
+  let gl = 0;
+  for (const [tg, a] of GLITCH) if (t >= tg && t < tg + 0.3) gl += a * Math.exp(-(t - tg) / 0.07);
+  const filters = [];
+  if (gl > 0.6) {
+    $('#rOff').setAttribute('dx', gl.toFixed(1)); $('#bOff').setAttribute('dx', (-gl).toFixed(1));
+    $('#rOff').setAttribute('dy', (gl * 0.3).toFixed(1)); $('#bOff').setAttribute('dy', (-gl * 0.3).toFixed(1));
+    filters.push('url(#rgb)');
+  }
+  if (frozen) filters.push('grayscale(1) contrast(1.15) brightness(0.8)');
+  $('#scene').style.filter = filters.length ? filters.join(' ') : 'none';
+
+  let fo = 0, fc = '255,255,255';
+  for (const [tf, c, a, d] of FLASH) {
+    if (t < tf || t > tf + d * 6) continue;
+    const v = a * Math.exp(-(t - tf) / d);
+    if (v > fo) { fo = v; fc = c; }
+  }
+  $('#flash').style.background = `rgb(${fc})`;
+  $('#flash').style.opacity = fo;
+
+  const mw = $('#meanwhile');
+  show(mw, frozen);
+  if (frozen) {
+    const p = E.outBack(P(t, T.freeze + 0.05, T.freeze + 0.25));
+    mw.style.transform = `translate(-50%, -50%) rotate(-5deg) scale(${lerp(0.3, 1, p)})`;
+    mw.style.left = '540px'; mw.style.top = '1180px';
+    mw.style.opacity = clamp(p * 3);
+  }
+}
+
+/* =========================================================================
+   Frame
+   ========================================================================= */
+function render(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  const th = Math.min(t, T.freeze);              // the hook freezes at 3.5 s
+  const ts = t >= T.freeze && t < T.stuck ? T.freeze : t;
+  renderBG(t, ts);
+  renderHook(t, th);
+  renderStuck(t);
+  renderLift(t);
+  renderFly(t);
+  renderEnd(t);
+  renderFX(t);
+}
+
+buildHook(); buildStuck(); buildLift(); buildFly(); buildEnd();
+
+const capture = new URLSearchParams(location.search).has('capture');
+window.seek = (t) => render(t);
+window.DURATION = DURATION;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  render(0);
+  return true;
+})();
+
+if (!capture) {
+  const stage = $('#stage');
+  const fit = () => {
+    const s = Math.min(innerWidth / W, innerHeight / H);
+    stage.style.transform = `translate(${(innerWidth - W * s) / 2}px, ${(innerHeight - H * s) / 2}px) scale(${s})`;
+  };
+  addEventListener('resize', fit); fit();
+  let playing = true, tNow = 0, last = null;
+  const ctl = $('#ctl');
+  const loop = (ms) => {
+    if (last != null && playing) tNow = (tNow + (ms - last) / 1000) % DURATION;
+    last = ms;
+    render(tNow);
+    ctl.textContent = `${tNow.toFixed(2)}s / ${DURATION}s   space: pause · ←/→: scrub`;
+    requestAnimationFrame(loop);
+  };
+  window.ready.then(() => requestAnimationFrame(loop));
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { playing = !playing; e.preventDefault(); }
+    if (e.code === 'ArrowRight') tNow = Math.min(DURATION - 0.01, tNow + (e.shiftKey ? 1 : 0.1));
+    if (e.code === 'ArrowLeft') tNow = Math.max(0, tNow - (e.shiftKey ? 1 : 0.1));
+  });
+} else {
+  $('#ctl').remove();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expectation vs Reality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Permanent+Marker&display=block" rel="stylesheet">
+<style>
+  :root {
+    --line: rgba(255, 255, 255, 0.08);
+    --line2: rgba(255, 255, 255, 0.14);
+    --text: #f4f6fa;
+    --muted: #a3acbb;
+    --dim: #5f6878;
+    --o: #ff7416;
+    --o2: #ff9d3b;
+    --green: #5fd47a;
+    --red: #ff4b40;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+  #stage {
+    position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+    background: #000; color: var(--text); transform-origin: 0 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  #scene { position: absolute; inset: 0; transform-origin: 540px 960px; background: radial-gradient(ellipse 120% 70% at 50% 40%, #121726 0%, #070a12 60%, #05070b 100%); }
+  .layer { position: absolute; inset: 0; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
+  .marker { font-family: 'Permanent Marker', cursive; }
+  .grad {
+    background: linear-gradient(180deg, #ffb054 4%, #ff7317 58%, #df4c08 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .ggrad {
+    background: linear-gradient(180deg, #b8f5c6 0%, #5fd47a 55%, #2e9f4a 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hl { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; letter-spacing: -0.045em; line-height: 1; white-space: nowrap; }
+  .w { display: inline-block; margin: 0 0.03em; }
+  .stamp {
+    position: absolute; left: 540px; top: 0; padding: 10px 30px 12px; border: 7px solid currentColor; border-radius: 16px;
+    font-weight: 900; letter-spacing: 0.08em; white-space: nowrap; line-height: 1;
+  }
+  .ck { display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; flex: 0 0 auto; }
+  .ck svg { width: 72%; height: 72%; }
+
+  /* ---------- 1. title ---------- */
+  #t-meme { top: 610px; font-size: 64px; font-weight: 800; color: #c9d0dc; letter-spacing: 0.02em; }
+  #t-main { top: 700px; font-size: 160px; }
+  #t-sub { top: 900px; font-size: 64px; font-weight: 800; letter-spacing: 0.02em; }
+  #t-sub .e { color: var(--green); } #t-sub .r { color: var(--red); } #t-sub .v { color: var(--dim); }
+
+  /* ---------- 2. split ---------- */
+  #top { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; overflow: hidden;
+    background: radial-gradient(ellipse 90% 80% at 50% 45%, #10241a 0%, #08140f 70%, #060c09 100%); }
+  #bot { position: absolute; left: 0; top: 960px; width: 1080px; height: 960px; overflow: hidden;
+    background: radial-gradient(ellipse 90% 80% at 50% 50%, #2a0c0c 0%, #140607 70%, #0b0405 100%); }
+  #divider { position: absolute; left: 0; right: 0; top: 957px; height: 6px; background: #05070b; }
+  #st-e { color: var(--green); font-size: 58px; top: 150px; }
+  #st-r { color: var(--red); font-size: 58px; top: 70px; }
+  #e-list { position: absolute; left: 150px; top: 290px; width: 780px; display: flex; flex-direction: column; gap: 26px; }
+  .e-item { display: flex; align-items: center; gap: 26px; font-size: 50px; font-weight: 700; color: #e4f6e9; }
+  .e-item .ck { width: 60px; height: 60px; border: 4px solid rgba(95,212,122,0.6); color: #06200f; }
+  #e-time { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-size: 46px; font-weight: 700; color: #9fe3b1; }
+  #term { position: absolute; left: 60px; top: 190px; width: 960px; height: 560px; border-radius: 20px; overflow: hidden;
+    background: #0b0c10; border: 2px solid rgba(255,75,64,0.45); box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 50px rgba(255,59,48,0.18); }
+  #term .bar { height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: #15161b; border-bottom: 1px solid var(--line); }
+  #term .bar i { width: 14px; height: 14px; border-radius: 50%; background: #3a404c; display: block; }
+  #term .bar i:first-child { background: #ff5f57; }
+  #term .bar span { margin-left: 10px; font-size: 22px; color: var(--muted); font-weight: 700; }
+  #clock { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 30px; font-weight: 700; color: #ffd0cc; }
+  #clock svg { width: 38px; height: 38px; }
+  #lines { position: absolute; left: 0; right: 0; top: 58px; bottom: 0; overflow: hidden; }
+  #lines-in { position: absolute; left: 26px; right: 20px; top: 14px; font-size: 27px; line-height: 44px; color: #dfe4ec; white-space: pre; }
+  #lines-in .ps { color: var(--o2); } #lines-in .err { color: var(--red); font-weight: 700; } #lines-in .dim { color: var(--dim); }
+  #scribble { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; overflow: visible; }
+  #nope { position: absolute; left: 540px; top: 470px; font-size: 190px; color: var(--red); }
+  #opt3 { top: 820px; font-size: 92px; }
+  #opt3 .n { font-size: 210px; vertical-align: -0.1em; }
+
+  /* ---------- 3. rosetta ---------- */
+  #r-stamp { color: var(--o2); font-size: 44px; top: 112px; border-width: 6px; }
+  #r-with { top: 196px; font-size: 38px; font-weight: 700; color: #c9d0dc; letter-spacing: -0.01em; }
+  #r-titles { position: absolute; left: 0; right: 0; top: 282px; height: 120px; }
+  .r-title { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-size: 82px; font-weight: 900; letter-spacing: -0.04em; white-space: nowrap; }
+  .r-title .num { color: var(--o2); }
+  #vp { position: absolute; left: 50px; top: 440px; width: 980px; height: 860px; border-radius: 28px; overflow: hidden;
+    background: #1e1e1e; border: 2px solid rgba(255,157,59,0.55); box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 60px rgba(255,116,22,0.2); }
+  .shot { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  .shot img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: block; }
+  .ring { position: absolute; border: 5px solid #ffa34a; border-radius: 12px; }
+  .ov { position: absolute; font-family: 'Segoe UI', Inter, sans-serif; white-space: nowrap; }
+  .ovv { font-size: 18px; color: #ececec; line-height: 22px; }
+  .ovl { font-size: 12.5px; color: #c4c4c4; background: #1e1e1e; padding: 0 5px; line-height: 14px; }
+  .caret { display: inline-block; width: 2px; height: 20px; background: #f0f0f0; vertical-align: -4px; margin-left: 1px; }
+  .cursor { position: absolute; width: 34px; height: 34px; }
+  .ripple { position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 4px solid var(--o2); }
+  #r-caps { position: absolute; left: 0; right: 0; top: 1330px; height: 70px; }
+  .r-cap { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-size: 44px; font-weight: 700; color: #e6eaf0; letter-spacing: -0.01em; }
+  #chips { position: absolute; left: 50px; top: 1430px; width: 980px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .chip { height: 62px; border-radius: 999px; display: flex; align-items: center; gap: 12px; padding: 0 18px; font-size: 25px; font-weight: 700;
+    background: rgba(255,255,255,0.05); border: 2px solid var(--line2); color: #aab3c2; white-space: nowrap; }
+  .chip .ck { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #4a5160; color: #06200f; }
+
+  /* ---------- 4. end ---------- */
+  #e-exp { top: 300px; font-size: 104px; color: #e8edf3; letter-spacing: 0.02em; }
+  #e-met { position: absolute; left: 540px; top: 420px; font-size: 230px; color: var(--green); padding: 6px 44px 18px; border-width: 12px; letter-spacing: 0.02em; }
+  #e-icon { position: absolute; left: 452px; top: 965px; width: 180px; height: 180px; }
+  .logo-svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 20px 50px rgba(255,116,22,0.35)); }
+  .logo-svg g, .logo-svg path { transform-box: fill-box; transform-origin: center; }
+  #e-name { position: absolute; left: 0; right: 0; top: 1165px; text-align: center; }
+  .ros { font-size: 42px; font-weight: 700; letter-spacing: 0.34em; color: #ffc08a; margin-left: 0.34em; }
+  .nm { font-size: 124px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-top: 8px; white-space: nowrap; }
+  .shine {
+    background: linear-gradient(100deg, #ff7317 0%, #ffb054 40%, #fff3e0 50%, #ffb054 60%, #df4c08 100%);
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #e-pill { position: absolute; left: 540px; top: 1392px; height: 66px; padding: 0 30px; border-radius: 999px; display: flex; align-items: center; gap: 14px;
+    font-size: 30px; font-weight: 700; background: rgba(95,212,122,0.12); border: 2px solid rgba(95,212,122,0.55); color: #d6f7de; white-space: nowrap; }
+  #e-pill svg { width: 30px; height: 30px; color: var(--green); }
+  #e-url { position: absolute; left: 0; right: 0; top: 1488px; display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 32px; font-weight: 500; color: #ffc08a; }
+  #e-url svg { width: 32px; height: 32px; }
+
+  #flash { pointer-events: none; }
+  #vig { pointer-events: none; background: radial-gradient(ellipse 85% 70% at 50% 50%, transparent 58%, rgba(0,0,0,0.5) 100%); }
+  #ctl { position: fixed; left: 12px; bottom: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; color: #8a93a3; z-index: 9; user-select: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="scene">
+    <div id="title" class="layer">
+      <div id="t-meme" class="hl">POV:</div>
+      <div id="t-main" class="hl"></div>
+      <div id="t-sub" class="hl"><span class="w e">EXPECTATION</span> <span class="w v">vs.</span> <span class="w r">REALITY</span></div>
+    </div>
+
+    <div id="split" class="layer">
+      <div id="top">
+        <div id="st-e" class="stamp">EXPECTATION</div>
+        <div id="e-list"></div>
+        <div id="e-time"></div>
+        <svg id="scribble" viewBox="0 0 1080 960"><path id="scrib" pathLength="1" fill="none" stroke="#ff3b30" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="1"
+          d="M120 300 L960 330 L140 420 L950 450 L150 540 L940 570 L160 660 L930 690 L170 780 L920 800"/></svg>
+        <div id="nope" class="marker">NOPE.</div>
+      </div>
+      <div id="bot">
+        <div id="st-r" class="stamp">REALITY</div>
+        <div id="term">
+          <div class="bar"><i></i><i></i><i></i><span>terminal</span><div id="clock" class="mono"></div></div>
+          <div id="lines"><div id="lines-in" class="mono"></div></div>
+        </div>
+      </div>
+      <div id="divider"></div>
+    </div>
+    <div id="opt3" class="hl"><span class="marker">…or there's option</span> <span class="w marker grad n">3</span></div>
+
+    <div id="ros" class="layer">
+      <div id="r-stamp" class="stamp">REALITY</div>
+      <div id="r-with" class="hl">with Rosetta DBT Studio</div>
+      <div id="r-titles"></div>
+      <div id="vp"></div>
+      <div id="r-caps"></div>
+      <div id="chips"></div>
+    </div>
+
+    <div id="end" class="layer">
+      <div id="e-exp" class="hl">EXPECTATION:</div>
+      <div id="e-met" class="stamp">MET.</div>
+      <div id="e-icon"></div>
+      <div id="e-name">
+        <div class="ros">ROSETTA</div>
+        <div class="nm">DBT <span class="shine" id="shine">Studio</span></div>
+      </div>
+      <div id="e-pill"></div>
+      <div id="e-url" class="mono"></div>
+    </div>
+
+    <div id="flash" class="layer"></div>
+    <div id="vig" class="layer"></div>
+  </div>
+</div>
+<div id="ctl"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="rgb" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+    <feOffset in="r" id="rOff" dx="0" dy="0" result="r2" />
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+    <feOffset in="b" id="bOff" dx="0" dy="0" result="b2" />
+    <feBlend in="r2" in2="g" mode="screen" result="rg" />
+    <feBlend in="rg" in2="b2" mode="screen" />
+  </filter>
+</svg>
+
+<script>
+/* =========================================================================
+   Deterministic timeline: everything on screen is a pure function of t (s).
+   Preview: open this file. Capture: ?capture=1 and call window.seek(t).
+   120 BPM: one beat = 0.5 s, one bar = 2 s. Cues sit on that grid so they
+   line up with score.py.
+   ========================================================================= */
+const DURATION = 22;
+const T = { split: 2.0, nope: 7.0, opt3: 7.4, drop: 8.0, end: 18.0, met: 18.5, lock: 19.0 };
+const W = 1080, H = 1920, VW = 980, VH = 860;
+
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, p) => a + (b - a) * p;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  outCubic: (p) => 1 - Math.pow(1 - p, 3),
+  inCubic: (p) => p * p * p,
+  inOutCubic: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+  outExpo: (p) => (p === 1 ? 1 : 1 - Math.pow(2, -10 * p)),
+  outBack: (p) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+function show(e, on) { const v = on ? '' : 'none'; if (e.style.display !== v) e.style.display = v; }
+const words = (s, cls = 'w') => s.split(' ').map((w) => `<span class="${cls}">${w}</span>`).join(' ');
+
+// a word slamming in: big -> settled, with a quick fade
+function slam(e, t, t0, from = 2.0, dur = 0.24) {
+  const p = P(t, t0, t0 + dur);
+  e.style.opacity = t < t0 ? 0 : clamp(p * 5);
+  e.style.transform = `scale(${lerp(from, 1, E.outExpo(p))})`;
+}
+// a rubber stamp: drops in big and rotated, lands with a tiny overshoot
+function stamp(e, t, t0, rot, from = 2.4) {
+  const p = P(t, t0, t0 + 0.2);
+  e.style.opacity = t < t0 ? 0 : clamp(p * 4);
+  e.style.transform = `translateX(-50%) rotate(${rot}deg) scale(${lerp(from, 1, E.outBack(p))})`;
+}
+
+/* ---------- icons ---------- */
+const I = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  smile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:44px;height:44px;vertical-align:-8px"><circle cx="12" cy="12" r="9.5"/><path d="M8 14.5c1.1 1.4 2.4 2 4 2s2.9-.6 4-2"/><circle cx="9" cy="9.5" r="0.6" fill="currentColor"/><circle cx="15" cy="9.5" r="0.6" fill="currentColor"/></svg>',
+  github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>',
+  cursor: '<svg viewBox="0 0 24 24" width="34" height="34"><path d="M4 2.5l15 10.2-6.6 1.3 3.9 7.3-3 1.5-3.8-7.3L4.8 20z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>',
+};
+function clockSVG() {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path id="hh" d="M12 12V7.5"/><path id="mh" d="M12 12V4.5"/></svg>`;
+}
+
+/* ---------- logo (same vector rebuild as rosetta-dbt-studio-15sec) ---------- */
+function logoSVG(id) {
+  const f = (pts, c) => `<polygon points="${pts}" fill="${c}" stroke="${c}" stroke-width="9" stroke-linejoin="round"/>`;
+  return `<svg class="logo-svg" viewBox="-40 -40 560 560">
+    <defs><linearGradient id="spg-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb054"/><stop offset="1" stop-color="#f0600e"/></linearGradient></defs>
+    <path class="lg-frame" pathLength="1" d="M420 262 V50 A70 70 0 0 0 350 -20 H50 A70 70 0 0 0 -20 50 V350 A70 70 0 0 0 50 420 H262" fill="none" stroke="#ff7a1f" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/>
+    <g class="lg-b3">${f('46,263 198,331 198,384 46,317', '#fb9145')}${f('198,331 346,263 346,317 198,384', '#f7641f')}</g>
+    <g class="lg-b2">${f('46,182 198,249 198,304 46,236', '#fc8939')}${f('198,249 346,182 346,236 198,304', '#f7641f')}<circle cx="236" cy="259" r="11.5" fill="#07090d"/></g>
+    <g class="lg-b1">${f('198,22 346,88 198,156 46,88', '#fc7927')}${f('46,88 198,156 198,222 46,154', '#fd8a37')}${f('198,156 346,88 346,154 198,222', '#f5621f')}</g>
+    <path class="lg-spark" d="M400 306 C409 372 428 391 494 400 C428 409 409 428 400 494 C391 428 372 409 306 400 C372 391 391 372 400 306 Z" fill="url(#spg-${id})"/>
+  </svg>`;
+}
+function logoParts(root) { return { frame: $('.lg-frame', root), b1: $('.lg-b1', root), b2: $('.lg-b2', root), b3: $('.lg-b3', root), spark: $('.lg-spark', root) }; }
+function animLogo(L, t, t0) {
+  [L.b3, L.b2, L.b1].forEach((g, k) => {
+    const p = P(t, t0 + k * 0.06, t0 + k * 0.06 + 0.3);
+    g.style.transform = `translateY(${(1 - E.outBack(p)) * -380}px)`;
+    g.style.opacity = clamp(p * 3);
+  });
+  const fp = E.inOutCubic(P(t, t0 + 0.12, t0 + 0.5));
+  L.frame.style.strokeDashoffset = 1 - fp;
+  L.frame.style.opacity = fp > 0 ? 1 : 0;
+  const sp = P(t, t0 + 0.3, t0 + 0.62);
+  L.spark.style.transform = `scale(${E.outBack(sp)}) rotate(${(1 - E.outCubic(sp)) * -200}deg)`;
+  L.spark.style.opacity = clamp(sp * 4);
+}
+
+/* =========================================================================
+   1. Title (0 - 2): "POV: setting up dbt" / EXPECTATION vs. REALITY
+   ========================================================================= */
+function buildTitle() { $('#t-main').innerHTML = `<span class="w">Setting</span> <span class="w">up</span><br><span class="w grad">dbt</span>`; }
+function renderTitle(t) {
+  const on = t < T.split + 0.25; show($('#title'), on); if (!on) return;
+  const out = E.inCubic(P(t, T.split - 0.05, T.split + 0.2));
+  slam($('#t-meme'), t, 0.1, 1.6, 0.2);
+  $$('#t-main .w').forEach((w, i) => slam(w, t, [0.25, 0.5, 0.75][i], 2.0));
+  $('#t-main').style.top = '600px'; $('#t-meme').style.top = '480px';
+  $$('#t-sub .w').forEach((w, i) => slam(w, t, [1.0, 1.25, 1.5][i], 1.8, 0.2));
+  $('#t-sub').style.top = '1000px';
+  $('#title').style.opacity = 1 - out;
+  $('#title').style.transform = `scale(${1 + out * 0.15})`;
+}
+
+/* =========================================================================
+   2. Split (2 - 8): calm checklist on top, terminal chaos below
+   ========================================================================= */
+const E_ITEMS = ['Install dbt', 'Create a project', 'Connect a database', 'Build models', 'Run dbt'];
+const E_TICK = (i) => 2.5 + i * 0.5;
+const LINES = [
+  [2.30, '<span class="ps">$</span> pip install dbt-core dbt-postgres'],
+  [2.70, '<span class="err">ERROR:</span> ResolutionImpossible'],
+  [3.05, '<span class="dim">  conflicting dependencies…</span>'],
+  [3.40, '<span class="ps">$</span> dbt init northwind'],
+  [3.75, '<span class="err">\'dbt\' is not recognized as a command</span>'],
+  [4.10, '<span class="ps">$</span> notepad ~/.dbt/profiles.yml'],
+  [4.45, '<span class="ps">$</span> dbt debug'],
+  [4.75, '<span class="err">Could not find profile named</span>'],
+  [4.95, '<span class="err">  \'northwind\'</span>'],
+  [5.25, '<span class="err">YAML error:</span> mapping values are'],
+  [5.40, '  not allowed here <span class="dim">(line 7)</span>'],
+  [5.70, '<span class="ps">$</span> dbt debug'],
+  [5.95, '  Connection test: <span class="err">[ERROR]</span>'],
+  [6.25, '<span class="ps">$</span> google "dbt profiles.yml help"'],
+  [6.55, '<span class="ps">$</span> stackoverflow.com/questions/…'],
+  [6.80, '<span class="err">ERROR:</span> <span class="err">ERROR:</span> <span class="err">ERROR:</span>'],
+];
+function buildSplit() {
+  $('#e-list').innerHTML = E_ITEMS.map((s) => `<div class="e-item"><div class="ck">${I.check}</div><span>${s}</span></div>`).join('');
+  $('#e-time').innerHTML = `Done in 5 minutes ${I.smile}`;
+  $('#lines-in').innerHTML = LINES.map(([, s]) => `<div>${s}</div>`).join('');
+  $('#clock').innerHTML = `${clockSVG()}<span id="clock-t"></span>`;
+}
+function clockText(minutes) {
+  const m = Math.floor(minutes) % (24 * 60);
+  let h = Math.floor(m / 60), mm = m % 60;
+  const ap = h >= 12 ? 'PM' : 'AM'; h %= 12; if (h === 0) h = 12;
+  return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${ap}`;
+}
+function renderSplit(t) {
+  const on = t >= T.split - 0.05 && t < T.drop; show($('#split'), on); if (!on) return;
+  // the two halves slide in from opposite sides, and leave the same way
+  const inP = E.outCubic(P(t, T.split - 0.05, T.split + 0.3));
+  const outP = E.inCubic(P(t, T.opt3, T.opt3 + 0.35));
+  $('#top').style.transform = `translateX(${(1 - inP) * -1080}px) translateY(${outP * -960}px)`;
+  $('#bot').style.transform = `translateX(${(1 - inP) * 1080}px) translateY(${outP * 960}px)`;
+  $('#divider').style.opacity = 1 - outP;
+  stamp($('#st-e'), t, 2.2, -3);
+  stamp($('#st-r'), t, 2.3, 2);
+
+  $$('#e-list .e-item').forEach((it, i) => {
+    const p = E.outBack(P(t, E_TICK(i), E_TICK(i) + 0.25));
+    const ck = $('.ck', it);
+    ck.style.background = p > 0 ? `rgba(95,212,122,${clamp(p)})` : 'transparent';
+    ck.querySelector('svg').style.transform = `scale(${p})`;
+    it.style.opacity = 0.55 + 0.45 * clamp(p * 2);
+    it.style.transform = `translateY(${Math.sin(t * 2.2 + i) * 3}px)`;
+  });
+  const tp = E.outBack(P(t, 5.0, 5.3));
+  $('#e-time').style.opacity = clamp(tp * 2); $('#e-time').style.transform = `scale(${lerp(0.6, 1, tp)})`;
+
+  // terminal: lines arrive, scroll, clock spins from 9 AM to 1:47 AM
+  const shown = LINES.filter(([lt]) => t >= lt).length;
+  $$('#lines-in > div').forEach((d, i) => { d.style.opacity = i < shown ? 1 : 0; });
+  const visible = 11;
+  const scrollTo = Math.max(0, shown - visible) * 44;
+  $('#lines-in').style.transform = `translateY(${-scrollTo}px)`;
+  const cp = Math.pow(P(t, 2.3, 6.9), 1.6);
+  const mins = 9 * 60 + cp * (16 * 60 + 47);
+  $('#clock-t').textContent = clockText(mins);
+  $('#mh').style.transform = `rotate(${mins * 6}deg)`; $('#mh').style.transformOrigin = '12px 12px';
+  $('#hh').style.transform = `rotate(${mins * 0.5}deg)`; $('#hh').style.transformOrigin = '12px 12px';
+  const panic = P(t, 4.5, 7.0);
+  const j = panic * 7;
+  $('#term').style.transform = `translate(${Math.sin(t * 61) * j}px, ${Math.cos(t * 53) * j}px) rotate(${Math.sin(t * 7) * panic * 0.8}deg)`;
+  $('#bot').style.filter = `saturate(${1 + panic * 0.4})`;
+
+  // NOPE: red marker scribbles the expectation out
+  const sp = E.inOutCubic(P(t, T.nope, T.nope + 0.32));
+  $('#scrib').style.strokeDashoffset = 1 - sp;
+  $('#scrib').style.opacity = sp > 0 ? 1 : 0;
+  const np = E.outBack(P(t, T.nope + 0.22, T.nope + 0.4));
+  $('#nope').style.opacity = t < T.nope + 0.22 ? 0 : clamp(np * 3);
+  $('#nope').style.transform = `translate(-50%, -50%) rotate(-8deg) scale(${lerp(2.2, 1, np)})`;
+}
+function renderOpt3(t) {
+  const on = t >= T.opt3 && t < T.drop + 0.2; show($('#opt3'), on); if (!on) return;
+  const p = E.outCubic(P(t, T.opt3 + 0.1, T.opt3 + 0.35));
+  const out = P(t, T.drop - 0.02, T.drop + 0.15);
+  $('#opt3').style.opacity = clamp(p * 2) * (1 - out);
+  $('#opt3').style.transform = `translateY(${(1 - p) * 40}px) scale(${1 + out * 0.6})`;
+  slam($('#opt3 .n'), t, T.opt3 + 0.3, 2.6, 0.22);
+}
+
+/* =========================================================================
+   3. Rosetta (8 - 18): the same checklist, done for real in the app
+   ========================================================================= */
+// cameras are rectangles in screenshot pixels: centre (cx, cy) and width w
+const STEPS = [
+  { t0: 8.0, t1: 9.5, title: 'Install dbt', cap: 'The setup wizard installs Python + dbt for you.', chip: 'Install dbt',
+    shots: [{ img: '00-start', from: 8.0, to: 9.5, cam: [{ cx: 960, cy: 560, w: 1800 }, { cx: 1372, cy: 1066, w: 560 }], free: true,
+      rings: [[1240, 1054, 258, 28, 8.6]] }] },
+  { t0: 9.5, t1: 11.5, title: 'Create a project', cap: 'Name it. Pick a connection. Save.', chip: 'New project',
+    shots: [{ img: '01-new-project', from: 9.5, to: 11.5, cam: [{ cx: 994, cy: 405, w: 800 }, { cx: 994, cy: 405, w: 660 }], form: true }] },
+  { t0: 11.5, t1: 13.5, title: 'Connect a database', cap: 'Postgres connected. Test passed.', chip: 'Connect DB',
+    shots: [
+      { img: '02a-connection-types', from: 11.5, to: 12.3, cam: [{ cx: 1175, cy: 560, w: 1500 }, { cx: 820, cy: 360, w: 1000 }],
+        rings: [[578, 97, 271, 283, 11.75]], click: [714, 240, 12.05] },
+      { img: '02b-postgres-success', from: 12.3, to: 13.5, cam: [{ cx: 990, cy: 520, w: 820 }, { cx: 1340, cy: 600, w: 1160 }],
+        host: true, rings: [[1486, 977, 408, 68, 12.75]] }] },
+  { t0: 13.5, t1: 15.0, title: 'Build models', cap: 'Staging models, generated for you.', chip: 'Build models',
+    shots: [{ img: '03b-staging-models', from: 13.5, to: 15.0, cam: [{ cx: 700, cy: 440, w: 1250 }, { cx: 520, cy: 420, w: 900 }],
+      rings: [[102, 338, 342, 140, 13.9]] }] },
+  { t0: 15.0, t1: 16.5, title: 'Run dbt', cap: '5 of 5 models passed.', chip: 'Run',
+    shots: [{ img: '04-run-success', from: 15.0, to: 16.5, cam: [{ cx: 960, cy: 760, w: 1250 }, { cx: 800, cy: 880, w: 820 }],
+      rings: [[446, 945, 640, 60, 15.55]] }] },
+  { t0: 16.5, t1: 18.0, title: 'See the lineage', cap: 'Everything connected. Bonus.', chip: 'Lineage',
+    shots: [{ img: '05-lineage', from: 16.5, to: 18.0, cam: [{ cx: 960, cy: 760, w: 1300 }, { cx: 1000, cy: 760, w: 1060 }],
+      rings: [[1120, 678, 326, 146, 17.0]] }] },
+];
+const TICK = (s) => s.t1 - 0.3;   // the step's chip ticks just before the next step
+
+function buildRos() {
+  $('#r-titles').innerHTML = STEPS.map((s, i) => `<div class="r-title"><span class="num">${i + 1}.</span> ${s.title}</div>`).join('');
+  $('#r-caps').innerHTML = STEPS.map((s) => `<div class="r-cap">${s.cap}</div>`).join('');
+  $('#chips').innerHTML = STEPS.map((s) => `<div class="chip"><div class="ck">${I.check}</div><span>${s.chip}</span></div>`).join('');
+  const vp = $('#vp');
+  STEPS.forEach((s) => s.shots.forEach((sh) => {
+    const d = document.createElement('div');
+    d.className = 'shot';
+    let html = `<img src="screenshots/${sh.img}.png" alt="">`;
+    (sh.rings || []).forEach(([x, y, w, h]) => { html += `<div class="ring" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`; });
+    if (sh.form) {
+      html += `<div class="ov ovv" id="f-path" style="left:794px;top:290px">C:\\projects</div>
+        <div class="ov ovl" id="f-name-l" style="left:788px;top:410px">Project Name</div>
+        <div class="ov ovv" id="f-name" style="left:794px;top:438px"></div>
+        <div class="ov ovl" id="f-conn-l" style="left:788px;top:626px">Connection</div>
+        <div class="ov ovv" id="f-conn" style="left:794px;top:654px">jaffle_shop</div>
+        <div class="ripple" id="f-rip" style="left:1199px;top:139px"></div>
+        <div class="cursor" id="f-cur">${I.cursor}</div>`;
+    }
+    if (sh.host) html += `<div class="ov ovv" style="left:794px;top:412px">db.example.com</div>`;
+    if (sh.click) html += `<div class="ripple" style="left:${sh.click[0]}px;top:${sh.click[1]}px"></div><div class="cursor">${I.cursor}</div>`;
+    d.innerHTML = html;
+    sh.el = d;
+    vp.appendChild(d);
+  }));
+}
+
+function camRect(c, free) {
+  const w = Math.min(c.w, 1920), h = (w * VH) / VW;
+  if (free) return { x: c.cx - w / 2, y: c.cy - h / 2, w };
+  const cx = clamp(c.cx, w / 2, 1920 - w / 2), cy = h >= 1080 ? 540 : clamp(c.cy, h / 2, 1080 - h / 2);
+  return { x: cx - w / 2, y: cy - h / 2, w };
+}
+function placeShot(sh, t) {
+  const p = E.inOutCubic(P(t, sh.from, sh.to));
+  const a = sh.cam[0], b = sh.cam[1];
+  const r = camRect({ cx: lerp(a.cx, b.cx, p), cy: lerp(a.cy, b.cy, p), w: lerp(a.w, b.w, p) }, sh.free);
+  const s = VW / r.w;
+  // horizontal swipe between shots, like flicking through a phone carousel
+  const inP = E.outCubic(P(t, sh.from - 0.02, sh.from + 0.22));
+  const outP = E.inCubic(P(t, sh.to - 0.18, sh.to + 0.02));
+  const dx = (1 - inP) * VW * 1.05 - outP * VW * 1.05;
+  sh.el.style.transform = `translate(${dx - r.x * s}px, ${-r.y * s}px) scale(${s})`;
+}
+
+function renderRos(t) {
+  const on = t >= T.drop; show($('#ros'), on); if (!on) return;
+  const out = E.inCubic(P(t, T.end, T.end + 0.4));
+  stamp($('#r-stamp'), t, T.drop + 0.02, -2, 2.2);
+  const wp = E.outCubic(P(t, T.drop + 0.15, T.drop + 0.4));
+  $('#r-with').style.opacity = wp * (1 - out); $('#r-with').style.transform = `translateY(${(1 - wp) * 20}px)`;
+  $('#r-stamp').style.opacity *= 1 - out;
+
+  const vpIn = E.outBack(P(t, T.drop, T.drop + 0.35));
+  $('#vp').style.transform = `scale(${lerp(0.7, 1, vpIn) * (1 - out * 0.4)}) translateY(${out * 300}px)`;
+  $('#vp').style.opacity = clamp(vpIn * 2) * (1 - out);
+
+  const titles = $$('#r-titles .r-title'), caps = $$('#r-caps .r-cap'), chips = $$('#chips .chip');
+  STEPS.forEach((s, i) => {
+    const vis = t >= s.t0 - 0.02 && t < s.t1;
+    show(titles[i], vis); show(caps[i], vis);
+    if (vis) {
+      const p = E.outCubic(P(t, s.t0, s.t0 + 0.25));
+      const o = E.inCubic(P(t, s.t1 - 0.15, s.t1));
+      titles[i].style.opacity = clamp(p * 2) * (1 - o) * (1 - out);
+      titles[i].style.transform = `translateX(${(1 - p) * 120 - o * 120}px)`;
+      const cp = E.outCubic(P(t, s.t0 + 0.15, s.t0 + 0.4));
+      caps[i].style.opacity = cp * (1 - o) * (1 - out);
+      caps[i].style.transform = `translateY(${(1 - cp) * 18}px)`;
+    }
+    s.shots.forEach((sh) => {
+      const sv = t >= sh.from - 0.02 && t < sh.to + 0.02;
+      show(sh.el, sv);
+      if (!sv) return;
+      placeShot(sh, t);
+      $$('.ring', sh.el).forEach((rg, k) => {
+        const t0 = sh.rings[k][4];
+        const rp = E.outBack(P(t, t0, t0 + 0.25));
+        rg.style.opacity = clamp(rp * 2);
+        rg.style.transform = `scale(${lerp(1.5, 1, rp)})`;
+        const g = 0.5 + 0.5 * Math.sin((t - t0) * 12);
+        rg.style.boxShadow = `0 0 ${16 + 16 * g}px rgba(255,140,40,${0.55 + 0.3 * g})`;
+      });
+      if (sh.form) renderForm(sh, t);
+      if (sh.click) {
+        const [cx, cy, tc] = sh.click;
+        const cur = $('.cursor', sh.el), rip = $('.ripple', sh.el);
+        const mp = E.inOutCubic(P(t, sh.from + 0.05, tc));
+        cur.style.left = `${lerp(cx + 260, cx, mp)}px`; cur.style.top = `${lerp(cy + 200, cy, mp)}px`;
+        cur.style.transform = `scale(${t > tc && t < tc + 0.12 ? 0.85 : 1})`;
+        const q = P(t, tc, tc + 0.4);
+        rip.style.opacity = t < tc ? 0 : 1 - q; rip.style.transform = `scale(${lerp(0.3, 1.6, E.outCubic(q))})`;
+      }
+    });
+    // chips: current step glows orange, finished steps turn green with a tick
+    const ch = chips[i], done = t >= TICK(s), active = t >= s.t0 && !done;
+    const kp = E.outBack(P(t, TICK(s), TICK(s) + 0.22));
+    ch.style.borderColor = done ? 'rgba(95,212,122,0.7)' : active ? 'rgba(255,157,59,0.8)' : '';
+    ch.style.background = done ? 'rgba(95,212,122,0.12)' : active ? 'rgba(255,116,22,0.12)' : '';
+    ch.style.color = done ? '#d6f7de' : active ? '#ffe2c8' : '';
+    const ck = $('.ck', ch);
+    ck.style.background = done ? '#5fd47a' : 'transparent';
+    ck.style.borderColor = done ? '#5fd47a' : '';
+    ck.querySelector('svg').style.transform = `scale(${done ? kp : 0})`;
+    ch.style.transform = `scale(${done ? lerp(1.12, 1, P(t, TICK(s), TICK(s) + 0.25)) : 1})`;
+  });
+  const cIn = E.outCubic(P(t, T.drop + 0.2, T.drop + 0.5));
+  // after the last tick the chips lift up and become the end card's checklist
+  const lift = E.inOutCubic(P(t, T.end, T.end + 0.45));
+  $('#chips').style.opacity = cIn;
+  $('#chips').style.transform = `translateY(${(1 - cIn) * 40 - lift * 650}px)`;
+}
+
+function renderForm(sh, t) {
+  const name = 'northwind';
+  const typed = Math.floor(clamp((t - 9.85) / 0.06, 0, name.length));
+  const pathOn = t > 9.7, connOn = t > 10.65;
+  $('#f-path').style.opacity = pathOn ? 1 : 0;
+  $('#f-name-l').style.opacity = t > 9.82 ? 1 : 0;
+  $('#f-name').innerHTML = name.slice(0, typed) + (t > 9.82 && t < 10.6 && Math.floor(t * 4) % 2 === 0 ? '<span class="caret"></span>' : '');
+  $('#f-conn-l').style.opacity = connOn ? 1 : 0;
+  $('#f-conn').style.opacity = connOn ? 1 : 0;
+  // cursor travels to Save and clicks it
+  const cur = $('#f-cur'), tc = 11.05;
+  const mp = E.inOutCubic(P(t, 10.75, tc));
+  cur.style.opacity = t > 10.7 ? 1 : 0;
+  cur.style.left = `${lerp(1100, 1196, mp)}px`; cur.style.top = `${lerp(560, 132, mp)}px`;
+  cur.style.transform = `scale(${t > tc && t < tc + 0.12 ? 0.85 : 1})`;
+  const q = P(t, tc, tc + 0.4);
+  $('#f-rip').style.opacity = t < tc ? 0 : 1 - q;
+  $('#f-rip').style.transform = `scale(${lerp(0.3, 1.6, E.outCubic(q))})`;
+}
+
+/* =========================================================================
+   4. End card (18 - 22): EXPECTATION: MET.
+   ========================================================================= */
+let LE;
+function buildEnd() {
+  $('#e-icon').innerHTML = logoSVG('e');
+  LE = logoParts($('#e-icon'));
+  $('#e-pill').innerHTML = `${I.check}<span>Python + dbt installed for you at setup</span>`;
+  $('#e-url').innerHTML = `${I.github}github.com/rosettadb/dbt-studio`;
+}
+function renderEnd(t) {
+  const on = t >= T.end; show($('#end'), on); if (!on) return;
+  slam($('#e-exp'), t, T.end + 0.2, 1.6, 0.22);
+  $('#e-exp').style.top = '210px';
+  stamp($('#e-met'), t, T.met, -4, 2.8);
+  $('#e-met').style.top = '330px';
+  const t0 = T.lock;
+  const ip = E.outBack(P(t, t0, t0 + 0.4));
+  $('#e-icon').style.transform = `scale(${lerp(0.4, 1, ip)}) translateY(${Math.sin((t - t0) * 2.2) * 4}px)`;
+  $('#e-icon').style.opacity = clamp(ip * 2);
+  animLogo(LE, t, t0);
+  const np = E.outCubic(P(t, t0 + 0.18, t0 + 0.55));
+  $('#e-name').style.transform = `translateY(${(1 - np) * 50}px)`; $('#e-name').style.opacity = np;
+  const pp = E.outBack(P(t, t0 + 0.5, t0 + 0.8));
+  $('#e-pill').style.opacity = clamp(pp * 2);
+  $('#e-pill').style.transform = `translateX(-50%) scale(${lerp(0.7, 1, pp)})`;
+  const up = E.outCubic(P(t, t0 + 0.8, t0 + 1.1));
+  $('#e-url').style.transform = `translateY(${(1 - up) * 20}px)`; $('#e-url').style.opacity = up;
+  const sh = E.inOutCubic(P(t, 20.5, 21.25));
+  $('#shine').style.backgroundPosition = `${lerp(100, 0, sh)}% 0`;
+}
+
+/* =========================================================================
+   Camera shake, flashes, RGB glitch
+   ========================================================================= */
+const STEP_CUTS = STEPS.slice(1).map((s) => s.t0);
+const HITS = [[T.split, 8, 0.2], [T.nope + 0.22, 14, 0.3], [T.drop, 20, 0.4], ...STEP_CUTS.map((c) => [c, 6, 0.18]), [T.met, 18, 0.35], [T.lock, 8, 0.25]];
+const GLITCH = [[T.split, 10], [5.95, 6], [6.8, 12], [T.nope, 10], [T.drop, 18], ...STEP_CUTS.map((c) => [c, 8]), [T.met, 12]];
+const FLASH = [[T.drop, '255,245,230', 0.9, 0.2], [T.met, '95,212,122', 0.45, 0.25], [T.lock, '255,170,90', 0.35, 0.25]];
+
+function renderFX(t) {
+  let amp = 0, sx = 0, sy = 0, sr = 0;
+  for (const [th, a, d] of HITS) {
+    if (t < th || t > th + d * 5) continue;
+    const k = a * Math.exp(-(t - th) / d);
+    amp += k;
+    sx += k * Math.sin((t - th) * 83 + th); sy += k * Math.cos((t - th) * 71 + th * 2); sr += k * 0.04 * Math.sin((t - th) * 57);
+  }
+  const rum = 4 * P(t, 7.45, 7.95) * (t < T.drop ? 1 : 0);
+  sx += rum * Math.sin(t * 91); sy += rum * Math.cos(t * 87); amp += rum;
+  $('#scene').style.transform = `translate(${sx}px, ${sy}px) rotate(${sr}deg) scale(${1 + amp / 320})`;
+
+  let gl = 0;
+  for (const [tg, a] of GLITCH) if (t >= tg && t < tg + 0.3) gl += a * Math.exp(-(t - tg) / 0.07);
+  if (gl > 0.6) {
+    $('#rOff').setAttribute('dx', gl.toFixed(1)); $('#bOff').setAttribute('dx', (-gl).toFixed(1));
+    $('#rOff').setAttribute('dy', (gl * 0.3).toFixed(1)); $('#bOff').setAttribute('dy', (-gl * 0.3).toFixed(1));
+    $('#scene').style.filter = 'url(#rgb)';
+  } else {
+    $('#scene').style.filter = 'none';
+  }
+  let fo = 0, fc = '255,255,255';
+  for (const [tf, c, a, d] of FLASH) {
+    if (t < tf || t > tf + d * 6) continue;
+    const v = a * Math.exp(-(t - tf) / d);
+    if (v > fo) { fo = v; fc = c; }
+  }
+  $('#flash').style.background = `rgb(${fc})`;
+  $('#flash').style.opacity = fo;
+}
+
+/* =========================================================================
+   Frame
+   ========================================================================= */
+function render(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  renderTitle(t);
+  renderSplit(t);
+  renderOpt3(t);
+  renderRos(t);
+  renderEnd(t);
+  renderFX(t);
+}
+
+buildTitle(); buildSplit(); buildRos(); buildEnd();
+
+const capture = new URLSearchParams(location.search).has('capture');
+window.seek = (t) => render(t);
+window.DURATION = DURATION;
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  render(0);
+  return true;
+})();
+
+if (!capture) {
+  const stage = $('#stage');
+  const fit = () => {
+    const s = Math.min(innerWidth / W, innerHeight / H);
+    stage.style.transform = `translate(${(innerWidth - W * s) / 2}px, ${(innerHeight - H * s) / 2}px) scale(${s})`;
+  };
+  addEventListener('resize', fit); fit();
+  let playing = true, tNow = 0, last = null;
+  const ctl = $('#ctl');
+  const loop = (ms) => {
+    if (last != null && playing) tNow = (tNow + (ms - last) / 1000) % DURATION;
+    last = ms;
+    render(tNow);
+    ctl.textContent = `${tNow.toFixed(2)}s / ${DURATION}s   space: pause · ←/→: scrub`;
+    requestAnimationFrame(loop);
+  };
+  window.ready.then(() => requestAnimationFrame(loop));
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { playing = !playing; e.preventDefault(); }
+    if (e.code === 'ArrowRight') tNow = Math.min(DURATION - 0.01, tNow + (e.shiftKey ? 1 : 0.1));
+    if (e.code === 'ArrowLeft') tNow = Math.max(0, tNow - (e.shiftKey ? 1 : 0.1));
+  });
+} else {
+  $('#ctl').remove();
+}
+</script>
+</body>
+</html>
