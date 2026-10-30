@@ -1,4 +1,4 @@
-# AI Agentic dbt Development: slides
+# Agentic dbt Development: slides
 
 Fourteen HTML decks, one per section of `COURSE-PLAN.md`, each with a talk track behind every slide. Open `index.html` to start.
 

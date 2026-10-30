@@ -9,7 +9,7 @@ TTS = {}
 
 TTS[0] = [
     # 1 title
-    "Welcome to AI agentic dbt development. In this crash course we build one real dbt project, from an empty folder to production patterns, using Rosetta dbt Studio and its built-in AI agent. All you need is basic SQL.",
+    "Welcome to agentic dbt development. In this crash course we build one real dbt project with an AI agent, from an empty folder to production patterns, using Rosetta dbt Studio. All you need is basic SQL.",
     # 2 statement
     "Agentic means the AI does more than chat. It reads your project, writes files, and runs dbt commands. That is powerful, which is exactly why you stay the engineer. The agent proposes. You review, you decide, and dbt tells you if it is right.",
     # 3 agentic loop

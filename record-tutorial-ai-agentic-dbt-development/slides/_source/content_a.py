@@ -6,11 +6,11 @@ P1 = 'Part 1 · Core'
 # =====================================================================================================================
 S00 = dict(num=0, file='s00-welcome', title='Welcome & the agentic loop', short='Welcome', part=P1, minutes=6,
            blurb='What we build, how the screen works, and the six habits of working with an AI agent.', slides=[
-    title('AI Agentic dbt Development',
+    title('Agentic dbt Development',
           'Build one real dbt project with an AI agent, and stay the engineer in charge.',
           chips=['14 sections', '≈ 2.5 hours', 'dbt v1', 'Rosetta dbt Studio', 'Real NYC taxi data'],
           kicker='Crash course · Section 00',
-          say=['Welcome to this crash course on AI agentic dbt development. My name is ___, and for the next couple of hours we are going to build **one real dbt project**, from an empty folder all the way to production patterns.',
+          say=['Welcome to this crash course on agentic dbt development. My name is ___, and for the next couple of hours we are going to build **one real dbt project**, from an empty folder all the way to production patterns.',
                'We use Rosetta dbt Studio, a desktop dbt IDE with an AI agent built in, and real public data: New York City taxi trips. Millions of rows, and they are messy, which is exactly what we want.',
                'You don\'t need to know dbt already. You need basic SQL, and Rosetta dbt Studio installed. If you haven\'t installed it, the Beginners Course, lessons 3 and 4, covers that.'],
           do=['Slides window full screen, presenter window on your second screen.']),

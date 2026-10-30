@@ -1,215 +1,215 @@
 1
-00:00:00,700 --> 00:00:03,708
-Welcome to AI agentic dbt development.
+00:00:00,700 --> 00:00:03,409
+Welcome to agentic dbt development.
 
 2
-00:00:03,988 --> 00:00:14,569
-In this crash course we build one real dbt project, from an empty folder to production patterns, using Rosetta dbt Studio and its built-in AI agent.
+00:00:03,689 --> 00:00:13,460
+In this crash course we build one real dbt project with an AI agent, from an empty folder to production patterns, using Rosetta dbt Studio.
 
 3
-00:00:14,849 --> 00:00:16,811
+00:00:13,739 --> 00:00:15,702
 All you need is basic SQL.
 
 4
-00:00:17,911 --> 00:00:20,343
+00:00:16,802 --> 00:00:19,234
 Agentic means the AI does more than chat.
 
 5
-00:00:20,623 --> 00:00:24,634
+00:00:19,514 --> 00:00:23,525
 It reads your project, writes files, and runs dbt commands.
 
 6
-00:00:24,914 --> 00:00:28,349
+00:00:23,805 --> 00:00:27,239
 That is powerful, which is exactly why you stay the engineer.
 
 7
-00:00:28,629 --> 00:00:29,973
+00:00:27,519 --> 00:00:28,863
 The agent proposes.
 
 8
-00:00:30,253 --> 00:00:33,751
+00:00:29,144 --> 00:00:32,642
 You review, you decide, and dbt tells you if it is right.
 
 9
-00:00:34,852 --> 00:00:37,710
+00:00:33,742 --> 00:00:36,601
 Every time we use the agent, we follow one loop.
 
 10
-00:00:37,990 --> 00:00:39,462
+00:00:36,881 --> 00:00:38,353
 Prompt with good context.
 
 11
-00:00:39,742 --> 00:00:41,065
+00:00:38,633 --> 00:00:39,955
 Let the agent plan.
 
 12
-00:00:41,345 --> 00:00:42,262
+00:00:40,236 --> 00:00:41,153
 Let it act.
 
 13
-00:00:42,542 --> 00:00:44,057
+00:00:41,433 --> 00:00:42,948
 Then review every change.
 
 14
-00:00:44,337 --> 00:00:47,537
+00:00:43,227 --> 00:00:46,428
 Then run dbt, and verify the actual rows.
 
 15
-00:00:47,817 --> 00:00:51,230
+00:00:46,708 --> 00:00:50,121
 Review is the step people skip, and the one that matters most.
 
 16
-00:00:52,330 --> 00:00:54,442
+00:00:51,221 --> 00:00:53,333
 Six habits, used in every section.
 
 17
-00:00:54,722 --> 00:00:56,791
+00:00:53,613 --> 00:00:55,682
 Give the agent files, not memory.
 
 18
-00:00:57,071 --> 00:00:59,077
+00:00:55,962 --> 00:00:57,968
 Plan before acting on big tasks.
 
 19
-00:00:59,357 --> 00:01:00,679
+00:00:58,248 --> 00:00:59,570
 One task per chat.
 
 20
-00:01:00,959 --> 00:01:02,922
+00:00:59,850 --> 00:01:01,813
 Read every diff before you keep it.
 
 21
-00:01:03,202 --> 00:01:04,887
+00:01:02,093 --> 00:01:03,778
 Let dbt be the judge.
 
 22
-00:01:05,167 --> 00:01:08,624
+00:01:04,058 --> 00:01:07,514
 And if you correct the agent twice, write the rule into a skill.
 
 23
-00:01:09,723 --> 00:01:11,857
+00:01:08,614 --> 00:01:10,748
 Each section follows the same rhythm.
 
 24
-00:01:12,137 --> 00:01:13,801
+00:01:11,027 --> 00:01:12,692
 A few slides with the idea.
 
 25
-00:01:14,081 --> 00:01:17,195
+00:01:12,972 --> 00:01:16,086
 The official dbt documentation, version one.
 
 26
-00:01:17,475 --> 00:01:23,982
+00:01:16,366 --> 00:01:22,873
 Then a recorded demo in Rosetta dbt Studio, where we build it, first by hand and then with the agent.
 
 27
-00:01:24,262 --> 00:01:25,948
+00:01:23,153 --> 00:01:24,838
 We finish with a git checkpoint.
 
 28
-00:01:27,047 --> 00:01:28,903
+00:01:25,938 --> 00:01:27,794
 This is the project you will build.
 
 29
-00:01:29,183 --> 00:01:30,975
+00:01:28,074 --> 00:01:29,866
 Sources and seeds on the left.
 
 30
-00:01:31,255 --> 00:01:36,290
+00:01:30,146 --> 00:01:35,181
 Staging models, one intermediate model with our business rules, and marts on the right.
 
 31
-00:01:36,570 --> 00:01:42,586
+00:01:35,461 --> 00:01:41,477
 A snapshot keeps history at the bottom, and an exposure marks the real analysis we answer at the end.
 
 32
-00:01:43,686 --> 00:01:50,513
+00:01:42,577 --> 00:01:49,404
 We use real data: New York City yellow taxi trips, published every month by the Taxi and Limousine Commission.
 
 33
-00:01:50,793 --> 00:01:56,659
+00:01:49,684 --> 00:01:55,550
 Millions of rows per month, small enough for a laptop, and messy enough that our tests will really fail.
 
 34
-00:01:56,939 --> 00:01:58,006
+00:01:55,830 --> 00:01:56,897
 That is the point.
 
 35
-00:01:59,106 --> 00:02:01,517
+00:01:57,997 --> 00:02:00,408
 The screen in Rosetta dbt Studio.
 
 36
-00:02:01,797 --> 00:02:03,525
+00:02:00,688 --> 00:02:02,416
 The project files on the left.
 
 37
-00:02:03,805 --> 00:02:07,346
+00:02:02,696 --> 00:02:06,237
 The editor in the middle, with run, preview and compiled SQL.
 
 38
-00:02:07,626 --> 00:02:09,098
+00:02:06,517 --> 00:02:07,989
 The AI chat on the right.
 
 39
-00:02:09,378 --> 00:02:13,581
+00:02:08,269 --> 00:02:12,472
 Every file the agent writes opens for review, with Keep or Discard.
 
 40
-00:02:13,861 --> 00:02:16,847
+00:02:12,752 --> 00:02:15,738
 Every command it wants to run waits for Allow or Deny.
 
 41
-00:02:17,947 --> 00:02:19,291
+00:02:16,838 --> 00:02:18,182
 The chat has two modes.
 
 42
-00:02:19,571 --> 00:02:21,022
+00:02:18,462 --> 00:02:19,913
 Ask mode is read-only.
 
 43
-00:02:21,302 --> 00:02:24,609
+00:02:20,193 --> 00:02:23,500
 We use it to explain, profile data, and trace lineage.
 
 44
-00:02:24,889 --> 00:02:28,430
+00:02:23,780 --> 00:02:27,321
 Code mode is where the agent writes files and runs commands.
 
 45
-00:02:28,710 --> 00:02:30,310
+00:02:27,601 --> 00:02:29,201
 Ask when you want to understand.
 
 46
-00:02:30,590 --> 00:02:32,297
+00:02:29,481 --> 00:02:31,188
 Code when you want something built.
 
 47
-00:02:33,397 --> 00:02:36,682
+00:02:32,287 --> 00:02:35,573
 The dbt documentation now has two versions.
 
 48
-00:02:36,962 --> 00:02:41,655
+00:02:35,853 --> 00:02:40,546
 This course follows version one, the version Rosetta dbt Studio runs.
 
 49
-00:02:41,935 --> 00:02:46,714
+00:02:40,826 --> 00:02:45,605
 The core idea: dbt transforms data that is already in your database.
 
 50
-00:02:46,994 --> 00:02:52,413
+00:02:45,885 --> 00:02:51,303
 You write select statements, and dbt handles the order, the tests and the documentation.
 
 51
-00:02:53,513 --> 00:02:54,537
+00:02:52,403 --> 00:02:53,427
 Here is the map.
 
 52
-00:02:54,817 --> 00:03:02,134
+00:02:53,707 --> 00:03:01,025
 Part one covers loading data, project structure, sources, seeds, staging, tests, macros, and the final marts.
 
 53
-00:03:02,414 --> 00:03:09,625
+00:03:01,305 --> 00:03:08,515
 Part two covers unit tests, incremental models, snapshots, and documentation, ending with a real analysis.
 
 54
-00:03:10,725 --> 00:03:25,381
+00:03:09,615 --> 00:03:24,271
 In the demo for this section, we create a new project called N Y C taxi, connect it to a new DuckDB database file, look at the AI, skills and M C P settings, and run dbt debug to check that everything works.

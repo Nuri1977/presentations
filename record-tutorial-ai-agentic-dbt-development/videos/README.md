@@ -22,7 +22,7 @@ The recap narration starts with "That is section N…", so it is written to come
 
 | Section | Slides video | Recap |
 |---|---|---|
-| S00 Welcome | 3:27 | 0:13 |
+| S00 Welcome | 3:26 | 0:13 |
 | S01 Load the real data | 3:26 | 0:18 |
 | S02 Project anatomy | 3:11 | 0:13 |
 | S03 Sources | 2:52 | 0:13 |

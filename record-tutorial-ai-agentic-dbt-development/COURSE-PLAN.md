@@ -1,4 +1,4 @@
-# AI Agentic dbt Development: Crash Course Plan
+# Agentic dbt Development: Crash Course Plan
 
 Suggestions for the brief in `README.md`. Status: **draft for review**. Nothing has been built or recorded yet.
 

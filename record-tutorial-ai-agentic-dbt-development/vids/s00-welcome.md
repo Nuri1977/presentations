@@ -1,14 +1,14 @@
 # S00 · Welcome & the agentic loop: Google Vids script
 
-**Import:** `s00-welcome.pptx` (speaker notes = the scripts below). **Voiceover:** 555 words, about 3.7 min at 150 wpm. **Demo recording budget:** about 5.8 min (Vids videos max 10 min).
+**Import:** `s00-welcome.pptx` (speaker notes = the scripts below). **Voiceover:** 553 words, about 3.7 min at 150 wpm. **Demo recording budget:** about 5.8 min (Vids videos max 10 min).
 
 **Scene order in Vids:** scenes 1 to 12 (slides) → your demo recording → scene 13 (recap). Drag the recap scene to the end after you add the recording.
 
 ## Voiceover, scene by scene
 
-**Scene 1 · AI Agentic dbt Development**
+**Scene 1 · Agentic dbt Development**
 
-Welcome to AI agentic dbt development. In this crash course we build one real dbt project, from an empty folder to production patterns, using Rosetta dbt Studio and its built-in AI agent. All you need is basic SQL.
+Welcome to agentic dbt development. In this crash course we build one real dbt project with an AI agent, from an empty folder to production patterns, using Rosetta dbt Studio. All you need is basic SQL.
 
 **Scene 2 · You stay the engineer. The agent does the typing.**
 

@@ -182,7 +182,7 @@
   };
 
   function footerHTML(i) {
-    return '<div class="footer"><span>' + DECK.code + ' · ' + DECK.short + '</span><span class="brand">AI Agentic dbt Development · Rosetta dbt Studio</span><span><span class="v1b">dbt v1</span>' + (i + 1) + ' / ' + N + '</span></div>';
+    return '<div class="footer"><span>' + DECK.code + ' · ' + DECK.short + '</span><span class="brand">Agentic dbt Development · Rosetta dbt Studio</span><span><span class="v1b">dbt v1</span>' + (i + 1) + ' / ' + N + '</span></div>';
   }
   function slideHTML(s, i, active) {
     var body = R[s.type] ? R[s.type](s) : '<h2>Unknown slide type ' + esc(s.type) + '</h2>';
