@@ -1,0 +1,57 @@
+# Course-level settings for the rosetta-academy-video skill.
+title: dbt Fundamentals
+subtitle: From ETL to ELT with open-source dbt
+academy: https://academy.rosettadb.io/
+source_draft: ../Academy-course-request-01/dbt_course_draft.docx.md
+
+app:
+  name: Rosetta DBT Studio
+  version: 1.7.5                      # pinned: every lesson of this course records this release
+  release_url: https://github.com/rosettadb/dbt-studio/releases/tag/1.7.5
+  assets:
+    linux_x64: Rosetta-DBT-Studio-1.7.5-x64.tar.gz
+    mac_x64: Rosetta-DBT-Studio-1.7.5-x64.zip
+    mac_arm64: Rosetta-DBT-Studio-1.7.5-arm64.zip
+
+runner: linux-cloud                   # one runner per course so fonts and rendering match (alt: mac-desktop)
+theme: dark
+
+runtime:                              # what Studio 1.7.5 installs by default, prepared once with setup-runtime.sh
+  python: 3.10.17
+  python_build_tag: "20250409"        # astral-sh/python-build-standalone, same tag Studio uses
+  dbt_core: 1.12.6
+  dbt_duckdb: 1.11.1
+
+voice:
+  engine: kokoro
+  voice: af_heart
+  speed: 1.0
+
+video:
+  width: 3840
+  height: 2160
+  fps: 30
+  crf: 16
+  title_card_s: 3
+  closing_card_s: 4
+
+youtube:
+  visibility: unlisted                # plays only inside Academy
+
+# Spoken forms. Slides and captions keep the written form; only the voice uses these.
+pronunciation:
+  - [ '\bdbt\b', 'D B T' ]
+  - [ '\bDBT\b', 'D B T' ]
+  - [ '\bLab 1\b', 'lab one' ]
+  - [ '\bSQL\b', 'sequel' ]
+  - [ '\.sql\b', ' dot sequel' ]
+  - [ '\bDuckDB\b', 'duck D B' ]
+  - [ '\bYAML\b', 'yammel' ]
+  - [ '\bDAG\b', 'dag' ]
+  - [ '\bCTE\b', 'C T E' ]
+  - [ '\bJinja\b', 'jinja' ]
+  - [ '\bETL\b', 'E T L' ]
+  - [ '\bELT\b', 'E L T' ]
+  - [ '\bCI\b', 'C I' ]
+  - [ '\bv1\b', 'version one' ]
+  - [ '\bv2\b', 'version two' ]

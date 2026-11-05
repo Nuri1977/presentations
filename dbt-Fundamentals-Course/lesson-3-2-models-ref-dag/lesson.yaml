@@ -1,0 +1,152 @@
+# Lesson 3.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Spoken text ("say") is plain words; code names are said as words and shown exactly on screen.
+id: lesson-3-2
+title: "Models, ref() and the DAG"
+module: "Module 3 · Building models"
+draft_section: "Lesson 3.2: Models, ref() and the DAG"
+next: "Lesson 3.3 · Sources and the staging layer"
+summary: "What a dbt model is, how ref() links models and resolves table names, and how dbt builds the DAG to order, parallelize and trace your models. Shown in Rosetta DBT Studio with DuckDB."
+start_state: lesson-3-2-start
+target_minutes: 3.5
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Module 3 · Lesson 3.2. Models, ref() and the DAG. dbt Fundamentals. Badges: Rosetta DBT Studio 1.7.5, dbt Core 1.12, DuckDB."
+
+  - id: s01
+    kind: slide
+    chapter: "What a model is"
+    slide: model
+    beats:
+      - { id: b01, step: 1, show: "A file card, stg_orders.sql, holding its select statement.", say: "A model is a select statement in a .sql file." }
+      - { id: b02, step: 2, show: "An arrow from the file to a database object card: view stg_orders.", say: "The file name becomes the name of the table or view it builds." }
+      - { id: b03, step: 3, show: "Above the select, a struck-through line create view stg_orders as, labelled dbt writes this.", say: "You never write create table, or create view. dbt writes that part for you." }
+
+  - id: s02
+    kind: app
+    chapter: "A model in Rosetta DBT Studio"
+    beats:
+      - id: b04
+        say: "Here is one in Rosetta DBT Studio. Open the project, then the models folder, then staging, and pick the staging orders model."
+        actions:
+          - open_project: dbt_course
+          - open_file: models/staging/stg_orders.sql
+      - id: b05
+        say: "It is a single select over the raw orders table: four columns, renamed and cast. There is no create statement, and no insert."
+        zoom: editor-code
+        card: { eyebrow: "A model", title: "One file, one select", sub: "stg_orders.sql builds the view stg_orders.", pos: top-right }
+      - id: b06
+        say: "The source call on the last line points at the raw table. Sources are the next lesson."
+        actions:
+          - point: { editor_line: 6 }
+
+  - id: s03
+    kind: slide
+    chapter: "ref(): name the model, not the table"
+    slide: ref
+    beats:
+      - { id: b07, step: 1, show: "Two model boxes, stg_orders and fct_orders. Inside fct_orders, a hard-coded name main.stg_orders, crossed out.", say: "The second idea is ref. When one model needs another, you do not write the table name." }
+      - { id: b08, step: 2, show: "The crossed-out name is replaced by {{ ref('stg_orders') }}, with the braces, ref and the model name each labelled.", say: "You write double curly braces, ref, and the model name." }
+      - { id: b09, step: 3, show: "Point 1, Resolves the name: dev compiles to \"course\".\"main\".\"stg_orders\", another target to its own schema (marked as an example).", say: "That does two things. It resolves to the right table in whichever environment you are running in." }
+      - { id: b10, step: 4, show: "Point 2, Records a dependency: an arrow draws from stg_orders to fct_orders.", say: "And it tells dbt that this model depends on that one." }
+
+  - id: s04
+    kind: app
+    chapter: "Write fct_orders with ref and compile"
+    beats:
+      - id: b11
+        say: "Let's use it. In the marts folder, create a new file for a model called fact orders."
+        actions:
+          - new_file: { folder: models/marts, name: fct_orders.sql }
+      - id: b12
+        say: "First the orders, straight from the staging orders model, through ref."
+        actions:
+          - type: |
+              with orders as (
+                  select * from {{ ref('stg_orders') }}
+              ),
+      - id: b13
+        say: "Then the payments, added up per order, from the staging payments model."
+        actions:
+          - type: |
+              payments as (
+                  select order_id, sum(amount) as amount
+                  from {{ ref('stg_payments') }}
+                  group by 1
+              )
+      - id: b14
+        say: "Finally, one row per order, with its total amount. Notice there is not a single hard-coded table name in this file."
+        actions:
+          - type: |
+              select
+                  o.order_id, o.customer_id, o.order_date, o.status,
+                  coalesce(p.amount, 0) as amount
+              from orders o
+              left join payments p using (order_id)
+      - id: b15
+        say: "Save it. Then open the Project menu, and choose Compile."
+        actions:
+          - click_save
+          - project_menu: Compile
+      - id: b16
+        say: "Compile turns every model into plain SQL. Nothing runs in the database."
+        actions:
+          - wait_for: manifest
+        zoom: terminal
+        card: { eyebrow: "Compile", title: "Jinja in, SQL out", sub: "The compiled SQL is written to the target folder.", pos: top-right }
+      - id: b17
+        say: "The result goes into the target folder. Open the compiled copy of fact orders, and look at what ref became."
+        actions:
+          - open_file: target/compiled/dbt_course/models/marts/fct_orders.sql
+      - id: b18
+        say: "The curly braces are gone. In their place is the full name of the staging orders view: this database, this schema, this model."
+        zoom: editor-code
+        card: { eyebrow: "What ref became", title: "\"course\".\"main\".\"stg_orders\"", sub: "database · schema · model", pos: top-right }
+        actions:
+          - point: { editor_line: 2 }
+      - id: b19
+        say: "Point the project at another environment, and the same model compiles to that environment's table instead."
+
+  - id: s05
+    kind: app
+    chapter: "Lineage in Studio"
+    beats:
+      - id: b20
+        say: "Close the compiled copy, which takes you back to fact orders, and open the Lineage tab."
+        actions:
+          - close_tab: target/compiled/dbt_course/models/marts/fct_orders.sql
+          - bottom_tab: LINEAGE
+      - id: b21
+        say: "Studio draws this graph from your refs. The two staging models feed fact orders, and the panel on the right lists what it depends on."
+        zoom: bottom-panel
+        card: { eyebrow: "Lineage", title: "Drawn from your refs", sub: "Nothing to keep up to date by hand.", pos: top-right }
+      - id: b21b
+        say: "Raise the depth to two, and the raw tables appear behind the staging models."
+        actions:
+          - lineage_depth: 2
+        zoom: lineage-wide
+        # verified 5 Nov 2026: depth 2 shows the sources orders and payments (tagged "source")
+
+  - id: s06
+    kind: slide
+    chapter: "The DAG"
+    slide: dag
+    beats:
+      - { id: b22, step: 1, show: "The DAG builds left to right: raw.customers, raw.orders, raw.payments, then the three staging models, then fct_orders, then dim_customers dimmed and tagged Lab 3.", say: "That graph is a directed acyclic graph, a DAG. Directed, because every dependency points one way. Acyclic, because nothing can depend on itself, even through other models." }
+      - { id: b23, step: 2, show: "Order numbers 1, 2, 3 appear above the layers.", say: "dbt uses the graph to run models in a safe order." }
+      - { id: b24, step: 3, show: "The three staging models highlight together, labelled in parallel.", say: "It runs independent models in parallel." }
+      - { id: b25, step: 4, show: "The path from raw.payments through stg_payments to fct_orders lights up, labelled lineage.", say: "And it shows you lineage: where each number comes from, and what breaks if you change it." }
+
+  - id: s07
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b26, step: 1, show: "Recap: A model is one select in one file. ref() resolves the name and records the dependency. dbt builds the DAG and works out the order.", say: "That is the pain from Lab 1, solved. You do not manage the order. You declare the dependencies, and dbt does the rest." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 3.3 · Sources and the staging layer, with the Rosetta logo."

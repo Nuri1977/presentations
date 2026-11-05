@@ -1,0 +1,10 @@
+# Keep sources (yaml, slides, scripts, captions, recipes). Ignore everything rendered or cached.
+render/
+reference-frames/
+*.mp4
+*.webm
+*.wav
+*.mp3
+*.zip
+*.pptx
+trace.zip

@@ -1,0 +1,44 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A model is a select statement in a dot sequel file.
+b02	The file name becomes the name of the table or view it builds.
+b03	You never write create table, or create view. D B T writes that part for you.
+b04	Here is one in Rosetta D B T Studio.
+b04	Open the project, then the models folder, then staging, and pick the staging orders model.
+b05	It is a single select over the raw orders table: four columns, renamed and cast.
+b05	There is no create statement, and no insert.
+b06	The source call on the last line points at the raw table.
+b06	Sources are the next lesson.
+b07	The second idea is ref.
+b07	When one model needs another, you do not write the table name.
+b08	You write double curly braces, ref, and the model name.
+b09	That does two things.
+b09	It resolves to the right table in whichever environment you are running in.
+b10	And it tells D B T that this model depends on that one.
+b11	Let's use it.
+b11	In the marts folder, create a new file for a model called fact orders.
+b12	First the orders, straight from the staging orders model, through ref.
+b13	Then the payments, added up per order, from the staging payments model.
+b14	Finally, one row per order, with its total amount.
+b14	Notice there is not a single hard-coded table name in this file.
+b15	Save it.
+b15	Then open the Project menu, and choose Compile.
+b16	Compile turns every model into plain sequel.
+b16	Nothing runs in the database.
+b17	The result goes into the target folder.
+b17	Open the compiled copy of fact orders, and look at what ref became.
+b18	The curly braces are gone.
+b18	In their place is the full name of the staging orders view: this database, this schema, this model.
+b19	Point the project at another environment, and the same model compiles to that environment's table instead.
+b20	Close the compiled copy, which takes you back to fact orders, and open the Lineage tab.
+b21	Studio draws this graph from your refs.
+b21	The two staging models feed fact orders, and the panel on the right lists what it depends on.
+b21b	Raise the depth to two, and the raw tables appear behind the staging models.
+b22	That graph is a directed acyclic graph, a dag.
+b22	Directed, because every dependency points one way.
+b22	Acyclic, because nothing can depend on itself, even through other models.
+b23	D B T uses the graph to run models in a safe order.
+b24	It runs independent models in parallel.
+b25	And it shows you lineage: where each number comes from, and what breaks if you change it.
+b26	That is the pain from lab one, solved.
+b26	You do not manage the order.
+b26	You declare the dependencies, and D B T does the rest.

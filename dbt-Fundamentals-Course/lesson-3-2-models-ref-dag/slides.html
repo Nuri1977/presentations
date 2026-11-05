@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3.2 · Models, ref() and the DAG</title>
+<!-- Source of the slide scenes for this lesson. Each slide has an id matching lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Renderer API: window.show(id, step).
+     Keys for preview: → / Space next step, ← back, Home, End, F fullscreen. -->
+<style>
+  :root { --text:#fff; --muted:#d7dce8; --dim:#8b93a7; --orange:#ff7a1a; --orange-2:#ff9a3d; --line:rgba(255,255,255,.16);
+          --card:rgba(255,255,255,.045); --blue:#72b7ff; --green:#4ade80; --red:#ff6b6b; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:#05060a; color:var(--text); overflow:hidden;
+              font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #viewport { position:fixed; inset:0; display:grid; place-items:center; }
+  .stage { position:absolute; left:50%; top:50%; width:1920px; height:1080px; transform:translate(-50%,-50%) scale(var(--scale,1));
+           transform-origin:center; overflow:hidden; opacity:0; transition:opacity .45s ease; pointer-events:none; }
+  .stage.active { opacity:1; pointer-events:auto; }
+  body.render .stage { left:0; top:0; transform:none; transition:none; }
+  .bg { position:absolute; inset:0;
+        background: radial-gradient(circle at 12% 10%, rgba(255,122,26,.17), transparent 30%),
+                    radial-gradient(circle at 90% 18%, rgba(114,183,255,.12), transparent 32%),
+                    linear-gradient(135deg,#07080c 0%,#11141b 55%,#08090d 100%); }
+  .bg::before { content:""; position:absolute; inset:0;
+        background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+        background-size:48px 48px; mask-image:radial-gradient(circle at center,black,transparent 80%); }
+  .pad { position:absolute; inset:0; padding:92px 120px; }
+  .pad.v { display:flex; flex-direction:column; justify-content:center; padding-bottom:120px; }
+  .eyebrow { display:inline-flex; align-items:center; gap:12px; color:var(--orange-2); font-size:20px; font-weight:850;
+             text-transform:uppercase; letter-spacing:.12em; margin-bottom:18px; }
+  .eyebrow::before { content:""; width:34px; height:4px; border-radius:99px; background:linear-gradient(90deg,var(--orange),var(--orange-2)); }
+  h1,h2 { margin:0; font-weight:920; letter-spacing:0; line-height:1; text-wrap:balance; }
+  h1 { font-size:104px; } h2 { font-size:64px; }
+  .accent { color:var(--orange-2); }
+  .subtitle { margin:26px 0 0; color:var(--muted); font-size:32px; font-weight:560; line-height:1.35; }
+  .detail { margin-top:30px; padding-left:22px; border-left:4px solid rgba(255,122,26,.75); color:#d7dbe5; font-size:26px; line-height:1.5; font-weight:560; max-width:860px; }
+  .badges { display:flex; gap:14px; margin-top:40px; flex-wrap:wrap; }
+  .badge { display:inline-flex; align-items:center; gap:10px; padding:14px 22px; border:1px solid var(--line); border-radius:6px;
+           background:rgba(255,255,255,.055); font-size:22px; font-weight:750; }
+  .badge::before { content:""; width:10px; height:10px; border-radius:50%; background:var(--orange); box-shadow:0 0 20px rgba(255,122,26,.75); }
+  .s { opacity:0; transform:translateY(18px); transition:opacity .45s ease, transform .55s cubic-bezier(.2,.8,.2,1); }
+  .s.on { opacity:1; transform:none; }
+  body.render .s { transition:none; }
+  .card { border:1px solid var(--line); border-radius:10px; background:var(--card); box-shadow:0 30px 80px rgba(0,0,0,.45); backdrop-filter:blur(18px); }
+  /* code */
+  .code { font-family:var(--mono); font-size:31px; line-height:1.62; padding:26px 32px; white-space:pre; color:#e6e9f2; }
+  .k { color:#7aa2ff; } .f { color:#7fdbca; } .str { color:#f0b37e; } .j { color:#ffd166; } .cm { color:#6b7387; }
+  .filetab { display:flex; align-items:center; gap:12px; padding:14px 24px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:22px; color:var(--muted); }
+  .filetab .ic { width:14px; height:18px; border-radius:3px; background:linear-gradient(#ff9a3d,#e8620a); }
+  /* layout helpers */
+  .row { display:flex; align-items:center; gap:48px; }
+  .arrow { font-size:72px; color:var(--orange-2); font-weight:300; }
+  .obj { padding:28px 34px; display:flex; flex-direction:column; gap:10px; min-width:420px; }
+  .obj .kind { font-size:20px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); font-weight:800; }
+  .obj .name { font-family:var(--mono); font-size:40px; font-weight:700; }
+  .pill { display:inline-block; padding:8px 16px; border-radius:99px; background:rgba(255,122,26,.16); border:1px solid rgba(255,122,26,.6);
+          color:var(--orange-2); font-size:20px; font-weight:800; letter-spacing:.04em; }
+  .strike { position:relative; color:var(--dim); }
+  .strike::after { content:""; position:absolute; left:-6px; right:-6px; top:54%; height:4px; background:var(--red); border-radius:2px; transform:rotate(-1.5deg); }
+  .point { padding:26px 30px; }
+  .point h3 { margin:0 0 12px; font-size:32px; font-weight:850; }
+  .point p { margin:0; color:var(--muted); font-size:24px; line-height:1.45; }
+  .num { display:inline-grid; place-items:center; width:44px; height:44px; border-radius:50%; background:var(--orange); color:#111; font-weight:900; font-size:24px; margin-right:14px; }
+  .map { font-family:var(--mono); font-size:22px; line-height:1.8; margin-top:12px; color:#e6e9f2; }
+  .map .t { color:var(--dim); display:inline-block; width:110px; }
+  .note { color:var(--dim); font-size:18px; font-style:italic; margin-top:8px; }
+  /* DAG */
+  svg text { font-family:var(--mono); }
+  .node rect { fill:rgba(255,255,255,.06); stroke:rgba(255,255,255,.28); stroke-width:2; rx:12; }
+  .node text { fill:#fff; font-size:24px; font-weight:600; }
+  .node .sub { fill:var(--dim); font-size:16px; font-family:Inter,sans-serif; letter-spacing:.1em; font-weight:800; }
+  .edge { fill:none; stroke:rgba(255,255,255,.35); stroke-width:3; }
+  .dim { opacity:.38; }
+  .hl rect { transition:stroke .4s, fill .4s, filter .4s; }
+  .par.on rect { stroke:var(--blue); fill:rgba(114,183,255,.14); filter:drop-shadow(0 0 14px rgba(114,183,255,.6)); }
+  .lin.on rect { stroke:var(--orange); fill:rgba(255,122,26,.16); filter:drop-shadow(0 0 14px rgba(255,122,26,.6)); }
+  .linedge { fill:none; stroke:var(--orange); stroke-width:5; opacity:0; transition:opacity .45s; }
+  .linedge.on { opacity:1; }
+  .tag { font-family:Inter,sans-serif; font-size:20px; font-weight:850; letter-spacing:.06em; }
+  /* recap */
+  .recap { display:grid; grid-template-columns:repeat(3,1fr); gap:30px; margin-top:64px; }
+  .recap .card { padding:36px 34px; min-height:300px; }
+  .recap h3 { font-size:36px; margin:18px 0 14px; font-weight:880; line-height:1.15; }
+  .recap p { color:var(--muted); font-size:24px; line-height:1.45; margin:0; }
+  .logo { width:620px; filter:drop-shadow(0 26px 70px rgba(255,122,26,.28)); }
+  .center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .counter { position:fixed; right:18px; bottom:14px; color:var(--dim); font:700 13px Inter,sans-serif; z-index:9; }
+  body.render .counter { display:none; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<!-- title -->
+<section class="stage" data-id="title">
+  <div class="bg"></div>
+  <div class="pad" style="display:grid;grid-template-columns:1.05fr .95fr;align-items:center;align-content:center;gap:40px">
+    <div>
+      <div class="eyebrow">Module 3 · Lesson 3.2</div>
+      <h1>Models, <span class="accent">ref()</span> and the DAG</h1>
+      <p class="subtitle">dbt Fundamentals</p>
+      <p class="detail">One select per file. One function that links them. One graph that puts them in order.</p>
+      <div class="badges"><span class="badge">Rosetta DBT Studio 1.7.5</span><span class="badge">dbt Core 1.12</span><span class="badge">DuckDB</span></div>
+    </div>
+    <div style="display:flex;justify-content:center"><img class="logo" src="logo_hero.svg" alt="Rosetta DBT Studio"></div>
+  </div>
+</section>
+
+<!-- model -->
+<section class="stage" data-id="model">
+  <div class="bg"></div>
+  <div class="pad v">
+    <div class="eyebrow">What a model is</div>
+    <h2>One file, one <span class="accent">select</span></h2>
+    <div class="row" style="margin-top:70px;align-items:flex-start">
+      <div>
+        <div class="s" data-step="3" style="font-family:var(--mono);font-size:26px;margin:0 0 16px 6px;display:flex;align-items:center;gap:18px">
+          <span class="strike">create view stg_orders as (</span><span class="pill">dbt writes this</span></div>
+        <div class="card s" data-step="1">
+          <div class="filetab"><span class="ic"></span>models/staging/stg_orders.sql</div>
+          <div class="code"><span class="k">select</span>
+    id <span class="k">as</span> order_id,
+    customer_id,
+    <span class="f">cast</span>(order_date <span class="k">as</span> date) <span class="k">as</span> order_date,
+    status
+<span class="k">from</span> <span class="j">{{</span> <span class="f">source</span>(<span class="str">'raw'</span>, <span class="str">'orders'</span>) <span class="j">}}</span></div>
+        </div>
+      </div>
+      <div class="arrow s" data-step="2" style="margin-top:230px">→</div>
+      <div class="card obj s" data-step="2" style="margin-top:180px">
+        <span class="kind">view in your database</span>
+        <span class="name">main.stg_orders</span>
+        <span style="color:var(--muted);font-size:22px">named after the file</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ref -->
+<section class="stage" data-id="ref">
+  <div class="bg"></div>
+  <div class="pad v">
+    <div class="eyebrow">ref()</div>
+    <h2>Name the model, not the <span class="accent">table</span></h2>
+    <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:56px;margin-top:64px">
+      <div>
+        <div class="row s" data-step="1" style="gap:26px">
+          <div class="card obj" style="min-width:0;padding:22px 28px"><span class="kind">model</span><span class="name" style="font-size:30px">stg_orders</span></div>
+          <svg width="150" height="40" viewBox="0 0 150 40"><path class="linedge" data-step="4" d="M4 20 H136" style="stroke-width:5"/><path d="M128 8 L146 20 L128 32" class="linedge" data-step="4" style="stroke-width:5"/></svg>
+          <div class="card obj" style="min-width:0;padding:22px 28px"><span class="kind">model</span><span class="name" style="font-size:30px">fct_orders</span></div>
+        </div>
+        <div class="card s" data-step="1" style="margin-top:34px">
+          <div class="filetab"><span class="ic"></span>models/marts/fct_orders.sql</div>
+          <div class="code" style="font-size:30px"><span class="k">select</span> * <span class="k">from</span> <span id="hard" class="strike" style="color:#e6e9f2">main.stg_orders</span></div>
+          <div class="code s" data-step="2" style="font-size:30px;padding-top:0"><span class="k">select</span> * <span class="k">from</span> <span class="j">{{</span> <span class="f">ref</span>(<span class="str">'stg_orders'</span>) <span class="j">}}</span></div>
+          <div class="s" data-step="2" style="padding:0 32px 28px;font-size:21px;color:var(--muted);font-weight:600">
+            <span class="j" style="font-family:var(--mono)">{{ }}</span> Jinja &nbsp;·&nbsp; <span class="f" style="font-family:var(--mono)">ref</span> the function &nbsp;·&nbsp; <span class="str" style="font-family:var(--mono)">'stg_orders'</span> the model name</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:28px;margin-top:6px">
+        <div class="card point s" data-step="3"><h3><span class="num">1</span>Resolves the name</h3>
+          <p>To the right table for the environment you run in.</p>
+          <div class="map"><span class="t">dev</span>"course"."main"."stg_orders"<br><span class="t">prod</span>"warehouse"."analytics"."stg_orders"</div>
+          <div class="note">prod line is an example</div></div>
+        <div class="card point s" data-step="4"><h3><span class="num">2</span>Records a dependency</h3>
+          <p>fct_orders depends on stg_orders, so dbt builds stg_orders first.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- dag -->
+<section class="stage" data-id="dag">
+  <div class="bg"></div>
+  <div class="pad v">
+    <div class="eyebrow">The DAG</div>
+    <h2>Directed. <span class="accent">Acyclic.</span> Graph.</h2>
+    <svg viewBox="0 0 1680 700" width="1680" height="700" style="margin-top:40px;overflow:visible">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="rgba(255,255,255,.55)"/></marker>
+            <marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#ff7a1a"/></marker></defs>
+      <g class="s" data-step="1">
+        <text class="tag" x="40" y="40" fill="#8b93a7">SOURCES · raw</text>
+        <text class="tag" x="560" y="40" fill="#8b93a7">STAGING</text>
+        <text class="tag" x="1080" y="40" fill="#8b93a7">MARTS</text>
+        <path class="edge" d="M380 150 H560" marker-end="url(#ah)"/>
+        <path class="edge" d="M380 350 H560" marker-end="url(#ah)"/>
+        <path class="edge" d="M380 550 H560" marker-end="url(#ah)"/>
+        <path class="edge" d="M900 350 C990 350 990 300 1080 300" marker-end="url(#ah)"/>
+        <path class="edge" d="M900 550 C990 550 990 340 1080 330" marker-end="url(#ah)"/>
+        <path class="edge dim" d="M900 150 C1030 150 1030 500 1296 500" marker-end="url(#ah)"/>
+        <path class="edge dim" d="M1240 360 C1240 440 1250 470 1296 470" marker-end="url(#ah)"/>
+        <g class="node"><rect x="40" y="100" width="340" height="100"/><text x="70" y="146">raw.customers</text><text class="sub" x="70" y="178">SOURCE</text></g>
+        <g class="node"><rect x="40" y="300" width="340" height="100"/><text x="70" y="346">raw.orders</text><text class="sub" x="70" y="378">SOURCE</text></g>
+        <g class="node lin hl" data-step="4"><rect x="40" y="500" width="340" height="100"/><text x="70" y="546">raw.payments</text><text class="sub" x="70" y="578">SOURCE</text></g>
+        <g class="node par hl" data-step="3" data-until="3"><rect x="560" y="100" width="340" height="100"/><text x="590" y="146">stg_customers</text><text class="sub" x="590" y="178">VIEW</text></g>
+        <g class="node par hl" data-step="3" data-until="3"><rect x="560" y="300" width="340" height="100"/><text x="590" y="346">stg_orders</text><text class="sub" x="590" y="378">VIEW</text></g>
+        <g class="node par hl" data-step="3" data-until="3"><g class="lin hl" data-step="4"><rect x="560" y="500" width="340" height="100"/></g><text x="590" y="546">stg_payments</text><text class="sub" x="590" y="578">VIEW</text></g>
+        <g class="node lin hl" data-step="4"><rect x="1080" y="250" width="320" height="110"/><text x="1110" y="300">fct_orders</text><text class="sub" x="1110" y="334">TABLE · THIS LESSON</text></g>
+        <g class="node dim"><rect x="1300" y="430" width="340" height="100"/><text x="1330" y="476">dim_customers</text><text class="sub" x="1330" y="508">TABLE · LAB 3</text></g>
+      </g>
+      <path class="linedge" data-step="4" d="M380 550 H556" marker-end="url(#aho)"/>
+      <path class="linedge" data-step="4" d="M900 550 C990 550 990 340 1076 330" marker-end="url(#aho)"/>
+      <g class="s" data-step="2">
+        <circle cx="730" cy="78" r="24" fill="#ff7a1a"/><text x="730" y="87" text-anchor="middle" font-size="24" font-weight="900" fill="#111" style="font-family:Inter">1</text>
+        <circle cx="1240" cy="222" r="24" fill="#ff7a1a"/><text x="1240" y="231" text-anchor="middle" font-size="24" font-weight="900" fill="#111" style="font-family:Inter">2</text>
+        <circle cx="1470" cy="402" r="24" fill="#ff7a1a" opacity=".5"/><text x="1470" y="411" text-anchor="middle" font-size="24" font-weight="900" fill="#111" style="font-family:Inter">3</text>
+        <text class="tag" x="1080" y="660" fill="#ff9a3d">1 → 2 → 3  SAFE ORDER</text>
+      </g>
+      <text class="tag s" data-step="3" data-until="3" x="560" y="660" fill="#72b7ff">RUN IN PARALLEL</text>
+      <text class="tag s" data-step="4" x="40" y="660" fill="#ff9a3d">LINEAGE: WHERE A NUMBER COMES FROM</text>
+    </svg>
+  </div>
+</section>
+
+<!-- recap -->
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad v">
+    <div class="eyebrow">Recap</div>
+    <h2>Declare it, and dbt <span class="accent">orders it</span></h2>
+    <div class="recap">
+      <div class="card"><span class="num">1</span><h3>A model is one select in one file</h3><p>The file name becomes the table or view. dbt writes the create statement.</p></div>
+      <div class="card"><span class="num">2</span><h3>ref() links models</h3><p>It resolves the right table name and records the dependency.</p></div>
+      <div class="card"><span class="num">3</span><h3>The DAG sets the order</h3><p>Safe order, parallel where possible, and lineage for every number.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- closing -->
+<section class="stage" data-id="closing">
+  <div class="bg"></div>
+  <div class="center">
+    <img class="logo" src="logo_hero.svg" alt="Rosetta DBT Studio" style="width:520px">
+    <div class="eyebrow" style="margin-top:46px">Next · Lesson 3.3</div>
+    <h1 style="font-size:84px">Sources and the <span class="accent">staging layer</span></h1>
+  </div>
+</section>
+
+</div>
+<div class="counter" id="counter"></div>
+<script>
+  const stages = [...document.querySelectorAll('.stage')];
+  const maxStep = (st) => Math.max(0, ...[...st.querySelectorAll('[data-step]')].map((e) => +e.dataset.step));
+  let cur = 0, step = 0;
+  function apply() {
+    stages.forEach((st, i) => {
+      st.classList.toggle('active', i === cur);
+      st.querySelectorAll('[data-step]').forEach((e) => e.classList.toggle('on', i === cur && +e.dataset.step <= step && (!e.dataset.until || step <= +e.dataset.until)));
+    });
+    document.getElementById('counter').textContent = `${stages[cur].dataset.id} · step ${step}/${maxStep(stages[cur])}`;
+  }
+  window.show = (id, s) => { cur = Math.max(0, stages.findIndex((st) => st.dataset.id === id)); step = s ?? maxStep(stages[cur]); apply(); };
+  function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); document.documentElement.style.setProperty('--scale', s); }
+  if (new URLSearchParams(location.search).has('render')) document.body.classList.add('render'); else { addEventListener('resize', fit); fit(); }
+  addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { if (step < maxStep(stages[cur])) step++; else if (cur < stages.length - 1) { cur++; step = 0; } apply(); }
+    if (e.key === 'ArrowLeft') { if (step > 0) step--; else if (cur > 0) { cur--; step = maxStep(stages[cur]); } apply(); }
+    if (e.key === 'Home') { cur = 0; step = 0; apply(); }
+    if (e.key === 'End') { cur = stages.length - 1; step = maxStep(stages[cur]); apply(); }
+    if (e.key.toLowerCase() === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  const h = location.hash.slice(1).split(':'); if (h[0]) window.show(h[0], h[1] ? +h[1] : undefined); else { step = maxStep(stages[0]); apply(); }
+</script>
+</body>
+</html>

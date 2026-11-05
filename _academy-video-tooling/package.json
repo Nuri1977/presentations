@@ -1,0 +1,8 @@
+{
+  "name": "academy-video-tooling",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Records Rosetta DBT Studio and HTML slides, voices them with Kokoro, renders Academy lesson videos.",
+  "dependencies": { "js-yaml": "^4.1.0" },
+  "devDependencies": { "playwright": "^1.57.0" }
+}

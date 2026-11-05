@@ -1,0 +1,8 @@
+# Start state for Lesson 3.2: Lab 1 data loaded, sources and staging models written, marts empty.
+name: lesson-3-2-start
+project_name: dbt_course
+database_file: course.duckdb
+sql:
+  - ../../downloads/starter_data.sql
+project_dir: project
+open_files: []
