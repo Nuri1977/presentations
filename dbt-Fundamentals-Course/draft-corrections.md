@@ -8,6 +8,7 @@ UI labels were already used in the videos; factual flags are waiting for your de
 | # | Where in the draft | Draft says | What the app shows | Affects |
 |---|---|---|---|---|
 | F1 | Open items: "Rosetta DBT Studio runs dbt Core v1"; Lesson 2.2; Lab 2 Part 3 | Studio embeds dbt Core v1 only; v2 is a command-line side lab | The 1.7.5 source has a dbt Core version switch in the dbt settings that installs v2 (`dbt-core@2.0.5`, shipped as `dbt-oss`, needs Python 3.11+). Not yet checked in the UI. The default install is still v1 (1.12.6 here). | Lessons 2.2, 2.3, 2.5; Lab 2 Part 3 could become an in-Studio demo |
+| F2 | Course landing page, Format line | "26 short lessons (video plus reading), 7 labs and a capstone" | The curriculum table lists Labs 1 to 6 plus the capstone (7 hands-on items, 6 of them labs). The welcome video says "6 labs + capstone". | Landing page text, welcome video title card |
 
 ## UI labels (already used in the videos)
 

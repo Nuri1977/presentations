@@ -1,0 +1,72 @@
+# Lesson 1.1 - the single source for this video. Edit this file; everything else is generated.
+id: lesson-1-1
+number: "1.1"
+title: "What dbt is (and is not)"
+module: "Module 1 · From ETL to ELT: why dbt exists"
+draft_section: "Lesson 1.1: What dbt is (and is not)"
+next: "Lesson 1.2 · ETL versus ELT"
+target_minutes: 3
+summary: "The simplest definition of dbt: the T in ELT. What a model is, what dbt adds around your SQL, and the three things dbt does not do: extract, load or store your data."
+tags: [what is dbt, dbt explained, ELT, data transformation]
+draft_changes:
+  - "The draft's spoken lines are kept, split into one beat per sentence group."
+  - "b14 adds the lesson's \"analogy for customers\" from the LMS text (dbt is to SQL what a build system is to source code), so the one-sentence definition on the recap slide is on screen long enough to read."
+  - "The draft cues (data flow; three icons for testing, documentation, version control) are kept. Two more slides illustrate \"that's a model\" and what dbt does not do, using the lesson's dbt does / does not table."
+accuracy_notes:
+  - "The model example is plain SQL on purpose; source() and ref() come in Module 3."
+  - "No version-specific claims in this lesson."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Module 1 · Lesson 1.1. What dbt is (and is not). dbt Fundamentals. Line: dbt is the T in ELT. Badges: Video + reading, 15 min, Concepts."
+
+  - id: s01
+    kind: slide
+    slide: flow
+    chapter: "dbt is the T in ELT"
+    beats:
+      - { id: b01, step: 1, show: "Data flow: Sources → Extract and load tool → Warehouse (dbt inside) → BI tools and apps, with E, L and T labels; dbt is the T.", say: "Let's start with the simplest possible definition. dbt is the T in ELT." }
+      - { id: b02, step: 2, show: "Inside the warehouse: raw tables → dbt → clean tables, labelled already in your warehouse.", say: "It transforms data that is already sitting in your warehouse." }
+
+  - id: s02
+    kind: slide
+    slide: model
+    chapter: "A model is a select statement"
+    beats:
+      - { id: b03, step: 1, show: "A file card, models/customer_orders.sql, with one plain select statement. Label: that's a model.", say: "You write a select statement. That's a model." }
+      - { id: b04, step: 2, show: "dbt wraps it in create view customer_orders as ( … ) (marked dbt adds this), and three chips: wraps it, runs it in order, tells you if it breaks.", say: "dbt wraps it in the right create table or create view statement, runs it in the right order, and tells you if something breaks." }
+
+  - id: s03
+    kind: slide
+    slide: not
+    chapter: "What dbt does not do"
+    beats:
+      - { id: b05, step: 1, show: "Column dbt does not: row 1, Extract data from source systems (crossed).", say: "Notice what dbt does not do. It does not extract data from source systems." }
+      - { id: b06, step: 2, show: "Row 2: Load raw data into the warehouse (crossed).", say: "It does not load data into your warehouse." }
+      - { id: b07, step: 3, show: "Row 3: Store your data or run your queries (crossed), with the note: your warehouse does that.", say: "It is not a database, and it does not run your queries itself." }
+      - { id: b08, step: 4, show: "Column dbt does appears: writes the SQL, orders it, adds the engineering around it.", say: "Your warehouse does the work. dbt writes and orders the SQL, and adds the engineering around it." }
+
+  - id: s04
+    kind: slide
+    slide: adds
+    chapter: "What dbt adds"
+    beats:
+      - { id: b09, step: 1, show: "Heading: the engineering is the real value. Three icon cards, dimmed.", say: "That engineering is the real value." }
+      - { id: b10, step: 2, show: "Card 1 lights up: Testing, tests run on every build.", say: "Tests that run on every build." }
+      - { id: b11, step: 3, show: "Card 2 lights up: Documentation, generated from the code.", say: "Documentation generated from the code." }
+      - { id: b12, step: 4, show: "Card 3 lights up: Version control, everything in Git, every change reviewed.", say: "Everything in Git, so every change is reviewed." }
+
+  - id: s05
+    kind: slide
+    slide: short
+    chapter: "dbt in one sentence"
+    beats:
+      - { id: b13, step: 1, show: "dbt in one sentence: dbt compiles SQL select statements and Jinja into runnable code, executes it in dependency order inside your data platform, and adds testing, documentation and lineage.", say: "In short, dbt brings software engineering practice to SQL." }
+      - { id: b14, step: 2, show: "Below it: dbt is to SQL what a build system is to source code.", say: "A useful comparison: dbt is to SQL what a build system is to source code. You describe what each piece should look like, and dbt works out the order and builds it." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.2 · ETL versus ELT, with the Rosetta logo."

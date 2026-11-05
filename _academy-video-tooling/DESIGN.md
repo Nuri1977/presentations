@@ -70,7 +70,8 @@ translucent cards) is the original. Rendered straight to 4K frames. Bullets and 
 per sentence. `.pptx` export: one full-slide image per slide, narration in the speaker notes.
 
 ## Outputs per lesson
-4K MP4 (3840x2160 H.264, CRF 16, AAC), `.srt` + `.vtt`, `voiceover-script.md`,
+4K MP4 (3840x2160 H.264, CRF 16, AAC) for YouTube, plus `<id>-1080p.mp4` (H.264 High 4.0, stereo AAC) for
+phones and sharing, because many phones cannot play 4K H.264, `.srt` + `.vtt`, `voiceover-script.md`,
 `voiceover-kokoro.txt`, `timeline.json`, `RECORDING-cue-sheet.md`, `.pptx`, `youtube.md` (unlisted,
 title, description with chapters, tags), 1280x720 thumbnail, readme (versions, changes from draft).
 Per course: reference-project zips, starter `.sql` files, `draft-corrections.md`.

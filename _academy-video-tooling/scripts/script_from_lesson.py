@@ -52,9 +52,9 @@ def describe(act):
 
 out = [f"# {lesson['title']} — voice-over script and beat sheet", '',
        f"{course['title']} · {lesson['module']} · next: {lesson['next']}", '',
-       f"Recorded in {course['app']['name']} {course['app']['version']} (dbt-core {course['runtime']['dbt_core']}, "
+       f"App: {course['app']['name']} {course['app']['version']} (dbt-core {course['runtime']['dbt_core']}, "
        f"dbt-duckdb {course['runtime']['dbt_duckdb']}, Python {course['runtime']['python']}), {course['theme']} theme. "
-       f"Voice: Kokoro `{course['voice']['voice']}` at {course['voice']['speed']}. Start state: `{lesson['start_state']}`.", '',
+       f"Voice: Kokoro `{course['voice']['voice']}` at {course['voice']['speed']}. Start state: `{lesson.get('start_state', 'none (slides only)')}`.", '',
        'Spoken lines are plain words. Code names are said as words and shown exactly on screen. '
        + ('Start times (@m:ss) and lengths are measured from the rendered video.' if tl else 'Times are estimates at 150 words per minute until the video is rendered.'), '']
 total_words, est = 0, 0.0

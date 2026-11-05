@@ -23,16 +23,26 @@ for sc in lesson['scenes']:
     if sc.get('chapter'):
         chapters.append([scene_start[sc['id']], sc['chapter']])
 chapters[0][0] = 0.0  # YouTube needs the first chapter at 0:00
-num = re.search(r'(\d+)-(\d+)', lid)
-title = f"{lesson['title']} | {course['title']} {num.group(1)}.{num.group(2)} | Rosetta DBT Studio"
+# YouTube drops all chapters if any is shorter than 10 s: merge short ones into the previous chapter
+def _merge(ch):
+    out = []
+    for i, (t0, n) in enumerate(ch):
+        t1 = ch[i + 1][0] if i + 1 < len(ch) else tl['total']
+        if out and t1 - t0 < 10: continue
+        out.append([t0, n])
+    if len(out) > 1 and tl['total'] - out[-1][0] < 10: out.pop()
+    return out
+chapters = _merge(chapters)
+title = lesson.get('youtube_title') or f"{lesson['title']} | {course['title']} {lesson['number']} | Rosetta DBT Studio"
 desc = [lesson.get('summary', ''), '',
         f"Part of the free {course['title']} course on Rosetta Academy: {course['academy']}", '',
-        'Chapters'] + [f"{fmt(t)} {n}" for t, n in chapters] + ['',
-        f"Recorded in Rosetta DBT Studio {course['app']['version']} with dbt Core {course['runtime']['dbt_core']} "
-        f"and dbt-duckdb {course['runtime']['dbt_duckdb']}.",
+        ] + ((['Chapters'] + [f"{fmt(t)} {n}" for t, n in chapters] + ['']) if len(chapters) >= 3 else []) + [
+        (f"Recorded in Rosetta DBT Studio {course['app']['version']} with dbt Core {course['runtime']['dbt_core']} "
+         f"and dbt-duckdb {course['runtime']['dbt_duckdb']}." if any(sc['kind'] == 'app' for sc in lesson['scenes'])
+         else f"Screens from Rosetta DBT Studio {course['app']['version']}."),
         'Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html',
         'Source code: https://github.com/rosettadb/dbt-studio']
-tags = ['dbt', 'dbt core', 'dbt models', 'ref', 'DAG', 'data lineage', 'analytics engineering', 'ELT', 'DuckDB', 'Rosetta DBT Studio', 'SQL']
+tags = list(dict.fromkeys(lesson.get('tags', []) + course.get('youtube', {}).get('tags', [])))
 yt = [f"# YouTube upload: {lesson['title']}", '',
       f"- **File:** `{lid}.mp4` (3840x2160, {fmt(tl['total'])}). Upload the 4K file; YouTube shows HD and 4K only after processing finishes, which can take from minutes to an hour, so the first view may look blurry.",
       f"- **Visibility:** {course['youtube']['visibility']} (embedded only in Academy)",
@@ -84,13 +94,13 @@ def act(a):
         'lineage_depth': lambda: f"In the lineage panel, set **Depth** to {v}",
     }
     return table[k]() if k in table else f"{k}: {v}"
-cue = [f"# {lesson['title']} — recording cue sheet", '',
-       f"For a human retake of the app scenes (the automated recording follows the same steps). App: Rosetta DBT Studio {course['app']['version']}, dark theme, window 1920x1080.", '',
-       '## Before you start', '',
-       f"- Start state `{lesson['start_state']}`: project `dbt_course` with the Lab 1 data in `course.duckdb`, `models/staging` holding `_sources.yml` and the three staging models, and an empty `models/marts`.",
-       '- No `target/` or `logs/` folders yet, so the compile in s04 creates them on camera.',
-       '- Close every editor tab and start on the home screen (Workspace Overview).',
-       '- Bottom panel open on TERMINAL.', '']
+app_scenes = [sc for sc in lesson['scenes'] if sc['kind'] == 'app']
+cue = [f"# {lesson['title']} — recording cue sheet", '']
+if not app_scenes:
+    cue += ['This lesson has no app scenes, so there is nothing to record. A human voice-over only needs `voiceover-script.md`.', '']
+else:
+    cue += [f"For a human retake of the app scenes (the automated recording follows the same steps). App: Rosetta DBT Studio {course['app']['version']}, {course['theme']} theme, window 1920x1080.", '',
+            '## Before you start', ''] + [f"- {n}" for n in lesson.get('start_notes', [])] + ['']
 for sc in lesson['scenes']:
     if sc['kind'] != 'app':
         continue
@@ -105,12 +115,14 @@ for sc in lesson['scenes']:
 # ---------------------------------------------------------------- readme
 ff = json.loads(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration,size:stream=codec_name,width,height', '-of', 'json', str(L / f'{lid}.mp4')], capture_output=True, text=True).stdout)
 size_mb = int(ff['format']['size']) / 1e6
-rd = [f"# Lesson 3.2 · {lesson['title']}", '',
+rel = f"../{C.name}/{L.name}"
+rd = [f"# Lesson {lesson['number']} · {lesson['title']}", '',
       f"{course['title']} · {lesson['module']}. Rendered {fmt(tl['total'])}, 3840x2160 H.264 + AAC, {size_mb:.0f} MB.", '',
       '## Files', '', '| File | What it is |', '|---|---|',
       f"| `lesson.yaml` | **The source.** Edit this, then re-render |",
       f"| `slides.html` | Slide scenes (open in a browser: arrows step through builds) |",
-      f"| `{lid}.mp4` | The video (not in git) |",
+      f"| `{lid}.mp4` | The 4K video for YouTube (not in git) |",
+      f"| `{lid}-1080p.mp4` | 1080p copy for phones and sharing (not in git) |",
       f"| `{lid}.srt`, `{lid}.vtt` | Captions, one cue per sentence |",
       '| `voiceover-script.md` | Beat sheet with measured start times |',
       '| `voiceover-kokoro.txt` | Exact spoken forms sent to the voice |',
@@ -118,24 +130,24 @@ rd = [f"# Lesson 3.2 · {lesson['title']}", '',
       f"| `{lid}-slides.pptx` | One image per slide state, narration in speaker notes (not in git) |",
       '| `youtube.md`, `thumbnail.png` | Upload package |', '| `timeline.json` | Start and length of every scene and beat |',
       '| `render/` | Frames, audio and intermediates; kept only on the machine that rendered (not in git) |', '',
-      '## Versions', '', f"Rosetta DBT Studio {course['app']['version']} (official Linux release), dbt-core {course['runtime']['dbt_core']}, "
+      '## Versions', '', f"Rosetta DBT Studio {course['app']['version']} (official release), dbt-core {course['runtime']['dbt_core']}, "
       f"dbt-duckdb {course['runtime']['dbt_duckdb']}, Python {course['runtime']['python']}. Voice: Kokoro `{course['voice']['voice']}` at {course['voice']['speed']}.", '',
-      '## Changes from the draft', '',
-      '- The draft\'s spoken lines are kept. Demo lines were added for the app scenes (opening stg_orders, writing fct_orders, Compile, the compiled copy, Lineage).',
-      '- b06 mentions source() and defers it to Lesson 3.3.', '- b22 adds what "directed" and "acyclic" mean (matches the lesson\'s quiz answer).',
-      '- The draft cue "lineage graph appears as models are added" is shown with Studio\'s LINEAGE tab at depth 1 and 2 rather than a growing diagram; the DAG slide builds the graph instead.', '',
-      '## Accuracy notes', '',
-      '- `ref(\'stg_orders\')` compiling to `"course"."main"."stg_orders"` is the real compiled output (target/compiled).',
-      '- The `prod` line on the ref slide is an illustrative example and is marked as one.',
-      '- Lineage at depth 2 showing the sources `orders` and `payments` was verified in this recording.',
-      '- Listen once for pronunciation: dbt is read as "D B T", SQL as "sequel", DAG as "dag".', '',
-      '## Re-render', '', '```sh', 'cd ../../_academy-video-tooling',
-      'NODE_PATH=$(npm root -g) ./run-headless.sh record.cjs ../dbt-Fundamentals-Course ../dbt-Fundamentals-Course/lesson-3-2-models-ref-dag',
-      'python3 scripts/tts.py ../dbt-Fundamentals-Course ../dbt-Fundamentals-Course/lesson-3-2-models-ref-dag     # --human to use voice-human/<beat>.wav',
-      'python3 scripts/render_stills.py ../dbt-Fundamentals-Course ../dbt-Fundamentals-Course/lesson-3-2-models-ref-dag',
-      'python3 scripts/compose.py ../dbt-Fundamentals-Course ../dbt-Fundamentals-Course/lesson-3-2-models-ref-dag',
-      'python3 scripts/package.py ../dbt-Fundamentals-Course ../dbt-Fundamentals-Course/lesson-3-2-models-ref-dag', '```', '',
+      '## Changes from the draft', ''] + [f"- {x}" for x in lesson.get('draft_changes', ['None.'])] + ['',
+      '## Accuracy notes', ''] + [f"- {x}" for x in lesson.get('accuracy_notes', [])] + [
+      '- Listen once for pronunciation (see `voiceover-kokoro.txt` for the exact spoken forms).', '',
+      '## Re-render', '', '```sh', 'cd ../../_academy-video-tooling'] + (
+      [f'NODE_PATH=$(npm root -g) ./run-headless.sh record.cjs ../{C.name} {rel}'] if app_scenes else []) + [
+      f'python3 scripts/tts.py ../{C.name} {rel}     # --human to use voice-human/<beat>.wav',
+      f'python3 scripts/render_stills.py ../{C.name} {rel}',
+      f'python3 scripts/compose.py ../{C.name} {rel}',
+      f'python3 scripts/package.py ../{C.name} {rel}', '```', '',
       'Only the narration changed: skip `record.cjs`. Only a slide changed: run `render_stills.py`, `compose.py`, `package.py`.', '']
 (L / 'readme.md').write_text('\n'.join(rd))
+# 1080p copy for phones and sharing (many phones cannot decode 4K H.264 level 5.1; YouTube gets the 4K file)
+src, prev = L / f'{lid}.mp4', L / f'{lid}-1080p.mp4'
+if not prev.exists() or prev.stat().st_mtime < src.stat().st_mtime:
+    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', str(src), '-vf', 'scale=1920:1080:flags=lanczos,format=yuv420p',
+                    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-profile:v', 'high', '-level', '4.0',
+                    '-c:a', 'aac', '-b:a', '160k', '-ac', '2', '-ar', '48000', '-movflags', '+faststart', str(prev)], check=True)
 subprocess.run([sys.executable, str(pathlib.Path(__file__).parent / 'script_from_lesson.py'), str(L), '--timeline', str(L / 'timeline.json')], check=True)
 print('packaged', lid)

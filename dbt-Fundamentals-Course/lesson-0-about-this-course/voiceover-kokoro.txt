@@ -1,0 +1,13 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Welcome.
+b01	If your team moves data into a cloud warehouse, someone is writing sequel to clean it up, join it and make it trustworthy.
+b02	The question is where that sequel lives, who can change it, and how you know it still works.
+b03	D B T is the most widely adopted answer to that question.
+b04	You write plain sequel select statements. D B T works out the order, builds the tables and views, tests them, and documents them.
+b05	And it gives your team the same workflow software engineers have used for decades: version control, code review, automated tests and deployment.
+b06	In this course you will learn what D B T is, and why it moved the industry from E T L to E L T.
+b07	You will also learn where that pattern is the wrong choice, and how to bring it into your own organization.
+b08	You will build a working project as you go, using duck D B and Rosetta D B T Studio, so nothing needs a cloud account.
+b09	We focus on the open-source versions of D B T: version 1, and the new version 2.
+b10	And we are direct about what is free, what is open source, and what is a paid commercial feature.
+b11	Let's get started.

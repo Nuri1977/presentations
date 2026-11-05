@@ -7,6 +7,22 @@ draft_section: "Lesson 3.2: Models, ref() and the DAG"
 next: "Lesson 3.3 · Sources and the staging layer"
 summary: "What a dbt model is, how ref() links models and resolves table names, and how dbt builds the DAG to order, parallelize and trace your models. Shown in Rosetta DBT Studio with DuckDB."
 start_state: lesson-3-2-start
+number: "3.2"
+tags: [dbt models, ref, DAG, data lineage]
+start_notes:
+  - "Start state `lesson-3-2-start`: project `dbt_course` with the Lab 1 data in `course.duckdb`, `models/staging` holding `_sources.yml` and the three staging models, and an empty `models/marts`."
+  - "No `target/` or `logs/` folders yet, so the compile in s04 creates them on camera."
+  - "Close every editor tab and start on the home screen (Workspace Overview)."
+  - "Bottom panel open on TERMINAL."
+draft_changes:
+  - "The draft's spoken lines are kept. Demo lines were added for the app scenes (opening stg_orders, writing fct_orders, Compile, the compiled copy, Lineage)."
+  - "b06 mentions source() and defers it to Lesson 3.3."
+  - "b22 adds what \"directed\" and \"acyclic\" mean (matches the lesson's quiz answer)."
+  - "The draft cue \"lineage graph appears as models are added\" is shown with Studio's LINEAGE tab at depth 1 and 2 rather than a growing diagram; the DAG slide builds the graph instead."
+accuracy_notes:
+  - "`ref('stg_orders')` compiling to `\"course\".\"main\".\"stg_orders\"` is the real compiled output (target/compiled)."
+  - "The `prod` line on the ref slide is an illustrative example and is marked as one."
+  - "Lineage at depth 2 showing the sources `orders` and `payments` was verified in this recording."
 target_minutes: 3.5
 
 scenes:

@@ -1,0 +1,47 @@
+1
+00:00:03,350 --> 00:00:03,996
+Welcome.
+
+2
+00:00:04,276 --> 00:00:11,234
+If your team moves data into a cloud warehouse, someone is writing SQL to clean it up, join it and make it trustworthy.
+
+3
+00:00:12,184 --> 00:00:17,281
+The question is where that SQL lives, who can change it, and how you know it still works.
+
+4
+00:00:18,231 --> 00:00:22,072
+dbt is the most widely adopted answer to that question.
+
+5
+00:00:23,022 --> 00:00:31,158
+You write plain SQL select statements. dbt works out the order, builds the tables and views, tests them, and documents them.
+
+6
+00:00:32,108 --> 00:00:40,856
+And it gives your team the same workflow software engineers have used for decades: version control, code review, automated tests and deployment.
+
+7
+00:00:41,806 --> 00:00:48,047
+In this course you will learn what dbt is, and why it moved the industry from ETL to ELT.
+
+8
+00:00:48,997 --> 00:00:54,361
+You will also learn where that pattern is the wrong choice, and how to bring it into your own organization.
+
+9
+00:00:55,311 --> 00:01:02,777
+You will build a working project as you go, using DuckDB and Rosetta DBT Studio, so nothing needs a cloud account.
+
+10
+00:01:03,727 --> 00:01:09,306
+We focus on the open-source versions of dbt: version 1, and the new version 2.
+
+11
+00:01:10,256 --> 00:01:15,551
+And we are direct about what is free, what is open source, and what is a paid commercial feature.
+
+12
+00:01:16,501 --> 00:01:17,635
+Let's get started.

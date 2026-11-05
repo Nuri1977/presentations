@@ -1,0 +1,76 @@
+# Course welcome ("About this course") - the single source for this video. Edit this file; everything else is generated.
+id: course-welcome
+number: "Welcome"
+title: "About this course"
+youtube_title: "Welcome to dbt Fundamentals | From ETL to ELT with open-source dbt | Rosetta Academy"
+module: "Course landing page"
+draft_section: "Course landing page (LMS) > About this course"
+next: "Lesson 1.1 · What dbt is (and is not)"
+target_minutes: 1.5
+summary: "A short welcome to the free dbt Fundamentals course on Rosetta Academy: the problem dbt solves, what you will learn, how you will practise with Rosetta DBT Studio and DuckDB on your own laptop, and how the course treats open-source, free and paid dbt."
+tags: [dbt course, dbt tutorial, learn dbt, dbt fundamentals]
+draft_changes:
+  - "Two long sentences are split for the voice: \"dbt works out the order ... and gives your team the same workflow\" and \"In this course you will learn ... your own organization\" (\"also\" added to the second half)."
+  - "The draft cue \"course title card, then a simple before/after diagram\" is kept; three more slides illustrate the rest of the script, one of them with a real Rosetta DBT Studio 1.7.5 screenshot from the Lesson 3.2 recording."
+  - "Course facts on the title card use the curriculum: 26 lessons, 6 labs and a capstone (the draft's landing text says \"7 labs and a capstone\", see draft-corrections.md)."
+accuracy_notes:
+  - "\"dbt is the most widely adopted answer\" is the draft's claim and was not checked."
+  - "The licensing split on the versions slide (dbt v1 and dbt OSS Apache 2.0, dbt v2 free but proprietary under the dbt Product Licensing Agreement, dbt platform paid) was checked against docs.getdbt.com/docs/dbt-licensing (updated 23 Oct 2026) on 5 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Rosetta Academy · Course welcome. dbt Fundamentals. From ETL to ELT with open-source dbt (v1 and v2). Badges: 26 lessons, 6 labs + capstone, Rosetta DBT Studio + DuckDB."
+
+  - id: s01
+    kind: slide
+    slide: question
+    chapter: "Where does your SQL live?"
+    beats:
+      - { id: b01, step: 1, show: "Sources flow into a cloud warehouse; inside it, scattered SQL scripts: clean up, join, make trustworthy.", say: "Welcome. If your team moves data into a cloud warehouse, someone is writing SQL to clean it up, join it and make it trustworthy." }
+      - { id: b02, step: 2, show: "Three question cards: Where does it live? Who can change it? How do you know it still works?", say: "The question is where that SQL lives, who can change it, and how you know it still works." }
+
+  - id: s02
+    kind: slide
+    slide: before-after
+    chapter: "What dbt does"
+    beats:
+      - { id: b03, step: 1, show: "Before: a tangle of scripts with crossing, unlabelled dependencies.", say: "dbt is the most widely adopted answer to that question." }
+      - { id: b04, step: 2, show: "An arrow to After: a clean lineage graph, sources to staging to marts, each node tested and documented.", say: "You write plain SQL select statements. dbt works out the order, builds the tables and views, tests them, and documents them." }
+      - { id: b05, step: 3, show: "Four chips appear under the graph: Version control, Code review, Automated tests, Deployment.", say: "And it gives your team the same workflow software engineers have used for decades: version control, code review, automated tests and deployment." }
+
+  - id: s03
+    kind: slide
+    slide: learn
+    chapter: "What you will learn"
+    beats:
+      - { id: b06, step: 1, show: "Cards 1 and 2: What dbt is. Why ETL became ELT.", say: "In this course you will learn what dbt is, and why it moved the industry from ETL to ELT." }
+      - { id: b07, step: 2, show: "Cards 3 and 4: When dbt is the wrong tool. Bringing it to your organization.", say: "You will also learn where that pattern is the wrong choice, and how to bring it into your own organization." }
+
+  - id: s04
+    kind: slide
+    slide: build
+    chapter: "Hands-on with Rosetta DBT Studio"
+    beats:
+      - { id: b08, step: 1, show: "A real Rosetta DBT Studio 1.7.5 window (fct_orders and its lineage), next to: free desktop IDE with dbt managed for you, DuckDB in one local file, no cloud account or credit card.", say: "You will build a working project as you go, using DuckDB and Rosetta DBT Studio, so nothing needs a cloud account." }
+
+  - id: s05
+    kind: slide
+    slide: versions
+    chapter: "Open source, free and paid"
+    beats:
+      - { id: b09, step: 1, show: "Two engines: dbt v1 (Python) and dbt v2 (Rust).", say: "We focus on the open-source versions of dbt: version 1, and the new version 2." }
+      - { id: b10, step: 2, show: "Three columns: Open source, Apache 2.0 (dbt v1, dbt OSS). Free but proprietary (dbt v2). Paid (dbt platform).", say: "And we are direct about what is free, what is open source, and what is a paid commercial feature." }
+
+  - id: s06
+    kind: slide
+    slide: start
+    chapter: "Let's get started"
+    beats:
+      - { id: b11, step: 1, show: "Course map: the seven modules, Module 1 marked Start here.", say: "Let's get started." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.1 · What dbt is (and is not), with the Rosetta logo."

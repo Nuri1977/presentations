@@ -37,6 +37,7 @@ video:
 
 youtube:
   visibility: unlisted                # plays only inside Academy
+  tags: [dbt, dbt core, analytics engineering, ELT, DuckDB, Rosetta DBT Studio, SQL, dbt Fundamentals]
 
 # Spoken forms. Slides and captions keep the written form; only the voice uses these.
 pronunciation:

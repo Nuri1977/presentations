@@ -8,7 +8,8 @@ dbt Fundamentals · Module 3 · Building models. Rendered 2:54, 3840x2160 H.264 
 |---|---|
 | `lesson.yaml` | **The source.** Edit this, then re-render |
 | `slides.html` | Slide scenes (open in a browser: arrows step through builds) |
-| `lesson-3-2.mp4` | The video (not in git) |
+| `lesson-3-2.mp4` | The 4K video for YouTube (not in git) |
+| `lesson-3-2-1080p.mp4` | 1080p copy for phones and sharing (not in git) |
 | `lesson-3-2.srt`, `lesson-3-2.vtt` | Captions, one cue per sentence |
 | `voiceover-script.md` | Beat sheet with measured start times |
 | `voiceover-kokoro.txt` | Exact spoken forms sent to the voice |
@@ -20,7 +21,7 @@ dbt Fundamentals · Module 3 · Building models. Rendered 2:54, 3840x2160 H.264 
 
 ## Versions
 
-Rosetta DBT Studio 1.7.5 (official Linux release), dbt-core 1.12.6, dbt-duckdb 1.11.1, Python 3.10.17. Voice: Kokoro `af_heart` at 1.0.
+Rosetta DBT Studio 1.7.5 (official release), dbt-core 1.12.6, dbt-duckdb 1.11.1, Python 3.10.17. Voice: Kokoro `af_heart` at 1.0.
 
 ## Changes from the draft
 
@@ -34,7 +35,7 @@ Rosetta DBT Studio 1.7.5 (official Linux release), dbt-core 1.12.6, dbt-duckdb 1
 - `ref('stg_orders')` compiling to `"course"."main"."stg_orders"` is the real compiled output (target/compiled).
 - The `prod` line on the ref slide is an illustrative example and is marked as one.
 - Lineage at depth 2 showing the sources `orders` and `payments` was verified in this recording.
-- Listen once for pronunciation: dbt is read as "D B T", SQL as "sequel", DAG as "dag".
+- Listen once for pronunciation (see `voiceover-kokoro.txt` for the exact spoken forms).
 
 ## Re-render
 

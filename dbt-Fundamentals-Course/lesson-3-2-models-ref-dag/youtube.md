@@ -31,4 +31,4 @@ Source code: https://github.com/rosettadb/dbt-studio
 
 ## Tags
 
-dbt, dbt core, dbt models, ref, DAG, data lineage, analytics engineering, ELT, DuckDB, Rosetta DBT Studio, SQL
+dbt models, ref, DAG, data lineage, dbt, dbt core, analytics engineering, ELT, DuckDB, Rosetta DBT Studio, SQL, dbt Fundamentals

@@ -1,0 +1,18 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Let's start with the simplest possible definition. D B T is the T in E L T.
+b02	It transforms data that is already sitting in your warehouse.
+b03	You write a select statement.
+b03	That's a model.
+b04	D B T wraps it in the right create table or create view statement, runs it in the right order, and tells you if something breaks.
+b05	Notice what D B T does not do.
+b05	It does not extract data from source systems.
+b06	It does not load data into your warehouse.
+b07	It is not a database, and it does not run your queries itself.
+b08	Your warehouse does the work. D B T writes and orders the sequel, and adds the engineering around it.
+b09	That engineering is the real value.
+b10	Tests that run on every build.
+b11	Documentation generated from the code.
+b12	Everything in Git, so every change is reviewed.
+b13	In short, D B T brings software engineering practice to sequel.
+b14	A useful comparison: D B T is to sequel what a build system is to source code.
+b14	You describe what each piece should look like, and D B T works out the order and builds it.
