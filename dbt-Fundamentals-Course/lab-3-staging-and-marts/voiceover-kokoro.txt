@@ -1,0 +1,58 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In this walkthrough we do Lab 3 in Rosetta D B T Studio.
+b01	We declare the raw tables as sources, build three staging models and two marts, and run them on duck D B.
+b02	You need the end of lab one: the raw customers, orders and payments tables in your duck D B file, and the D B T course project with an empty models folder.
+b03	Open the D B T course project.
+b03	The models folder is still empty.
+b04	Right-click models, choose New Folder, and name it staging.
+b04	Then make a second folder, called marts.
+b05	In staging, create the sources file.
+b05	Its name starts with an underscore, so it stays at the top of the folder.
+b06	It declares one source called raw, in the schema raw, with three tables: customers, orders and payments.
+b07	Save the file.
+b07	From now on, models read raw data through source, and D B T can trace lineage all the way back to these tables.
+b08	Next, one staging model per source table, starting with staging customers.
+b09	Light cleanup only.
+b09	Rename id to customer id, and cast created at to a date.
+b09	No joins, and no business logic.
+b09	Save it.
+b10	Staging orders follows the same pattern: rename the id, cast the order date, and save.
+b11	Staging payments renames the method, and turns cents into dollars.
+b11	Save that one too.
+b12	Now the marts.
+b12	In the marts folder, create fact orders.
+b13	It is the model from Lesson 3.2.
+b13	First the orders, from staging, through ref.
+b14	Then the payments, added up per order.
+b15	And one row per order, with its amount.
+b15	Save the model.
+b16	Next, dim customers: one row per customer.
+b17	It keeps the customer columns, and adds the first order date, the number of orders, and the lifetime value.
+b18	Those come from fact orders, joined on customer id.
+b18	Because of this ref, D B T will always build fact orders first.
+b18	Save it.
+b19	Open D B T project dot yammel, and go to the end of the file.
+b20	Add a models block.
+b20	Everything in staging becomes a view, and everything in marts becomes a table.
+b21	Save it.
+b21	These are folder defaults, and a single model can still override them.
+b22	Now open the Project menu, and choose Compile.
+b23	In target, compiled, open fact orders.
+b23	Every ref has become a real table name in your duck D B file.
+b24	Then the Project menu again, and Run.
+b25	Five models, built in dependency order: three views and two tables.
+b25	The last line says pass five, error zero.
+b26	Let's check the data.
+b26	Open the sequel Editor, pick the course connection, and ask for each customer's order count and lifetime value.
+b27	Run it with the green arrow next to the line.
+b28	Ava comes first, with three orders and one hundred and two dollars.
+b28	Farid has none.
+b28	That is exactly the expected result on the lab page.
+b29	Last, the lineage.
+b29	Back in the project, open dim customers, and the Lineage tab.
+b30	Maximize it, and set the depth to three.
+b31	That is the whole lab in one picture: the raw sources on the left, the staging views in the middle, and the two marts on the right.
+b32	That is Lab 3.
+b32	The raw data stayed untouched, the staging layer cleaned it once, and the marts were built in the right order by one command.
+b33	Before you move on, answer the reflection questions on the lab page.
+b33	Try changing staging orders, and run it with a plus sign after the name, to rebuild everything downstream.

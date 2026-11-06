@@ -137,14 +137,14 @@ const ACTIONS = {
     await click(page.getByRole('menuitem', { name: item, exact: true }).first(), `Project → ${item}`, { settleMs: [200] });
   },
   async wait_for(what) {
-    if (what !== 'manifest') throw new Error('unknown wait_for ' + what);
+    if (what !== 'manifest' && what !== 'run') throw new Error('unknown wait_for ' + what);
     const man = path.join(seeded.projectDir, 'target', 'manifest.json');
     const imgs = []; const ts = []; const t0 = Date.now();
     let doneAt = null;
     while (Date.now() - t0 < 90000) {
       imgs.push(await snap()); ts.push((Date.now() - t0) / 1000);
-      const toast = await isVisible(page.getByText(/completed successfully/i));
-      if (fs.existsSync(man) && !doneAt) doneAt = Date.now();
+      const toast = await isVisible(page.getByText(what === 'run' ? /dbt run completed successfully/i : /completed successfully/i));
+      if ((what === 'run' ? toast : fs.existsSync(man)) && !doneAt) doneAt = Date.now();
       if (doneAt && (toast || Date.now() - doneAt > 4000)) break;
       await page.waitForTimeout(350);
     }
@@ -173,14 +173,59 @@ const ACTIONS = {
     await click(tab, `${label} tab`, { settleMs: [300, 900, 1800, 2800] });
   },
   async lineage_depth(n) {
-    const depthLabel = page.getByText('Depth', { exact: true }).first();
-    const lb = await boxOf(depthLabel);
-    const combos = await page.getByRole('combobox').all();
+    // the panel and the Maximize dialog each have their own Depth select; use the dialog when it is open
+    const root = (await page.getByRole('dialog').count()) ? page.getByRole('dialog').last() : page;
+    const lb = await boxOf(root.getByText('Depth', { exact: true }).first());
     let target = null;
-    for (const c of combos) { const b = await c.boundingBox(); if (b && Math.abs(b.y + b.height / 2 - (lb.y + lb.height / 2)) < 20 && b.x > lb.x) { target = c; break; } }
+    for (const c of await root.getByRole('combobox').all()) { const b = await c.boundingBox(); if (b && Math.abs(b.y + b.height / 2 - (lb.y + lb.height / 2)) < 20 && b.x > lb.x) { target = c; break; } }
     if (!target) throw new Error('depth select not found');
     await click(target, 'Depth select', { settleMs: [200, 500] });
     await click(page.getByRole('option', { name: String(n), exact: true }), `Depth ${n}`, { settleMs: [300, 900, 1800, 2800] });
+  },
+  async lineage_maximize() {
+    await click(page.getByRole('button', { name: 'Maximize' }).first(), 'Maximize lineage', { settleMs: [300, 900, 1800] });
+  },
+  async lineage_fit() {
+    const root = (await page.getByRole('dialog').count()) ? page.getByRole('dialog').last() : page;
+    const fit = root.locator('.react-flow__controls-fitview').first();
+    if (await fit.count()) await click(fit, 'fit view', { settleMs: [300, 900, 1600] });
+  },
+  async new_folder({ parent, name }) {
+    await openPath(parent, { open: false });
+    const parts = parent.split('/');
+    await click(treeItem(parts[parts.length - 1], parts.length + 1).first(), `right-click ${parent}`, { button: 'right', dx: 0.3, maxDx: 140, settleMs: [150, 400] });
+    await click(page.getByRole('menuitem', { name: 'New Folder' }), 'New Folder', { settleMs: [200, 500] });
+    await click(page.getByRole('dialog').getByRole('textbox').first(), 'folder name field', { dx: 0.25, settleMs: [150] });
+    await typeKeys(name, 'folder name');
+    await click(page.getByRole('dialog').getByRole('button', { name: 'Save', exact: true }).first(), 'Save new folder', { settleMs: [250, 700, 1300] });
+    if (!fs.existsSync(path.join(seeded.projectDir, parent, name))) throw new Error('folder not created: ' + name);
+  },
+  async type_end(text) {
+    await attachEditor(page);
+    await tameEditor(page);
+    await page.evaluate(() => { const ed = window.__recEditor; const m = ed.getModel(); const n = m.getLineCount(); ed.setPosition({ lineNumber: n, column: m.getLineMaxColumn(n) }); ed.revealLine(n); ed.focus(); });
+    await page.waitForTimeout(200);
+    await still();
+    await typeKeys(text, 'type at end of file');
+  },
+  async nav(label) {
+    await click(page.getByRole('link', { name: label, exact: true }).first(), `nav ${label}`, { settleMs: [300, 900, 1800, 2600] });
+  },
+  async sql_connection(name) {
+    await click(page.getByRole('combobox').first(), 'connection select', { settleMs: [200, 500] });
+    await click(page.getByRole('option', { name, exact: true }).first(), `connection ${name}`, { settleMs: [400, 1200, 2400, 3400] });
+  },
+  async sql_run() {
+    // the green run arrow sits in the gutter, 74 px left of the first code line
+    const box = await boxOf(page.locator('.monaco-editor:visible .view-line').first());
+    await glideTo(Math.round(box.x - 74), Math.round(box.y + box.height / 2), 'run arrow');
+    await page.mouse.down(); await page.waitForTimeout(60); await page.mouse.up();
+    ev({ k: 'press', at: [box.x - 74, box.y + box.height / 2], button: 'left', label: 'run query' });
+    await settle([300, 900, 1800, 3000]);
+  },
+  async point_tree(rel) {
+    const parts = rel.split('/');
+    await pointAt(treeItem(parts[parts.length - 1], parts.length + 1).first(), `point ${rel}`, { dx: 0.3, maxDx: 140 });
   },
 };
 
@@ -188,6 +233,8 @@ const ACTIONS = {
   seeded = seedProfile({ stateDir: path.join(courseDir, 'states', lesson.start_state), home: HOME, dbtEnv: path.join(T, '.cache', 'dbt-env'), python: path.join(T, '.cache', 'dbt-env', 'bin', 'python') });
   app = await launchStudio({ appBin: path.join(T, '.cache', 'app', `Rosetta-DBT-Studio-${course.app.version}-x64`, 'rosetta-dbt-studio'), home: HOME, userData: seeded.userData, scale: 2, theme: course.theme });
   app.process().stderr.on('data', (d) => fs.appendFileSync(path.join(OUT, 'electron-stderr.log'), d));
+  app.process().stdout.on('data', (d) => fs.appendFileSync(path.join(OUT, 'electron-stderr.log'), d));
+  app.process().on('exit', (code, sig) => log('electron exited', code, sig));
   ({ page } = await mainWindow(app));
   await page.waitForTimeout(3000);
   await sizeWindow(app, page);

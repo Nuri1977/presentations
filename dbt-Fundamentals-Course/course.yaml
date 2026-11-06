@@ -48,6 +48,7 @@ pronunciation:
   - [ '\.sql\b', ' dot sequel' ]
   - [ '\bDuckDB\b', 'duck D B' ]
   - [ '\bYAML\b', 'yammel' ]
+  - [ '\byml\b', 'yammel' ]
   - [ '\bDAG\b', 'dag' ]
   - [ '\bCTE\b', 'C T E' ]
   - [ '\bJinja\b', 'jinja' ]

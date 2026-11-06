@@ -1,0 +1,8 @@
+# End of Lab 1: Appendix A data loaded into course.duckdb (raw schema), dbt_course project with no models yet.
+# Start state for the Lab 3 walkthrough.
+name: lab-1-end
+project_name: dbt_course
+database_file: course.duckdb
+sql:
+  - ../../downloads/starter_data.sql
+project_dir: project

@@ -96,7 +96,8 @@ async function launchStudio(opts) {
   const electronApp = await _electron.launch({
     executablePath: opts.appBin,
     args: [`--user-data-dir=${opts.userData}`, '--no-sandbox', `--force-device-scale-factor=${scale}`, '--disable-gpu'],
-    env: { ...process.env, HOME: opts.home, ELECTRON_NO_UPDATER: '1', DISABLE_ANALYTICS: '1' },
+    // dbt usage tracking is blocked in the sandbox and can stall dbt; it never shows on screen
+    env: { ...process.env, HOME: opts.home, ELECTRON_NO_UPDATER: '1', DISABLE_ANALYTICS: '1', DBT_SEND_ANONYMOUS_USAGE_STATS: 'false', DO_NOT_TRACK: '1' },
     ...(opts.recordVideoDir ? { recordVideo: { dir: opts.recordVideoDir, size: { width: W, height: H } } } : {}),
     timeout: 120000,
   });

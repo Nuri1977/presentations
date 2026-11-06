@@ -91,6 +91,14 @@ def act(a):
         'point': lambda: f"Point at line {v['editor_line']}" if isinstance(v, dict) else f"Point at {v}",
         'close_tab': lambda: f"Close the editor tab for `{v}` (its ×)",
         'bottom_tab': lambda: f"Click the **{v}** tab in the bottom panel (it appears after the compile, once the model file is active)",
+        'new_folder': lambda: f"Right-click `{v['parent']}` → **New Folder**, type `{v['name']}`, click **Save**",
+        'type_end': lambda: 'Click at the end of the file and type:<br><br>```yaml\n' + (v or '').rstrip('\n') + '\n```',
+        'nav': lambda: f"In the left bar, click **{v}**",
+        'sql_connection': lambda: f"Open the connection list (top left) and pick **{v}**",
+        'sql_run': lambda: "Click the green ▶ arrow next to line 1",
+        'lineage_maximize': lambda: "Click **Maximize** (top right of the lineage panel)",
+        'lineage_fit': lambda: "Click the fit-view button (bottom left of the graph)",
+        'point_tree': lambda: f"Point at `{v}` in the Explorer",
         'lineage_depth': lambda: f"In the lineage panel, set **Depth** to {v}",
     }
     return table[k]() if k in table else f"{k}: {v}"

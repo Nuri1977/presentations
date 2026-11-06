@@ -1,0 +1,282 @@
+# Lab 3 walkthrough - the single source for this video. Edit this file; everything else is generated.
+id: lab-3-walkthrough
+number: "Lab 3"
+title: "Staging and marts on DuckDB (walkthrough)"
+youtube_title: "Lab 3 walkthrough: staging and marts on DuckDB | dbt Fundamentals | Rosetta DBT Studio"
+module: "Module 3 · Building models"
+draft_section: "Lab 3: Staging and marts on DuckDB (Appendix C: optional walkthrough video)"
+next: "Module 4 · Lesson 4.1 · Data tests"
+start_state: lab-1-end
+target_minutes: 6
+summary: "Lab 3 done live in Rosetta DBT Studio: declare the raw tables as sources, write three staging models and two marts, set materializations, compile, run, check the result in the SQL Editor and see the whole lineage graph. Runs locally on DuckDB."
+tags: [dbt lab, dbt staging models, dbt marts, dbt sources, dbt lineage, dbt tutorial]
+start_notes:
+  - "Start state `lab-1-end`: project `dbt_course` with the Lab 1 data (raw.customers, raw.orders, raw.payments) in `course.duckdb`, `dbt_project.yml` without a models block, and an empty `models` folder."
+  - "No `target/` or `logs/` folders yet."
+  - "Start on the home screen (Workspace Overview), no editor tabs open, bottom panel on TERMINAL."
+draft_changes:
+  - "The draft has no script for the lab walkthroughs (Appendix C plans them as optional 5 to 8 minute videos), so the narration is written from the Lab 3 steps."
+  - "Step 5.3 runs `select customer_id, first_name, order_count, lifetime_value ... order by lifetime_value desc` instead of `select *`: these are the columns of the lab's Expected result table, and Studio 1.7.5's SQL Editor shows the date column first_order_date as {\"days\": N} (reported separately)."
+  - "Step 5.4 uses the LINEAGE tab, Maximize and Depth 3 to show the whole graph."
+  - "The optional staging-layer generator mentioned in Step 2 is not shown."
+accuracy_notes:
+  - "The query result in the video (Ava 3 orders 102, Dmitri 55, Chloe 50, Ben 23, Elena 12, Farid 0) is the real output and matches the lab's Expected result table."
+  - "`dbt run` built 3 view models and 2 table models, PASS=5, as narrated."
+  - "Studio bug seen while preparing: the SQL Editor result grid renders DATE values as {\"days\": N}."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Lab 3 walkthrough. Staging and marts on DuckDB. dbt Fundamentals, Module 3. Badges: Rosetta DBT Studio 1.7.5, DuckDB, Hands-on."
+
+  - id: s01
+    kind: slide
+    slide: plan
+    chapter: "What we build"
+    beats:
+      - { id: b01, step: 1, show: "The target graph: three raw sources → three staging models → fct_orders and dim_customers.", say: "In this walkthrough we do Lab 3 in Rosetta DBT Studio. We declare the raw tables as sources, build three staging models and two marts, and run them on DuckDB." }
+      - { id: b02, step: 2, show: "Before you start: the Lab 1 data in course.duckdb, and an empty dbt_course project.", say: "You need the end of Lab 1: the raw customers, orders and payments tables in your DuckDB file, and the dbt course project with an empty models folder." }
+
+  - id: s02
+    kind: app
+    chapter: "Folders and sources"
+    beats:
+      - id: b03
+        say: "Open the dbt course project. The models folder is still empty."
+        actions:
+          - open_project: dbt_course
+          - point_tree: models
+      - id: b04
+        say: "Right-click models, choose New Folder, and name it staging. Then make a second folder, called marts."
+        actions:
+          - new_folder: { parent: models, name: staging }
+          - new_folder: { parent: models, name: marts }
+      - id: b05
+        say: "In staging, create the sources file. Its name starts with an underscore, so it stays at the top of the folder."
+        actions:
+          - new_file: { folder: models/staging, name: _sources.yml }
+      - id: b06
+        say: "It declares one source called raw, in the schema raw, with three tables: customers, orders and payments."
+        actions:
+          - type: |
+              version: 2
+
+              sources:
+                - name: raw
+                  schema: raw
+                  tables:
+                    - name: customers
+                    - name: orders
+                    - name: payments
+      - id: b07
+        say: "Save the file. From now on, models read raw data through source, and dbt can trace lineage all the way back to these tables."
+        actions:
+          - click_save
+        zoom: editor-code
+        card: { eyebrow: "Sources", title: "Declare once", sub: "Then read raw tables with source('raw', 'orders').", pos: top-right }
+
+  - id: s03
+    kind: app
+    chapter: "Staging models"
+    beats:
+      - id: b08
+        say: "Next, one staging model per source table, starting with staging customers."
+        actions:
+          - new_file: { folder: models/staging, name: stg_customers.sql }
+      - id: b09
+        say: "Light cleanup only. Rename id to customer id, and cast created at to a date. No joins, and no business logic. Save it."
+        actions:
+          - type: |
+              select
+                  id as customer_id,
+                  first_name,
+                  last_name,
+                  email,
+                  cast(created_at as date) as created_at
+              from {{ source('raw', 'customers') }}
+          - click_save
+      - id: b10
+        say: "Staging orders follows the same pattern: rename the id, cast the order date, and save."
+        actions:
+          - new_file: { folder: models/staging, name: stg_orders.sql }
+          - type: |
+              select
+                  id as order_id,
+                  customer_id,
+                  cast(order_date as date) as order_date,
+                  status
+              from {{ source('raw', 'orders') }}
+          - click_save
+      - id: b11
+        say: "Staging payments renames the method, and turns cents into dollars. Save that one too."
+        actions:
+          - new_file: { folder: models/staging, name: stg_payments.sql }
+          - type: |
+              select
+                  id as payment_id,
+                  order_id,
+                  method as payment_method,
+                  amount_cents / 100.0 as amount
+              from {{ source('raw', 'payments') }}
+          - click_save
+
+  - id: s04
+    kind: app
+    chapter: "Marts"
+    beats:
+      - id: b12
+        say: "Now the marts. In the marts folder, create fact orders."
+        actions:
+          - new_file: { folder: models/marts, name: fct_orders.sql }
+      - id: b13
+        say: "It is the model from Lesson 3.2. First the orders, from staging, through ref."
+        actions:
+          - type: |
+              with orders as (
+                  select * from {{ ref('stg_orders') }}
+              ),
+      - id: b14
+        say: "Then the payments, added up per order."
+        actions:
+          - type: |
+              payments as (
+                  select order_id, sum(amount) as amount
+                  from {{ ref('stg_payments') }}
+                  group by 1
+              )
+      - id: b15
+        say: "And one row per order, with its amount. Save the model."
+        actions:
+          - type: |
+              select
+                  o.order_id, o.customer_id, o.order_date, o.status,
+                  coalesce(p.amount, 0) as amount
+              from orders o
+              left join payments p using (order_id)
+          - click_save
+      - id: b16
+        say: "Next, dim customers: one row per customer."
+        actions:
+          - new_file: { folder: models/marts, name: dim_customers.sql }
+      - id: b17
+        say: "It keeps the customer columns, and adds the first order date, the number of orders, and the lifetime value."
+        actions:
+          - type: |
+              select
+                  c.customer_id,
+                  c.first_name,
+                  c.last_name,
+                  c.email,
+                  min(o.order_date) as first_order_date,
+                  count(o.order_id) as order_count,
+                  coalesce(sum(o.amount), 0) as lifetime_value
+      - id: b18
+        say: "Those come from fact orders, joined on customer id. Because of this ref, dbt will always build fact orders first. Save it."
+        actions:
+          - type: |
+              from {{ ref('stg_customers') }} c
+              left join {{ ref('fct_orders') }} o using (customer_id)
+              group by 1, 2, 3, 4
+          - click_save
+
+  - id: s05
+    kind: app
+    chapter: "Materializations"
+    beats:
+      - id: b19
+        say: "Open dbt project dot yml, and go to the end of the file."
+        actions:
+          - open_file: dbt_project.yml
+      - id: b20
+        say: "Add a models block. Everything in staging becomes a view, and everything in marts becomes a table."
+        actions:
+          - type_end: |
+
+              models:
+                dbt_course:
+                  staging:
+                    +materialized: view
+                  marts:
+                    +materialized: table
+      - id: b21
+        say: "Save it. These are folder defaults, and a single model can still override them."
+        actions:
+          - click_save
+        zoom: editor-code
+
+  - id: s06
+    kind: app
+    chapter: "Compile and run"
+    beats:
+      - id: b22
+        say: "Now open the Project menu, and choose Compile."
+        actions:
+          - project_menu: Compile
+          - wait_for: manifest
+      - id: b23
+        say: "In target, compiled, open fact orders. Every ref has become a real table name in your DuckDB file."
+        actions:
+          - open_file: target/compiled/dbt_course/models/marts/fct_orders.sql
+          - point: { editor_line: 2 }
+        zoom: editor-code
+      - id: b24
+        say: "Then the Project menu again, and Run."
+        actions:
+          - project_menu: Run
+          - wait_for: run
+      - id: b25
+        say: "Five models, built in dependency order: three views and two tables. The last line says pass five, error zero."
+        zoom: terminal
+        card: { eyebrow: "dbt run", title: "3 views · 2 tables", sub: "Built in dependency order. PASS=5, ERROR=0.", pos: top-right }
+
+  - id: s07
+    kind: app
+    chapter: "Check the result"
+    beats:
+      - id: b26
+        say: "Let's check the data. Open the SQL Editor, pick the course connection, and ask for each customer's order count and lifetime value."
+        actions:
+          - nav: SQL Editor
+          - sql_connection: course
+          - type: "select customer_id, first_name, order_count, lifetime_value from dim_customers order by lifetime_value desc;"
+      - id: b27
+        say: "Run it with the green arrow next to the line."
+        actions:
+          - sql_run
+      - id: b28
+        say: "Ava comes first, with three orders and one hundred and two dollars. Farid has none. That is exactly the expected result on the lab page."
+        zoom: sql-results
+        card: { eyebrow: "Expected result", title: "It matches", sub: "Ava 102 · Dmitri 55 · Chloe 50 · Ben 23 · Elena 12 · Farid 0", pos: top-right }
+
+  - id: s08
+    kind: app
+    chapter: "The whole lineage"
+    beats:
+      - id: b29
+        say: "Last, the lineage. Back in the project, open dim customers, and the Lineage tab."
+        actions:
+          - nav: DBT Studio
+          - open_file: models/marts/dim_customers.sql
+          - bottom_tab: LINEAGE
+      - id: b30
+        say: "Maximize it, and set the depth to three."
+        actions:
+          - lineage_maximize
+          - lineage_depth: 3
+          - lineage_fit
+      - id: b31
+        say: "That is the whole lab in one picture: the raw sources on the left, the staging views in the middle, and the two marts on the right."
+
+  - id: s09
+    kind: slide
+    slide: recap
+    chapter: "Recap"
+    beats:
+      - { id: b32, step: 1, show: "Checklist: sources declared; staging views; marts as tables; built in order by one command; result matches.", say: "That is Lab 3. The raw data stayed untouched, the staging layer cleaned it once, and the marts were built in the right order by one command." }
+      - { id: b33, step: 2, show: "Reflection: compare customer_summary from Lab 1 with dim_customers; which models are views and which are tables; change stg_orders and run dbt run --select stg_orders+.", say: "Before you move on, answer the reflection questions on the lab page. Try changing staging orders, and run it with a plus sign after the name, to rebuild everything downstream." }
+
+  - id: s10
+    kind: closing
+    slide: closing
+    show: "Next · Module 4 · Data tests, with the Rosetta logo."

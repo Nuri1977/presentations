@@ -46,6 +46,14 @@ def describe(act):
         'close_active_tab': lambda: "Close the active editor tab",
         'close_tab': lambda: f"Close the editor tab for `{v}`",
         'bottom_tab': lambda: f"Open the **{v}** tab in the bottom panel",
+        'new_folder': lambda: f"Right-click `{v['parent']}` → **New Folder** → `{v['name']}` → **Save**",
+        'type_end': lambda: f"At the end of the file, type {len(v)} characters",
+        'nav': lambda: f"Left bar → **{v}**",
+        'sql_connection': lambda: f"Pick the connection **{v}**",
+        'sql_run': lambda: "Click the green run arrow next to line 1",
+        'lineage_maximize': lambda: "Click **Maximize** on the lineage panel",
+        'lineage_fit': lambda: "Fit the graph to the view",
+        'point_tree': lambda: f"Point at `{v}` in the Explorer",
         'lineage_depth': lambda: f"Set lineage **Depth** to {v}",
     }.get(k, lambda: f"{k}: {v}")()
 

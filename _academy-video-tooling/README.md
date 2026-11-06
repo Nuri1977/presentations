@@ -32,3 +32,10 @@ Linux runner only: `apt-get install -y libxss1 gnome-keyring dbus-x11 fonts-inte
 `script_from_lesson.py` (beat sheet, get approval) → `record.cjs` → `tts.py` → `render_stills.py` → `compose.py` (try `--preview 45` first) → `package.py`.
 
 `.cache/` and `node_modules/` are not committed.
+
+## Things that bite
+
+- **One recording at a time.** `run-headless.sh` always uses Xvfb display `:97`. A second run started while another is still going shares that display, and when the first one exits it takes the display down and the app quits mid-beat (`Target page, context or browser has been closed`).
+- **Save every typed file.** The `type` action only types. Add `click_save` after it (and say "save it" in the narration), or the file stays empty on disk and `dbt compile` / `dbt run` will not see it.
+- **dbt usage tracking** is blocked in the cloud sandbox and can stall dbt; `lib/studio.cjs` sets `DBT_SEND_ANONYMOUS_USAGE_STATS=false` and `DO_NOT_TRACK=1`.
+- **SQL Editor dates.** Studio 1.7.5's result grid shows DATE columns as `{"days": N}`. Select only the columns you need in on-screen queries.
