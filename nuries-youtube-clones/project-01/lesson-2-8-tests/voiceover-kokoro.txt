@@ -1,0 +1,37 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A D B T data test is a query that looks for bad rows.
+b01	If it returns nothing, the test passes.
+b01	If it returns rows, it fails.
+b02	D B T has four built in: unique, not null, accepted values, and relationships.
+b02	Start with the grain: the column that should be unique and never empty, like the month in monthly summary.
+b03	Open the project, and open schema dot yammel.
+b03	Tests go right under the column they check.
+b04	Under borough, in trips per month: accepted values, with the boroughs we expect.
+b05	Zone id in top pickup zones is that table's grain: not null and unique.
+b06	The same for month in monthly summary.
+b06	Save.
+b07	And in seeds dot yammel, Location ID: not null and unique.
+b07	Save.
+b08	Run them all: Project menu, Test.
+b09	Six pass, one fails: accepted values on borough.
+b09	Got one result, so one borough is not in our list.
+b10	It is N A.
+b10	The zone lookup has a zone two sixty-five, outside of New York City, with the borough N A, and about two hundred fifty trips in 2025 started there.
+b10	The data is right; our list was wrong.
+b11	Add N A to the list, and save.
+b12	To check just this model, open trips per month, and in the Model menu choose Test.
+b13	One test on this model, and it passes.
+b14	One more command: build.
+b14	It seeds, runs and tests, in dag order, so a failing test stops the models that depend on bad data.
+b15	Project menu, Build.
+b16	One seed, four models, seven tests.
+b16	Twelve passes, no errors.
+b17	The Git tab: schema dot yammel and seeds dot yammel changed.
+b18	Stage all, type a message, add data tests, and commit.
+b19	Sync Changes.
+b19	That's the end of D B T basics.
+b20	To recap: tests live in yammel next to the columns.
+b20	A failing test told us something true about the data.
+b20	And build runs and tests everything, in order.
+b20	That's D B T basics.
+b20	Next, we ship it: git hub Actions builds the project on every push.

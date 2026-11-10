@@ -1,0 +1,85 @@
+# Lesson 0 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only: nothing is built yet, so there is no start state and no recording.
+id: lesson-0
+number: "0"
+title: "Welcome: build a dbt + DuckDB project"
+module: "Welcome"
+draft_section: "plan-dbt-project01.md, Lesson 0 (git light, 10 Nov 2026) (merges the plan's 1.1)"
+next: "Lesson 1.1 · Install Rosetta DBT Studio"
+summary: "Welcome to Project 1. Build a real analytics project with dbt and DuckDB in Rosetta DBT Studio: a year of NYC green taxi trips, from raw parquet files to clean models, tests, docs, and a GitHub Actions pipeline that publishes a warehouse anyone can query. This lesson shows what you will build, the data, the tools, and how to use the course repository: one commit per lesson."
+tags: [dbt course, dbt tutorial, DuckDB, NYC taxi, analytics engineering, GitHub]
+target_minutes: 3.5
+show_help_links: true
+draft_changes:
+  - "Merges the plan's Lesson 1.1 (project and data) into the new Lesson 0, as agreed on 9 Nov 2026. Lesson 0 is recorded first, so the finished project is drawn on slides instead of shown in Studio."
+  - "Adds how to use the course repo: one public repository, one commit per lesson (changed 10 Nov 2026 from one pull request per lesson). Git and GitHub basics are assumed."
+accuracy_notes:
+  - "Data measured on 9 Nov 2026 from the TLC 2025 Green Taxi files downloaded that day: 12 files, 14.5 MB in total (1.1 to 1.3 MB each), 591,375 rows. Taxi zone lookup: 265 zones."
+  - "Busiest 2025 pickup zone in these files: 74, East Harlem North, Manhattan (145,092 pickups)."
+  - "Rosetta DBT Studio is open source under AGPL-3.0 (LICENSE in rosettadb/dbt-studio); releases exist for Mac, Windows and Linux (1.7.6 assets)."
+  - "Course repo github.com/Nuri1977/nyc-taxi-dbt does not exist yet; the slide shows its planned address."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Lesson 0 · Welcome. Build a dbt + DuckDB project. Project 1 · NYC taxi trips. Badges: Rosetta DBT Studio, dbt Core, DuckDB, GitHub."
+
+  - id: s01
+    kind: slide
+    chapter: "Welcome"
+    slide: welcome
+    beats:
+      - { id: b01, step: 1, show: "Big statement: From raw files to a tested, automated pipeline. Under it: Rosetta DBT Studio · dbt Core · DuckDB · GitHub.", say: "Welcome to Project 1. In this course, you build a real analytics project with dbt and DuckDB. You start from an empty folder, and finish with a tested, automated pipeline, all inside Rosetta DBT Studio." }
+
+  - id: s02
+    kind: slide
+    chapter: "What you will build"
+    slide: build
+    beats:
+      - { id: b02, step: 1, show: "Left column of the DAG: 12 parquet files (2025 green taxi trips) and taxi_zone_lookup.csv.", say: "We start with a full year of New York City green taxi trips: twelve monthly parquet files, and a small lookup table of taxi zones." }
+      - { id: b03, step: 2, show: "An arrow to the model trips (view): one clean row per trip.", say: "dbt turns the raw files into one clean model of trips." }
+      - { id: b04, step: 3, show: "Three tables appear: trips_per_month, top_pickup_zones, monthly_summary.", say: "On top of it, three small tables: trips per month and borough, the busiest pickup zones, and a monthly summary of how riders pay." }
+      - { id: b05, step: 4, show: "Badges under the tables: tests, docs and lineage.", say: "We add tests that catch bad data, and documentation with a lineage graph." }
+      - { id: b06, step: 5, show: "Right column: GitHub Actions builds on every change and publishes prod.duckdb; label: anyone can query it.", say: "Finally, GitHub Actions rebuilds everything on every change, and publishes the finished DuckDB database, so anyone can query it." }
+
+  - id: s03
+    kind: slide
+    chapter: "The data"
+    slide: data
+    beats:
+      - { id: b07, step: 1, show: "Trip card: the columns we use, pickup and drop-off time, zones, distance, payment type, fare, tip, total. Source: NYC TLC Trip Record Data.", say: "The data comes from the New York City Taxi and Limousine Commission, the TLC. Every trip has its pickup and drop-off time, the pickup and drop-off zones, the distance, how the rider paid, and what it cost." }
+      - { id: b08, step: 2, show: "Big numbers: 12 files · 14.5 MB · 591,375 trips (2025, as of 9 Nov 2026).", say: "For 2025, that is about five hundred ninety thousand trips, in twelve files of about one megabyte each. Small enough to build on a laptop in seconds." }
+      - { id: b09, step: 3, show: "Zone card: taxi_zone_lookup.csv, 265 zones; example row 74 · East Harlem North · Manhattan; joined on the pickup zone.", say: "A second file maps every zone number to its name and borough. Zone seventy-four, for example, is East Harlem North, in Manhattan, the busiest pickup zone of the year." }
+
+  - id: s04
+    kind: slide
+    chapter: "The tools"
+    slide: tools
+    beats:
+      - { id: b10, step: 1, show: "Rosetta DBT Studio card: one app with editor, terminal, lineage and git; installs Python and dbt Core for you; open source.", say: "You need one app: Rosetta DBT Studio. It is open source, it installs Python and dbt Core for you, and it gives you an editor, a terminal, lineage, and git, in one window." }
+      - { id: b11, step: 2, show: "DuckDB card: a database in one file, no server. GitHub card: keeps the code, runs the pipeline.", say: "DuckDB is the database. It lives in a single file on your computer, so there is no server to set up. And GitHub keeps your code, and later runs the pipeline for you." }
+
+  - id: s05
+    kind: slide
+    chapter: "The course repository"
+    slide: repo
+    beats:
+      - { id: b12, step: 1, show: "The repository github.com/Nuri1977/nyc-taxi-dbt, public: a commit list, one commit per lesson (Create the nyc_taxi dbt project, Get the data, Models, ...).", say: "The whole project lives in one public repository on GitHub. We create it in lesson 2.1, and every lesson ends with a commit and a push." }
+      - { id: b13, step: 2, show: "One commit opened: models/trips.sql added, green lines. Label: Code for this lesson.", say: "So each lesson's commit is the code for that lesson. The link to the repository is in every video description." }
+      - { id: b14, step: 3, show: "Two columns: your repo, built as you watch; the course repo, the answer key.", say: "Build your own copy as you watch. And if you get stuck, compare it with the course repository." }
+
+  - id: s06
+    kind: slide
+    chapter: "The course map"
+    slide: map
+    beats:
+      - { id: b15, step: 1, show: "Module 1 · Set up: 1.1 Install Rosetta DBT Studio.", say: "The course has three modules. First, set up: install Rosetta DBT Studio." }
+      - { id: b16, step: 2, show: "Module 2 · dbt basics: 2.1 Create the project to 2.8 Tests.", say: "Second, dbt basics: create the project and connect it to GitHub, get the data, then models, Jinja, properties, docs, materializations, and tests." }
+      - { id: b17, step: 3, show: "Module 3 · Ship it: 3.1 Ship & Automate, 3.2 Showcase.", say: "Third, ship it: automate the build with GitHub Actions, and turn the repository into a portfolio project." }
+      - { id: b18, step: 4, show: "What you need: a computer (Mac, Windows or Linux), a GitHub account and the basics of git, basic SQL. No dbt installed: we start from zero.", say: "You need a computer, a GitHub account and the basics of git, and some basic SQL. No dbt installed yet: we start from zero. New to git? There are links in the description. See you in the first lesson." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.1 · Install Rosetta DBT Studio."

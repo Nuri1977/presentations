@@ -1,0 +1,40 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Open the N Y C taxi project.
+b01	First, load the zone lookup into duck D B: open the Project menu, and choose Seed.
+b02	D B T reads the C S V, and inserts two hundred sixty-five rows into a table called taxi zone lookup.
+b03	To use one model inside another, write ref, and the name of the model or seed.
+b03	Not the table name: D B T fills that in, for whichever database you run against.
+b04	Each ref is also a dependency. D B T draws the graph from them, and always builds trips before the models that use it.
+b05	Right-click models, New File: trips per month dot sql.
+b06	Count the trips and the average fare for each month and pickup borough.
+b07	From ref trips, joined to ref taxi zone lookup, to get the borough of each pickup zone.
+b07	Group by all, and save.
+b08	A second model: top pickup zones dot sql.
+b09	This time, start with a jinja variable: set top n to ten.
+b10	Then count the trips for each pickup zone, with the zone's name and borough, from the same two refs.
+b11	Order by trips, busiest first, and limit to top n.
+b11	Save.
+b12	jinja has three kinds of braces.
+b12	Double curly braces print a value.
+b12	Curly brace and percent run logic, like set.
+b12	And curly brace and hash is a comment.
+b13	When D B T compiles a model, all of it turns into plain sequel.
+b13	Let's see that.
+b14	With top pickup zones open, open the Model menu, and choose Compile.
+b15	Studio opens the compiled sequel in a window.
+b15	The first tab shows what we wrote, with the jinja.
+b16	Switch to Compiled sequel.
+b16	Both refs became full table names in the dev database, and limit top n became limit ten.
+b17	This is the sequel duck D B will run.
+b17	Close the window.
+b18	Now run the whole project: Project menu, Run.
+b19	D B T builds trips first, and only then the two models that depend on it.
+b19	Three models, no errors.
+b20	Open the Git tab.
+b20	The two new models are listed.
+b21	Stage all, type a message, add trips per month and top pickup zones, and commit.
+b22	Sync Changes pushes it to git hub.
+b23	To recap: a seed loads a C S V.
+b23	Ref names a model and records the dependency, so D B T runs things in the right order.
+b23	jinja adds variables and logic, and compile shows the plain sequel.
+b23	Next, we describe our models with properties.

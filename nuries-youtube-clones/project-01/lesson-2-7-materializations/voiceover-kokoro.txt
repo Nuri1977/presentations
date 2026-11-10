@@ -1,0 +1,29 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	D B T can build a model as a view or as a table.
+b01	A view stores only the query, so it is always fresh, but every read runs it again.
+b01	A table stores the rows: fast to read, and as fresh as the last run.
+b02	Right now every model is a view, the default.
+b02	We keep trips a view, a thin layer over the files, and make the three marts tables, because people query those.
+b02	Incremental and ephemeral models come later.
+b03	Open the project, and open D B T project dot yammel.
+b04	Under N Y C taxi, add plus materialized, table.
+b04	Every model in the project becomes a table.
+b04	Save.
+b05	But trips should stay a view.
+b05	Open trips dot sql.
+b05	At the very top, add a config block: materialized equals view.
+b05	A setting in the model wins over the project file.
+b05	Save.
+b06	Run the project: Project menu, Run.
+b07	The log now says sql view model for trips, and sql table model for the other three.
+b08	Let's check in duck D B.
+b08	Open the sequel Editor, pick N Y C taxi dev, and list the tables in the main schema, with their type.
+b09	Run it.
+b10	Trips is a view.
+b10	The three marts are base tables, and so is the seed.
+b11	Back in the project, the Git tab shows the two changed files.
+b12	Stage all, type a message, materialize the marts as tables, and commit.
+b13	Sync Changes, and it's on git hub.
+b14	To recap: views store the query, tables store the rows.
+b14	One line in D B T project dot yammel sets the default, and a config block in a model overrides it.
+b14	Next, we test the data.

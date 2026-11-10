@@ -1,0 +1,199 @@
+# Lesson 2.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-1
+number: "2.1"
+title: "Create the dbt project"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, change of 10 Nov 2026: Lesson 2.1 (create project, create repo, commit, push)"
+next: "Lesson 2.2 · Get the data"
+summary: "Create the nyc_taxi dbt project in Rosetta DBT Studio: a DuckDB connection, Studio's project template, dbt_project.yml and profiles.yml, and dbt debug. Then create a public GitHub repository and push the first commit from Studio's Git tab. Git and GitHub basics are assumed; links for beginners are below."
+start_state: after-setup
+show_help_links: true
+tags: [dbt project, dbt_project.yml, profiles.yml, dbt debug, DuckDB, GitHub]
+target_minutes: 5
+rehearsal: true
+start_notes:
+  - "Start state `after-setup`: Studio with Python and dbt installed (as after Lesson 1.1), no project, no connection; learner git config uses the stored token."
+  - "Rehearsal: pushes to the private Nuri1977/nyc-taxi-dbt-rehearsal. The repo-creation scene reuses the Lesson 1.2 recording; the final run creates the public Nuri1977/nyc-taxi-dbt."
+draft_changes:
+  - "Connection first, then project: Studio's New Connection page returns to the connections list on Save, so the lesson creates the DuckDB connection from Home, then picks it in Setup New Project."
+  - "The dev database file lives next to the project folder (projects/nyc_taxi_dev.duckdb), so it is never committed."
+  - "Studio's template creates an `analysis` folder while dbt_project.yml says `analyses`; shown as is."
+  - "Rehearsal cut: the GitHub scene shows nyc-taxi-dbt-rehearsal (Private), recorded in Lesson 1.2."
+accuracy_notes:
+  - "Setup New Project fields, the DuckDB form (Connection Name, Database File Path, Schema, Test Connection) and the Git tab flow (Initialize Repository, Commit, Publish Branch → Add git remote) checked in Studio 1.7.6 on 10 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.1. Create the dbt project. Badges: DuckDB connection, dbt debug, first push to GitHub."
+
+  - id: s01
+    kind: slide
+    chapter: "What a dbt project is"
+    slide: anatomy
+    beats:
+      - { id: b01, step: 1, show: "A folder tree: models, seeds, macros, tests, snapshots, analyses, and dbt_project.yml.", say: "A dbt project is a folder. Models, seeds, tests and macros live in their own subfolders, and one file at the top, dbt_project.yml, gives the project its name and settings." }
+      - { id: b02, step: 2, show: "profiles.yml: profile nyc_taxi → target dev → type duckdb, path to the database file.", say: "A second file, profiles.yml, says where dbt runs. Our profile has one target, dev, and it points at a DuckDB database file." }
+
+  - id: s02
+    kind: app
+    chapter: "A DuckDB connection"
+    beats:
+      - id: b03
+        say: "First, the database. On the home screen, click New Connection, and choose DuckDB."
+        actions:
+          - click_at: { role: button, name: New Connection, label: New Connection, settleMs: [400, 1200, 2200] }
+          - click_at: { text: "^DuckDB$", regex: true, label: DuckDB, settleMs: [400, 1200, 2000] }
+      - id: b04
+        say: "Name it nyc taxi dev. For the file, type a path next to your projects folder: nyc taxi dev dot duckdb. DuckDB creates the file the first time dbt connects. Save."
+        zoom: center-wide
+        actions:
+          - click_at: { role: textbox, name: Connection Name, label: Connection Name, dx: 0.9 }
+          - press_keys: "Meta+A"
+          - type_keys: nyc_taxi_dev
+          - type_text: { role: textbox, name: Database File Path, label: Database File Path, text: /Users/Shared/academy/learner/projects/nyc_taxi_dev.duckdb }
+          - click_at: { role: button, name: Save, exact: true, label: Save, settleMs: [400, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Create the project"
+    beats:
+      - id: b05
+        say: "Now the project. Go back home, open the DBT Project card, and click New Project."
+        actions:
+          - nav: Home
+          - click_at: { role: button, name: "DBT Project", regex: true, label: DBT Project, settleMs: [400, 1500] }
+          - click_at: { role: button, name: New Project, label: New Project, settleMs: [400, 1500] }
+      - id: b06
+        say: "Call it nyc taxi. Keep the template folders switched on, pick the nyc taxi dev connection, and save."
+        zoom: center-wide
+        actions:
+          - type_text: { role: textbox, name: Project Name, label: Project Name, text: nyc_taxi }
+          - point_at: { role: checkbox, name: Create template dbt directories, label: template folders }
+          - click_at: { role: combobox, name: "Connection", regex: true, label: Connection }
+          - click_at: { role: option, name: "nyc_taxi_dev", regex: true, label: nyc_taxi_dev }
+          - click_at: { role: button, name: Save, exact: true, label: Save, settleMs: [500, 1500, 3000, 4500] }
+      - id: b07
+        say: "Studio creates the folder and opens it. Here are the template folders, and the two files we just talked about."
+        zoom: explorer
+        actions:
+          - point_tree: models
+          - point_tree: dbt_project.yml
+          - point_tree: profiles.yml
+      - id: b08
+        say: "Open dbt project dot yml: the project name is nyc taxi, it uses the profile with the same name, and lists where each kind of file lives."
+        zoom: code-mid
+        actions:
+          - open_file: dbt_project.yml
+          - point: { editor_line: 5 }
+
+  - id: s04
+    kind: app
+    chapter: "Check the setup with dbt debug"
+    beats:
+      - id: b09
+        say: "Let's check that dbt can reach the database. In the command box under the terminal, type dbt debug, and press Enter."
+        zoom: terminal-close
+        actions:
+          - terminal: { cmd: "dbt debug", until: "All checks passed" }
+      - id: b10
+        say: "dbt finds the project and the profile, and connects to DuckDB. All checks passed."
+        zoom: terminal-close
+        card: { eyebrow: "dbt debug", title: "All checks passed!", sub: "Project, profile and DuckDB connection are OK.", pos: top-right }
+
+  - id: s05
+    kind: app
+    chapter: "Files that keep git clean"
+    beats:
+      - id: b11
+        say: "Before the first commit, add a dot gitignore file at the top of the project, so build output, logs, data and the database stay out of git."
+        zoom: code-close
+        actions:
+          - new_root_file: .gitignore
+          - type: |
+              target/
+              dbt_packages/
+              logs/
+              data/
+              *.duckdb
+              *.duckdb.wal
+              .env
+          - click_save
+          - expect_file: { path: .gitignore, snippet: ../snippets/2.1/gitignore }
+      - id: b12
+        say: "And a short README, so people who open the repository know what it is."
+        zoom: code-close
+        actions:
+          - new_root_file: README.md
+          - type: |
+              # NYC taxi dbt project
+
+              Code for the course dbt + DuckDB in Rosetta DBT Studio, Project 1.
+              One commit per lesson.
+          - click_save
+          - expect_file: { path: README.md, snippet: ../snippets/2.1/README.md }
+
+  - id: s06
+    kind: pane
+    chapter: "A repository on GitHub"
+    beats:
+      - id: b13
+        say: "Now create an empty repository on GitHub: the plus button, then New repository."
+        zoom: center-wide
+        actions:
+          - web: "github.com → + → New repository (frames from Lesson 1.2's recording)"
+      - id: b14
+        say: "Name it nyc taxi dbt, and make it public, so anyone can get the code. This rehearsal copy is private. Add no README, gitignore or license, and create it."
+        zoom: gh-form
+        actions:
+          - web: "Repository name, visibility, Create repository"
+      - id: b15
+        say: "Copy the HTTPS address of the new, empty repository."
+        zoom: center-wide
+        actions:
+          - web: "Quick setup → copy the HTTPS URL"
+
+  - id: s07
+    kind: app
+    chapter: "First commit and push"
+    beats:
+      - id: b16
+        say: "Back in Studio, open the Git tab, and click Initialize Repository."
+        zoom: git-panel
+        actions:
+          - git_tab
+          - git_init
+      - id: b17
+        say: "Stage all the changes, type a message, create the nyc taxi dbt project, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Create the nyc_taxi dbt project
+          - git_commit
+      - id: b18
+        say: "Click Publish Branch. Studio asks for the remote: paste the repository address, and add it. Studio pushes the main branch to GitHub."
+        actions:
+          - publish_branch: { url: "https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git" }
+
+  - id: s08
+    kind: browser
+    chapter: "The code is on GitHub"
+    beats:
+      - id: b19
+        say: "Refresh the repository page. The project is on GitHub: the folders, the two YAML files, the gitignore, and the README."
+        zoom: center-wide
+        actions:
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal
+
+  - id: s09
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b20, step: 1, show: "Recap: DuckDB connection; nyc_taxi project; dbt debug passes; first commit pushed to GitHub.", say: "To recap: a DuckDB connection, a dbt project called nyc taxi, a passing dbt debug, and the first commit on GitHub. From now on, every lesson ends with a commit and a push. Next, we get the data." }
+
+  - id: s10
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.2 · Get the data. Code: github.com/Nuri1977/nyc-taxi-dbt."

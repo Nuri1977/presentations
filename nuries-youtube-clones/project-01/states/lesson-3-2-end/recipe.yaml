@@ -1,0 +1,20 @@
+# End of Lesson 3.2 = start state of Lesson 3.3 (Models).
+# Project nyc_taxi from Studio's template, .gitignore (A1), the raw source (A2), the zone lookup seed,
+# the 12 Green Taxi 2025 parquet files in data/raw (gitignored), an empty data/dev.duckdb,
+# and a local git history with the commits Lessons 3.1 and 3.2 make on camera. Nothing is pushed.
+name: lesson-3-2-end
+project_name: nyc_taxi
+database_file: data/dev.duckdb
+sql: []
+project_dir: project
+copy:
+  - { from: ../../.cache/data/raw, to: data/raw }
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com
+  commits:
+    - message: Create the nyc_taxi dbt project
+      paths: [.gitignore, dbt_project.yml, profiles.yml]
+    - message: Declare the raw trips source and add the zone lookup
+      paths: [models/sources.yml, seeds/taxi_zone_lookup.csv]
+connection_name: nyc_taxi

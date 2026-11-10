@@ -1,0 +1,7 @@
+target/
+dbt_packages/
+logs/
+data/
+*.duckdb
+*.duckdb.wal
+.env

@@ -1,0 +1,37 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In this lesson, you install Rosetta D B T Studio, the one app we use for the whole course.
+b01	You download it, copy it to your computer, and its first-run setup installs Python and D B T Core for you.
+b02	Studio is open source, and every version is published on git hub.
+b02	Open the releases page of rosetta D B, D B T-studio.
+b02	The latest release is 1.7.6.
+b03	Scroll down to Assets.
+b03	There is a build for every system: a D M G for Mac, an E X E for Windows, and deb, R P M and flatpak packages for Linux.
+b04	On a Mac, pick the D M G for your processor: arm sixty-four for Apple silicon, x sixty-four for Intel.
+b04	This Mac has an Intel chip, so click the x sixty-four D M G.
+b05	When the download finishes, open the file.
+b05	A window shows the app on the left, and your Applications folder on the right.
+b06	Drag Rosetta D B T Studio onto Applications, and wait for the copy to finish.
+b07	Then open it from Applications.
+b07	The first time, macOS asks whether you want to open an app downloaded from the internet.
+b07	Click Open.
+b08	Studio starts with a short setup.
+b08	First, the D B T version.
+b08	Choose D B T 1.x, the recommended one.
+b09	Then the exact version.
+b09	Keep the latest, 1.12.6.
+b10	Next, the adapters, one for each database D B T can talk to.
+b10	This course only needs duck D B, so uncheck the others, keep D B T-duckdb, and click Continue.
+b11	Skip the optional tools, and click Install.
+b12	Studio downloads its own copy of Python, then installs D B T Core and the duck D B adapter, all inside its own folder.
+b12	Here it took about a minute and a half; the video speeds it up.
+b13	Python 3.10.17, and D B T 1.12.6 with one adapter.
+b13	Click Finish.
+b14	This is Studio's home screen, the Workspace Overview.
+b14	No projects yet: we create the first one in Module 2.
+b15	The status bar at the bottom shows what was installed: D B T 1.12.6, Python 3.10.17, and duck D B.
+b16	At the top right are New Connection, Open Project, and Settings.
+b16	That is all we need for now.
+b17	To recap: you installed one app.
+b17	Studio set up its own Python and D B T Core, with the duck D B adapter, inside its own folder.
+b17	You did not install Python or D B T yourself.
+b18	Next, we create the D B T project, and connect it to a repository on git hub.

@@ -1,0 +1,97 @@
+# Course-level settings for the rosetta-academy-video skill (see plan-dbt-project01.md, Appendix B).
+title: "dbt + DuckDB in Rosetta DBT Studio"
+subtitle: "Project 1: NYC taxi trips, from raw files to a tested, automated pipeline"
+series: nuries-youtube-clones/project-01
+academy: https://academy.rosettadb.io/
+source_draft: plan-dbt-project01.md
+inspired_by: "Luke Barousse, dbt for Data Analytics & Engineering (Project #1)"
+code_repo: https://github.com/Nuri1977/nyc-taxi-dbt
+help_links_title: "New to git and GitHub? Start here (free videos):"
+help_links:
+  - { title: "Git and GitHub for Beginners - Crash Course (freeCodeCamp)", url: "https://www.youtube.com/watch?v=RGOj5yH7evk" }
+  - { title: "Git Tutorial for Beginners: Learn Git in 1 Hour (Programming with Mosh)", url: "https://www.youtube.com/watch?v=8JJ101D3knE" }
+  - { title: "Git and GitHub Explained in 7 Minutes", url: "https://www.youtube.com/watch?v=y-an0v208A0" }
+  - { title: "Learn GitHub without needing the terminal", url: "https://www.youtube.com/watch?v=2SgI1kAczfk" }
+credit_line: "Lesson order inspired by Luke Barousse's dbt course: https://www.youtube.com/watch?v=1Bf049kXV2g"
+
+app:
+  name: Rosetta DBT Studio
+  version: 1.7.6                      # pinned: every lesson of this course records this release
+  release_url: https://github.com/rosettadb/dbt-studio/releases/tag/1.7.6
+  assets:
+    mac_x64: Rosetta-DBT-Studio-1.7.6-x64.zip      # this Mac is Intel (i7-9750H)
+    mac_arm64: Rosetta-DBT-Studio-1.7.6-arm64.zip
+
+# Fast path agreed with Nuri on 9 Nov 2026: the pilot's stills recorder (Playwright _electron) on the Mac,
+# true 4K frames, cursor drawn in compose. Computer-use live capture is a later upgrade.
+runner: mac-desktop
+capture: { mode: stills, scale: 2, window: [1920, 1080] }
+learner_home: /Users/Shared/academy/learner       # fake HOME so on-screen paths are clean (D10)
+projects_dir: projects                            # project at <learner_home>/projects/<project_name>
+browser_profile: /Users/Shared/academy/learner/profiles/browser   # recording browser (Playwright Chromium), signed in to GitHub once by Nuri
+theme: dark                           # Studio theme during recording
+slides_theme: v2                      # slides-theme/ (bigger, full-bleed) + v2 cards
+
+runtime:                              # Studio's managed CPython + dbt (same pins as the dbt Fundamentals pilot)
+  python: 3.10.17
+  python_build_tag: "20250409"
+  dbt_core: 1.12.6
+  dbt_duckdb: 1.11.1
+
+dataset:
+  name: NYC TLC Green Taxi Trip Records 2025
+  base_url: https://d37ci6vzurychx.cloudfront.net/trip-data/
+  files: green_tripdata_2025-01.parquet … green_tripdata_2025-12.parquet
+  seed_url: https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+  page: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+  local_cache: .cache/data                       # downloaded once, copied into each start state
+
+voice:
+  engine: kokoro
+  voice: af_heart
+  speed: 1.0
+
+video:
+  width: 3840
+  height: 2160
+  fps: 30
+  crf: 16
+  title_card_s: 3
+  closing_card_s: 4
+
+youtube:
+  visibility: unlisted
+  playlist: "dbt + DuckDB in Rosetta DBT Studio: Project 1"
+  tags: [dbt, dbt core, DuckDB, analytics engineering, Rosetta DBT Studio, NYC taxi, SQL]
+
+# Spoken forms. Slides and captions keep the written form; only the voice uses these.
+pronunciation:
+  - [ '\bdbt\b', 'D B T' ]
+  - [ '\bDBT\b', 'D B T' ]
+  - [ '\bSQL\b', 'sequel' ]
+  - [ '\.sql\b', ' dot sequel' ]
+  - [ '\bDuckDB\b', 'duck D B' ]
+  - [ '\bYAML\b', 'yammel' ]
+  - [ '\.yml\b', ' dot yammel' ]
+  - [ '\byml\b', 'yammel' ]
+  - [ '\bDAG\b', 'dag' ]
+  - [ '\bCTE\b', 'C T E' ]
+  - [ '\bJinja\b', 'jinja' ]
+  - [ '\bCI\b', 'C I' ]
+  - [ '\bNYC\b', 'N Y C' ]
+  - [ '\bnyc\b', 'N Y C' ]
+  - [ '\bTLC\b', 'T L C' ]
+  - [ '\bEWR\b', 'Newark airport' ]
+  - [ '\bparquet\b', 'par-kay' ]
+  - [ '\bParquet\b', 'Par-kay' ]
+  - [ '\bCSV\b', 'C S V' ]
+  - [ '\bGitHub\b', 'git hub' ]
+  - [ '\bdmg\b', 'D M G' ]
+  - [ '\bexe\b', 'E X E' ]
+  - [ '\brpm\b', 'R P M' ]
+  - [ '\barm64\b', 'arm sixty-four' ]
+  - [ '\bx64\b', 'x sixty-four' ]
+  - [ '\brosettadb\b', 'rosetta D B' ]
+  - [ '\bREADME\b', 'read me' ]
+  - [ '\bgitignore\b', 'git ignore' ]
+  - [ '\bHTTPS\b', 'H T T P S' ]

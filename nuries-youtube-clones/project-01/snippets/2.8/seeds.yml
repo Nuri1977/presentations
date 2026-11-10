@@ -1,0 +1,7 @@
+seeds:
+  - name: taxi_zone_lookup
+    description: TLC taxi zones, from the Taxi Zone Lookup Table on the TLC site.
+    columns:
+      - name: LocationID
+        description: Zone id used by PULocationID and DOLocationID.
+        data_tests: [not_null, unique]

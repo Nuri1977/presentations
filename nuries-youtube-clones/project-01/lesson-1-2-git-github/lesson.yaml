@@ -1,0 +1,99 @@
+# Lesson 1.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+# The GitHub scene is a browser scene: the recorder's own browser profile, signed in once by Nuri1977.
+id: lesson-1-2
+number: "1.2"
+title: "Git and GitHub"
+module: "Module 1 · Set up"
+draft_section: "plan-dbt-project01.md, Course repo and PR design: Lesson 1.2 (old 2.2)"
+next: "Lesson 2.1 · Create the dbt project"
+summary: "Why a dbt project lives in git, how changes travel from your folder to GitHub (commit, push, pull request), and creating the empty GitHub repository the course project will use. Pushing needs a personal access token, which we set up before the first push."
+tags: [git, GitHub, version control, pull request, dbt project]
+target_minutes: 3.5
+rehearsal: true
+start_notes:
+  - "Recorder browser profile signed in to GitHub as Nuri1977 (browser-login.cjs); the scene starts on the public rosettadb/dbt-studio page so no personal dashboard is shown."
+  - "Rehearsal run: the repository is nyc-taxi-dbt-rehearsal and Private. The final run creates nyc-taxi-dbt, Public, with the same steps."
+draft_changes:
+  - "Rehearsal cut: creates Nuri1977/nyc-taxi-dbt-rehearsal (Private). The final take creates Nuri1977/nyc-taxi-dbt (Public) after the placeholder repo is deleted; narration b08 changes with it."
+  - "The scene starts on the public rosettadb/dbt-studio page (not the GitHub dashboard), so no personal repositories or activity appear on screen."
+  - "The plan's token page mock is a short slide; creating and storing the token happens off camera, by Nuri, after this lesson."
+accuracy_notes:
+  - "GitHub does not accept account passwords for Git over HTTPS; it needs a personal access token (or SSH key). Fine-grained tokens can be limited to one repository with Contents and Workflows permissions (checked on the token page, 9 Nov 2026)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 1.2. Git and GitHub. Badges: version control, GitHub, one PR per lesson."
+
+  - id: s01
+    kind: slide
+    chapter: "Why git"
+    slide: why
+    beats:
+      - { id: b01, step: 1, show: "Statement: A dbt project is code. Git keeps its history. Three cards: see what changed, undo mistakes, work together.", say: "A dbt project is code: SQL and YAML files. Git keeps the history of that code, so you can see what changed, undo a mistake, and work with others." }
+      - { id: b02, step: 2, show: "GitHub card: a copy online that others can see, and that can run your pipeline.", say: "GitHub keeps a copy online. Others can see your work there, and later it runs your pipeline for you." }
+
+  - id: s02
+    kind: slide
+    chapter: "From your folder to GitHub"
+    slide: flow
+    beats:
+      - { id: b03, step: 1, show: "Your project folder: changed files.", say: "Here is the loop. You change files in your project folder." }
+      - { id: b04, step: 2, show: "Commit: a snapshot with a message, made in Studio's Git tab.", say: "You commit them: a snapshot with a short message, made in Studio's Git tab." }
+      - { id: b05, step: 3, show: "Push: commits go to GitHub; in Studio, Publish Branch the first time, then Push.", say: "You push the commits to GitHub. In Studio, that is Publish Branch the first time, then Push." }
+      - { id: b06, step: 4, show: "Pull request: from Lesson 2.2 each lesson is a branch and a pull request, merged into main.", say: "And from lesson 2.2 on, each lesson's work goes on its own branch, and becomes a pull request on GitHub, which we merge into main." }
+
+  - id: s03
+    kind: browser
+    chapter: "Create the repository"
+    beats:
+      - id: b07
+        say: "Let's create the repository. On GitHub, signed in, click the plus button at the top, and choose New repository."
+        actions:
+          - goto: https://github.com/rosettadb/dbt-studio
+          - click_at: { role: button, name: "Create new", regex: true, label: "+ Create new" }
+          - click_at: { role: menuitem, name: New repository, label: New repository, settleMs: [400, 1500, 3000] }
+      - id: b08
+        say: "Give it a name. This is a rehearsal copy, nyc taxi dbt rehearsal, and it is private. In your own project, call it nyc taxi dbt, and make it public."
+        zoom: gh-form
+        actions:
+          - type_text: { role: textbox, name: "Repository name", regex: true, label: Repository name, text: nyc-taxi-dbt-rehearsal }
+          - pause: 1500
+          - click_at: { role: button, name: "Choose visibility", regex: true, label: Choose visibility }
+          - click_at: { role: menuitemradio, name: "^Private", regex: true, label: Private }
+      - id: b09
+        say: "Leave everything else empty: no README, no gitignore, no license. Our first commit, in lesson 2.1, brings those files. Click Create repository."
+        zoom: gh-form
+        actions:
+          - point_at: { role: button, name: Add README, label: Add README }
+          - point_at: { role: button, name: "Add .gitignore", regex: true, label: No .gitignore }
+          - point_at: { role: button, name: "Add license", regex: true, label: No license }
+          - click_at: { role: button, name: Create repository, label: Create repository, settleMs: [500, 1500, 3000, 4500] }
+      - id: b10
+        say: "The repository is ready, and empty. GitHub shows its address. Copy the HTTPS address: Studio needs it in lesson 2.1."
+        zoom: center-wide
+        card: { eyebrow: "Repository address", title: "Copy the HTTPS URL", sub: "Studio adds it as the remote in Lesson 2.1.", pos: top-right }
+        actions:
+          - point_at: { role: textbox, name: Clone URL, label: Clone URL }
+          - click_at: { role: button, name: Copy URL to clipboard, label: Copy URL }
+
+  - id: s04
+    kind: slide
+    chapter: "Pushing needs a token"
+    slide: token
+    beats:
+      - { id: b11, step: 1, show: "Password crossed out → personal access token.", say: "One more thing. GitHub does not accept your account password for pushing code. Pushes use a personal access token: a key you create on GitHub." }
+      - { id: b12, step: 2, show: "Token settings: only this repository; Contents and Workflows, read and write; an expiry date.", say: "Make it work for this repository only, with contents and workflows set to read and write. We set it up right before the first push, in lesson 2.1." }
+
+  - id: s05
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b13, step: 1, show: "Recap: git keeps the history; GitHub keeps a copy online; one pull request per lesson.", say: "To recap. Git keeps the history, GitHub keeps a copy online, and one pull request per lesson keeps every change easy to follow. Next, we create the dbt project." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.1 · Create the dbt project."

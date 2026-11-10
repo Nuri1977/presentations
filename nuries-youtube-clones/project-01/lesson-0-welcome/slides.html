@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 0 · Welcome</title>
+<!-- Slide scenes for Lesson 0. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (v2). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .title-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.3fr .7fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .title-grid .badges { margin-top: 48px; }
+  .hero-icon { width: 500px; filter: drop-shadow(0 40px 120px rgba(255,122,26,.45)); justify-self: center; }
+  .lockup { position: absolute; left: var(--safe); bottom: 48px; height: 104px; opacity: .95; }
+
+  /* welcome statement */
+  .statement { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 56px; }
+  .statement .big { font-size: 112px; font-weight: 900; line-height: 1.04; letter-spacing: -0.015em; text-wrap: balance; }
+  .chain { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 18px; padding: 20px 30px; border-radius: 16px; border: 1px solid var(--line);
+    background: rgba(255,255,255,.06); font-size: 40px; font-weight: 800; }
+  .chip img { height: 56px; }
+  .plus { font-size: 44px; color: var(--dim); font-weight: 700; }
+
+  /* build DAG */
+  .dag { flex: 1; display: grid; grid-template-columns: 1fr 56px .9fr 56px 1.15fr 56px 1fr; align-items: center; margin-top: 20px; }
+  .col { display: flex; flex-direction: column; gap: 22px; }
+  .node { padding: 26px 30px; border-radius: 16px; border: 2px solid rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+  .node .k { font-size: 26px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .node .n { font-family: var(--mono); font-size: 40px; font-weight: 700; margin-top: 8px; }
+  .node .d { font-size: 32px; color: var(--muted); font-weight: 600; margin-top: 8px; line-height: 1.3; }
+  .node.hot { border-color: var(--orange); background: rgba(255,122,26,.12); box-shadow: 0 0 40px rgba(255,122,26,.25); }
+  .node.ship { border-color: var(--green); background: rgba(74,222,128,.08); }
+  .arrow { text-align: center; font-size: 72px; color: var(--orange-2); font-weight: 300; }
+  .tagrow { display: flex; gap: 14px; flex-wrap: wrap; }
+  .tagrow .pill { font-size: 28px; }
+
+  /* data */
+  .data-grid { flex: 1; display: grid; grid-template-columns: .9fr 1.1fr; gap: 32px; margin-top: 30px; min-height: 0; }
+  .cols { padding: 34px 40px; }
+  .cols h3, .zone h3 { margin: 0 0 18px; font-size: 40px; font-weight: 880; }
+  .cols ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 16px; }
+  .cols li { font-family: var(--mono); font-size: 36px; color: #e6e9f2; }
+  .cols li span { color: var(--dim); font-family: Inter, sans-serif; font-size: 28px; margin-left: 12px; }
+  .cols .src { margin-top: 22px; font-size: 28px; color: var(--dim); font-weight: 650; }
+  .right { display: grid; grid-template-rows: auto 1fr; gap: 22px; min-height: 0; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .stat { padding: 24px 26px; }
+  .stat .v { font-size: 60px; white-space: nowrap; font-weight: 900; color: var(--orange-2); line-height: 1; }
+  .stat .l { font-size: 28px; color: var(--muted); font-weight: 650; margin-top: 10px; }
+  .asof { grid-column: 1 / -1; font-size: 28px; color: var(--dim); font-weight: 650; }
+  .zone { padding: 26px 34px; }
+  .zrow { display: grid; grid-template-columns: 110px 1fr 240px; gap: 18px; font-family: var(--mono); font-size: 32px; padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08); }
+  .zrow.h { font-family: Inter, sans-serif; font-size: 26px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .zrow.hl { color: var(--orange-2); }
+  .zone .note { font-size: 30px; color: var(--muted); font-weight: 600; margin-top: 14px; }
+
+  /* tools */
+  .tools { flex: 1; display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 32px; margin-top: 44px; }
+  .tool { padding: 44px 44px; display: flex; flex-direction: column; gap: 24px; }
+  .tool img { height: 120px; align-self: flex-start; }
+  .tool h3 { margin: 0; font-size: 54px; font-weight: 900; }
+  .tool ul { margin: 0; padding: 0 0 0 30px; display: grid; gap: 12px; }
+  .tool li { font-size: 40px; color: var(--muted); font-weight: 600; line-height: 1.3; }
+  .tool li::marker { color: var(--orange); }
+
+  /* repo */
+  .repo-grid { flex: 1; display: grid; grid-template-columns: 1.08fr .92fr; gap: 36px; margin-top: 40px; }
+  .prs { padding: 0; overflow: hidden; }
+  .prs .bar { padding: 22px 32px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 30px; color: var(--muted); display: flex; align-items: center; gap: 16px; }
+  .prs .bar img { height: 34px; }
+  .pr { display: flex; align-items: center; gap: 22px; padding: 24px 32px; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .pr .st { flex: none; padding: 6px 16px; border-radius: 99px; background: rgba(167,139,250,.18); border: 2px solid rgba(167,139,250,.7); color: #c4b5fd; font-size: 24px; font-weight: 850; }
+  .pr .t { font-size: 36px; font-weight: 750; }
+  .pr .n { margin-left: auto; color: var(--dim); font-size: 30px; font-weight: 650; }
+  .files { padding: 0; overflow: hidden; }
+  .files .ft { padding: 20px 28px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 30px; display: flex; justify-content: space-between; }
+  .files .ft b { color: var(--green); }
+  .files pre { margin: 0; padding: 18px 28px; font-family: var(--mono); font-size: 29px; line-height: 1.5; color: #d9f7e1; background: rgba(74,222,128,.08); }
+  .files .label { padding: 18px 28px; font-size: 32px; font-weight: 850; color: var(--orange-2); }
+  .pair { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  .pair .card { padding: 26px 34px; font-size: 36px; font-weight: 750; display: flex; align-items: center; gap: 20px; }
+  .pair .card span { color: var(--muted); font-weight: 600; }
+
+  /* map */
+  .map { flex: 1; display: grid; grid-template-columns: .9fr 1.3fr .9fr; gap: 30px; margin-top: 40px; align-items: stretch; }
+  .mod { padding: 34px 36px; }
+  .mod .m { font-size: 28px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; color: var(--orange-2); }
+  .mod h3 { margin: 10px 0 24px; font-size: 58px; font-weight: 900; }
+  .mod ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 18px; }
+  .mod li { font-size: 38px; color: var(--muted); font-weight: 620; }
+  .mod li b { font-family: var(--mono); color: #fff; margin-right: 14px; font-weight: 700; }
+  .mod.two ol { grid-template-columns: 1fr 1fr; column-gap: 26px; }
+  .need { margin-top: 26px; padding: 24px 34px; display: flex; align-items: center; gap: 30px; font-size: 36px; font-weight: 700; }
+  .need .pill { font-size: 30px; }
+
+  .next-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .next-grid h1 { font-size: 132px; }
+  .logo-hero { width: 640px; justify-self: center; filter: drop-shadow(0 30px 90px rgba(255,122,26,.3)); }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<!-- title -->
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 1 · Lesson 0 · Welcome</div>
+      <h1 style="margin-top:28px;font-size:140px">Build a <span class="accent">dbt</span> + DuckDB project</h1>
+      <p class="lead">A year of NYC green taxi trips, from raw files to an automated pipeline.</p>
+      <div class="badges"><span class="badge">Rosetta DBT Studio</span><span class="badge">dbt Core</span><span class="badge">DuckDB</span><span class="badge">GitHub</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+</section>
+
+<!-- welcome -->
+<section class="stage" data-id="welcome">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Welcome to Project 1</div>
+    <div class="statement s" data-step="1">
+      <div class="big">From raw files to a <span class="accent">tested, automated</span> pipeline.</div>
+      <div class="chain">
+        <span class="chip"><img src="../brand/icon.svg" alt="">Rosetta DBT Studio</span><span class="plus">+</span>
+        <span class="chip">dbt Core</span><span class="plus">+</span>
+        <span class="chip"><img src="../brand/icons/duckdb-yellow.svg" alt="">DuckDB</span><span class="plus">+</span>
+        <span class="chip"><img src="../brand/icons/git-branch-white.svg" alt="">GitHub</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:4%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 0</b></div></div>
+</section>
+
+<!-- build -->
+<section class="stage" data-id="build">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What you will build</div>
+    <h2>Raw files in, a <span class="accent">warehouse</span> out</h2>
+    <div class="dag">
+      <div class="col s" data-step="1">
+        <div class="node"><div class="k">Raw · parquet</div><div class="n">12 files</div><div class="d">2025 green taxi trips</div></div>
+        <div class="node"><div class="k">Seed · csv</div><div class="n" style="font-size:30px">taxi_zone_lookup</div><div class="d">zone names, boroughs</div></div>
+      </div>
+      <div class="arrow s" data-step="2">→</div>
+      <div class="col s" data-step="2">
+        <div class="node hot"><div class="k">Model · view</div><div class="n">trips</div><div class="d">one clean row per trip</div></div>
+      </div>
+      <div class="arrow s" data-step="3">→</div>
+      <div class="col">
+        <div class="node s" data-step="3"><div class="k">Table</div><div class="n" style="font-size:36px">trips_per_month</div></div>
+        <div class="node s" data-step="3"><div class="k">Table</div><div class="n" style="font-size:36px">top_pickup_zones</div></div>
+        <div class="node s" data-step="3"><div class="k">Table</div><div class="n" style="font-size:36px">monthly_summary</div></div>
+        <div class="tagrow s" data-step="4"><span class="pill">tests</span><span class="pill">docs</span><span class="pill">lineage</span></div>
+      </div>
+      <div class="arrow s" data-step="5">→</div>
+      <div class="col s" data-step="5">
+        <div class="node ship"><div class="k">GitHub Actions</div><div class="n" style="font-size:32px">build on every change</div></div>
+        <div class="node ship"><div class="k">Published</div><div class="n">prod.duckdb</div><div class="d">anyone can query it</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:4%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 0</b></div></div>
+</section>
+
+<!-- data -->
+<section class="stage" data-id="data">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The data</div>
+    <h2>NYC <span class="accent">green taxi</span> trips, 2025</h2>
+    <div class="data-grid">
+      <div class="card cols s" data-step="1">
+        <h3>One row per trip</h3>
+        <ul>
+          <li>pickup / dropoff time</li>
+          <li>PULocationID <span>pickup zone</span></li>
+          <li>DOLocationID <span>drop-off zone</span></li>
+          <li>trip_distance</li>
+          <li>payment_type <span>1 = card</span></li>
+          <li>fare · tip · total</li>
+        </ul>
+        <div class="src">Source: NYC TLC Trip Record Data</div>
+      </div>
+      <div class="right">
+        <div class="stats s" data-step="2">
+          <div class="card stat"><div class="v">12</div><div class="l">monthly files</div></div>
+          <div class="card stat"><div class="v">14.5 MB</div><div class="l">about 1.2 MB each</div></div>
+          <div class="card stat"><div class="v">591,375</div><div class="l">trips</div></div>
+          <div class="asof">2025 data, downloaded 9 Nov 2026</div>
+        </div>
+        <div class="card zone s" data-step="3">
+          <h3><span class="mono" style="font-size:.9em">taxi_zone_lookup.csv</span> · 265 zones</h3>
+          <div class="zrow h"><span>ID</span><span>Zone</span><span>Borough</span></div>
+          <div class="zrow"><span>1</span><span>Newark Airport</span><span>EWR</span></div>
+          <div class="zrow hl"><span>74</span><span>East Harlem North</span><span>Manhattan</span></div>
+          <div class="note">Joined on the pickup zone. Zone 74 is the busiest of 2025.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:4%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 0</b></div></div>
+</section>
+
+<!-- tools -->
+<section class="stage" data-id="tools">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The tools</div>
+    <h2>One app, one <span class="accent">file</span>, one repo</h2>
+    <div class="tools">
+      <div class="card tool s" data-step="1">
+        <img src="../brand/icon.svg" alt="">
+        <h3>Rosetta DBT Studio</h3>
+        <ul><li>Open source</li><li>Installs Python and dbt Core for you</li><li>Editor, terminal, lineage, git</li></ul>
+      </div>
+      <div class="card tool s" data-step="2">
+        <img src="../brand/icons/duckdb-yellow.svg" alt="">
+        <h3>DuckDB</h3>
+        <ul><li>A database in one file</li><li>No server to set up</li></ul>
+      </div>
+      <div class="card tool s" data-step="2">
+        <img src="../brand/icons/git-branch-white.svg" alt="">
+        <h3>GitHub</h3>
+        <ul><li>Keeps your code</li><li>Runs the pipeline for you</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:4%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 0</b></div></div>
+</section>
+
+<!-- repo -->
+<section class="stage" data-id="repo">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The course repository</div>
+    <h2>One lesson, one <span class="accent">commit</span></h2>
+    <div class="repo-grid">
+      <div class="card prs s" data-step="1">
+        <div class="bar"><img src="../brand/icons/git-branch-white.svg" alt="">Nuri1977/nyc-taxi-dbt · public · main</div>
+        <div class="pr"><span class="st">2.1</span><span class="t">Create the nyc_taxi dbt project</span></div>
+        <div class="pr"><span class="st">2.2</span><span class="t">Get the data</span></div>
+        <div class="pr"><span class="st">2.3</span><span class="t">Models</span></div>
+        <div class="pr" style="border-bottom:0"><span class="st">…</span><span class="t" style="color:var(--dim)">one commit per lesson</span></div>
+      </div>
+      <div class="card files s" data-step="2">
+        <div class="ft"><span>models/trips.sql</span><b>+18</b></div>
+<pre>+ select
++     VendorID as vendor_id,
++     lpep_pickup_datetime as pickup_at,
++     …
++ from {{ source('raw', 'green_trips') }}</pre>
+        <div class="label">= Code for this lesson</div>
+      </div>
+      <div class="pair s" data-step="3">
+        <div class="card">Your repo <span>· built as you watch</span></div>
+        <div class="card">Course repo <span>· the answer key</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:4%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 0</b></div></div>
+</section>
+
+<!-- map -->
+<section class="stage" data-id="map">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The course map</div>
+    <h2>Three modules, <span class="accent">eleven</span> lessons</h2>
+    <div class="map">
+      <div class="card mod s" data-step="1"><div class="m">Module 1</div><h3>Set up</h3>
+        <ol><li><b>1.1</b>Install Studio</li></ol></div>
+      <div class="card mod two s" data-step="2"><div class="m">Module 2</div><h3>dbt basics</h3>
+        <ol><li><b>2.1</b>Create the project</li><li><b>2.5</b>Properties</li><li><b>2.2</b>Get the data</li><li><b>2.6</b>Docs &amp; DAG</li>
+            <li><b>2.3</b>Models</li><li><b>2.7</b>Materializations</li><li><b>2.4</b>Jinja</li><li><b>2.8</b>Tests</li></ol></div>
+      <div class="card mod s" data-step="3"><div class="m">Module 3</div><h3>Ship it</h3>
+        <ol><li><b>3.1</b>Ship &amp; Automate</li><li><b>3.2</b>Showcase</li></ol></div>
+    </div>
+    <div class="card need s" data-step="4">You need: <span class="pill">a computer</span><span class="pill">GitHub + git basics</span><span class="pill">basic SQL</span><span style="color:var(--muted);font-weight:600">New to git? Links in the description.</span></div>
+  </div>
+  <div class="footer"><div class="bar" style="width:4%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 0</b></div></div>
+</section>
+
+<!-- closing -->
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 1.1</h1>
+      <h2 style="font-size:96px">Install <span class="accent">Rosetta DBT Studio</span></h2>
+    </div>
+    <img class="logo-hero" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

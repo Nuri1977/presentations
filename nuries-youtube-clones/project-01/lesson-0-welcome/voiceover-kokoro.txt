@@ -1,0 +1,35 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Welcome to Project 1.
+b01	In this course, you build a real analytics project with D B T and duck D B.
+b01	You start from an empty folder, and finish with a tested, automated pipeline, all inside Rosetta D B T Studio.
+b02	We start with a full year of New York City green taxi trips: twelve monthly par-kay files, and a small lookup table of taxi zones.
+b03	D B T turns the raw files into one clean model of trips.
+b04	On top of it, three small tables: trips per month and borough, the busiest pickup zones, and a monthly summary of how riders pay.
+b05	We add tests that catch bad data, and documentation with a lineage graph.
+b06	Finally, git hub Actions rebuilds everything on every change, and publishes the finished duck D B database, so anyone can query it.
+b07	The data comes from the New York City Taxi and Limousine Commission, the T L C.
+b07	Every trip has its pickup and drop-off time, the pickup and drop-off zones, the distance, how the rider paid, and what it cost.
+b08	For 2025, that is about five hundred ninety thousand trips, in twelve files of about one megabyte each.
+b08	Small enough to build on a laptop in seconds.
+b09	A second file maps every zone number to its name and borough.
+b09	Zone seventy-four, for example, is East Harlem North, in Manhattan, the busiest pickup zone of the year.
+b10	You need one app: Rosetta D B T Studio.
+b10	It is open source, it installs Python and D B T Core for you, and it gives you an editor, a terminal, lineage, and git, in one window.
+b11	duck D B is the database.
+b11	It lives in a single file on your computer, so there is no server to set up.
+b11	And git hub keeps your code, and later runs the pipeline for you.
+b12	The whole project lives in one public repository on git hub.
+b12	We create it in lesson 2.1, and every lesson ends with a commit and a push.
+b13	So each lesson's commit is the code for that lesson.
+b13	The link to the repository is in every video description.
+b14	Build your own copy as you watch.
+b14	And if you get stuck, compare it with the course repository.
+b15	The course has three modules.
+b15	First, set up: install Rosetta D B T Studio.
+b16	Second, D B T basics: create the project and connect it to git hub, get the data, then models, jinja, properties, docs, materializations, and tests.
+b17	Third, ship it: automate the build with git hub Actions, and turn the repository into a portfolio project.
+b18	You need a computer, a git hub account and the basics of git, and some basic sequel.
+b18	No D B T installed yet: we start from zero.
+b18	New to git?
+b18	There are links in the description.
+b18	See you in the first lesson.

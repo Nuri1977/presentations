@@ -1,0 +1,39 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A D B T project is a folder.
+b01	Models, seeds, tests and macros live in their own subfolders, and one file at the top, dbt_project dot yammel, gives the project its name and settings.
+b02	A second file, profiles dot yammel, says where D B T runs.
+b02	Our profile has one target, dev, and it points at a duck D B database file.
+b03	First, the database.
+b03	On the home screen, click New Connection, and choose duck D B.
+b04	Name it N Y C taxi dev.
+b04	For the file, type a path next to your projects folder: N Y C taxi dev dot duckdb.
+b04	duck D B creates the file the first time D B T connects.
+b04	Save.
+b05	Now the project.
+b05	Go back home, open the D B T Project card, and click New Project.
+b06	Call it N Y C taxi.
+b06	Keep the template folders switched on, pick the N Y C taxi dev connection, and save.
+b07	Studio creates the folder and opens it.
+b07	Here are the template folders, and the two files we just talked about.
+b08	Open D B T project dot yammel: the project name is N Y C taxi, it uses the profile with the same name, and lists where each kind of file lives.
+b09	Let's check that D B T can reach the database.
+b09	In the command box under the terminal, type D B T debug, and press Enter.
+b10	D B T finds the project and the profile, and connects to duck D B.
+b10	All checks passed.
+b11	Before the first commit, add a dot git ignore file at the top of the project, so build output, logs, data and the database stay out of git.
+b12	And a short read me, so people who open the repository know what it is.
+b13	Now create an empty repository on git hub: the plus button, then New repository.
+b14	Name it N Y C taxi D B T, and make it public, so anyone can get the code.
+b14	This rehearsal copy is private.
+b14	Add no read me, git ignore or license, and create it.
+b15	Copy the H T T P S address of the new, empty repository.
+b16	Back in Studio, open the Git tab, and click Initialize Repository.
+b17	Stage all the changes, type a message, create the N Y C taxi D B T project, and commit.
+b18	Click Publish Branch.
+b18	Studio asks for the remote: paste the repository address, and add it.
+b18	Studio pushes the main branch to git hub.
+b19	Refresh the repository page.
+b19	The project is on git hub: the folders, the two yammel files, the git ignore, and the read me.
+b20	To recap: a duck D B connection, a D B T project called N Y C taxi, a passing D B T debug, and the first commit on git hub.
+b20	From now on, every lesson ends with a commit and a push.
+b20	Next, we get the data.

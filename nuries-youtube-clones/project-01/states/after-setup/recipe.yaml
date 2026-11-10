@@ -1,0 +1,8 @@
+# End of Lesson 1.1 = start of Lesson 2.1: Studio set up (Python 3.10.17, dbt 1.12.6 + dbt-duckdb), no project, no connection.
+name: after-setup
+setup_only: true
+project_name: nyc_taxi          # the project 2.1 creates (path used by off-camera checks)
+clean: [projects]
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com

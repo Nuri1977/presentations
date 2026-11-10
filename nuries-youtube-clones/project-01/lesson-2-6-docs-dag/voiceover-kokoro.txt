@@ -1,0 +1,28 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Open the project, and create one more model in models: monthly summary dot sql.
+b02	First, a block called totals: the trips per month, from ref trips per month.
+b03	Then a block called card: the trips paid by credit card each month, straight from ref trips.
+b04	Join them by month, and work out the percent paid by card.
+b04	Save.
+b05	Describe it too: at the end of schema dot yammel, paste the entry for monthly summary, and save.
+b06	All those refs form a graph: the dag.
+b06	Directed, because every arrow points one way.
+b06	Acyclic, because no model can depend on itself.
+b07	D B T uses it for the build order, to run independent models in parallel, and to show you what a change affects.
+b08	Back in monthly summary, open the Model menu, and choose Run plus model, upstream.
+b08	That runs this model, and everything it depends on.
+b09	Three models, in dag order: trips, trips per month, then monthly summary.
+b10	Now the docs.
+b10	Open the Project menu, and choose Generate Docs. D B T reads the project and the database, and writes a small website into target.
+b11	Then Project, Serve Docs.
+b11	Studio starts a local web server, on port eighty eighty.
+b12	In the browser, open localhost, port eighty eighty, and pick monthly summary.
+b12	Here is the description from schema dot yammel, every column, and what the model depends on.
+b13	The button at the bottom right opens the lineage graph: the whole dag, from the raw source and the seed, to monthly summary.
+b14	Back in Studio, the Git tab shows the new model, and the change to schema dot yammel.
+b15	Stage all, type a message, add the monthly summary, and commit.
+b16	Sync Changes, and it's on git hub.
+b17	To recap: refs form the dag, and D B T uses it for order and impact.
+b17	Run plus model builds a model with everything upstream.
+b17	And two clicks give you a docs site, with descriptions and the lineage graph.
+b17	Next, views or tables: materializations.

@@ -1,0 +1,15 @@
+# End of Lesson 2.3 = start of Lesson 2.4 (Dependencies & Jinja).
+# Clone of what 2.3 pushed (adds models/trips.sql), the empty template folders, the 12 parquet files in
+# data/raw (gitignored, copied in as the learner did), and the nyc_taxi_dev DuckDB connection.
+name: lesson-2-3-end
+project_name: nyc_taxi
+clone: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git
+dirs: [analysis, macros, models, seeds, snapshots, tests]
+copy:
+  - { from: ../../.cache/data/raw, to: data/raw }
+database_file: ../nyc_taxi_dev.duckdb
+sql: []
+connection_name: nyc_taxi_dev
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com

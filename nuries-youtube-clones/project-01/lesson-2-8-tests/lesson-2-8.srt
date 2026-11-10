@@ -1,0 +1,143 @@
+1
+00:00:03,350 --> 00:00:07,123
+A dbt data test is a query that looks for bad rows.
+
+2
+00:00:07,403 --> 00:00:09,617
+If it returns nothing, the test passes.
+
+3
+00:00:09,897 --> 00:00:11,594
+If it returns rows, it fails.
+
+4
+00:00:12,544 --> 00:00:18,098
+dbt has four built in: unique, not null, accepted values, and relationships.
+
+5
+00:00:18,378 --> 00:00:24,355
+Start with the grain: the column that should be unique and never empty, like the month in monthly summary.
+
+6
+00:00:25,305 --> 00:00:28,085
+Open the project, and open schema dot yml.
+
+7
+00:00:28,365 --> 00:00:30,412
+Tests go right under the column they check.
+
+8
+00:00:31,979 --> 00:00:36,541
+Under borough, in trips per month: accepted values, with the boroughs we expect.
+
+9
+00:00:38,612 --> 00:00:43,273
+Zone id in top pickup zones is that table's grain: not null and unique.
+
+10
+00:00:44,223 --> 00:00:46,359
+The same for month in monthly summary.
+
+11
+00:00:46,639 --> 00:00:47,239
+Save.
+
+12
+00:00:49,139 --> 00:00:53,171
+And in seeds dot yml, Location ID: not null and unique.
+
+13
+00:00:53,451 --> 00:00:54,051
+Save.
+
+14
+00:00:58,556 --> 00:01:00,623
+Run them all: Project menu, Test.
+
+15
+00:01:03,474 --> 00:01:06,816
+Six pass, one fails: accepted values on borough.
+
+16
+00:01:07,096 --> 00:01:09,899
+Got one result, so one borough is not in our list.
+
+17
+00:01:10,849 --> 00:01:11,662
+It is N A.
+
+18
+00:01:11,942 --> 00:01:21,756
+The zone lookup has a zone two sixty-five, outside of New York City, with the borough N A, and about two hundred fifty trips in 2025 started there.
+
+19
+00:01:22,036 --> 00:01:24,130
+The data is right; our list was wrong.
+
+20
+00:01:25,080 --> 00:01:26,731
+Add N A to the list, and save.
+
+21
+00:01:29,240 --> 00:01:33,939
+To check just this model, open trips per month, and in the Model menu choose Test.
+
+22
+00:01:35,497 --> 00:01:37,726
+One test on this model, and it passes.
+
+23
+00:01:38,697 --> 00:01:40,214
+One more command: build.
+
+24
+00:01:40,494 --> 00:01:46,940
+It seeds, runs and tests, in DAG order, so a failing test stops the models that depend on bad data.
+
+25
+00:01:47,890 --> 00:01:49,125
+Project menu, Build.
+
+26
+00:01:50,194 --> 00:01:52,401
+One seed, four models, seven tests.
+
+27
+00:01:52,681 --> 00:01:54,294
+Twelve passes, no errors.
+
+28
+00:01:55,244 --> 00:01:58,927
+The Git tab: schema dot yml and seeds dot yml changed.
+
+29
+00:02:00,195 --> 00:02:03,455
+Stage all, type a message, add data tests, and commit.
+
+30
+00:02:08,152 --> 00:02:09,127
+Sync Changes.
+
+31
+00:02:09,407 --> 00:02:11,505
+That's the end of dbt basics.
+
+32
+00:02:13,252 --> 00:02:16,198
+To recap: tests live in YAML next to the columns.
+
+33
+00:02:16,478 --> 00:02:19,289
+A failing test told us something true about the data.
+
+34
+00:02:19,569 --> 00:02:22,001
+And build runs and tests everything, in order.
+
+35
+00:02:22,281 --> 00:02:23,779
+That's dbt basics.
+
+36
+00:02:24,059 --> 00:02:28,308
+Next, we ship it: GitHub Actions builds the project on every push.

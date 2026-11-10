@@ -41,7 +41,12 @@ desc = [lesson.get('summary', ''), '',
          f"and dbt-duckdb {course['runtime']['dbt_duckdb']}." if any(sc['kind'] == 'app' for sc in lesson['scenes'])
          else f"Screens from Rosetta DBT Studio {course['app']['version']}."),
         'Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html',
-        'Source code: https://github.com/rosettadb/dbt-studio']
+        'Source code: https://github.com/rosettadb/dbt-studio'] + ([course['credit_line']] if course.get('credit_line') else [])
+if lesson.get('links'):
+    desc += ['', 'Links for this lesson'] + [f"- {h['title']}: {h['url']}" for h in lesson['links']]
+help_links = lesson.get('help_links', course.get('help_links') if lesson.get('show_help_links') else None) or []
+if help_links:
+    desc += ['', course.get('help_links_title', 'Useful links')] + [f"- {h['title']}: {h['url']}" for h in help_links]
 tags = list(dict.fromkeys(lesson.get('tags', []) + course.get('youtube', {}).get('tags', [])))
 yt = [f"# YouTube upload: {lesson['title']}", '',
       f"- **File:** `{lid}.mp4` (3840x2160, {fmt(tl['total'])}). Upload the 4K file; YouTube shows HD and 4K only after processing finishes, which can take from minutes to an hour, so the first view may look blurry.",
@@ -71,10 +76,12 @@ for sc in lesson['scenes']:
             add(R / 'slides' / f"{sc['slide']}-{b['step']}.png", b['say'])
     else:  # app scene: one frame from the recording, with its narration, so the deck still tells the whole lesson
         mid = next(b for b in tl['beats'] if b['scene'] == sc['id'])
-        ev = json.loads((R / 'app' / 'events.json').read_text())['beats']
+        ev = json.loads((R / 'app' / 'events.json').read_text())['beats'] if (R / 'app' / 'events.json').exists() else {}
+        if (R / 'pane' / 'events.json').exists():
+            ev.update(json.loads((R / 'pane' / 'events.json').read_text())['beats'])
         last = [s for b in sc['beats'] for s in ev[b['id']]['steps'] if s['k'] in ('still', 'type', 'live')][-1]
         img = last.get('img') or last['imgs'][-1]
-        add(R / 'app' / 'frames' / img, 'APP DEMO (record in Rosetta DBT Studio, see RECORDING-cue-sheet.md):\n' + '\n'.join(b['say'] for b in sc['beats']))
+        add((R / img) if '/' in img else (R / 'app' / 'frames' / img), 'APP DEMO (record in Rosetta DBT Studio, see RECORDING-cue-sheet.md):\n' + '\n'.join(b['say'] for b in sc['beats']))
 prs.save(L / f'{lid}-slides.pptx')
 
 # ---------------------------------------------------------------- human cue sheet
@@ -100,9 +107,36 @@ def act(a):
         'lineage_fit': lambda: "Click the fit-view button (bottom left of the graph)",
         'point_tree': lambda: f"Point at `{v}` in the Explorer",
         'lineage_depth': lambda: f"In the lineage panel, set **Depth** to {v}",
+        'expect_file': lambda: f"(Check that `{v['path']}` matches `{v['snippet']}`)",
+        'terminal': lambda: f"Click the command box under the terminal, type `{v['cmd']}`, press Enter",
+        'git_tab': lambda: "Click the **Git** tab at the top of the sidebar",
+        'explorer_tab': lambda: "Click the **Explorer** tab at the top of the sidebar",
+        'git_stage': lambda: f"Hover `{v}` in Changes and click its **+** (Stage Changes)",
+        'git_message': lambda: f"Click the message box and type: {v}",
+        'git_commit': lambda: "Click **Commit**",
+        'type_text': lambda: f"Click **{v.get('label') or v.get('name')}** and type `{v['text']}`",
+        'pause': lambda: f"Wait {v/1000:.1f} s",
+        'press_keys': lambda: f"Press {v}",
+        'type_keys': lambda: f"Type `{v}`",
+        'new_root_file': lambda: f"Right-click the project root → **New File** → `{v}` → **Save**",
+        'wait_text': lambda: f"Wait for “{v['text']}”",
+        'git_init': lambda: "Click **Initialize Repository**",
+        'git_stage_all': lambda: "Hover CHANGES and click **+** (Stage All Changes)",
+        'publish_branch': lambda: f"Click **Publish Branch**, paste `{v['url']}`, add the remote",
+        'point_tree': lambda: f"Point at `{v}` in the Explorer",
+        'web': lambda: f"GitHub (built-in browser): {v}",
+        'click_at': lambda: f"Click **{v.get('label') or v.get('name') or v.get('text') or v}**" if isinstance(v, dict) else f"Click **{v}**",
+        'point_at': lambda: f"Point at **{v.get('label') or v.get('name') or v.get('text') or v}**" if isinstance(v, dict) else f"Point at **{v}**",
+        'check': lambda: f"Check {', '.join(v) if isinstance(v, list) else v}",
+        'uncheck': lambda: f"Uncheck {', '.join(v) if isinstance(v, list) else v}",
+        'wait_enabled': lambda: f"Wait until **{v['name']}** is enabled (this takes a while)",
+        'follow_window': lambda: "Studio opens its main window",
+        'goto': lambda: f"In the browser, open {v}",
+        'scroll_to': lambda: f"Scroll to **{v.get('label') or v.get('text') or v.get('selector')}**",
+        'click_download': lambda: f"Click the download link **{v.get('label') or v.get('text') or v.get('selector')}**",
     }
     return table[k]() if k in table else f"{k}: {v}"
-app_scenes = [sc for sc in lesson['scenes'] if sc['kind'] == 'app']
+app_scenes = [sc for sc in lesson['scenes'] if sc['kind'] in ('app', 'browser', 'pane')]
 cue = [f"# {lesson['title']} — recording cue sheet", '']
 if not app_scenes:
     cue += ['This lesson has no app scenes, so there is nothing to record. A human voice-over only needs `voiceover-script.md`.', '']
@@ -110,7 +144,7 @@ else:
     cue += [f"For a human retake of the app scenes (the automated recording follows the same steps). App: Rosetta DBT Studio {course['app']['version']}, {course['theme']} theme, window 1920x1080.", '',
             '## Before you start', ''] + [f"- {n}" for n in lesson.get('start_notes', [])] + ['']
 for sc in lesson['scenes']:
-    if sc['kind'] != 'app':
+    if sc['kind'] not in ('app', 'browser', 'pane'):
         continue
     cue += [f"## {sc['id']} · {sc.get('chapter', '')}", '', '| Listen for | Do this |', '|---|---|']
     for b in sc['beats']:

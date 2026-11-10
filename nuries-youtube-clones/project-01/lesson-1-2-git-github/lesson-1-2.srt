@@ -1,0 +1,115 @@
+1
+00:00:03,350 --> 00:00:06,977
+A dbt project is code: SQL and YAML files.
+
+2
+00:00:07,257 --> 00:00:13,119
+Git keeps the history of that code, so you can see what changed, undo a mistake, and work with others.
+
+3
+00:00:14,069 --> 00:00:15,757
+GitHub keeps a copy online.
+
+4
+00:00:16,037 --> 00:00:19,674
+Others can see your work there, and later it runs your pipeline for you.
+
+5
+00:00:20,624 --> 00:00:21,553
+Here is the loop.
+
+6
+00:00:21,833 --> 00:00:23,958
+You change files in your project folder.
+
+7
+00:00:24,908 --> 00:00:29,277
+You commit them: a snapshot with a short message, made in Studio's Git tab.
+
+8
+00:00:30,227 --> 00:00:31,807
+You push the commits to GitHub.
+
+9
+00:00:32,087 --> 00:00:35,421
+In Studio, that is Publish Branch the first time, then Push.
+
+10
+00:00:36,371 --> 00:00:44,779
+And from lesson 2.2 on, each lesson's work goes on its own branch, and becomes a pull request on GitHub, which we merge into main.
+
+11
+00:00:45,729 --> 00:00:47,423
+Let's create the repository.
+
+12
+00:00:47,703 --> 00:00:52,500
+On GitHub, signed in, click the plus button at the top, and choose New repository.
+
+13
+00:00:53,450 --> 00:00:54,229
+Give it a name.
+
+14
+00:00:54,509 --> 00:00:59,913
+This is a rehearsal copy, nyc taxi dbt rehearsal, and it is private.
+
+15
+00:01:00,193 --> 00:01:04,992
+In your own project, call it nyc taxi dbt, and make it public.
+
+16
+00:01:05,942 --> 00:01:10,129
+Leave everything else empty: no README, no gitignore, no license.
+
+17
+00:01:10,409 --> 00:01:13,858
+Our first commit, in lesson 2.1, brings those files.
+
+18
+00:01:14,138 --> 00:01:15,667
+Click Create repository.
+
+19
+00:01:16,617 --> 00:01:18,738
+The repository is ready, and empty.
+
+20
+00:01:19,018 --> 00:01:20,443
+GitHub shows its address.
+
+21
+00:01:20,723 --> 00:01:25,543
+Copy the HTTPS address: Studio needs it in lesson 2.1.
+
+22
+00:01:26,493 --> 00:01:27,345
+One more thing.
+
+23
+00:01:27,625 --> 00:01:30,951
+GitHub does not accept your account password for pushing code.
+
+24
+00:01:31,231 --> 00:01:35,082
+Pushes use a personal access token: a key you create on GitHub.
+
+25
+00:01:36,032 --> 00:01:41,366
+Make it work for this repository only, with contents and workflows set to read and write.
+
+26
+00:01:41,646 --> 00:01:45,111
+We set it up right before the first push, in lesson 2.1.
+
+27
+00:01:46,061 --> 00:01:46,794
+To recap.
+
+28
+00:01:47,074 --> 00:01:54,377
+Git keeps the history, GitHub keeps a copy online, and one pull request per lesson keeps every change easy to follow.
+
+29
+00:01:54,656 --> 00:01:57,069
+Next, we create the dbt project.

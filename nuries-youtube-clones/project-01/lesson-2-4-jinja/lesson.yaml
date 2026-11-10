@@ -1,0 +1,187 @@
+# Lesson 2.4 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-4
+number: "2.4"
+title: "Dependencies & Jinja"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.4 Dependencies & Jinja (now 2.4), dropdown rule of 10 Nov 2026"
+next: "Lesson 2.5 · Properties"
+summary: "Load the taxi zone lookup seed, then build two models on top of trips with ref(): trips per month and borough, and the ten busiest pickup zones, using a Jinja variable. Compile to see the plain SQL dbt sends to DuckDB, run the project in dependency order, then commit and push. All dbt commands from Rosetta DBT Studio's Project and Model menus."
+start_state: lesson-2-3-end
+tags: [dbt ref, Jinja, dbt seed, dbt compile, dependencies, DuckDB, NYC taxi]
+target_minutes: 5
+rehearsal: true
+start_notes:
+  - "Start state `lesson-2-3-end`: a clone of what Lesson 2.3 pushed (adds models/trips.sql), the 12 parquet files in data/raw, and the nyc_taxi_dev connection. The trips view is built again by Project ▸ Run in this lesson."
+draft_changes:
+  - "dbt commands from Studio's dropdowns: Project ▸ Seed, Model ▸ Compile on top_pickup_zones, Project ▸ Run."
+  - "The plan's lineage view (s07) moves to Lesson 2.6, which is about the DAG."
+  - "Model ▸ Compile opens a Compiled SQL window (Original SQL / Compiled SQL tabs) in Studio 1.7.6; the lesson shows it there instead of opening target/compiled."
+accuracy_notes:
+  - "Measured with dbt-core 1.12.6 / dbt-duckdb 1.11.1 on 10 Nov 2026 (files downloaded 9 Nov 2026): seed INSERT 265; busiest pickup zone 74 East Harlem North with 143,115 trips; Manhattan 344,997 trips in trips_per_month."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.4. Dependencies & Jinja. Badges: dbt seed, ref(), Jinja."
+
+  - id: s01
+    kind: app
+    chapter: "Load the seed"
+    beats:
+      - id: b01
+        say: "Open the nyc taxi project. First, load the zone lookup into DuckDB: open the Project menu, and choose Seed."
+        zoom: project-menu
+        actions:
+          - open_project: nyc_taxi
+          - project_menu: Seed
+      - id: b02
+        say: "dbt reads the CSV, and inserts two hundred sixty-five rows into a table called taxi zone lookup."
+        zoom: terminal-close
+        card: { eyebrow: "dbt seed", title: "INSERT 265", sub: "main.taxi_zone_lookup", pos: top-right }
+        actions:
+          - wait_text: { text: "OK loaded seed file main.taxi_zone_lookup", label: seed output }
+
+  - id: s02
+    kind: slide
+    chapter: "ref(): models that build on models"
+    slide: ref
+    beats:
+      - { id: b03, step: 1, show: "ref('trips') → \"nyc_taxi_dev\".\"main\".\"trips\": name the model or seed, not the table.", say: "To use one model inside another, write ref, and the name of the model or seed. Not the table name: dbt fills that in, for whichever database you run against." }
+      - { id: b04, step: 2, show: "A small graph: raw.green_trips → trips → trips_per_month and top_pickup_zones; taxi_zone_lookup → both.", say: "Each ref is also a dependency. dbt draws the graph from them, and always builds trips before the models that use it." }
+
+  - id: s03
+    kind: app
+    chapter: "Trips per month"
+    beats:
+      - id: b05
+        say: "Right-click models, New File: trips per month dot sql."
+        zoom: explorer
+        actions:
+          - new_file: { folder: models, name: trips_per_month.sql }
+      - id: b06
+        say: "Count the trips and the average fare for each month and pickup borough."
+        zoom: code-close
+        actions:
+          - type: "-- trips per month and pickup borough\nselect\n    date_trunc('month', t.pickup_at) as month,\n    z.Borough                        as borough,\n    count(*)                         as trips,\n    round(avg(t.fare_amount), 2)     as avg_fare\n"
+      - id: b07
+        say: "From ref trips, joined to ref taxi zone lookup, to get the borough of each pickup zone. Group by all, and save."
+        zoom: code-close
+        actions:
+          - type: "from {{ ref('trips') }} as t\nleft join {{ ref('taxi_zone_lookup') }} as z\n    on t.pickup_zone_id = z.LocationID\ngroup by all\norder by month, borough\n"
+          - click_save
+          - expect_file: { path: models/trips_per_month.sql, snippet: ../snippets/2.4/trips_per_month.sql }
+
+  - id: s04
+    kind: app
+    chapter: "Top pickup zones, with a Jinja variable"
+    beats:
+      - id: b08
+        say: "A second model: top pickup zones dot sql."
+        zoom: explorer
+        actions:
+          - close_tab: models/trips_per_month.sql
+          - new_file: { folder: models, name: top_pickup_zones.sql }
+      - id: b09
+        say: "This time, start with a Jinja variable: set top n to ten."
+        zoom: code-close
+        actions:
+          - type: "-- the busiest pickup zones of 2025\n{% set top_n = 10 %}\n\n"
+      - id: b10
+        say: "Then count the trips for each pickup zone, with the zone's name and borough, from the same two refs."
+        zoom: code-close
+        actions:
+          - type: "select\n    t.pickup_zone_id as zone_id,\n    z.Zone           as zone,\n    z.Borough        as borough,\n    count(*)         as trips\nfrom {{ ref('trips') }} as t\njoin {{ ref('taxi_zone_lookup') }} as z\n    on t.pickup_zone_id = z.LocationID\n"
+      - id: b11
+        say: "Order by trips, busiest first, and limit to top n. Save."
+        zoom: code-close
+        actions:
+          - type: "group by all\norder by trips desc\nlimit {{ top_n }}\n"
+          - click_save
+          - expect_file: { path: models/top_pickup_zones.sql, snippet: ../snippets/2.4/top_pickup_zones.sql }
+
+  - id: s05
+    kind: slide
+    chapter: "Jinja in one minute"
+    slide: jinja
+    beats:
+      - { id: b12, step: 1, show: "Three kinds of braces: {{ }} prints a value, {% %} runs logic, {# #} is a comment.", say: "Jinja has three kinds of braces. Double curly braces print a value. Curly brace and percent run logic, like set. And curly brace and hash is a comment." }
+      - { id: b13, step: 2, show: "Compile turns Jinja into plain SQL: limit {{ top_n }} → limit 10; ref('trips') → \"nyc_taxi_dev\".\"main\".\"trips\".", say: "When dbt compiles a model, all of it turns into plain SQL. Let's see that." }
+
+  - id: s06
+    kind: app
+    chapter: "Compile: see the plain SQL"
+    beats:
+      - id: b14
+        say: "With top pickup zones open, open the Model menu, and choose Compile."
+        zoom: model-menu
+        actions:
+          - model_menu: Compile
+          - wait_text: { text: "Compiled node", label: compile output, timeoutMs: 60000 }
+      - id: b15
+        say: "Studio opens the compiled SQL in a window. The first tab shows what we wrote, with the Jinja."
+        zoom: center-wide
+        actions:
+          - pause: 800
+      - id: b16
+        say: "Switch to Compiled SQL. Both refs became full table names in the dev database, and limit top n became limit ten."
+        zoom: center-wide
+        card: { eyebrow: "Compiled SQL", title: "limit 10", sub: "Jinja is gone; plain SQL is left.", pos: bottom-right }
+        actions:
+          - click_at: { role: tab, name: "Compiled SQL", label: Compiled SQL tab, settleMs: [300, 900] }
+      - id: b17
+        say: "This is the SQL DuckDB will run. Close the window."
+        zoom: center-wide
+        actions:
+          - click_at: { role: button, name: Close, label: Close, settleMs: [300, 800] }
+
+  - id: s07
+    kind: app
+    chapter: "Run in dependency order"
+    beats:
+      - id: b18
+        say: "Now run the whole project: Project menu, Run."
+        zoom: project-menu
+        actions:
+          - project_menu: Run
+      - id: b19
+        say: "dbt builds trips first, and only then the two models that depend on it. Three models, no errors."
+        zoom: terminal-close
+        card: { eyebrow: "dbt run", title: "trips first, then the marts", sub: "PASS=3 ERROR=0", pos: top-right }
+        actions:
+          - wait_text: { text: "PASS=3", label: run output }
+
+  - id: s08
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b20
+        say: "Open the Git tab. The two new models are listed."
+        zoom: git-panel
+        actions:
+          - close_tab: models/top_pickup_zones.sql
+          - git_tab
+      - id: b21
+        say: "Stage all, type a message, add trips per month and top pickup zones, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Add trips per month and top pickup zones
+          - git_commit
+      - id: b22
+        say: "Sync Changes pushes it to GitHub."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s09
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b23, step: 1, show: "Recap: seed loaded; ref() names models and draws the graph; Jinja {{ }} {% %} {# #}; compile shows plain SQL; run in dependency order; pushed.", say: "To recap: a seed loads a CSV. Ref names a model and records the dependency, so dbt runs things in the right order. Jinja adds variables and logic, and compile shows the plain SQL. Next, we describe our models with properties." }
+
+  - id: s10
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.5 · Properties. Code: github.com/Nuri1977/nyc-taxi-dbt."

@@ -1,0 +1,206 @@
+# Lesson 2.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Spoken text ("say") is plain words; code names are said as words and shown exactly on screen.
+id: lesson-2-3
+number: "2.3"
+title: "Models: your first dbt model"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.3 Models (pilot lesson)"
+next: "Lesson 2.4 · Dependencies & Jinja"
+summary: "Build the first dbt model of the NYC taxi project: trips.sql, one select over the raw 2025 green taxi parquet files. Run it from the Model menu in Rosetta DBT Studio, look at the rows with dbt show, read the create view statement dbt wrote, then commit and push the model from Studio's Git tab."
+start_state: lesson-2-2-end
+rehearsal: true
+tags: [dbt models, dbt run, dbt show, DuckDB, parquet, NYC taxi]
+target_minutes: 5
+start_notes:
+  - "Start state `lesson-2-2-end`: a clone of what Lesson 2.2 pushed to nyc-taxi-dbt-rehearsal (`.gitignore`, README, `models/sources.yml`, `seeds/taxi_zone_lookup.csv`), the 12 Green Taxi 2025 parquet files in `data/raw`, and the nyc_taxi_dev connection."
+  - "No `target/` or `logs/` folders yet, so the run in s04 creates them on camera."
+  - "Start on the home screen with no editor tabs open. Bottom panel open on TERMINAL."
+draft_changes:
+  - "The plan's s05 queried `trips` in the SQL Editor. In Studio 1.7.6 the SQL Editor, Execute Query and Model > Preview all run DuckDB from Studio's own folder, so the view's relative parquet path fails (\"No files found\"). The lesson uses `dbt show` in Studio's terminal instead, which runs in the project folder. Logged in studio-notes.md."
+  - "dbt commands from Studio's dropdowns (Nuri, 10 Nov): the model runs from Model ▸ Run. Model ▸ Preview cannot read the view's relative parquet path in 1.7.6, so the rows still come from dbt show in the terminal."
+  - "Ends with commit + Sync Changes (push to main) and the models folder on GitHub (rehearsal repo)."
+  - "The Source Control panel is the Git tab in the Explorer sidebar in 1.7.6; a new file must be staged with + before Commit is enabled."
+accuracy_notes:
+  - "Measured on 9 Nov 2026 from the TLC files downloaded that day: 591,375 raw rows in green_tripdata_2025-01..12; 565,039 rows in `trips` after the filter."
+  - "Run output `OK created sql view model main.trips` and the `create view \"nyc_taxi_dev\".\"main\".\"trips__dbt_tmp\"` statement in target/run are the real outputs of this recording (dbt-core 1.12.6, dbt-duckdb 1.11.1)."
+  - "dbt's view materialization creates the view under a temporary name and then renames it, which is why target/run shows trips__dbt_tmp."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.3. Models: your first dbt model. dbt + DuckDB in Rosetta DBT Studio. Badges: Rosetta DBT Studio 1.7.6, dbt Core 1.12, DuckDB, NYC taxi 2025."
+
+  - id: s01
+    kind: slide
+    chapter: "What a model is"
+    slide: model
+    beats:
+      - { id: b01, step: 1, show: "Big statement: A model is one select, in one .sql file. A file card trips.sql with a select.", say: "In the last lesson, we pointed dbt at the raw taxi files. Now we build on top of them, with a model. A model is one select statement, saved in one .sql file, in the models folder." }
+      - { id: b02, step: 2, show: "An arrow from the file to a DuckDB object card: view main.trips, named after the file.", say: "When you run it, dbt builds a view or a table from that select, and names it after the file. So trips.sql becomes a view called trips." }
+
+  - id: s02
+    kind: app
+    chapter: "Write trips.sql in Rosetta DBT Studio"
+    beats:
+      - id: b03
+        say: "Here is the project from the last lesson. Open it, right-click the models folder, choose New File, and call it trips.sql."
+        zoom: explorer
+        actions:
+          - open_project: nyc_taxi
+          - new_file: { folder: models, name: trips.sql }
+      - id: b04
+        say: "Start with a comment that says what one row is: one green taxi trip from 2025. Then, select."
+        zoom: code-close
+        actions:
+          - type: |
+              -- one row per 2025 green taxi trip, obviously broken rows removed
+              select
+      - id: b05
+        say: "Pick the columns we need, and give them clear names: the vendor, the pickup and drop-off times, and the pickup and drop-off zones."
+        zoom: code-close
+        actions:
+          - type: |2
+                  VendorID              as vendor_id,
+                  lpep_pickup_datetime  as pickup_at,
+                  lpep_dropoff_datetime as dropoff_at,
+                  PULocationID          as pickup_zone_id,
+                  DOLocationID          as dropoff_zone_id,
+      - id: b06
+        say: "Then the passenger count, the distance, how the rider paid, and the money: fare, tip, and total."
+        zoom: code-close
+        actions:
+          - type: |2
+                  passenger_count,
+                  trip_distance,
+                  payment_type,
+                  fare_amount,
+                  tip_amount,
+                  total_amount
+      - id: b07
+        say: "Read them from the raw green trips source. The source function points at the parquet files we declared in the last lesson."
+        zoom: code-close
+        card: { eyebrow: "source()", title: "No file paths in the model", sub: "sources.yml says where raw.green_trips lives.", pos: top-right }
+        actions:
+          - type: |
+              from {{ source('raw', 'green_trips') }}
+      - id: b08
+        say: "Finally, keep only trips that started in 2025, and drop the rows with no distance, or no charge."
+        zoom: code-close
+        actions:
+          - type: |
+              where lpep_pickup_datetime >= '2025-01-01'
+                and lpep_pickup_datetime <  '2026-01-01'
+                and trip_distance > 0
+                and total_amount > 0
+      - id: b09
+        say: "That is the whole model. One select, and no create statement. Save it."
+        actions:
+          - click_save
+          - expect_file: { path: models/trips.sql, snippet: ../snippets/3.3/trips.sql }
+
+  - id: s03
+    kind: slide
+    chapter: "How dbt runs a model"
+    slide: flow
+    beats:
+      - { id: b10, step: 1, show: "Step 1, Compile: the Jinja in curly braces becomes SQL; source('raw','green_trips') becomes read_parquet('data/raw/...').", say: "So what happens when you run it? First, dbt compiles the file. The Jinja in curly braces becomes plain SQL, and the source call becomes the real read parquet call." }
+      - { id: b11, step: 2, show: "Step 2, Wrap: create view trips as ( your select ). Label: dbt writes this.", say: "Then dbt wraps your select in a create view statement. That is the part you never write." }
+      - { id: b12, step: 3, show: "Step 3, Execute: the statement goes to DuckDB; data/dev.duckdb now holds the view main.trips.", say: "And it sends the statement to DuckDB, which saves the view in the dev database file." }
+
+  - id: s04
+    kind: app
+    chapter: "Run the model"
+    beats:
+      - id: b13
+        say: "Let's run it. Above the editor, open the Model menu, and choose Run. It runs just this model."
+        zoom: model-menu
+        actions:
+          - model_menu: Run
+      - id: b14
+        say: "The terminal shows one model, trips, created as a view in the main schema. One pass, no errors."
+        zoom: terminal-close
+        card: { eyebrow: "dbt run", title: "OK created sql view model main.trips", sub: "PASS=1 ERROR=0", pos: top-right }
+        actions:
+          - wait_text: { text: "OK created sql view model main.trips", label: run output }
+
+  - id: s05
+    kind: app
+    chapter: "Look at the rows with dbt show"
+    beats:
+      - id: b15
+        say: "To look at the rows, use the command box under the terminal. The model's Preview runs outside the project folder, so it can't find the parquet files yet. Type: dbt show, select trips, limit ten. Then press Enter."
+        zoom: terminal-close
+        actions:
+          - terminal: { cmd: "dbt show --select trips --limit 10", until: "Previewing node 'trips'" }
+      - id: b16
+        say: "dbt runs the model's select, and prints the first ten trips: New Year's Day, 2025, with the pickup and drop-off times and zones. Across the whole year, the model keeps more than half a million trips."
+        zoom: terminal-close
+        card: { eyebrow: "2025 data, as of 9 Nov 2026", title: "565,039 trips", sub: "kept from 591,375 raw rows", pos: top-right }
+
+  - id: s06
+    kind: app
+    chapter: "The SQL dbt wrote"
+    beats:
+      - id: b17
+        say: "Want to see exactly what dbt sent to DuckDB? Refresh the Explorer, and open target, then run, nyc taxi, models, and trips.sql."
+        zoom: explorer
+        actions:
+          - refresh_explorer
+          - open_file: target/run/nyc_taxi/models/trips.sql
+      - id: b18
+        say: "There it is: create view, followed by your select. dbt builds the view under a temporary name, then swaps it in."
+        zoom: code-mid
+        card: { eyebrow: "target/run", title: "create view … as (", sub: "dbt wrote this line, not you.", pos: top-right }
+        actions:
+          - point: { editor_line: 3 }
+      - id: b19
+        say: "And the source call became read parquet, with the file pattern from sources.yml."
+        zoom: code-mid
+        actions:
+          - point: { editor_line: 17 }
+
+  - id: s07
+    kind: app
+    chapter: "Commit the model"
+    beats:
+      - id: b20
+        say: "Last step: commit and push. Open the Git tab. Trips.sql is listed as a new file. The target and logs folders are not, because git ignores them."
+        zoom: git-panel
+        actions:
+          - close_tab: target/run/nyc_taxi/models/trips.sql
+          - git_tab
+      - id: b21
+        say: "Stage it with the plus button, type a message, add the trips staging model, and click Commit."
+        zoom: git-panel
+        actions:
+          - git_stage: trips.sql
+          - git_message: Add the trips staging model
+          - git_commit
+      - id: b22
+        say: "Click Sync Changes, and the commit goes to GitHub."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s07b
+    kind: browser
+    chapter: "On GitHub"
+    beats:
+      - id: b22b
+        say: "On GitHub, the models folder now holds trips dot sql, next to sources dot yml."
+        zoom: center-wide
+        actions:
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/tree/main/models
+
+  - id: s08
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b23, step: 1, show: "Recap: A model is one select in one .sql file. Run: compile, wrap in create view, execute in DuckDB. dbt show prints the rows. Commit and push in the Git tab.", say: "To recap. A model is one select in one file. dbt compiles it, wraps it in create view, and runs it in DuckDB. dbt show prints the rows, and the Git tab sends it to GitHub. Next, we add two more models that build on trips." }
+
+  - id: s09
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.4 · Dependencies & Jinja. Code: github.com/Nuri1977/nyc-taxi-dbt."

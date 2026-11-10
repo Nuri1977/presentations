@@ -1,0 +1,28 @@
+models:
+  - name: trips
+    description: Cleaned 2025 green taxi trips; one row per trip. Rows with no distance or no charge are removed.
+    columns:
+      - name: pickup_at
+        description: When the meter started.
+      - name: pickup_zone_id
+        description: TLC taxi zone where the trip started (joins taxi_zone_lookup.LocationID).
+      - name: payment_type
+        description: TLC payment code; 1 is credit card (see the data dictionary).
+      - name: total_amount
+        description: Total charged to the rider, in US dollars.
+  - name: trips_per_month
+    description: Trips and average fare per month and pickup borough.
+    columns:
+      - name: month
+        description: Month of pickup.
+      - name: borough
+        description: Pickup borough from the zone lookup.
+      - name: trips
+        description: Trips that month from that borough.
+  - name: top_pickup_zones
+    description: The ten busiest pickup zones of 2025.
+    columns:
+      - name: zone_id
+        description: TLC zone id; the grain of this table.
+      - name: trips
+        description: Trips that started in the zone.

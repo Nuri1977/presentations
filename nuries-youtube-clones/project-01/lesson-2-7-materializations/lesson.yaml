@@ -1,0 +1,132 @@
+# Lesson 2.7 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-7
+number: "2.7"
+title: "Materializations: views and tables"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.7 Materializations (now 2.7), dropdown rule of 10 Nov 2026"
+next: "Lesson 2.8 · Tests"
+summary: "Views or tables? Make the three marts of the nyc_taxi project tables with one line in dbt_project.yml, keep trips a view with a config block, run the project from Rosetta DBT Studio's Project menu, and check the result in information_schema in Studio's SQL Editor. Commit and push."
+start_state: lesson-2-6-end
+tags: [dbt materializations, view, table, dbt_project.yml, config, DuckDB, NYC taxi]
+target_minutes: 4
+rehearsal: true
+start_notes:
+  - "Start state `lesson-2-6-end`: a clone of what Lesson 2.6 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera): every model is a view."
+draft_changes:
+  - "The plan's s02 queried information_schema before the change. Studio's SQL Editor holds the DuckDB file open, which can block dbt's write, so the lesson changes the config and runs first, then queries once; the slide shows the before state (all views)."
+  - "+materialized: table is added at the end of the nyc_taxi block (after +persist_docs), the same settings as plan A8 in a different order."
+accuracy_notes:
+  - "Checked off camera on 10 Nov 2026: after the change, trips is VIEW; trips_per_month, top_pickup_zones and monthly_summary are BASE TABLE; the seed taxi_zone_lookup is BASE TABLE."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.7. Materializations: views and tables. Badges: view, table, config()."
+
+  - id: s01
+    kind: slide
+    chapter: "View or table?"
+    slide: compare
+    beats:
+      - { id: b01, step: 1, show: "View: stores only the query; always fresh; slower to read. Table: stores the rows; fast to read; fresh as of the last run.", say: "dbt can build a model as a view or as a table. A view stores only the query, so it is always fresh, but every read runs it again. A table stores the rows: fast to read, and as fresh as the last run." }
+      - { id: b02, step: 2, show: "Right now: every model is a view (dbt's default). Plan: trips stays a view, the three marts become tables. Later: incremental, ephemeral.", say: "Right now every model is a view, the default. We keep trips a view, a thin layer over the files, and make the three marts tables, because people query those. Incremental and ephemeral models come later." }
+
+  - id: s02
+    kind: app
+    chapter: "One line for the whole project"
+    beats:
+      - id: b03
+        say: "Open the project, and open dbt project dot yml."
+        zoom: explorer
+        actions:
+          - open_project: nyc_taxi
+          - open_file: dbt_project.yml
+      - id: b04
+        say: "Under nyc taxi, add plus materialized, table. Every model in the project becomes a table. Save."
+        zoom: code-mid
+        actions:
+          - type_end: "    +materialized: table\n"
+          - click_save
+          - expect_file: { path: dbt_project.yml, snippet: ../snippets/2.7/dbt_project.yml }
+
+  - id: s03
+    kind: app
+    chapter: "Keep trips a view"
+    beats:
+      - id: b05
+        say: "But trips should stay a view. Open trips dot sql. At the very top, add a config block: materialized equals view. A setting in the model wins over the project file. Save."
+        zoom: code-close
+        actions:
+          - close_tab: dbt_project.yml
+          - open_file: models/trips.sql
+          - type_start: "{{ config(materialized='view') }}\n\n"
+          - click_save
+          - expect_file: { path: models/trips.sql, snippet: ../snippets/2.7/trips.sql }
+
+  - id: s04
+    kind: app
+    chapter: "Run and check"
+    beats:
+      - id: b06
+        say: "Run the project: Project menu, Run."
+        zoom: project-menu
+        actions:
+          - project_menu: Run
+      - id: b07
+        say: "The log now says sql view model for trips, and sql table model for the other three."
+        zoom: terminal-close
+        card: { eyebrow: "dbt run", title: "1 view, 3 tables", sub: "PASS=4 ERROR=0", pos: top-right }
+        actions:
+          - wait_text: { text: "PASS=4", label: run output }
+      - id: b08
+        say: "Let's check in DuckDB. Open the SQL Editor, pick nyc taxi dev, and list the tables in the main schema, with their type."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: nyc_taxi_dev
+          - type: "select table_name, table_type from information_schema.tables where table_schema = 'main' order by 1;"
+      - id: b09
+        say: "Run it."
+        zoom: explorer
+        actions:
+          - sql_run
+      - id: b10
+        say: "Trips is a view. The three marts are base tables, and so is the seed."
+        zoom: sql-results
+        card: { eyebrow: "information_schema.tables", title: "trips: VIEW", sub: "marts and seed: BASE TABLE", pos: top-right }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b11
+        say: "Back in the project, the Git tab shows the two changed files."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - git_tab
+      - id: b12
+        say: "Stage all, type a message, materialize the marts as tables, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Materialize the marts as tables
+          - git_commit
+      - id: b13
+        say: "Sync Changes, and it's on GitHub."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b14, step: 1, show: "Recap: view vs table; +materialized in dbt_project.yml for the project; config() in the model wins; check in information_schema; pushed.", say: "To recap: views store the query, tables store the rows. One line in dbt project dot yml sets the default, and a config block in a model overrides it. Next, we test the data." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.8 · Tests. Code: github.com/Nuri1977/nyc-taxi-dbt."

@@ -1,0 +1,112 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:08.090
+Our raw data is twelve parquet files, one per month of 2025.
+
+00:00:08.370 --> 00:00:12.460
+They are too big for git, so they stay in a data folder that git ignores.
+
+00:00:12.740 --> 00:00:19.324
+DuckDB reads them in place, and a source, in sources dot yml, gives them a name dbt can use.
+
+00:00:20.274 --> 00:00:24.991
+The second file is small: a lookup of the 265 taxi zones.
+
+00:00:25.271 --> 00:00:27.959
+Small CSV files like this one are seeds.
+
+00:00:28.239 --> 00:00:32.041
+They live in the repository, and dbt loads them as tables.
+
+00:00:32.991 --> 00:00:37.173
+The files come from the New York City Taxi and Limousine Commission website.
+
+00:00:37.453 --> 00:00:43.632
+Under 2025, download Green Taxi Trip Records for each month, January to December.
+
+00:00:43.912 --> 00:00:45.400
+The links are in the description.
+
+00:00:46.350 --> 00:00:51.044
+Further down the same page, download the Taxi Zone Lookup Table, as CSV.
+
+00:00:51.994 --> 00:00:55.070
+In Studio, open the nyc taxi project.
+
+00:00:55.350 --> 00:00:58.580
+Right-click the project, choose New Folder, and call it data.
+
+00:01:01.529 --> 00:01:03.886
+Inside data, make a folder called raw.
+
+00:01:07.334 --> 00:01:13.178
+Now move the twelve parquet files into data, raw, and the zone lookup CSV into seeds.
+
+00:01:13.458 --> 00:01:15.564
+Refresh the explorer, and there they are.
+
+00:01:16.514 --> 00:01:19.003
+Next, tell dbt about the raw files.
+
+00:01:19.283 --> 00:01:22.810
+Right-click models, New File, and call it sources dot yml.
+
+00:01:23.760 --> 00:01:26.146
+A source called raw, with a short description.
+
+00:01:28.160 --> 00:01:32.043
+It has one table, green trips: one row per green taxi trip.
+
+00:01:32.993 --> 00:01:38.578
+And where the table lives: external location, a read parquet call over all twelve files.
+
+00:01:38.858 --> 00:01:44.190
+Union by name lines up the columns, even if a month's file has them in a different order.
+
+00:01:44.470 --> 00:01:45.069
+Save.
+
+00:01:46.019 --> 00:01:47.773
+Does dbt find the data?
+
+00:01:48.053 --> 00:01:53.000
+In the command box, type dbt show, inline, and a query that counts the rows of the source.
+
+00:01:54.280 --> 00:01:55.088
+Press Enter.
+
+00:01:59.468 --> 00:02:10.116
+dbt turns the source into the read parquet call, and DuckDB counts five hundred ninety-one thousand, three hundred seventy-five trips, in 2025.
+
+00:02:11.066 --> 00:02:12.094
+Now the Git tab.
+
+00:02:12.374 --> 00:02:16.235
+Only two files changed: sources dot yml and the CSV.
+
+00:02:16.515 --> 00:02:21.029
+The parquet files are not here, because the gitignore leaves out the data folder.
+
+00:02:21.979 --> 00:02:27.115
+Stage all, type a message, declare the raw trips source and add the zone lookup, and commit.
+
+00:02:30.669 --> 00:02:32.085
+Then click Sync Changes.
+
+00:02:32.365 --> 00:02:34.318
+Studio pushes the commit to GitHub.
+
+00:02:35.769 --> 00:02:41.691
+On GitHub, the repository now has the models and seeds folders, and the latest commit message.
+
+00:02:42.641 --> 00:02:46.045
+To recap: the trip files sit in data raw, outside git.
+
+00:02:46.325 --> 00:02:47.711
+The zone lookup is a seed.
+
+00:02:47.991 --> 00:02:53.837
+And sources dot yml names the raw files, raw dot green trips, which dbt can read.
+
+00:02:54.117 --> 00:02:56.482
+Next, we build our first model on top of it.

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.1 · Install Rosetta DBT Studio</title>
+<!-- Slide scenes for Lesson 1.1. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (v2). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .title-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.3fr .7fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .title-grid .badges { margin-top: 48px; }
+  .hero-icon { width: 500px; filter: drop-shadow(0 40px 120px rgba(255,122,26,.45)); justify-self: center; }
+  .lockup { position: absolute; left: var(--safe); bottom: 48px; height: 104px; opacity: .95; }
+
+  .statement { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 64px; }
+  .statement .big { font-size: 108px; font-weight: 900; line-height: 1.04; letter-spacing: -0.015em; text-wrap: balance; }
+  .flowchips { display: grid; grid-template-columns: 1fr 70px 1fr 70px 1fr; align-items: center; }
+  .fchip { padding: 34px 36px; display: flex; align-items: center; gap: 26px; }
+  .fchip .num { display: inline-grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: var(--orange); color: #111; font-weight: 900; font-size: 42px; flex: none; }
+  .fchip b { font-size: 46px; font-weight: 900; display: block; }
+  .fchip span { font-size: 32px; color: var(--muted); font-weight: 600; }
+  .chev { text-align: center; font-size: 76px; color: var(--orange-2); font-weight: 300; }
+
+  /* DMG window, rebuilt from the release's assets/dmg-background.png and electron-builder layout (540x380, icons at 127,214 and 412,214) */
+  .dmg-grid { flex: 1; display: grid; grid-template-columns: 918px 1fr; gap: 48px; align-items: center; margin-top: 10px; }
+  .win { position: relative; width: 918px; border-radius: 22px; overflow: hidden; box-shadow: 0 50px 120px rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18); }
+  .win .bar { height: 44px; background: #2a2c31; display: flex; align-items: center; gap: 14px; padding: 0 22px; }
+  .win .bar i { width: 20px; height: 20px; border-radius: 50%; background: #5a5d64; display: block; }
+  .win .canvas { position: relative; width: 918px; height: 646px; background: url(../brand/dmg-background.png) center / 918px 646px no-repeat; }
+  .ico { position: absolute; width: 200px; height: 200px; margin-left: -100px; margin-top: -100px; display: grid; place-items: center; }
+  .ico img { width: 180px; } .ico svg { width: 170px; }
+  .ico.app { left: 216px; top: 364px; }
+  .ico.apps { left: 700px; top: 364px; }
+  .lbl { position: absolute; top: 488px; width: 260px; margin-left: -130px; text-align: center; font-size: 24px; font-weight: 750; color: #222; }
+  .lbl.app { left: 216px; } .lbl.apps { left: 700px; }
+  .ghost { left: 650px; top: 340px; opacity: .55; }
+  .cur { position: absolute; left: 690px; top: 380px; width: 46px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+  .prompt { position: absolute; left: 84px; top: 120px; width: 750px; padding: 40px 44px; border-radius: 22px; background: rgba(28,30,36,.97);
+    border: 1px solid rgba(255,255,255,.2); box-shadow: 0 40px 120px rgba(0,0,0,.7); display: grid; grid-template-columns: 110px 1fr; gap: 28px; }
+  .prompt img { width: 110px; }
+  .prompt p { margin: 0; font-size: 32px; line-height: 1.35; font-weight: 650; color: #fff; }
+  .prompt .q { margin-top: 12px; font-size: 28px; color: var(--muted); font-weight: 560; }
+  .prompt .btns { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 18px; margin-top: 8px; }
+  .prompt .btns span { padding: 14px 34px; border-radius: 12px; font-size: 30px; font-weight: 800; background: rgba(255,255,255,.1); }
+  .prompt .btns span.open { background: var(--orange); color: #111; box-shadow: 0 0 0 4px rgba(255,122,26,.35); }
+  .steps3 { display: flex; flex-direction: column; gap: 26px; }
+  .st { padding: 30px 32px; display: flex; gap: 24px; align-items: center; }
+  .st .num { display: inline-grid; place-items: center; width: 70px; height: 70px; border-radius: 50%; background: var(--orange); color: #111; font-weight: 900; font-size: 38px; flex: none; }
+  .st b { font-size: 40px; font-weight: 880; display: block; }
+  .st span { font-size: 30px; color: var(--muted); font-weight: 600; }
+
+  /* installed */
+  .inst { flex: 1; display: grid; grid-template-columns: .8fr 1.2fr; gap: 36px; margin-top: 44px; }
+  .box { padding: 44px 46px; display: flex; flex-direction: column; gap: 22px; }
+  .box .k { font-size: 30px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--orange-2); }
+  .box h3 { margin: 0; font-size: 56px; font-weight: 900; line-height: 1.1; }
+  .box .path { font-family: var(--mono); font-size: 30px; color: var(--muted); }
+  .box ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 18px; }
+  .box li { font-size: 42px; font-weight: 750; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.08); padding-bottom: 14px; }
+  .box li span { font-family: var(--mono); color: var(--orange-2); font-weight: 700; }
+  .box img { height: 140px; align-self: flex-start; }
+  .nextstrip { grid-column: 1 / -1; padding: 28px 40px; font-size: 40px; font-weight: 800; display: flex; align-items: center; gap: 24px; }
+
+  .next-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .next-grid h1 { font-size: 132px; }
+  .logo-hero { width: 640px; justify-self: center; filter: drop-shadow(0 30px 90px rgba(255,122,26,.3)); }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<!-- title -->
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 1 · Lesson 1.1 · Set up</div>
+      <h1 style="margin-top:28px;font-size:144px">Install Rosetta <span class="accent">DBT Studio</span></h1>
+      <p class="lead">One app. It installs Python and dbt Core for you.</p>
+      <div class="badges"><span class="badge">Version 1.7.6</span><span class="badge">Mac · Windows · Linux</span><span class="badge">About 5 minutes</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+</section>
+
+<!-- toolkit -->
+<section class="stage" data-id="toolkit">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">One app for the whole course</div>
+    <div class="statement s" data-step="1">
+      <div class="big">Install <span class="accent">one app</span>. It sets up Python and dbt for you.</div>
+      <div class="flowchips">
+        <div class="card fchip"><span class="num">1</span><div><b>Download</b><span>from GitHub</span></div></div>
+        <div class="chev">›</div>
+        <div class="card fchip"><span class="num">2</span><div><b>Copy</b><span>to Applications</span></div></div>
+        <div class="chev">›</div>
+        <div class="card fchip"><span class="num">3</span><div><b>Set up</b><span>Python + dbt Core</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:12%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<!-- dmg -->
+<section class="stage" data-id="dmg">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Copy it to Applications</div>
+    <h2>Open the <span class="mono" style="font-size:.86em">.dmg</span>, drag, <span class="accent">open</span></h2>
+    <div class="dmg-grid">
+      <div class="win s" data-step="1">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="canvas">
+          <div class="ico app"><img src="../brand/icon.svg" alt=""></div>
+          <div class="ico apps"><svg viewBox="0 0 120 100"><path d="M8 18c0-5 4-9 9-9h28l10 11h48c5 0 9 4 9 9v56c0 5-4 9-9 9H17c-5 0-9-4-9-9z" fill="#4aa3ff"/><path d="M8 34h104v51c0 5-4 9-9 9H17c-5 0-9-4-9-9z" fill="#6cb8ff"/><path d="M48 52l12-10 12 10M60 42v30" stroke="#1d5fa8" stroke-width="5" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="lbl app">Rosetta DBT Studio</div>
+          <div class="lbl apps">Applications</div>
+          <div class="ico ghost s" data-step="2" data-until="2"><img src="../brand/icon.svg" alt=""></div>
+          <svg class="cur s" data-step="2" data-until="2" viewBox="0 0 28 28"><path d="M4 2 L4 22 L9.5 16.8 L13.2 25 L16.4 23.6 L12.8 15.6 L20 15.6 Z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <div class="prompt s" data-step="3">
+            <img src="../brand/icon.svg" alt="">
+            <div><p>“Rosetta DBT Studio” is an app downloaded from the internet.</p><p class="q">macOS asks once: are you sure you want to open it?</p></div>
+            <div class="btns"><span>Cancel</span><span class="open">Open</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="steps3">
+        <div class="card st s" data-step="1"><span class="num">1</span><div><b>Open the .dmg</b><span>from your Downloads</span></div></div>
+        <div class="card st s" data-step="2"><span class="num">2</span><div><b>Drag to Applications</b><span>wait for the copy</span></div></div>
+        <div class="card st s" data-step="3"><span class="num">3</span><div><b>Open → Open</b><span>first launch only</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:12%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<!-- installed -->
+<section class="stage" data-id="installed">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What was installed</div>
+    <h2>One app, <span class="accent">its own</span> Python and dbt</h2>
+    <div class="inst">
+      <div class="card box s" data-step="1">
+        <img src="../brand/icon.svg" alt="">
+        <div class="k">Applications</div>
+        <h3>Rosetta DBT Studio 1.7.6</h3>
+      </div>
+      <div class="card box s" data-step="1">
+        <div class="k">Studio's own folder</div>
+        <ul>
+          <li>Python <span>3.10.17</span></li>
+          <li>dbt Core <span>1.12.6</span></li>
+          <li>dbt-duckdb <span>1.11.1</span></li>
+        </ul>
+        <div class="path">~/Library/Application Support/rosetta-dbt-studio</div>
+      </div>
+      <div class="card nextstrip s" data-step="2"><span class="pill">Next</span>Create the dbt project and connect it to GitHub</div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:12%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<!-- closing -->
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 2.1</h1>
+      <h2 style="font-size:96px">Create the <span class="accent">dbt project</span></h2>
+    </div>
+    <img class="logo-hero" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:06.629
+dbt can build a model as a view or as a table.
+
+00:00:06.909 --> 00:00:11.932
+A view stores only the query, so it is always fresh, but every read runs it again.
+
+00:00:12.212 --> 00:00:16.430
+A table stores the rows: fast to read, and as fresh as the last run.
+
+00:00:17.380 --> 00:00:19.669
+Right now every model is a view, the default.
+
+00:00:19.949 --> 00:00:26.433
+We keep trips a view, a thin layer over the files, and make the three marts tables, because people query those.
+
+00:00:26.713 --> 00:00:29.195
+Incremental and ephemeral models come later.
+
+00:00:30.145 --> 00:00:33.925
+Open the project, and open dbt project dot yml.
+
+00:00:35.888 --> 00:00:39.343
+Under nyc taxi, add plus materialized, table.
+
+00:00:39.623 --> 00:00:41.935
+Every model in the project becomes a table.
+
+00:00:42.215 --> 00:00:42.815
+Save.
+
+00:00:43.765 --> 00:00:45.079
+But trips should stay a view.
+
+00:00:45.359 --> 00:00:46.995
+Open trips dot sql.
+
+00:00:47.275 --> 00:00:51.308
+At the very top, add a config block: materialized equals view.
+
+00:00:51.588 --> 00:00:54.282
+A setting in the model wins over the project file.
+
+00:00:54.562 --> 00:00:55.162
+Save.
+
+00:00:56.112 --> 00:00:58.424
+Run the project: Project menu, Run.
+
+00:00:59.374 --> 00:01:04.651
+The log now says sql view model for trips, and sql table model for the other three.
+
+00:01:05.601 --> 00:01:07.112
+Let's check in DuckDB.
+
+00:01:07.392 --> 00:01:13.634
+Open the SQL Editor, pick nyc taxi dev, and list the tables in the main schema, with their type.
+
+00:01:17.886 --> 00:01:18.457
+Run it.
+
+00:01:22.065 --> 00:01:23.033
+Trips is a view.
+
+00:01:23.313 --> 00:01:26.161
+The three marts are base tables, and so is the seed.
+
+00:01:27.111 --> 00:01:30.591
+Back in the project, the Git tab shows the two changed files.
+
+00:01:32.845 --> 00:01:37.354
+Stage all, type a message, materialize the marts as tables, and commit.
+
+00:01:42.016 --> 00:01:44.051
+Sync Changes, and it's on GitHub.
+
+00:01:47.116 --> 00:01:50.407
+To recap: views store the query, tables store the rows.
+
+00:01:50.687 --> 00:01:57.373
+One line in dbt project dot yml sets the default, and a config block in a model overrides it.
+
+00:01:57.653 --> 00:01:58.984
+Next, we test the data.

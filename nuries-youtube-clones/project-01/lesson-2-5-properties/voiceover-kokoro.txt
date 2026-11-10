@@ -1,0 +1,35 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Properties are yammel files that sit next to your sequel.
+b01	They describe models, seeds and sources: what a table is, what each column means, and later, the tests.
+b02	We already have one: sources dot yammel.
+b02	Today we add schema dot yammel for the models, and seeds dot yammel for the zone lookup.
+b03	Open the project.
+b03	In models, create a new file: schema dot yammel.
+b04	It is long, so paste it.
+b04	One entry per model: a name, a description, and the columns that need explaining.
+b04	The code is in the repository.
+b05	For example, payment type: one means credit card.
+b05	Anyone reading the model learns that here, not from a PDF.
+b05	Save.
+b06	Now the seed.
+b06	In seeds, a new file: seeds dot yammel.
+b07	This one is short: the zone lookup, where it comes from, and its key column, Location ID.
+b07	Save.
+b08	Descriptions can also go into the database itself.
+b08	Open D B T project dot yammel, and add a models block at the end.
+b09	Under N Y C taxi, persist docs, with relation and columns set to true.
+b09	Save.
+b10	Run the project from the Project menu, so D B T rebuilds the models with their comments.
+b11	Three models, no errors.
+b12	Let's look inside duck D B.
+b12	Open the sequel Editor, pick the N Y C taxi dev connection, and ask duck D B for the columns of trips per month, with their comments.
+b13	Run it with the green arrow.
+b14	Each column carries the description from schema dot yammel.
+b14	Average fare has none, because we didn't describe it.
+b15	So one description shows up in three places: in the docs site, which we build next lesson, in the database, and for everyone who reads the code.
+b16	Back in the project, open the Git tab: two new yammel files, and the change to D B T project dot yammel.
+b17	Stage all, type a message, describe the models and the zone seed, and commit.
+b18	Sync Changes, and it's on git hub.
+b19	To recap: properties are yammel next to your sequel.
+b19	Schema dot yammel describes the models, seeds dot yammel the seed, and persist docs copies the descriptions into duck D B.
+b19	Next, the docs site and the dag.

@@ -1,0 +1,135 @@
+1
+00:00:03,350 --> 00:00:04,784
+Welcome to Project 1.
+
+2
+00:00:05,064 --> 00:00:10,084
+In this course, you build a real analytics project with dbt and DuckDB.
+
+3
+00:00:10,364 --> 00:00:17,874
+You start from an empty folder, and finish with a tested, automated pipeline, all inside Rosetta DBT Studio.
+
+4
+00:00:18,824 --> 00:00:26,912
+We start with a full year of New York City green taxi trips: twelve monthly parquet files, and a small lookup table of taxi zones.
+
+5
+00:00:27,862 --> 00:00:31,687
+dbt turns the raw files into one clean model of trips.
+
+6
+00:00:32,637 --> 00:00:40,430
+On top of it, three small tables: trips per month and borough, the busiest pickup zones, and a monthly summary of how riders pay.
+
+7
+00:00:41,380 --> 00:00:45,728
+We add tests that catch bad data, and documentation with a lineage graph.
+
+8
+00:00:46,678 --> 00:00:55,023
+Finally, GitHub Actions rebuilds everything on every change, and publishes the finished DuckDB database, so anyone can query it.
+
+9
+00:00:55,973 --> 00:01:00,424
+The data comes from the New York City Taxi and Limousine Commission, the TLC.
+
+10
+00:01:00,704 --> 00:01:08,080
+Every trip has its pickup and drop-off time, the pickup and drop-off zones, the distance, how the rider paid, and what it cost.
+
+11
+00:01:09,030 --> 00:01:16,242
+For 2025, that is about five hundred ninety thousand trips, in twelve files of about one megabyte each.
+
+12
+00:01:16,522 --> 00:01:18,898
+Small enough to build on a laptop in seconds.
+
+13
+00:01:19,848 --> 00:01:23,416
+A second file maps every zone number to its name and borough.
+
+14
+00:01:23,696 --> 00:01:30,011
+Zone seventy-four, for example, is East Harlem North, in Manhattan, the busiest pickup zone of the year.
+
+15
+00:01:30,961 --> 00:01:33,643
+You need one app: Rosetta DBT Studio.
+
+16
+00:01:33,923 --> 00:01:42,341
+It is open source, it installs Python and dbt Core for you, and it gives you an editor, a terminal, lineage, and git, in one window.
+
+17
+00:01:43,291 --> 00:01:44,970
+DuckDB is the database.
+
+18
+00:01:45,250 --> 00:01:49,442
+It lives in a single file on your computer, so there is no server to set up.
+
+19
+00:01:49,722 --> 00:01:53,229
+And GitHub keeps your code, and later runs the pipeline for you.
+
+20
+00:01:54,179 --> 00:01:58,220
+The whole project lives in one public repository on GitHub.
+
+21
+00:01:58,500 --> 00:02:03,255
+We create it in lesson 2.1, and every lesson ends with a commit and a push.
+
+22
+00:02:04,205 --> 00:02:07,068
+So each lesson's commit is the code for that lesson.
+
+23
+00:02:07,348 --> 00:02:10,719
+The link to the repository is in every video description.
+
+24
+00:02:11,669 --> 00:02:13,485
+Build your own copy as you watch.
+
+25
+00:02:13,765 --> 00:02:17,028
+And if you get stuck, compare it with the course repository.
+
+26
+00:02:17,978 --> 00:02:19,541
+The course has three modules.
+
+27
+00:02:19,821 --> 00:02:23,114
+First, set up: install Rosetta DBT Studio.
+
+28
+00:02:24,064 --> 00:02:34,191
+Second, dbt basics: create the project and connect it to GitHub, get the data, then models, Jinja, properties, docs, materializations, and tests.
+
+29
+00:02:35,141 --> 00:02:42,012
+Third, ship it: automate the build with GitHub Actions, and turn the repository into a portfolio project.
+
+30
+00:02:42,962 --> 00:02:47,926
+You need a computer, a GitHub account and the basics of git, and some basic SQL.
+
+31
+00:02:48,206 --> 00:02:51,227
+No dbt installed yet: we start from zero.
+
+32
+00:02:51,507 --> 00:02:52,253
+New to git?
+
+33
+00:02:52,533 --> 00:02:54,044
+There are links in the description.
+
+34
+00:02:54,324 --> 00:02:55,749
+See you in the first lesson.

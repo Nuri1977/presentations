@@ -1,0 +1,175 @@
+# Lesson 2.8 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-8
+number: "2.8"
+title: "Tests: trust your data"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.8 Tests (now 2.8), dropdown rule of 10 Nov 2026"
+next: "Lesson 3.1 · Ship & Automate"
+summary: "Add data tests to the nyc_taxi project: not_null and unique on each table's grain, and accepted_values on the borough. Run them from Rosetta DBT Studio's Project menu, read a real failure (the N/A borough of zone 265, Outside of NYC), fix it, test one model from the Model menu, then dbt build: run and test in DAG order. Commit and push."
+start_state: lesson-2-7-end
+tags: [dbt tests, data tests, unique, not_null, accepted_values, dbt build, NYC taxi]
+target_minutes: 5
+rehearsal: true
+start_notes:
+  - "Start state `lesson-2-7-end`: a clone of what Lesson 2.7 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera)."
+draft_changes:
+  - "The deliberate failure is the plan's own accepted_values list: it misses 'N/A', which the 2025 data has (zone 265, Outside of NYC, 255 trips). The failing rows are explained with a card rather than the SQL Editor."
+  - "Dropdowns: Project ▸ Test, Model ▸ Test on trips_per_month, Project ▸ Build."
+  - "accepted_values takes its list under arguments: on dbt Core 1.12.6 (parses with no warning)."
+accuracy_notes:
+  - "Checked off camera on 10 Nov 2026: first dbt test gives PASS=6 ERROR=1 (accepted_values, Got 1 result); after adding 'N/A', dbt build gives PASS=12 (1 seed, 4 models, 7 tests). Boroughs in trips_per_month: Manhattan, Queens, Brooklyn, Bronx, Unknown, N/A, Staten Island, EWR."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.8. Tests: trust your data. Badges: unique, not_null, accepted_values, dbt build."
+
+  - id: s01
+    kind: slide
+    chapter: "What a data test is"
+    slide: tests
+    beats:
+      - { id: b01, step: 1, show: "A data test is a query that returns the bad rows. Zero rows = pass.", say: "A dbt data test is a query that looks for bad rows. If it returns nothing, the test passes. If it returns rows, it fails." }
+      - { id: b02, step: 2, show: "Four built-in tests: unique, not_null, accepted_values, relationships. Grain: one row per month, per zone.", say: "dbt has four built in: unique, not null, accepted values, and relationships. Start with the grain: the column that should be unique and never empty, like the month in monthly summary." }
+
+  - id: s02
+    kind: app
+    chapter: "Add tests in YAML"
+    beats:
+      - id: b03
+        say: "Open the project, and open schema dot yml. Tests go right under the column they check."
+        zoom: explorer
+        actions:
+          - open_project: nyc_taxi
+          - open_file: models/schema.yml
+      - id: b04
+        say: "Under borough, in trips per month: accepted values, with the boroughs we expect."
+        zoom: code-mid
+        actions:
+          - insert_at: { line: 19, text: "\n        data_tests:\n          - accepted_values:\n              arguments:\n                values: ['Bronx', 'Brooklyn', 'EWR', 'Manhattan', 'Queens', 'Staten Island', 'Unknown']" }
+      - id: b05
+        say: "Zone id in top pickup zones is that table's grain: not null and unique."
+        zoom: code-mid
+        actions:
+          - insert_at: { line: 30, text: "\n        data_tests: [not_null, unique]" }
+      - id: b06
+        say: "The same for month in monthly summary. Save."
+        zoom: code-mid
+        actions:
+          - insert_at: { line: 38, text: "\n        data_tests: [not_null, unique]" }
+          - click_save
+          - expect_file: { path: models/schema.yml, snippet: ../snippets/2.8/schema_fail.yml }
+      - id: b07
+        say: "And in seeds dot yml, Location ID: not null and unique. Save."
+        zoom: code-close
+        actions:
+          - close_tab: models/schema.yml
+          - open_file: seeds/seeds.yml
+          - insert_at: { line: 6, text: "\n        data_tests: [not_null, unique]" }
+          - click_save
+          - expect_file: { path: seeds/seeds.yml, snippet: ../snippets/2.8/seeds.yml }
+
+  - id: s03
+    kind: app
+    chapter: "Run the tests"
+    beats:
+      - id: b08
+        say: "Run them all: Project menu, Test."
+        zoom: project-menu
+        actions:
+          - close_tab: seeds/seeds.yml
+          - project_menu: Test
+      - id: b09
+        say: "Six pass, one fails: accepted values on borough. Got one result, so one borough is not in our list."
+        zoom: terminal-close
+        card: { eyebrow: "dbt test", title: "FAIL 1: accepted_values", sub: "PASS=6 ERROR=1", pos: top-right }
+        actions:
+          - wait_text: { text: "ERROR=1", label: test output }
+      - id: b10
+        say: "It is N A. The zone lookup has a zone two sixty-five, outside of New York City, with the borough N A, and about two hundred fifty trips in 2025 started there. The data is right; our list was wrong."
+        zoom: terminal-close
+        card: { eyebrow: "The failing value", title: "borough = 'N/A'", sub: "Zone 265, Outside of NYC: 255 trips in 2025", pos: top-right }
+
+  - id: s04
+    kind: app
+    chapter: "Fix and test one model"
+    beats:
+      - id: b11
+        say: "Add N A to the list, and save."
+        zoom: code-mid
+        actions:
+          - open_file: models/schema.yml
+          - insert_at: { line: 23, back: 1, text: ", 'N/A'" }
+          - click_save
+          - expect_file: { path: models/schema.yml, snippet: ../snippets/2.8/schema.yml }
+      - id: b12
+        say: "To check just this model, open trips per month, and in the Model menu choose Test."
+        zoom: model-menu
+        actions:
+          - close_tab: models/schema.yml
+          - open_file: models/trips_per_month.sql
+          - model_menu: Test
+      - id: b13
+        say: "One test on this model, and it passes."
+        zoom: terminal-close
+        actions:
+          - wait_text: { text: "PASS=1", label: model test output }
+
+  - id: s05
+    kind: slide
+    chapter: "dbt build"
+    slide: build
+    beats:
+      - { id: b14, step: 1, show: "build = seed + run + test, in DAG order. A failing test stops the models downstream of it.", say: "One more command: build. It seeds, runs and tests, in DAG order, so a failing test stops the models that depend on bad data." }
+
+  - id: s06
+    kind: app
+    chapter: "Build everything"
+    beats:
+      - id: b15
+        say: "Project menu, Build."
+        zoom: project-menu
+        actions:
+          - project_menu: Build
+      - id: b16
+        say: "One seed, four models, seven tests. Twelve passes, no errors."
+        zoom: terminal-close
+        card: { eyebrow: "dbt build", title: "PASS=12", sub: "1 seed · 4 models · 7 tests", pos: top-right }
+        actions:
+          - wait_text: { text: "PASS=12", label: build output, timeoutMs: 180000 }
+
+  - id: s07
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b17
+        say: "The Git tab: schema dot yml and seeds dot yml changed."
+        zoom: git-panel
+        actions:
+          - close_tab: models/trips_per_month.sql
+          - git_tab
+      - id: b18
+        say: "Stage all, type a message, add data tests, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Add data tests
+          - git_commit
+      - id: b19
+        say: "Sync Changes. That's the end of dbt basics."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s08
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b20, step: 1, show: "Recap: tests in YAML; a failure that taught us about the data; Model ▸ Test for one model; Project ▸ Build = run + test in order; pushed.", say: "To recap: tests live in YAML next to the columns. A failing test told us something true about the data. And build runs and tests everything, in order. That's dbt basics. Next, we ship it: GitHub Actions builds the project on every push." }
+
+  - id: s09
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 3.1 · Ship & Automate. Code: github.com/Nuri1977/nyc-taxi-dbt."

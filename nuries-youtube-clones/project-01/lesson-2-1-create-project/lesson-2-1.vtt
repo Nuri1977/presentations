@@ -1,0 +1,115 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:05.405
+A dbt project is a folder.
+
+00:00:05.685 --> 00:00:15.641
+Models, seeds, tests and macros live in their own subfolders, and one file at the top, dbt_project.yml, gives the project its name and settings.
+
+00:00:16.591 --> 00:00:20.535
+A second file, profiles.yml, says where dbt runs.
+
+00:00:20.815 --> 00:00:25.612
+Our profile has one target, dev, and it points at a DuckDB database file.
+
+00:00:26.562 --> 00:00:27.855
+First, the database.
+
+00:00:28.135 --> 00:00:31.550
+On the home screen, click New Connection, and choose DuckDB.
+
+00:00:32.815 --> 00:00:34.557
+Name it nyc taxi dev.
+
+00:00:34.837 --> 00:00:40.624
+For the file, type a path next to your projects folder: nyc taxi dev dot duckdb.
+
+00:00:40.904 --> 00:00:44.683
+DuckDB creates the file the first time dbt connects.
+
+00:00:44.963 --> 00:00:45.563
+Save.
+
+00:00:46.513 --> 00:00:47.584
+Now the project.
+
+00:00:47.864 --> 00:00:52.295
+Go back home, open the DBT Project card, and click New Project.
+
+00:00:54.867 --> 00:00:56.405
+Call it nyc taxi.
+
+00:00:56.685 --> 00:01:01.945
+Keep the template folders switched on, pick the nyc taxi dev connection, and save.
+
+00:01:04.487 --> 00:01:06.705
+Studio creates the folder and opens it.
+
+00:01:06.985 --> 00:01:10.582
+Here are the template folders, and the two files we just talked about.
+
+00:01:11.532 --> 00:01:21.714
+Open dbt project dot yml: the project name is nyc taxi, it uses the profile with the same name, and lists where each kind of file lives.
+
+00:01:22.664 --> 00:01:25.398
+Let's check that dbt can reach the database.
+
+00:01:25.678 --> 00:01:30.333
+In the command box under the terminal, type dbt debug, and press Enter.
+
+00:01:31.838 --> 00:01:36.303
+dbt finds the project and the profile, and connects to DuckDB.
+
+00:01:36.583 --> 00:01:37.677
+All checks passed.
+
+00:01:38.627 --> 00:01:47.072
+Before the first commit, add a dot gitignore file at the top of the project, so build output, logs, data and the database stay out of git.
+
+00:01:48.325 --> 00:01:52.472
+And a short README, so people who open the repository know what it is.
+
+00:01:59.718 --> 00:02:05.078
+Now create an empty repository on GitHub: the plus button, then New repository.
+
+00:02:06.028 --> 00:02:11.374
+Name it nyc taxi dbt, and make it public, so anyone can get the code.
+
+00:02:11.654 --> 00:02:13.498
+This rehearsal copy is private.
+
+00:02:13.778 --> 00:02:16.891
+Add no README, gitignore or license, and create it.
+
+00:02:17.841 --> 00:02:22.008
+Copy the HTTPS address of the new, empty repository.
+
+00:02:22.958 --> 00:02:27.277
+Back in Studio, open the Git tab, and click Initialize Repository.
+
+00:02:29.519 --> 00:02:35.810
+Stage all the changes, type a message, create the nyc taxi dbt project, and commit.
+
+00:02:38.763 --> 00:02:39.943
+Click Publish Branch.
+
+00:02:40.223 --> 00:02:44.371
+Studio asks for the remote: paste the repository address, and add it.
+
+00:02:44.651 --> 00:02:46.891
+Studio pushes the main branch to GitHub.
+
+00:02:47.841 --> 00:02:49.696
+Refresh the repository page.
+
+00:02:49.976 --> 00:02:55.311
+The project is on GitHub: the folders, the two YAML files, the gitignore, and the README.
+
+00:02:56.261 --> 00:03:05.856
+To recap: a DuckDB connection, a dbt project called nyc taxi, a passing dbt debug, and the first commit on GitHub.
+
+00:03:06.136 --> 00:03:09.268
+From now on, every lesson ends with a commit and a push.
+
+00:03:09.548 --> 00:03:10.806
+Next, we get the data.

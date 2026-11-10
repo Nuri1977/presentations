@@ -1,0 +1,82 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:08.813
+Open the project, and create one more model in models: monthly summary dot sql.
+
+00:00:13.857 --> 00:00:17.994
+First, a block called totals: the trips per month, from ref trips per month.
+
+00:00:20.624 --> 00:00:25.845
+Then a block called card: the trips paid by credit card each month, straight from ref trips.
+
+00:00:27.257 --> 00:00:30.522
+Join them by month, and work out the percent paid by card.
+
+00:00:30.802 --> 00:00:31.401
+Save.
+
+00:00:34.665 --> 00:00:40.252
+Describe it too: at the end of schema dot yml, paste the entry for monthly summary, and save.
+
+00:00:41.202 --> 00:00:43.327
+All those refs form a graph: the DAG.
+
+00:00:43.607 --> 00:00:46.058
+Directed, because every arrow points one way.
+
+00:00:46.338 --> 00:00:49.043
+Acyclic, because no model can depend on itself.
+
+00:00:49.993 --> 00:00:56.975
+dbt uses it for the build order, to run independent models in parallel, and to show you what a change affects.
+
+00:00:57.925 --> 00:01:02.954
+Back in monthly summary, open the Model menu, and choose Run plus model, upstream.
+
+00:01:03.234 --> 00:01:05.954
+That runs this model, and everything it depends on.
+
+00:01:06.904 --> 00:01:11.102
+Three models, in DAG order: trips, trips per month, then monthly summary.
+
+00:01:12.052 --> 00:01:12.990
+Now the docs.
+
+00:01:13.270 --> 00:01:22.044
+Open the Project menu, and choose Generate Docs. dbt reads the project and the database, and writes a small website into target.
+
+00:01:22.994 --> 00:01:24.561
+Then Project, Serve Docs.
+
+00:01:24.841 --> 00:01:28.013
+Studio starts a local web server, on port eighty eighty.
+
+00:01:29.476 --> 00:01:34.212
+In the browser, open localhost, port eighty eighty, and pick monthly summary.
+
+00:01:34.492 --> 00:01:39.754
+Here is the description from schema dot yml, every column, and what the model depends on.
+
+00:01:40.704 --> 00:01:47.940
+The button at the bottom right opens the lineage graph: the whole DAG, from the raw source and the seed, to monthly summary.
+
+00:01:48.890 --> 00:01:53.734
+Back in Studio, the Git tab shows the new model, and the change to schema dot yml.
+
+00:01:54.684 --> 00:01:58.384
+Stage all, type a message, add the monthly summary, and commit.
+
+00:02:03.284 --> 00:02:05.319
+Sync Changes, and it's on GitHub.
+
+00:02:08.384 --> 00:02:13.103
+To recap: refs form the DAG, and dbt uses it for order and impact.
+
+00:02:13.383 --> 00:02:16.720
+Run plus model builds a model with everything upstream.
+
+00:02:16.000 --> 00:02:20.990
+And two clicks give you a docs site, with descriptions and the lineage graph.
+
+00:02:21.270 --> 00:02:24.084
+Next, views or tables: materializations.

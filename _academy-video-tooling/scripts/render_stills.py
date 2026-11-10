@@ -35,6 +35,21 @@ h2.mono{font-family:"JetBrains Mono",monospace;font-size:21px;line-height:1.3;fo
 p{margin:14px 0 0;color:#d7dce8;font-size:17px;line-height:1.4;font-weight:620}
 </style></head><body><div class="content __POS__"><div class="eyebrow">__EYEBROW__</div><h2 class="__CLS__">__TITLE__</h2><p>__SUB__</p></div></body></html>"""
 
+# Slides v2 courses (course.yaml: slides_theme: v2) get bigger cards set in the course's own fonts.
+course = yaml.safe_load((C / 'course.yaml').read_text())
+if course.get('slides_theme') == 'v2':
+    import base64
+    fonts = C / 'slides-theme' / 'fonts'
+    face = lambda fam, f, w: (f"@font-face{{font-family:'{fam}';font-weight:{w};src:url(data:font/woff2;base64,"
+                              + base64.b64encode((fonts / f).read_bytes()).decode() + ") format('woff2')}")
+    CARD = (CARD.replace('<style>', '<style>' + face('Inter', 'Inter-Variable.woff2', '100 900') + face('JetBrains Mono', 'JetBrainsMono-Variable.woff2', '100 800'))
+            .replace('width:380px;padding:30px 32px', 'width:500px;padding:36px 40px')
+            .replace('font-size:13px;font-weight:850', 'font-size:18px;font-weight:850')
+            .replace('h2{margin:0;font-size:34px', 'h2{margin:0;font-size:44px')
+            .replace('font-size:21px;line-height:1.3', 'font-size:28px;line-height:1.3')
+            .replace('p{margin:14px 0 0;color:#d7dce8;font-size:17px', 'p{margin:16px 0 0;color:#d7dce8;font-size:24px')
+            .replace('.top-right{right:92px;top:108px}', '.top-right{right:72px;top:96px}'))
+
 with sync_playwright() as p:
     b = p.chromium.launch(args=['--force-color-profile=srgb', '--hide-scrollbars'])
     pg = b.new_page(viewport={'width': 1920, 'height': 1080}, device_scale_factor=2)

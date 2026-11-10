@@ -1,0 +1,77 @@
+/* Slides v2 for "dbt + DuckDB in Rosetta DBT Studio" (Project 1).
+   Same identity as the house style (dark, Inter + JetBrains Mono, orange #ff7a1a / #ff9a3d),
+   but full-bleed, bigger and bolder: body 40-44 px, nothing under 30 px, 72 px safe area.
+   Each lesson's slides.html links this file and only holds <section class="stage"> blocks. */
+@font-face { font-family: "Inter"; src: url("fonts/Inter-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; }
+@font-face { font-family: "JetBrains Mono"; src: url("fonts/JetBrainsMono-Variable.woff2") format("woff2"); font-weight: 100 800; font-style: normal; }
+
+:root {
+  --text: #ffffff; --muted: #d4d9e6; --dim: #8e97ad; --orange: #ff7a1a; --orange-2: #ff9a3d;
+  --line: rgba(255,255,255,.16); --card: rgba(255,255,255,.05); --blue: #72b7ff; --green: #4ade80; --red: #ff6b6b;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --safe: 72px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #05060a; color: var(--text); overflow: hidden;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+#viewport { position: fixed; inset: 0; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin: center; overflow: hidden; opacity: 0; transition: opacity .45s ease; pointer-events: none; }
+.stage.active { opacity: 1; pointer-events: auto; }
+body.render .stage { left: 0; top: 0; transform: none; transition: none; }
+
+/* full-bleed background: deep gradient, orange glow, faint grid */
+.bg { position: absolute; inset: 0;
+  background:
+    radial-gradient(1100px 760px at 8% 0%, rgba(255,122,26,.26), transparent 62%),
+    radial-gradient(900px 700px at 100% 100%, rgba(114,183,255,.13), transparent 60%),
+    linear-gradient(135deg, #07080c 0%, #10131a 52%, #07080b 100%); }
+.bg::before { content: ""; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 64px 64px; mask-image: radial-gradient(circle at 50% 45%, black, transparent 85%); }
+.bg.hero { background:
+    radial-gradient(1300px 900px at 0% 0%, rgba(255,122,26,.34), transparent 60%),
+    radial-gradient(1000px 800px at 100% 100%, rgba(255,154,61,.14), transparent 60%),
+    linear-gradient(135deg, #090a0f 0%, #12151d 55%, #08090c 100%); }
+
+.pad { position: absolute; left: var(--safe); right: var(--safe); top: 64px; bottom: 112px; display: flex; flex-direction: column; }
+.eyebrow { display: inline-flex; align-items: center; gap: 16px; color: var(--orange-2); font-size: 30px; font-weight: 850;
+  text-transform: uppercase; letter-spacing: .12em; }
+.eyebrow::before { content: ""; width: 48px; height: 6px; border-radius: 99px; background: linear-gradient(90deg, var(--orange), var(--orange-2)); }
+h1, h2 { margin: 0; font-weight: 900; letter-spacing: -0.01em; line-height: 1.02; text-wrap: balance; }
+h1 { font-size: 148px; }
+h2 { font-size: 84px; margin-top: 18px; }
+.accent { color: var(--orange-2); }
+.lead { font-size: 44px; line-height: 1.35; color: var(--muted); font-weight: 560; margin: 26px 0 0; }
+.mono { font-family: var(--mono); }
+
+/* build steps */
+.s { opacity: 0; transform: translateY(22px); transition: opacity .45s ease, transform .55s cubic-bezier(.2,.8,.2,1); }
+.s.on { opacity: 1; transform: none; }
+body.render .s { transition: none; }
+
+.card { border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: 0 40px 100px rgba(0,0,0,.5); backdrop-filter: blur(18px); }
+.pill { display: inline-flex; align-items: center; padding: 10px 22px; border-radius: 99px; background: rgba(255,122,26,.16);
+  border: 2px solid rgba(255,122,26,.65); color: var(--orange-2); font-size: 30px; font-weight: 850; letter-spacing: .02em; white-space: nowrap; }
+.badges { display: flex; gap: 18px; flex-wrap: wrap; }
+.badge { display: inline-flex; align-items: center; gap: 14px; padding: 16px 26px; border: 1px solid var(--line); border-radius: 12px;
+  background: rgba(255,255,255,.06); font-size: 32px; font-weight: 750; }
+.badge::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 22px rgba(255,122,26,.8); }
+
+/* code panel */
+.filetab { display: flex; align-items: center; gap: 16px; padding: 18px 30px; border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 32px; color: var(--muted); }
+.filetab .ic { width: 18px; height: 24px; border-radius: 4px; background: linear-gradient(#ff9a3d, #e8620a); }
+.code { font-family: var(--mono); font-size: 40px; line-height: 1.5; padding: 26px 34px; white-space: pre; color: #e6e9f2; }
+.k { color: #7aa2ff; } .f { color: #7fdbca; } .str { color: #f0b37e; } .j { color: #ffd166; } .cm { color: #6f7890; } .dimc { color: #6f7890; }
+
+/* persistent footer on content slides */
+.footer { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--safe); border-top: 1px solid rgba(255,255,255,.08); background: rgba(5,6,10,.55); }
+.footer img { height: 60px; }
+.footer .where { font-size: 30px; font-weight: 750; color: var(--muted); letter-spacing: .02em; }
+.footer .where b { color: var(--orange-2); font-weight: 850; }
+.footer .bar { position: absolute; left: 0; top: -3px; height: 3px; background: linear-gradient(90deg, var(--orange), var(--orange-2)); }
+
+.counter { position: fixed; right: 18px; bottom: 14px; color: var(--dim); font: 700 13px Inter, sans-serif; z-index: 9; }
+body.render .counter { display: none; }

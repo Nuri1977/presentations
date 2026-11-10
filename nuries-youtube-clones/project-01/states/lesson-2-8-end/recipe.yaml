@@ -1,0 +1,17 @@
+# End of Lesson 2.8 = start of Lesson 3.1 (Ship & Automate).
+# Clone of what 2.8 pushed (data tests), the empty template folders,
+# the 12 parquet files in data/raw, the nyc_taxi_dev connection, and the database as 2.8 left it
+# (dbt build, off camera).
+name: lesson-2-8-end
+project_name: nyc_taxi
+clone: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git
+dirs: [analysis, macros, models, seeds, snapshots, tests]
+copy:
+  - { from: ../../.cache/data/raw, to: data/raw }
+database_file: ../nyc_taxi_dev.duckdb
+sql: []
+dbt: [build]
+connection_name: nyc_taxi_dev
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com

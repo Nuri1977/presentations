@@ -55,6 +55,33 @@ def describe(act):
         'lineage_fit': lambda: "Fit the graph to the view",
         'point_tree': lambda: f"Point at `{v}` in the Explorer",
         'lineage_depth': lambda: f"Set lineage **Depth** to {v}",
+        'expect_file': lambda: f"(check: `{v['path']}` equals `{v['snippet']}`)",
+        'terminal': lambda: f"In the command box under the terminal, type `{v['cmd']}` and press Enter",
+        'git_tab': lambda: "Open the **Git** tab in the sidebar",
+        'explorer_tab': lambda: "Open the **Explorer** tab in the sidebar",
+        'git_stage': lambda: f"Hover `{v}` and click **+** (Stage Changes)",
+        'git_message': lambda: f"Type the commit message “{v}”",
+        'git_commit': lambda: "Click **Commit**",
+        'type_text': lambda: f"Click **{v.get('label') or v.get('name')}** and type `{v['text']}`",
+        'pause': lambda: f"Wait {v/1000:.1f} s",
+        'press_keys': lambda: f"Press {v}",
+        'type_keys': lambda: f"Type `{v}`",
+        'new_root_file': lambda: f"Right-click the project root → **New File** → `{v}` → **Save**",
+        'wait_text': lambda: f"Wait for “{v['text']}”",
+        'git_init': lambda: "Click **Initialize Repository**",
+        'git_stage_all': lambda: "Hover CHANGES and click **+** (Stage All Changes)",
+        'publish_branch': lambda: f"Click **Publish Branch**, paste `{v['url']}`, add the remote",
+        'point_tree': lambda: f"Point at `{v}` in the Explorer",
+        'web': lambda: f"GitHub (built-in browser): {v}",
+        'click_at': lambda: f"Click **{v.get('label') or v.get('name') or v.get('text') or v}**" if isinstance(v, dict) else f"Click **{v}**",
+        'point_at': lambda: f"Point at **{v.get('label') or v.get('name') or v.get('text') or v}**" if isinstance(v, dict) else f"Point at **{v}**",
+        'check': lambda: f"Check {', '.join(v) if isinstance(v, list) else v}",
+        'uncheck': lambda: f"Uncheck {', '.join(v) if isinstance(v, list) else v}",
+        'wait_enabled': lambda: f"Wait until **{v['name']}** is enabled (sped up)",
+        'follow_window': lambda: "Studio opens its main window",
+        'goto': lambda: f"Browser: open {v}",
+        'scroll_to': lambda: f"Scroll to **{v.get('label') or v.get('text') or v.get('selector')}**",
+        'click_download': lambda: f"Click the download link **{v.get('label') or v.get('text') or v.get('selector')}**",
     }.get(k, lambda: f"{k}: {v}")()
 
 
@@ -73,7 +100,7 @@ for sc in lesson['scenes']:
         out += [f"## {sc['id']} · {kind} card ({secs} s, no voice)", '', sc.get('show', ''), '']
         est += secs
         continue
-    label = f"slide `{sc['slide']}`" if kind == 'slide' else 'Rosetta DBT Studio'
+    label = f"slide `{sc['slide']}`" if kind == 'slide' else ('Browser' if kind in ('browser', 'pane') else 'Rosetta DBT Studio')
     out += [f"## {sc['id']} · {kind} — {label}", '', '| Beat | Spoken | On screen | Words | ~s |', '|---|---|---|---|---|']
     for b in sc['beats']:
         w = words(b['say']); total_words += w

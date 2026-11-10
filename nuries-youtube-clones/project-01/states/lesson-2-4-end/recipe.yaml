@@ -1,0 +1,17 @@
+# End of Lesson 2.4 = start of Lesson 2.5 (Properties).
+# Clone of what 2.4 pushed (adds trips_per_month.sql and top_pickup_zones.sql), the empty template folders,
+# the 12 parquet files in data/raw, the nyc_taxi_dev connection, and the database as 2.4 left it
+# (dbt seed + dbt run, off camera).
+name: lesson-2-4-end
+project_name: nyc_taxi
+clone: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git
+dirs: [analysis, macros, models, seeds, snapshots, tests]
+copy:
+  - { from: ../../.cache/data/raw, to: data/raw }
+database_file: ../nyc_taxi_dev.duckdb
+sql: []
+dbt: [seed, run]
+connection_name: nyc_taxi_dev
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com

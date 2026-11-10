@@ -1,0 +1,160 @@
+# Lesson 2.5 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-5
+number: "2.5"
+title: "Properties: describe your models"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.5 Properties (now 2.5), dropdown rule of 10 Nov 2026"
+next: "Lesson 2.6 · Docs & the DAG"
+summary: "Describe the nyc_taxi models and the zone seed with properties: models/schema.yml and seeds/seeds.yml. Turn on persist_docs in dbt_project.yml, run the project from Rosetta DBT Studio's Project menu, and see the descriptions as comments inside DuckDB in Studio's SQL Editor. Then commit and push."
+start_state: lesson-2-4-end
+tags: [dbt properties, schema.yml, persist_docs, documentation, DuckDB, NYC taxi]
+target_minutes: 5
+rehearsal: true
+start_notes:
+  - "Start state `lesson-2-4-end`: a clone of what Lesson 2.4 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera), as 2.4 left it."
+draft_changes:
+  - "schema.yml is pasted (long YAML, plan D8); seeds.yml and the persist_docs lines are typed."
+  - "The plan's s04 (comments in duckdb_columns()) is kept: dbt-duckdb 1.11.1 persists relation and column comments, checked off camera on 10 Nov 2026."
+accuracy_notes:
+  - "persist_docs checked with dbt-core 1.12.6 / dbt-duckdb 1.11.1: duckdb_columns().comment holds the column descriptions of trips_per_month; avg_fare has none because schema.yml does not describe it."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.5. Properties: describe your models. Badges: schema.yml, seeds.yml, persist_docs."
+
+  - id: s01
+    kind: slide
+    chapter: "What properties are"
+    slide: props
+    beats:
+      - { id: b01, step: 1, show: "Properties = YAML beside your SQL: descriptions, columns, tests, config.", say: "Properties are YAML files that sit next to your SQL. They describe models, seeds and sources: what a table is, what each column means, and later, the tests." }
+      - { id: b02, step: 2, show: "Three files: models/sources.yml (sources, done), models/schema.yml (models), seeds/seeds.yml (seeds).", say: "We already have one: sources dot yml. Today we add schema dot yml for the models, and seeds dot yml for the zone lookup." }
+
+  - id: s02
+    kind: app
+    chapter: "schema.yml and seeds.yml"
+    beats:
+      - id: b03
+        say: "Open the project. In models, create a new file: schema dot yml."
+        zoom: explorer
+        actions:
+          - open_project: nyc_taxi
+          - new_file: { folder: models, name: schema.yml }
+      - id: b04
+        say: "It is long, so paste it. One entry per model: a name, a description, and the columns that need explaining. The code is in the repository."
+        zoom: code-mid
+        actions:
+          - paste: "models:\n  - name: trips\n    description: Cleaned 2025 green taxi trips; one row per trip. Rows with no distance or no charge are removed.\n    columns:\n      - name: pickup_at\n        description: When the meter started.\n      - name: pickup_zone_id\n        description: TLC taxi zone where the trip started (joins taxi_zone_lookup.LocationID).\n      - name: payment_type\n        description: TLC payment code; 1 is credit card (see the data dictionary).\n      - name: total_amount\n        description: Total charged to the rider, in US dollars.\n  - name: trips_per_month\n    description: Trips and average fare per month and pickup borough.\n    columns:\n      - name: month\n        description: Month of pickup.\n      - name: borough\n        description: Pickup borough from the zone lookup.\n      - name: trips\n        description: Trips that month from that borough.\n  - name: top_pickup_zones\n    description: The ten busiest pickup zones of 2025.\n    columns:\n      - name: zone_id\n        description: TLC zone id; the grain of this table.\n      - name: trips\n        description: Trips that started in the zone.\n"
+      - id: b05
+        say: "For example, payment type: one means credit card. Anyone reading the model learns that here, not from a PDF. Save."
+        zoom: code-mid
+        actions:
+          - point: { editor_line: 10 }
+          - click_save
+          - expect_file: { path: models/schema.yml, snippet: ../snippets/2.5/schema.yml }
+      - id: b06
+        say: "Now the seed. In seeds, a new file: seeds dot yml."
+        zoom: explorer
+        actions:
+          - close_tab: models/schema.yml
+          - new_file: { folder: seeds, name: seeds.yml }
+      - id: b07
+        say: "This one is short: the zone lookup, where it comes from, and its key column, Location ID. Save."
+        zoom: code-close
+        actions:
+          - type: "seeds:\n  - name: taxi_zone_lookup\n    description: TLC taxi zones, from the Taxi Zone Lookup Table on the TLC site.\n    columns:\n      - name: LocationID\n        description: Zone id used by PULocationID and DOLocationID.\n"
+          - click_save
+          - expect_file: { path: seeds/seeds.yml, snippet: ../snippets/2.5/seeds.yml }
+
+  - id: s03
+    kind: app
+    chapter: "Keep the descriptions in the database"
+    beats:
+      - id: b08
+        say: "Descriptions can also go into the database itself. Open dbt project dot yml, and add a models block at the end."
+        zoom: explorer
+        actions:
+          - close_tab: seeds/seeds.yml
+          - open_file: dbt_project.yml
+      - id: b09
+        say: "Under nyc taxi, persist docs, with relation and columns set to true. Save."
+        zoom: code-mid
+        actions:
+          - type_end: "\nmodels:\n  nyc_taxi:\n    +persist_docs:\n      relation: true\n      columns: true\n"
+          - click_save
+          - expect_file: { path: dbt_project.yml, snippet: ../snippets/2.5/dbt_project.yml }
+      - id: b10
+        say: "Run the project from the Project menu, so dbt rebuilds the models with their comments."
+        zoom: project-menu
+        actions:
+          - project_menu: Run
+      - id: b11
+        say: "Three models, no errors."
+        zoom: terminal-close
+        actions:
+          - wait_text: { text: "PASS=3", label: run output }
+
+  - id: s04
+    kind: app
+    chapter: "Descriptions inside DuckDB"
+    beats:
+      - id: b12
+        say: "Let's look inside DuckDB. Open the SQL Editor, pick the nyc taxi dev connection, and ask DuckDB for the columns of trips per month, with their comments."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: nyc_taxi_dev
+          - type: "select table_name, column_name, comment from duckdb_columns() where table_name = 'trips_per_month';"
+      - id: b13
+        say: "Run it with the green arrow."
+        zoom: explorer
+        actions:
+          - sql_run
+      - id: b14
+        say: "Each column carries the description from schema dot yml. Average fare has none, because we didn't describe it."
+        zoom: sql-results
+        card: { eyebrow: "persist_docs", title: "Descriptions in the database", sub: "Every SQL tool now sees them.", pos: top-right }
+
+  - id: s05
+    kind: slide
+    chapter: "Where descriptions show up"
+    slide: where
+    beats:
+      - { id: b15, step: 1, show: "Three places: the docs site (next lesson), database comments, and every reviewer of the code.", say: "So one description shows up in three places: in the docs site, which we build next lesson, in the database, and for everyone who reads the code." }
+
+  - id: s06
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b16
+        say: "Back in the project, open the Git tab: two new YAML files, and the change to dbt project dot yml."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - git_tab
+      - id: b17
+        say: "Stage all, type a message, describe the models and the zone seed, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Describe the models and the zone seed
+          - git_commit
+      - id: b18
+        say: "Sync Changes, and it's on GitHub."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s07
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b19, step: 1, show: "Recap: schema.yml for models, seeds.yml for seeds, persist_docs puts descriptions in DuckDB; pushed.", say: "To recap: properties are YAML next to your SQL. Schema dot yml describes the models, seeds dot yml the seed, and persist docs copies the descriptions into DuckDB. Next, the docs site and the DAG." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.6 · Docs & the DAG. Code: github.com/Nuri1977/nyc-taxi-dbt."

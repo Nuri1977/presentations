@@ -1,0 +1,4 @@
+# A brand-new install: empty Studio profile, no Python/dbt runtime, no projects (Lesson 1.1).
+name: fresh-install
+fresh: true
+clean: [projects]

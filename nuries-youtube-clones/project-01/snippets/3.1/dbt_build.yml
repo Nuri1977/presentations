@@ -1,0 +1,29 @@
+name: dbt build & publish
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 5 * * 1'     # every Monday
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DUCKDB_PATH: ${{ github.workspace }}/data/prod.duckdb
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.10'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/download_data.py
+      - run: dbt build --profiles-dir ci
+      - name: Publish the warehouse
+        run: |
+          gh release create warehouse --title "Warehouse" --notes "Built by dbt on every push" || true
+          gh release upload warehouse data/prod.duckdb --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2.2 · Get the data</title>
+<!-- Slide scenes for Lesson 2.2. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (v2). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .title-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.3fr .7fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .title-grid .badges { margin-top: 48px; }
+  .hero-icon { width: 500px; filter: drop-shadow(0 40px 120px rgba(255,122,26,.45)); justify-self: center; }
+  .lockup { position: absolute; left: var(--safe); bottom: 48px; height: 104px; opacity: .95; }
+
+  .statement { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 64px; }
+  .statement .big { font-size: 108px; font-weight: 900; line-height: 1.04; letter-spacing: -0.015em; text-wrap: balance; }
+  .flowchips { display: grid; grid-template-columns: 1fr 70px 1fr 70px 1fr; align-items: center; }
+  .fchip { padding: 34px 36px; display: flex; align-items: center; gap: 26px; }
+  .fchip .num { display: inline-grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: var(--orange); color: #111; font-weight: 900; font-size: 42px; flex: none; }
+  .fchip b { font-size: 46px; font-weight: 900; display: block; }
+  .fchip span { font-size: 32px; color: var(--muted); font-weight: 600; }
+  .chev { text-align: center; font-size: 76px; color: var(--orange-2); font-weight: 300; }
+
+  /* DMG window, rebuilt from the release's assets/dmg-background.png and electron-builder layout (540x380, icons at 127,214 and 412,214) */
+  .dmg-grid { flex: 1; display: grid; grid-template-columns: 918px 1fr; gap: 48px; align-items: center; margin-top: 10px; }
+  .win { position: relative; width: 918px; border-radius: 22px; overflow: hidden; box-shadow: 0 50px 120px rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18); }
+  .win .bar { height: 44px; background: #2a2c31; display: flex; align-items: center; gap: 14px; padding: 0 22px; }
+  .win .bar i { width: 20px; height: 20px; border-radius: 50%; background: #5a5d64; display: block; }
+  .win .canvas { position: relative; width: 918px; height: 646px; background: url(../brand/dmg-background.png) center / 918px 646px no-repeat; }
+  .ico { position: absolute; width: 200px; height: 200px; margin-left: -100px; margin-top: -100px; display: grid; place-items: center; }
+  .ico img { width: 180px; } .ico svg { width: 170px; }
+  .ico.app { left: 216px; top: 364px; }
+  .ico.apps { left: 700px; top: 364px; }
+  .lbl { position: absolute; top: 488px; width: 260px; margin-left: -130px; text-align: center; font-size: 24px; font-weight: 750; color: #222; }
+  .lbl.app { left: 216px; } .lbl.apps { left: 700px; }
+  .ghost { left: 650px; top: 340px; opacity: .55; }
+  .cur { position: absolute; left: 690px; top: 380px; width: 46px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+  .prompt { position: absolute; left: 84px; top: 120px; width: 750px; padding: 40px 44px; border-radius: 22px; background: rgba(28,30,36,.97);
+    border: 1px solid rgba(255,255,255,.2); box-shadow: 0 40px 120px rgba(0,0,0,.7); display: grid; grid-template-columns: 110px 1fr; gap: 28px; }
+  .prompt img { width: 110px; }
+  .prompt p { margin: 0; font-size: 32px; line-height: 1.35; font-weight: 650; color: #fff; }
+  .prompt .q { margin-top: 12px; font-size: 28px; color: var(--muted); font-weight: 560; }
+  .prompt .btns { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 18px; margin-top: 8px; }
+  .prompt .btns span { padding: 14px 34px; border-radius: 12px; font-size: 30px; font-weight: 800; background: rgba(255,255,255,.1); }
+  .prompt .btns span.open { background: var(--orange); color: #111; box-shadow: 0 0 0 4px rgba(255,122,26,.35); }
+  .steps3 { display: flex; flex-direction: column; gap: 26px; }
+  .st { padding: 30px 32px; display: flex; gap: 24px; align-items: center; }
+  .st .num { display: inline-grid; place-items: center; width: 70px; height: 70px; border-radius: 50%; background: var(--orange); color: #111; font-weight: 900; font-size: 38px; flex: none; }
+  .st b { font-size: 40px; font-weight: 880; display: block; }
+  .st span { font-size: 30px; color: var(--muted); font-weight: 600; }
+
+  /* installed */
+  .inst { flex: 1; display: grid; grid-template-columns: .8fr 1.2fr; gap: 36px; margin-top: 44px; }
+  .box { padding: 44px 46px; display: flex; flex-direction: column; gap: 22px; }
+  .box .k { font-size: 30px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--orange-2); }
+  .box h3 { margin: 0; font-size: 56px; font-weight: 900; line-height: 1.1; }
+  .box .path { font-family: var(--mono); font-size: 30px; color: var(--muted); }
+  .box ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 18px; }
+  .box li { font-size: 42px; font-weight: 750; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.08); padding-bottom: 14px; }
+  .box li span { font-family: var(--mono); color: var(--orange-2); font-weight: 700; }
+  .box img { height: 140px; align-self: flex-start; }
+  .nextstrip { grid-column: 1 / -1; padding: 28px 40px; font-size: 40px; font-weight: 800; display: flex; align-items: center; gap: 24px; }
+
+  .next-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .next-grid h1 { font-size: 132px; }
+  .logo-hero { width: 640px; justify-self: center; filter: drop-shadow(0 30px 90px rgba(255,122,26,.3)); }
+</style>
+<style>
+  .two { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 40px; }
+  .box p { margin: 0; font-size: 36px; line-height: 1.4; color: var(--muted); font-weight: 600; }
+  .box p b { color: #fff; }
+  .mono { font-family: var(--mono); color: var(--orange-2); font-weight: 700; }
+  .dl { flex: 1; display: grid; grid-template-columns: 1.15fr .85fr; gap: 36px; margin-top: 36px; }
+  .crumbs { font-size: 34px; font-weight: 750; line-height: 1.7; }
+  .crumbs span { color: var(--orange-2); }
+  .url { font-family: var(--mono); font-size: 25px; color: #e6e9f2; word-break: break-all; background: rgba(0,0,0,.35); padding: 16px 20px; border-radius: 12px; }
+  .tree { padding: 36px 40px; font-family: var(--mono); font-size: 34px; line-height: 1.55; white-space: pre; color: #e6e9f2; }
+  .tree .d { color: var(--orange-2); } .tree .c { color: var(--dim); font-family: Inter, sans-serif; font-size: 28px; }
+</style>
+</head>
+<body>
+<div id="viewport">
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 1 · Lesson 2.2 · dbt basics</div>
+      <h1 style="margin-top:28px;font-size:144px">Get the <span class="accent">data</span></h1>
+      <p class="lead">Twelve months of NYC green taxi trips, a source, and a seed.</p>
+      <div class="badges"><span class="badge">Parquet</span><span class="badge">sources.yml</span><span class="badge">Seed CSV</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+</section>
+<section class="stage" data-id="sources">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Raw data in a dbt project</div>
+    <h2>A <span class="accent">source</span> and a <span class="accent">seed</span></h2>
+    <div class="two">
+      <div class="card box s" data-step="1"><div class="k">Source</div><h3>Big raw files stay outside git</h3>
+        <p>12 parquet files in <span class="mono">data/raw</span>. DuckDB reads them in place. <b>sources.yml</b> gives them a name dbt can use: <span class="mono">raw.green_trips</span>.</p></div>
+      <div class="card box s" data-step="2"><div class="k">Seed</div><h3>A small CSV that lives in the repo</h3>
+        <p><span class="mono">seeds/taxi_zone_lookup.csv</span>: 265 taxi zones with their borough and name. dbt loads it as a table.</p></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.2</b></div></div>
+</section>
+<section class="stage" data-id="download">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Download the files</div>
+    <h2>From the <span class="accent">TLC</span> website</h2>
+    <div class="dl">
+      <div class="card box s" data-step="1"><div class="k">nyc.gov · TLC Trip Record Data</div>
+        <div class="crumbs">2025 <span>›</span> January … December <span>›</span> Green Taxi Trip Records</div>
+        <div class="url">d37ci6vzurychx.cloudfront.net/trip-data/<br>green_tripdata_2025-01.parquet … -12.parquet</div>
+        <p>12 files, about 1.2 MB each. Links in the description.</p>
+        <div class="crumbs s" style="margin-top:10px" data-step="2">Taxi Zone Lookup Table <span>›</span> CSV</div>
+        <div class="url s" data-step="2">d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv</div></div>
+      <div class="card tree s" data-step="1"><span class="d">nyc_taxi/</span>
+  <span class="d">data/raw/</span>   <span class="c">ignored by git</span>
+    green_tripdata_2025-01.parquet
+    …
+    green_tripdata_2025-12.parquet
+  <span class="d">seeds/</span>
+    taxi_zone_lookup.csv</div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.2</b></div></div>
+</section>
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>The data is <span class="accent">in place</span></h2>
+    <div class="inst s" data-step="1" style="grid-template-columns:1fr 1fr">
+      <div class="card box"><div class="k">In the project</div><ul><li>Trips <span>data/raw</span></li><li>Zones <span>seeds/</span></li><li>Source <span>raw.green_trips</span></li></ul></div>
+      <div class="card box"><div class="k">Checked</div><ul><li>dbt show <span>591,375 rows</span></li><li>In git <span>2 files</span></li><li>Pushed <span>Sync Changes</span></li></ul></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.2</b></div></div>
+</section>
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 2.3</h1>
+      <h2 style="font-size:96px">Your first <span class="accent">model</span></h2>
+    </div>
+    <img class="logo-hero" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2.3 · Models</title>
+<!-- Slide scenes for Lesson 2.3. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (v2). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  /* lesson-only layout */
+  .title-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.25fr .75fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .title-grid .badges { margin-top: 48px; }
+  .hero-icon { width: 520px; filter: drop-shadow(0 40px 120px rgba(255,122,26,.45)); justify-self: center; }
+  .lockup { position: absolute; left: var(--safe); bottom: 48px; height: 104px; opacity: .95; }
+
+  .model-row { flex: 1; display: grid; grid-template-columns: minmax(0,1fr) 100px 560px; align-items: center; gap: 24px; margin-top: 28px; }
+  .model-row .code { font-size: 40px; line-height: 1.55; padding: 30px 38px; }
+  .big-arrow { font-size: 130px; font-weight: 300; color: var(--orange-2); text-align: center; line-height: 1; }
+  .obj { padding: 52px 54px; display: flex; flex-direction: column; gap: 26px; }
+  .obj .head { display: flex; align-items: center; gap: 22px; }
+  .obj .head img { width: 110px; height: 110px; }
+  .obj .kind { font-size: 32px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 850; }
+  .obj .name { font-family: var(--mono); font-size: 72px; font-weight: 700; }
+  .obj .note { font-size: 40px; line-height: 1.35; color: var(--muted); font-weight: 600; }
+
+  .flow { flex: 1; display: grid; grid-template-columns: 1fr 70px 1fr 70px 1fr; align-items: stretch; margin-top: 44px; }
+  .step { padding: 38px 36px; display: flex; flex-direction: column; gap: 22px; }
+  .step .top { display: flex; align-items: center; gap: 22px; }
+  .num { display: inline-grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: var(--orange); color: #111;
+    font-weight: 900; font-size: 42px; flex: none; }
+  .step h3 { margin: 0; font-size: 56px; font-weight: 900; }
+  .step .snip { font-family: var(--mono); font-size: 34px; line-height: 1.5; padding: 22px 24px; border-radius: 12px; background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.08); white-space: pre; color: #e6e9f2; }
+  .step .cap { font-size: 40px; line-height: 1.3; color: var(--muted); font-weight: 600; margin-top: auto; }
+  .chev { align-self: center; text-align: center; font-size: 76px; color: var(--orange-2); font-weight: 300; }
+  .duck { display: flex; align-items: center; gap: 20px; font-family: var(--mono); font-size: 34px; }
+  .duck img { width: 72px; height: 72px; }
+
+  .checks { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 34px; margin-top: 48px; }
+  .check { padding: 44px 46px; display: flex; gap: 32px; align-items: center; }
+  .tick { flex: none; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: var(--orange); color: #111; font-size: 50px; font-weight: 900; }
+  .check h3 { margin: 0 0 16px; font-size: 52px; font-weight: 880; line-height: 1.12; }
+  .check p { margin: 0; font-size: 38px; color: var(--muted); line-height: 1.35; font-weight: 560; }
+
+  .next-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .next-grid h1 { font-size: 132px; }
+  .codelink { margin-top: 56px; display: inline-flex; align-items: center; gap: 20px; padding: 22px 30px; border-radius: 14px;
+    border: 1px solid var(--line); background: rgba(255,255,255,.06); font-size: 34px; color: var(--muted); font-weight: 650; }
+  .codelink .mono { color: #fff; font-size: 34px; }
+  .logo-hero { width: 640px; justify-self: center; filter: drop-shadow(0 30px 90px rgba(255,122,26,.3)); }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<!-- title -->
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 1 · Lesson 2.3 · Models</div>
+      <h1 style="margin-top:28px">Your first<br>dbt <span class="accent">model</span></h1>
+      <p class="lead">One select over a year of NYC green taxi trips.</p>
+      <div class="badges"><span class="badge">Rosetta DBT Studio 1.7.6</span><span class="badge">dbt Core 1.12</span><span class="badge">DuckDB</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+</section>
+
+<!-- model -->
+<section class="stage" data-id="model">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What a model is</div>
+    <h2>One <span class="accent">select</span>, in one <span class="mono" style="font-size:.86em">.sql</span> file</h2>
+    <div class="model-row">
+      <div class="card s" data-step="1">
+        <div class="filetab"><span class="ic"></span>models/trips.sql</div>
+        <div class="code"><span class="cm">-- one row per 2025 green taxi trip</span>
+<span class="k">select</span>
+    VendorID <span class="k">as</span> vendor_id,
+    lpep_pickup_datetime <span class="k">as</span> pickup_at,
+    <span class="dimc">…</span>
+<span class="k">from</span> <span class="j">{{</span> <span class="f">source</span>(<span class="str">'raw'</span>, <span class="str">'green_trips'</span>) <span class="j">}}</span>
+<span class="k">where</span> <span class="dimc">…</span></div>
+      </div>
+      <div class="big-arrow s" data-step="2">→</div>
+      <div class="card obj s" data-step="2">
+        <div class="head"><img src="../brand/icons/duckdb-yellow.svg" alt=""><span class="kind">view in<br>nyc_taxi_dev.duckdb</span></div>
+        <span class="name">main.trips</span>
+        <span class="note">Named after the file.<br>dbt writes the <span class="mono">create view</span>.</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:46%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.3</b></div></div>
+</section>
+
+<!-- flow -->
+<section class="stage" data-id="flow">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">dbt run</div>
+    <h2>How dbt runs a <span class="accent">model</span></h2>
+    <div class="flow">
+      <div class="card step s" data-step="1">
+        <div class="top"><span class="num">1</span><h3>Compile</h3></div>
+        <div class="snip"><span class="j">{{</span> <span class="f">source</span>(<span class="str">'raw'</span>,
+   <span class="str">'green_trips'</span>) <span class="j">}}</span>
+        <span class="accent">↓</span>
+<span class="f">read_parquet</span>(
+  <span class="str">'data/raw/…'</span>)</div>
+        <div class="cap">Jinja becomes plain SQL.</div>
+      </div>
+      <div class="chev s" data-step="2">›</div>
+      <div class="card step s" data-step="2">
+        <div class="top"><span class="num">2</span><h3>Wrap</h3></div>
+        <div class="snip"><span class="k">create view</span> trips <span class="k">as</span> (
+  <span class="k">select</span> <span class="dimc">…</span>
+  <span class="k">from</span> <span class="f">read_parquet</span>(<span class="dimc">…</span>)
+)</div>
+        <span class="pill" style="align-self:flex-start">dbt writes this</span>
+        <div class="cap">Your select, inside a create view.</div>
+      </div>
+      <div class="chev s" data-step="3">›</div>
+      <div class="card step s" data-step="3">
+        <div class="top"><span class="num">3</span><h3>Execute</h3></div>
+        <div class="duck"><img src="../brand/icons/duckdb-yellow.svg" alt=""><span>nyc_taxi_dev.duckdb</span></div>
+        <div class="snip">view <span class="accent">main.trips</span>  <span style="color:var(--green)">✓</span></div>
+        <div class="cap">DuckDB saves the view in the dev database file.</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:46%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.3</b></div></div>
+</section>
+
+<!-- recap -->
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>Your first model, <span class="accent">done</span></h2>
+    <div class="checks s" data-step="1">
+      <div class="card check"><span class="tick">✓</span><div><h3>One select, one file</h3><p><span class="mono">trips.sql</span> builds the view <span class="mono">trips</span>.</p></div></div>
+      <div class="card check"><span class="tick">✓</span><div><h3>Run = compile, wrap, execute</h3><p>dbt writes the <span class="mono">create view</span> for you.</p></div></div>
+      <div class="card check"><span class="tick">✓</span><div><h3><span class="mono" style="font-size:.9em">dbt show</span> prints the rows</h3><p>Typed in the box under Studio's terminal.</p></div></div>
+      <div class="card check"><span class="tick">✓</span><div><h3>Committed and pushed</h3><p>Stage, commit, Sync Changes.</p></div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:46%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.3</b></div></div>
+</section>
+
+<!-- closing -->
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 2.4</h1>
+      <h2 style="font-size:96px">Dependencies <span class="accent">&amp;</span> Jinja</h2>
+      <div class="codelink">Code <span class="mono">github.com/Nuri1977/nyc-taxi-dbt</span></div>
+    </div>
+    <img class="logo-hero" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

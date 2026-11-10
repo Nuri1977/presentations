@@ -1,0 +1,16 @@
+# Keep sources (yaml, slides, snippets, recipes, brand). Ignore everything rendered, downloaded or cached.
+.cache/
+render/
+profiles/
+takes/
+reference-frames/
+*.mp4
+*.webm
+*.wav
+*.mp3
+*.zip
+*.pptx
+*.duckdb
+*.duckdb.wal
+trace.zip
+.DS_Store

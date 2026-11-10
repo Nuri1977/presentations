@@ -1,0 +1,135 @@
+1
+00:00:03,350 --> 00:00:06,423
+Properties are YAML files that sit next to your SQL.
+
+2
+00:00:06,703 --> 00:00:12,766
+They describe models, seeds and sources: what a table is, what each column means, and later, the tests.
+
+3
+00:00:13,716 --> 00:00:16,102
+We already have one: sources dot yml.
+
+4
+00:00:16,382 --> 00:00:21,489
+Today we add schema dot yml for the models, and seeds dot yml for the zone lookup.
+
+5
+00:00:22,439 --> 00:00:23,624
+Open the project.
+
+6
+00:00:23,904 --> 00:00:26,795
+In models, create a new file: schema dot yml.
+
+7
+00:00:32,304 --> 00:00:33,847
+It is long, so paste it.
+
+8
+00:00:34,127 --> 00:00:39,051
+One entry per model: a name, a description, and the columns that need explaining.
+
+9
+00:00:39,331 --> 00:00:41,284
+The code is in the repository.
+
+10
+00:00:42,234 --> 00:00:45,323
+For example, payment type: one means credit card.
+
+11
+00:00:45,603 --> 00:00:49,098
+Anyone reading the model learns that here, not from a PDF.
+
+12
+00:00:49,378 --> 00:00:49,978
+Save.
+
+13
+00:00:50,928 --> 00:00:51,790
+Now the seed.
+
+14
+00:00:52,070 --> 00:00:54,565
+In seeds, a new file: seeds dot yml.
+
+15
+00:00:59,216 --> 00:01:04,550
+This one is short: the zone lookup, where it comes from, and its key column, Location ID.
+
+16
+00:01:04,830 --> 00:01:05,429
+Save.
+
+17
+00:01:08,657 --> 00:01:11,695
+Descriptions can also go into the database itself.
+
+18
+00:01:11,975 --> 00:01:16,328
+Open dbt project dot yml, and add a models block at the end.
+
+19
+00:01:17,278 --> 00:01:22,171
+Under nyc taxi, persist docs, with relation and columns set to true.
+
+20
+00:01:22,451 --> 00:01:23,050
+Save.
+
+21
+00:01:24,000 --> 00:01:29,319
+Run the project from the Project menu, so dbt rebuilds the models with their comments.
+
+22
+00:01:30,269 --> 00:01:31,755
+Three models, no errors.
+
+23
+00:01:33,469 --> 00:01:35,248
+Let's look inside DuckDB.
+
+24
+00:01:35,528 --> 00:01:44,047
+Open the SQL Editor, pick the nyc taxi dev connection, and ask DuckDB for the columns of trips per month, with their comments.
+
+25
+00:01:45,721 --> 00:01:47,121
+Run it with the green arrow.
+
+26
+00:01:49,900 --> 00:01:53,093
+Each column carries the description from schema dot yml.
+
+27
+00:01:53,373 --> 00:01:56,163
+Average fare has none, because we didn't describe it.
+
+28
+00:01:57,113 --> 00:02:05,831
+So one description shows up in three places: in the docs site, which we build next lesson, in the database, and for everyone who reads the code.
+
+29
+00:02:06,781 --> 00:02:13,604
+Back in the project, open the Git tab: two new YAML files, and the change to dbt project dot yml.
+
+30
+00:02:14,554 --> 00:02:18,941
+Stage all, type a message, describe the models and the zone seed, and commit.
+
+31
+00:02:24,153 --> 00:02:26,188
+Sync Changes, and it's on GitHub.
+
+32
+00:02:29,253 --> 00:02:31,989
+To recap: properties are YAML next to your SQL.
+
+33
+00:02:32,269 --> 00:02:40,157
+Schema dot yml describes the models, seeds dot yml the seed, and persist docs copies the descriptions into DuckDB.
+
+34
+00:02:40,437 --> 00:02:42,274
+Next, the docs site and the DAG.

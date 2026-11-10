@@ -1,0 +1,151 @@
+# Lesson 2.6 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-6
+number: "2.6"
+title: "Docs & the DAG"
+module: "Module 2 · dbt basics"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.6 Docs & the DAG (now 2.6), dropdown rule of 10 Nov 2026"
+next: "Lesson 2.7 · Materializations"
+summary: "Add monthly_summary, a model with two refs, and describe it. Learn what the DAG is, run the model with everything upstream from Rosetta DBT Studio's Model menu, then generate and serve the dbt docs site: model pages, column descriptions and the lineage graph. Commit and push."
+start_state: lesson-2-5-end
+tags: [dbt docs, DAG, lineage, ref, documentation, DuckDB, NYC taxi]
+target_minutes: 5
+rehearsal: true
+start_notes:
+  - "Start state `lesson-2-5-end`: a clone of what Lesson 2.5 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera)."
+draft_changes:
+  - "Run: Model ▸ Run +model (Upstream) on monthly_summary; docs: Project ▸ Generate Docs and Project ▸ Serve Docs (dropdown rule, 10 Nov)."
+  - "Lineage is shown in the docs site's lineage graph. Studio 1.7.6 showed no LINEAGE tab in the bottom panel in this project."
+  - "Serve Docs: dbt opens the system browser by default. The recording sets BROWSER to a no-op for Studio and opens the docs in the recording browser at 127.0.0.1:8080 (dbt listens on IPv4 only)."
+accuracy_notes:
+  - "monthly_summary checked off camera on 10 Nov 2026: January 2025 has 45,507 trips, 71.4% paid by card."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 2.6. Docs & the DAG. Badges: ref() x2, lineage, dbt docs."
+
+  - id: s01
+    kind: app
+    chapter: "A model with two refs"
+    beats:
+      - id: b01
+        say: "Open the project, and create one more model in models: monthly summary dot sql."
+        zoom: explorer
+        actions:
+          - open_project: nyc_taxi
+          - new_file: { folder: models, name: monthly_summary.sql }
+      - id: b02
+        say: "First, a block called totals: the trips per month, from ref trips per month."
+        zoom: code-close
+        actions:
+          - type: "-- one row per month: total trips and the share paid by card\nwith totals as (\n    select month, sum(trips) as total_trips\n    from {{ ref('trips_per_month') }}\n    group by month\n),\n"
+      - id: b03
+        say: "Then a block called card: the trips paid by credit card each month, straight from ref trips."
+        zoom: code-close
+        actions:
+          - type: "card as (\n    select date_trunc('month', pickup_at) as month, count(*) as card_trips\n    from {{ ref('trips') }}\n    where payment_type = 1   -- credit card\n    group by month\n)\n"
+      - id: b04
+        say: "Join them by month, and work out the percent paid by card. Save."
+        zoom: code-close
+        actions:
+          - type: "select\n    month,\n    total_trips,\n    card_trips,\n    round(100.0 * card_trips / total_trips, 1) as pct_card\nfrom totals\njoin card using (month)\norder by month\n"
+          - click_save
+          - expect_file: { path: models/monthly_summary.sql, snippet: ../snippets/2.6/monthly_summary.sql }
+      - id: b05
+        say: "Describe it too: at the end of schema dot yml, paste the entry for monthly summary, and save."
+        zoom: code-mid
+        actions:
+          - open_file: models/schema.yml
+          - paste: { text: "  - name: monthly_summary\n    description: One row per month of 2025 with total trips and the share paid by card.\n    columns:\n      - name: month\n        description: Month of pickup; the grain.\n      - name: pct_card\n        description: Percent of the month's trips paid by credit card.\n", end: true }
+          - click_save
+          - expect_file: { path: models/schema.yml, snippet: ../snippets/2.6/schema.yml }
+
+  - id: s02
+    kind: slide
+    chapter: "The DAG"
+    slide: dag
+    beats:
+      - { id: b06, step: 1, show: "The project's DAG: raw.green_trips → trips → trips_per_month, top_pickup_zones; taxi_zone_lookup → both; trips_per_month + trips → monthly_summary.", say: "All those refs form a graph: the DAG. Directed, because every arrow points one way. Acyclic, because no model can depend on itself." }
+      - { id: b07, step: 2, show: "Three uses: build order; independent models run in parallel; impact: change trips, and you see everything downstream.", say: "dbt uses it for the build order, to run independent models in parallel, and to show you what a change affects." }
+
+  - id: s03
+    kind: app
+    chapter: "Run a model and everything upstream"
+    beats:
+      - id: b08
+        say: "Back in monthly summary, open the Model menu, and choose Run plus model, upstream. That runs this model, and everything it depends on."
+        zoom: model-menu
+        actions:
+          - close_tab: models/schema.yml
+          - model_menu: Run +model (Upstream)
+      - id: b09
+        say: "Three models, in DAG order: trips, trips per month, then monthly summary."
+        zoom: terminal-close
+        card: { eyebrow: "+monthly_summary", title: "3 models, in DAG order", sub: "trips → trips_per_month → monthly_summary", pos: top-right }
+        actions:
+          - wait_text: { text: "PASS=3", label: run output }
+
+  - id: s04
+    kind: app
+    chapter: "Generate and serve the docs"
+    beats:
+      - id: b10
+        say: "Now the docs. Open the Project menu, and choose Generate Docs. dbt reads the project and the database, and writes a small website into target."
+        actions:
+          - project_menu: Generate Docs
+          - wait_text: { text: "Catalog written", label: docs generate, timeoutMs: 120000 }
+      - id: b11
+        say: "Then Project, Serve Docs. Studio starts a local web server, on port eighty eighty."
+        actions:
+          - project_menu: Serve Docs
+          - wait_text: { text: "Serving docs at", label: docs serve, timeoutMs: 60000 }
+
+  - id: s05
+    kind: browser
+    chapter: "The docs site"
+    beats:
+      - id: b12
+        say: "In the browser, open localhost, port eighty eighty, and pick monthly summary. Here is the description from schema dot yml, every column, and what the model depends on."
+        zoom: center-wide
+        actions:
+          - goto: "http://127.0.0.1:8080/#!/model/model.nyc_taxi.monthly_summary"
+      - id: b13
+        say: "The button at the bottom right opens the lineage graph for this model: trips, then trips per month, then monthly summary. The same order dbt just ran."
+        actions:
+          - click_at: { selector: "a[title='View Lineage Graph']", label: View Lineage Graph, settleMs: [500, 1500, 3000] }
+
+  - id: s06
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b14
+        say: "Back in Studio, the Git tab shows the new model, and the change to schema dot yml."
+        zoom: git-panel
+        actions:
+          - close_tab: models/monthly_summary.sql
+          - git_tab
+      - id: b15
+        say: "Stage all, type a message, add the monthly summary, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Add the monthly summary
+          - git_commit
+      - id: b16
+        say: "Sync Changes, and it's on GitHub."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s07
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b17, step: 1, show: "Recap: refs form the DAG; run +model runs everything upstream; Generate Docs + Serve Docs; lineage graph; pushed.", say: "To recap: refs form the DAG, and dbt uses it for order and impact. Run plus model builds a model with everything upstream. And two clicks give you a docs site, with descriptions and the lineage graph. Next, views or tables: materializations." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.7 · Materializations. Code: github.com/Nuri1977/nyc-taxi-dbt."

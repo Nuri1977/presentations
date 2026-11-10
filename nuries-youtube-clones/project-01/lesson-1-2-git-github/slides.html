@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.2 · Git and GitHub</title>
+<!-- Slide scenes for Lesson 1.2. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (v2). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .title-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.3fr .7fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .title-grid .badges { margin-top: 48px; }
+  .hero-icon { width: 440px; justify-self: center; filter: drop-shadow(0 40px 120px rgba(255,122,26,.45)); }
+  .lockup { position: absolute; left: var(--safe); bottom: 48px; height: 104px; opacity: .95; }
+
+  .why { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 48px; align-content: start; }
+  .why .card { padding: 44px 44px; min-height: 300px; }
+  .why .card b { display: block; font-size: 60px; font-weight: 900; color: var(--orange-2); }
+  .why .card span { display: block; font-size: 40px; color: var(--muted); font-weight: 600; margin-top: 12px; line-height: 1.3; }
+  .why .ic { font-size: 64px; }
+  .gh { grid-column: 1 / -1; padding: 34px 40px; display: flex; align-items: center; gap: 30px; font-size: 42px; font-weight: 800; }
+  .gh img { height: 80px; }
+  .gh span { color: var(--muted); font-weight: 600; }
+
+  .loop { flex: 1; display: grid; grid-template-columns: 1fr 60px 1fr 60px 1fr 60px 1.15fr; align-items: stretch; margin-top: 48px; }
+  .node { padding: 34px 32px; display: flex; flex-direction: column; gap: 16px; }
+  .node .num { display: inline-grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--orange); color: #111; font-weight: 900; font-size: 40px; }
+  .node h3 { margin: 0; font-size: 52px; font-weight: 900; }
+  .node p { margin: 0; font-size: 34px; color: var(--muted); font-weight: 600; line-height: 1.3; }
+  .node .studio { margin-top: auto; font-family: var(--mono); font-size: 30px; color: var(--orange-2); }
+  .node.pr { border-color: rgba(167,139,250,.7); background: rgba(167,139,250,.08); }
+  .chev { align-self: center; text-align: center; font-size: 76px; color: var(--orange-2); font-weight: 300; }
+
+  .tok { flex: 1; display: grid; grid-template-columns: .9fr 1.1fr; gap: 36px; margin-top: 48px; }
+  .tok .card { padding: 44px 46px; display: flex; flex-direction: column; gap: 26px; justify-content: center; }
+  .pw { font-size: 56px; font-weight: 900; }
+  .pw s { color: var(--dim); text-decoration-color: var(--red); text-decoration-thickness: 6px; }
+  .pw .arrow { color: var(--orange-2); margin: 0 18px; font-weight: 300; }
+  .tok p { margin: 0; font-size: 38px; color: var(--muted); font-weight: 600; line-height: 1.3; }
+  .row { display: flex; justify-content: space-between; align-items: center; font-size: 40px; font-weight: 750; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .row span { font-family: var(--mono); color: var(--orange-2); font-size: 34px; }
+
+  .checks { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 52px; align-content: start; }
+  .check { padding: 44px 42px; display: flex; flex-direction: column; gap: 22px; min-height: 360px; }
+  .tick { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: var(--orange); color: #111; font-size: 50px; font-weight: 900; }
+  .check h3 { margin: 0; font-size: 52px; font-weight: 900; line-height: 1.1; }
+  .check p { margin: 0; font-size: 36px; color: var(--muted); font-weight: 600; line-height: 1.3; }
+
+  .next-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; padding: 0 var(--safe); gap: 40px; }
+  .next-grid h1 { font-size: 132px; }
+  .logo-hero { width: 640px; justify-self: center; filter: drop-shadow(0 30px 90px rgba(255,122,26,.3)); }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 1 · Lesson 1.2 · Set up</div>
+      <h1 style="margin-top:28px">Git and <span class="accent">GitHub</span></h1>
+      <p class="lead">Save every change, share it, and follow the course one pull request at a time.</p>
+      <div class="badges"><span class="badge">Version control</span><span class="badge">GitHub repository</span><span class="badge">One PR per lesson</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icons/git-branch-white.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="why">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Why git</div>
+    <h2>A dbt project is <span class="accent">code</span></h2>
+    <div class="why">
+      <div class="card s" data-step="1"><b>History</b><span>See what changed, when, and why.</span></div>
+      <div class="card s" data-step="1"><b>Undo</b><span>Go back when a change breaks something.</span></div>
+      <div class="card s" data-step="1"><b>Together</b><span>Review and share every change.</span></div>
+      <div class="card gh s" data-step="2"><img src="../brand/icons/git-branch-white.svg" alt="">GitHub <span>· a copy online that others can see, and that runs your pipeline later</span></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:20%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="flow">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">From your folder to GitHub</div>
+    <h2>Change, <span class="accent">commit</span>, push, pull request</h2>
+    <div class="loop">
+      <div class="card node s" data-step="1"><span class="num">1</span><h3>Change</h3><p>Edit files in your project folder.</p><div class="studio">Explorer · editor</div></div>
+      <div class="chev s" data-step="2">›</div>
+      <div class="card node s" data-step="2"><span class="num">2</span><h3>Commit</h3><p>A snapshot with a short message.</p><div class="studio">Git tab · Commit</div></div>
+      <div class="chev s" data-step="3">›</div>
+      <div class="card node s" data-step="3"><span class="num">3</span><h3>Push</h3><p>Send your commits to GitHub.</p><div class="studio">Publish Branch · Push</div></div>
+      <div class="chev s" data-step="4">›</div>
+      <div class="card node pr s" data-step="4"><span class="num">4</span><h3>Pull request</h3><p>From Lesson 2.2: one branch and one PR per lesson, merged into main.</p><div class="studio">github.com</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:20%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="token">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Pushing needs a token</div>
+    <h2>Not your password: a <span class="accent">token</span></h2>
+    <div class="tok">
+      <div class="card s" data-step="1">
+        <div class="pw"><s>password</s><span class="arrow">→</span>token</div>
+        <p>GitHub does not accept your account password for git. Pushes use a personal access token that you create on GitHub.</p>
+      </div>
+      <div class="card s" data-step="2">
+        <div class="row">Repository access <span>only this repo</span></div>
+        <div class="row">Contents <span>read and write</span></div>
+        <div class="row">Workflows <span>read and write</span></div>
+        <div class="row" style="border:0">Set up <span>before the first push · 2.1</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:20%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>Ready for the <span class="accent">first commit</span></h2>
+    <div class="checks s" data-step="1">
+      <div class="card check"><span class="tick">✓</span><h3>Git keeps the history</h3><p>Every change, with a message.</p></div>
+      <div class="card check"><span class="tick">✓</span><h3>GitHub keeps a copy</h3><p>Your empty repository is ready.</p></div>
+      <div class="card check"><span class="tick">✓</span><h3>One PR per lesson</h3><p>Easy to follow, easy to compare.</p></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:20%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 2.1</h1>
+      <h2 style="font-size:96px">Create the <span class="accent">dbt project</span></h2>
+    </div>
+    <img class="logo-hero" src="../brand/logo_hero.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

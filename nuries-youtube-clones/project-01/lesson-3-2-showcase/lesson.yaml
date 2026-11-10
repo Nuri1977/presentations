@@ -1,0 +1,148 @@
+# Lesson 3.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-3-2
+number: "3.2"
+title: "Showcase: docs site, README and a public warehouse"
+module: "Module 3 · Ship it"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 4.2 Showcase (now 3.2)"
+next: "Project 1 complete"
+summary: "Turn the nyc_taxi dbt project into a portfolio piece: deploy the dbt docs to GitHub Pages from the CI workflow, write a README with a build badge, and query the published DuckDB warehouse straight from GitHub in Rosetta DBT Studio's SQL Editor."
+start_state: lesson-3-1-end
+tags: [GitHub Pages, dbt docs, README, DuckDB, httpfs, portfolio, NYC taxi]
+target_minutes: 6
+rehearsal: true
+start_notes:
+  - "Start state `lesson-3-1-end`: a clone of what Lesson 3.1 pushed (CI workflow), the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt build (off camera)."
+  - "Rehearsal repo made public by Nuri on 10 Nov 2026 for this lesson; Pages was on 'Deploy from a branch' and is switched to GitHub Actions on camera."
+draft_changes:
+  - "Action pins: actions/upload-pages-artifact@v5, actions/deploy-pages@v5 (current majors on 10 Nov 2026)."
+  - "README is pasted in full (owner/repo already filled in for the rehearsal repo); no DAG image."
+accuracy_notes:
+  - "The public attach was checked off camera on 10 Nov 2026: top_pickup_zones from the release prod.duckdb gives 74 East Harlem North, 143,115 trips."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 3.2. Showcase. Badges: GitHub Pages, README, public warehouse."
+
+  - id: s01
+    kind: slide
+    chapter: "A portfolio project"
+    slide: portfolio
+    beats:
+      - { id: b01, step: 1, show: "A portfolio project: a README that explains it, live docs, a green build badge, data anyone can query.", say: "Last step: make the project easy to show. A README that explains it, live docs, a green build badge, and a warehouse anyone can query." }
+
+  - id: s02
+    kind: browser
+    chapter: "Turn on GitHub Pages"
+    beats:
+      - id: b02
+        say: "On GitHub, open the repository's Settings, then Pages. Under Source, choose GitHub Actions, so the workflow can publish the docs."
+        zoom: center-wide
+        actions:
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/settings/pages
+          - click_at: { role: button, name: "Source Deploy from a branch", label: Source, settleMs: [400, 1000] }
+          - click_at: { text: "GitHub Actions", label: GitHub Actions, settleMs: [600, 1500, 3000] }
+
+  - id: s03
+    kind: app
+    chapter: "Docs in the workflow, and a README"
+    beats:
+      - id: b03
+        say: "In Studio, open the workflow file, and paste three more build steps at the end: generate the docs, copy the site files, and upload them for Pages."
+        zoom: code-mid
+        actions:
+          - open_project: nyc_taxi
+          - open_file: .github/workflows/dbt_build.yml
+          - paste: { text: "      - run: dbt docs generate --profiles-dir ci\n      - run: mkdir site && cp target/index.html target/manifest.json target/catalog.json site/\n      - uses: actions/upload-pages-artifact@v5\n        with:\n          path: site\n  docs:\n    needs: build\n    runs-on: ubuntu-latest\n    permissions:\n      pages: write\n      id-token: write\n    environment:\n      name: github-pages\n      url: ${{ steps.deploy.outputs.page_url }}\n    steps:\n      - id: deploy\n        uses: actions/deploy-pages@v5\n", end: true }
+      - id: b04
+        say: "And a second job, docs, that runs after build and deploys the site. Save."
+        zoom: code-mid
+        actions:
+          - click_save
+          - expect_file: { path: .github/workflows/dbt_build.yml, snippet: ../snippets/3.2/dbt_build.yml }
+      - id: b05
+        say: "Now the README. Open it, select all, and paste the new one: a build badge, a docs link, what the project does and where to look, how to query the warehouse, and how to run it yourself. Save."
+        zoom: code-mid
+        actions:
+          - close_tab: .github/workflows/dbt_build.yml
+          - open_file: README.md
+          - paste: { replace: true, text: "# NYC taxi dbt project\n\n[![dbt build & publish](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions/workflows/dbt_build.yml/badge.svg)](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions/workflows/dbt_build.yml)\n[![docs](https://img.shields.io/badge/docs-live-ff7a1a)](https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/)\n\nA dbt + DuckDB project on the NYC TLC green taxi trips of 2025, built in Rosetta DBT Studio.\nGitHub Actions builds and tests it on every push, publishes the warehouse, and deploys the docs.\n\n| What | How | Where to look |\n|---|---|---|\n| Pipeline | source \u2192 `trips` view \u2192 three mart tables | `models/` |\n| Tests | unique, not_null, accepted_values | `models/schema.yml`, `seeds/seeds.yml` |\n| Docs | dbt docs, lineage graph | [docs site](https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/) |\n| CI | `dbt build` on every push and every Monday | `.github/workflows/dbt_build.yml` |\n| Environments | dev in Studio, prod in CI | `profiles.yml`, `ci/profiles.yml` |\n| Warehouse | `prod.duckdb`, a release asset | [Releases](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/tag/warehouse) |\n\n## Query the warehouse\n\nIn DuckDB (or the SQL Editor of Rosetta DBT Studio):\n\n```sql\ninstall httpfs; load httpfs;\nattach 'https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/download/warehouse/prod.duckdb' as taxi (read_only);\nselect * from taxi.main.top_pickup_zones;\n```\n\nThe marts are tables; `trips` is a view over local files, so query the marts.\n\n## Run it yourself\n\nOpen the folder in [Rosetta DBT Studio](https://rosettadb.io/download-dbtstudio.html), or:\n\n```bash\npip install -r requirements.txt\npython scripts/download_data.py\ndbt build\n```\n\n## Data\n\nNYC Taxi & Limousine Commission trip records: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page\n\nCourse: dbt + DuckDB in Rosetta DBT Studio, Project 1. One commit per lesson.\n" }
+          - click_save
+          - expect_file: { path: README.md, snippet: ../snippets/3.2/README.md }
+
+  - id: s04
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b06
+        say: "Git tab: stage all, type a message, publish docs and README, and commit."
+        zoom: git-panel
+        actions:
+          - close_tab: README.md
+          - git_tab
+          - git_stage_all
+          - git_message: Publish docs and README
+          - git_commit
+      - id: b07
+        say: "Sync Changes. The push starts the workflow."
+        zoom: git-panel
+        actions:
+          - git_push
+
+  - id: s05
+    kind: browser
+    chapter: "Live on GitHub"
+    beats:
+      - id: b08
+        say: "On GitHub, the Actions tab shows the run, now with two jobs: build, then docs."
+        actions:
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions
+          - click_at: { role: link, name: "Publish docs and README", label: the run, settleMs: [800, 2500] }
+      - id: b09
+        say: "A minute later, both are green."
+        actions:
+          - wait_text: { text: "^Success$", regex: true, timeoutMs: 900000, everyMs: 4000, label: CI run }
+      - id: b10
+        say: "The docs are live on GitHub Pages, for anyone, with the lineage graph of the whole project."
+        actions:
+          - goto: https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/
+          - click_at: { selector: "a[title='View Lineage Graph']", label: View Lineage Graph, settleMs: [500, 1500, 3000] }
+      - id: b11
+        say: "And the repository page shows the README, with the green build badge."
+        actions:
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal
+          - scroll_to: { text: "NYC taxi dbt project", at: 0.15 }
+
+  - id: s06
+    kind: app
+    chapter: "Query the warehouse from anywhere"
+    beats:
+      - id: b12
+        say: "Finally, anyone can query the warehouse. In Studio's SQL Editor, load DuckDB's web extension, attach prod dot duckdb straight from the GitHub release, and select the top pickup zones."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: nyc_taxi_dev
+          - type: "install httpfs; load httpfs; attach 'https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/download/warehouse/prod.duckdb' as taxi (read_only); select * from taxi.main.top_pickup_zones;"
+      - id: b13
+        say: "Run it."
+        zoom: explorer
+        actions:
+          - sql_run
+      - id: b14
+        say: "East Harlem North leads, with a hundred forty-three thousand trips: built by CI, read over the internet."
+        zoom: sql-results
+        card: { eyebrow: "taxi.main.top_pickup_zones", title: "East Harlem North: 143,115", sub: "read from the GitHub release", pos: top-right }
+
+  - id: s07
+    kind: slide
+    chapter: "Project 1 recap"
+    slide: recap
+    beats:
+      - { id: b15, step: 1, show: "Project 1 checklist: source + seed, models with ref, properties, docs and DAG, materializations, tests, CI, Pages, public warehouse.", say: "That's Project 1. Raw files and a seed, models with ref, descriptions, docs and the DAG, tables where they matter, tests, CI on every push, live docs, and a warehouse anyone can query. All built in Rosetta DBT Studio, and all on GitHub." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Project 1 complete. Code: github.com/Nuri1977/nyc-taxi-dbt."

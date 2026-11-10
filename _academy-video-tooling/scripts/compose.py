@@ -22,6 +22,9 @@ course = yaml.safe_load((C / 'course.yaml').read_text())
 lesson = yaml.safe_load((L / 'lesson.yaml').read_text())
 audio = json.loads((R / 'audio' / 'beats.json').read_text())
 events = json.loads((R / 'app' / 'events.json').read_text()) if (R / 'app' / 'events.json').exists() else {'beats': {}}
+# pane scenes (GitHub in the built-in browser, captured by scripts/pane.py) add their beats too
+if (R / 'pane' / 'events.json').exists():
+    events.setdefault('beats', {}).update(json.loads((R / 'pane' / 'events.json').read_text())['beats'])
 FPS = course['video']['fps']; OW, OH = course['video']['width'], course['video']['height']
 S = OW / 1920  # pixels per DIP
 LEAD, TAIL, ACT0 = 0.35, 0.6, 0.25
@@ -30,6 +33,10 @@ FULL = (0.0, 0.0, 1920.0, 1080.0)
 ZOOMS = {  # DIP rects, 16:9, about 1.6x
     'editor-code': (360, 75, 1200, 675), 'terminal': (356, 405, 1200, 675), 'bottom-panel': (705, 405, 1200, 675),
     'lineage-wide': (480, 405, 1200, 675), 'sql-results': (360, 300, 1360, 765),
+    'git-panel': (0, 0, 960, 540),
+    'explorer': (0, 40, 1280, 720), 'project-menu': (960, 0, 960, 540), 'model-menu': (1040, 20, 880, 495),
+    'code-close': (372, 96, 800, 450), 'code-mid': (372, 100, 960, 540), 'terminal-close': (360, 562, 920, 518),
+    'setup': (0, 20, 960, 540), 'statusbar': (1280, 720, 640, 360), 'home-header': (960, 0, 960, 540), 'center-wide': (320, 120, 1280, 720), 'gh-form': (300, 140, 1350, 760),
 }
 
 # ------------------------------------------------------------------ timeline
@@ -105,8 +112,11 @@ print(f'timeline {TOTAL:.1f}s, {len(beats_tl)} beats')
 # carry app image + cursor across beats/scenes
 app_img, cursor = None, tuple(events.get('initialCursor', (1180, 640)))
 for bt in beats_tl:
-    if bt['kind'] != 'app':
+    if bt['kind'] not in ('app', 'browser', 'pane'):
         continue
+    # a glide starts where the cursor was on that surface (Studio or browser keep separate cursors)
+    if bt['glides']:
+        cursor = tuple(bt['glides'][0][2])
     bt['img0'], bt['cursor0'] = app_img, cursor
     if bt['img_changes']:
         app_img = bt['img_changes'][-1][1]
@@ -213,7 +223,7 @@ def render(st):
         return im
     # app
     _, img, z, cur, rip, card = st
-    base = load(str(R / 'app' / 'frames' / img))
+    base = load(str(R / img) if '/' in img else str(R / 'app' / 'frames' / img))
     x, y, w, h = z
     if (float(x), float(y), float(w), float(h)) != FULL:
         base = base.crop((int(x * S), int(y * S), int((x + w) * S), int((y + h) * S))).resize((OW, OH), Image.BICUBIC)
@@ -239,8 +249,13 @@ def render(st):
 
 OUTDIR = R / 'composite'
 
+# Cached composites are keyed by state; the salt changes whenever a slide or card image is re-rendered,
+# so a changed card (same path, new content) never reuses an old composite.
+SALT = hashlib.sha1(''.join(f"{p.name}{p.stat().st_mtime_ns}" for d in ('slides', 'cards') if (R / d).exists()
+                            for p in sorted((R / d).iterdir())).encode()).hexdigest()[:8]
+
 def key_name(st):
-    return hashlib.sha1(json.dumps(st).encode()).hexdigest()[:16] + '.jpg'
+    return hashlib.sha1((json.dumps(st) + SALT).encode()).hexdigest()[:16] + '.jpg'
 
 def render_to_file(st):
     p = OUTDIR / key_name(st)

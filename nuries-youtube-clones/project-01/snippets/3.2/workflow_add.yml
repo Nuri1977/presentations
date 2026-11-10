@@ -1,0 +1,17 @@
+      - run: dbt docs generate --profiles-dir ci
+      - run: mkdir site && cp target/index.html target/manifest.json target/catalog.json site/
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+  docs:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

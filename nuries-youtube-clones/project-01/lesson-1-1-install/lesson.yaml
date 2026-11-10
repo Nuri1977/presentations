@@ -1,0 +1,141 @@
+# Lesson 1.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-1-1
+number: "1.1"
+title: "Install Rosetta DBT Studio"
+module: "Module 1 · Set up"
+draft_section: "plan-dbt-project01.md, Course repo and PR design: Lesson 1.1 (old 2.1)"
+next: "Lesson 2.1 · Create the dbt project"
+summary: "Install Rosetta DBT Studio 1.7.6, the one app used for the whole course. Download it from the GitHub release page, copy it to Applications, and let its first-run setup install Python and dbt Core with the DuckDB adapter. No Python or dbt to install yourself."
+start_state: fresh-install
+tags: [install dbt, Rosetta DBT Studio, dbt Core, DuckDB, Mac]
+target_minutes: 4
+start_notes:
+  - "Start state `fresh-install`: Studio 1.7.6 launched with an empty profile (no Python, no dbt, no projects), so its first-run setup appears."
+  - "The browser scene opens the 1.7.6 release page directly."
+draft_changes:
+  - "The DMG window and the macOS open prompt are shown on a slide built from the release's own DMG background (assets/dmg-background.png) and window layout (540x380, app left, Applications right). The recorder cannot capture Finder, and the recording Mac keeps its own Studio in /Applications."
+  - "The download is started for real on the release page and cancelled in this rehearsal; the app used is the same 1.7.6 x64 build."
+  - "The plan's home tour named New Project; Studio 1.7.6's home screen shows New Connection, Open Project and Settings, and projects start from the DBT Project card (Lesson 2.1)."
+accuracy_notes:
+  - "Release page checked 9 Nov 2026: 1.7.6 is Latest; GitHub lists Rosetta-DBT-Studio-1.7.6-x64.dmg as 196 MB and -arm64.dmg as 187 MB, plus .exe, .deb, .rpm, .flatpak, .tar.gz and .zip builds."
+  - "The 1.7.6 Mac app is signed and notarized (spctl: accepted, source=Notarized Developer ID), so macOS shows its standard open prompt for downloaded apps."
+  - "First-run setup, recorded here: Step 1 of 2 asks for dbt 1.x (Recommended) or 2.x, the version (1.12.6 latest), adapters (all except DuckDB are checked by default), optional tools (Flowfile). Step 2 of 2 installs Python 3.10.17 and dbt 1.12.6 with 1 adapter (about 90 seconds here)."
+  - "After setup, Studio's folder holds python/cpython-3.10.17 (51 MB) and venv with dbt-core 1.12.6 + dbt-duckdb 1.11.1 (346 MB)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 1 · Lesson 1.1. Install Rosetta DBT Studio. Badges: version 1.7.6, Mac · Windows · Linux, about 5 minutes."
+
+  - id: s01
+    kind: slide
+    chapter: "One app for the whole course"
+    slide: toolkit
+    beats:
+      - { id: b01, step: 1, show: "Statement: One app. It installs Python and dbt Core for you. Three steps: download, copy, first-run setup.", say: "In this lesson, you install Rosetta DBT Studio, the one app we use for the whole course. You download it, copy it to your computer, and its first-run setup installs Python and dbt Core for you." }
+
+  - id: s02
+    kind: browser
+    chapter: "Download the release"
+    beats:
+      - id: b02
+        say: "Studio is open source, and every version is published on GitHub. Open the releases page of rosettadb, dbt-studio. The latest release is 1.7.6."
+        zoom: center-wide
+        actions:
+          - goto: https://github.com/rosettadb/dbt-studio/releases/tag/1.7.6
+        card: { eyebrow: "Download page", title: "github.com/rosettadb/dbt-studio/releases", sub: "Latest: 1.7.6", pos: top-right }
+      - id: b03
+        say: "Scroll down to Assets. There is a build for every system: a dmg for Mac, an exe for Windows, and deb, rpm and flatpak packages for Linux."
+        zoom: center-wide
+        actions:
+          - scroll_to: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-amd64.deb"]', label: Assets, at: 0.22 }
+          - point_at: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-amd64.deb"]', label: ".deb", dx: 0.3 }
+          - point_at: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-x64.exe"]', label: ".exe", dx: 0.3 }
+      - id: b04
+        say: "On a Mac, pick the dmg for your processor: arm64 for Apple silicon, x64 for Intel. This Mac has an Intel chip, so click the x64 dmg."
+        zoom: center-wide
+        card: { eyebrow: "This Mac: Intel", title: "The x64 .dmg, 196 MB", sub: "Apple silicon Macs: the arm64 .dmg (187 MB).", pos: top-right }
+        actions:
+          - point_at: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-arm64.dmg"]', label: "arm64.dmg", dx: 0.4 }
+          - click_download: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-x64.dmg"]', label: "x64.dmg" }
+
+  - id: s03
+    kind: slide
+    chapter: "Copy it to Applications"
+    slide: dmg
+    beats:
+      - { id: b05, step: 1, show: "The Rosetta Studio disk window (the release's own background): the app icon on the left, Applications on the right.", say: "When the download finishes, open the file. A window shows the app on the left, and your Applications folder on the right." }
+      - { id: b06, step: 2, show: "A cursor drags the app icon along the INSTALL arrow onto Applications.", say: "Drag Rosetta DBT Studio onto Applications, and wait for the copy to finish." }
+      - { id: b07, step: 3, show: "Prompt card: Rosetta DBT Studio is an app downloaded from the internet. Are you sure you want to open it? Open is highlighted.", say: "Then open it from Applications. The first time, macOS asks whether you want to open an app downloaded from the internet. Click Open." }
+
+  - id: s04
+    kind: app
+    chapter: "First-run setup"
+    beats:
+      - id: b08
+        say: "Studio starts with a short setup. First, the dbt version. Choose dbt 1.x, the recommended one."
+        zoom: setup
+        actions:
+          - click_at: { role: radio, name: "^dbt 1\\.x", regex: true, label: "dbt 1.x", dx: 0.08 }
+      - id: b09
+        say: "Then the exact version. Keep the latest, 1.12.6."
+        zoom: setup
+        actions:
+          - click_at: { role: radio, name: "^1\\.12\\.6", regex: true, label: "1.12.6 latest", dx: 0.08 }
+      - id: b10
+        say: "Next, the adapters, one for each database dbt can talk to. This course only needs DuckDB, so uncheck the others, keep dbt-duckdb, and click Continue."
+        zoom: setup
+        card: { eyebrow: "Adapters", title: "Only dbt-duckdb", sub: "You can add others later in Settings.", pos: top-right }
+        actions:
+          - uncheck: [dbt-postgres, dbt-snowflake, dbt-bigquery, dbt-redshift, dbt-databricks, dbt-kinetica]
+          - check: dbt-duckdb
+          - click_at: { role: button, name: Continue, label: Continue }
+      - id: b11
+        say: "Skip the optional tools, and click Install."
+        actions:
+          - click_at: { role: button, name: Continue, label: Continue }
+          - click_at: { role: button, name: Install, label: Install }
+      - id: b12
+        say: "Studio downloads its own copy of Python, then installs dbt Core and the DuckDB adapter, all inside its own folder. Here it took about a minute and a half; the video speeds it up."
+        zoom: setup
+        card: { eyebrow: "Sped up", title: "About 90 seconds", sub: "Python 3.10.17, then dbt Core 1.12.6 + dbt-duckdb", pos: top-right }
+        actions:
+          - wait_enabled: { role: button, name: Finish }
+      - id: b13
+        say: "Python 3.10.17, and dbt 1.12.6 with one adapter. Click Finish."
+        actions:
+          - click_at: { role: button, name: Finish, label: Finish, closes: true }
+          - follow_window
+
+  - id: s05
+    kind: app
+    chapter: "The home screen"
+    beats:
+      - id: b14
+        say: "This is Studio's home screen, the Workspace Overview. No projects yet: we create the first one in Module 2."
+      - id: b15
+        say: "The status bar at the bottom shows what was installed: dbt 1.12.6, Python 3.10.17, and DuckDB."
+        zoom: statusbar
+        actions:
+          - point_at: { text: "dbt: 1.12.6", label: "dbt: 1.12.6" }
+      - id: b16
+        say: "At the top right are New Connection, Open Project, and Settings. That is all we need for now."
+        zoom: home-header
+        actions:
+          - point_at: { role: button, name: New Connection, label: New Connection }
+          - point_at: { role: button, name: Open Project, label: Open Project }
+          - point_at: { role: button, name: Settings, label: Settings }
+
+  - id: s06
+    kind: slide
+    chapter: "What was installed"
+    slide: installed
+    beats:
+      - { id: b17, step: 1, show: "Rosetta DBT Studio 1.7.6 in Applications; in Studio's own folder: Python 3.10.17 and dbt Core 1.12.6 with dbt-duckdb.", say: "To recap: you installed one app. Studio set up its own Python and dbt Core, with the DuckDB adapter, inside its own folder. You did not install Python or dbt yourself." }
+      - { id: b18, step: 2, show: "Next: create the dbt project and connect it to GitHub.", say: "Next, we create the dbt project, and connect it to a repository on GitHub." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.1 · Create the dbt project."

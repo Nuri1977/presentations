@@ -1,0 +1,30 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A D B T project is code: sequel and yammel files.
+b01	Git keeps the history of that code, so you can see what changed, undo a mistake, and work with others.
+b02	git hub keeps a copy online.
+b02	Others can see your work there, and later it runs your pipeline for you.
+b03	Here is the loop.
+b03	You change files in your project folder.
+b04	You commit them: a snapshot with a short message, made in Studio's Git tab.
+b05	You push the commits to git hub.
+b05	In Studio, that is Publish Branch the first time, then Push.
+b06	And from lesson 2.2 on, each lesson's work goes on its own branch, and becomes a pull request on git hub, which we merge into main.
+b07	Let's create the repository.
+b07	On git hub, signed in, click the plus button at the top, and choose New repository.
+b08	Give it a name.
+b08	This is a rehearsal copy, N Y C taxi D B T rehearsal, and it is private.
+b08	In your own project, call it N Y C taxi D B T, and make it public.
+b09	Leave everything else empty: no read me, no git ignore, no license.
+b09	Our first commit, in lesson 2.1, brings those files.
+b09	Click Create repository.
+b10	The repository is ready, and empty.
+b10	git hub shows its address.
+b10	Copy the H T T P S address: Studio needs it in lesson 2.1.
+b11	One more thing.
+b11	git hub does not accept your account password for pushing code.
+b11	Pushes use a personal access token: a key you create on git hub.
+b12	Make it work for this repository only, with contents and workflows set to read and write.
+b12	We set it up right before the first push, in lesson 2.1.
+b13	To recap.
+b13	Git keeps the history, git hub keeps a copy online, and one pull request per lesson keeps every change easy to follow.
+b13	Next, we create the D B T project.
