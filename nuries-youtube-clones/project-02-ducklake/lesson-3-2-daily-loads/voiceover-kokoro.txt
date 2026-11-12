@@ -1,0 +1,22 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Real pipelines run every day, and sometimes twice: a retry after an error, or a click too many.
+b01	A plain insert would load the same day twice.
+b02	We want an idempotent load: one you can run again, and nothing changes.
+b03	In the sequel Editor, on eth lake: insert the blocks of the second of November, but only those where no block with the same number exists yet.
+b04	Count by day.
+b04	Studio 1.7.6 shows a date column as a day number, so read the rows in order: the first and the second of November, seven thousand one hundred seventy-six blocks each.
+b05	Now run the load again, as if a job retried.
+b06	Count again: still seven thousand one hundred seventy-six.
+b06	No duplicates.
+b07	And the snapshots: one new snapshot for the first run.
+b07	The second run inserted nothing, so it did not even create a snapshot.
+b08	The general tool is merge into.
+b08	It matches new rows to existing ones on a key, updates the rows that match, and inserts the rest.
+b08	duck lake supports it.
+b09	Studio's sequel Editor does not accept merge, so here we used insert where not exists.
+b09	In Lesson 6.3, D B T runs a real merge on this lake for us.
+b10	Save the load as 3 underscore 2 daily load dot sequel, commit, and push.
+b11	To recap: insert only rows whose key is new, and the load can run twice safely.
+b11	A change that changes nothing makes no snapshot.
+b11	And merge does the same, with updates too.
+b11	Next: changing a table's columns.

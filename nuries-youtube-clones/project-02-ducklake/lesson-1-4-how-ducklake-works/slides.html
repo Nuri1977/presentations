@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.4 · How DuckLake works</title>
+<!-- Slide scenes for Lesson 1.4. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (white). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .choices { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+  .choices .pill { font-size: 26px; padding: 8px 18px; }
+  .lake .box { align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+  .side { display: grid; grid-template-columns: 1.05fr .95fr; gap: 36px; flex: 1; align-items: center; margin-top: 20px; }
+  .mini { border-radius: 20px; border: 1px solid var(--line); background: #fff; padding: 30px 34px; box-shadow: 0 18px 44px rgba(20,23,31,.07); }
+  .mini .k { font-size: 26px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .mini + .mini { margin-top: 24px; }
+  .snaprow { display: flex; align-items: center; gap: 14px; margin-top: 18px; font-size: 30px; font-weight: 750; }
+  .snaprow .dot { width: 54px; height: 54px; border-radius: 50%; border: 5px solid #c5cad4; display: grid; place-items: center; font-weight: 900; font-size: 26px; color: var(--muted); background: #fff; }
+  .snaprow .dot.now { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .snaprow .bar { flex: 1; height: 5px; border-radius: 9px; background: var(--line); }
+  .stat { font-family: var(--mono); font-size: 24px; color: var(--dim); }
+  .file.skip { opacity: .4; border-style: dashed; }
+  .file.read { border-color: var(--orange); background: var(--orange-soft); }
+  .big-cards .card { padding: 52px 50px; min-height: 470px; }
+  .big-cards .card .k { font-size: 32px; }
+  .big-cards .card .t { font-size: 62px; margin-top: 16px; }
+  .big-cards .card .d { font-size: 42px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<!-- title -->
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 1.4</div>
+      <h1 style="margin-top:28px">How <span class="accent">DuckLake</span> works</h1>
+      <p class="lead">The mental model for the whole course.</p>
+      <div class="badges"><span class="badge">Catalog</span><span class="badge">Parquet files</span><span class="badge">Snapshots</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<!-- two parts -->
+<section class="stage" data-id="parts">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">DuckLake in one picture</div>
+    <h2>A catalog and a folder of files</h2>
+    <div class="lake">
+      <div class="box catalog s" data-step="1">
+        <div class="k">Catalog</div><div class="n">A SQL database</div>
+        <div class="d">Tables, columns, snapshots, and the list of files in each table.</div>
+        <div class="choices"><span class="pill">DuckDB file</span><span class="pill grey">SQLite</span><span class="pill grey">PostgreSQL</span><span class="pill grey">MySQL</span></div>
+      </div>
+      <div class="link s" data-step="2">⟷</div>
+      <div class="box files s" data-step="2">
+        <div class="k">Data</div><div class="n">Parquet files</div>
+        <div class="d">In a folder or a bucket. Never edited: only added or removed.</div>
+        <div class="files-strip">
+          <div class="file">ducklake-01a1.parquet<small>data file</small></div>
+          <div class="file">ducklake-01a2.parquet<small>data file</small></div>
+          <div class="file del">ducklake-01a3-delete<small>delete file</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:14%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+<!-- a write -->
+<section class="stage" data-id="write">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">A write</div>
+    <h2>Files first, then one commit</h2>
+    <div class="side">
+      <div class="steps" style="margin-top:0">
+        <div class="step s" data-step="1"><div class="num">1</div><div><div class="t">Write Parquet files</div><div class="d">New rows go into new files in the data folder. Not visible yet.</div></div></div>
+        <div class="step hot s" data-step="2"><div class="num">2</div><div><div class="t">One transaction in the catalog</div><div class="d">It records the files and creates a snapshot. Now the change is visible.</div></div></div>
+        <div class="step s" data-step="3"><div class="num">3</div><div><div class="t">If anything fails</div><div class="d">The catalog does not change. Readers never see half a write.</div></div></div>
+      </div>
+      <div>
+        <div class="mini s" data-step="1"><div class="k">Data folder</div>
+          <div class="files-strip"><div class="file">ducklake-01a1.parquet<small>already there</small></div><div class="file new">ducklake-01a2.parquet<small>just written</small></div></div></div>
+        <div class="mini s" data-step="2"><div class="k">Catalog</div>
+          <div class="snaprow"><div class="dot">1</div><div class="bar"></div><div class="dot">2</div><div class="bar"></div><div class="dot now">3</div><span style="margin-left:10px">new snapshot</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:34%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+<!-- a read -->
+<section class="stage" data-id="read">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">A read</div>
+    <h2>Ask the catalog, then read less</h2>
+    <div class="side">
+      <div class="steps" style="margin-top:0">
+        <div class="step s" data-step="1"><div class="num">1</div><div><div class="t">Which files are the table now?</div><div class="d">The catalog answers with a list of files.</div></div></div>
+        <div class="step s" data-step="2"><div class="num">2</div><div><div class="t">Skip files by statistics</div><div class="d">Smallest and largest value of each column, kept per file.</div></div></div>
+        <div class="step hot s" data-step="3"><div class="num">3</div><div><div class="t">Read what is left</div><div class="d">Only the Parquet files that can match.</div></div></div>
+      </div>
+      <div class="mini s" data-step="1"><div class="k">where date = '2026-10-03'</div>
+        <div class="files-strip" style="flex-direction:column">
+          <div class="file s skip" data-step="2" style="min-width:560px">ducklake-01a1.parquet<span class="stat">date 2026-10-01 .. 2026-10-01</span></div>
+          <div class="file s skip" data-step="2" style="min-width:560px">ducklake-01a2.parquet<span class="stat">date 2026-10-02 .. 2026-10-02</span></div>
+          <div class="file read" style="min-width:560px">ducklake-01a3.parquet<span class="stat">date 2026-10-03 .. 2026-10-03</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:52%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+<!-- what you get -->
+<section class="stage" data-id="gets">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What this design gives you</div>
+    <h2>Three things for free</h2>
+    <div class="row three big-cards">
+      <div class="card s" data-step="1"><div class="k">Safe changes</div><div class="t">Real transactions</div><div class="d">All or nothing, even across several tables.</div></div>
+      <div class="card hot s" data-step="2"><div class="k">History</div><div class="t">Snapshots and time travel</div><div class="d">Query a table as it was yesterday, or last week.</div></div>
+      <div class="card s" data-step="3"><div class="k">Small changes</div><div class="t">Stay small</div><div class="d">A few rows in the catalog, not a pile of metadata files.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:70%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+  <div class="checked">Checked against the DuckLake docs on 11 Nov 2026</div>
+</section>
+
+<!-- who can read it -->
+<section class="stage" data-id="readers">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Who can read it</div>
+    <h2>Open on both sides</h2>
+    <div class="row two big-cards">
+      <div class="card hot s" data-step="1"><div class="k">Today</div><div class="t">DuckDB + the <span class="mono">ducklake</span> extension</div><div class="d">Reads and writes the lake. Rosetta DBT Studio uses it under the hood.</div></div>
+      <div class="card s" data-step="2"><div class="k">Nothing locked away</div><div class="t">Plain SQL tables, plain Parquet</div><div class="d">Any SQL client can look inside the catalog. Any Parquet reader can open the files.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:86%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+  <div class="checked">Checked against the DuckLake docs on 11 Nov 2026</div>
+</section>
+
+<!-- recap -->
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What to remember</h2>
+    <div class="recap s" data-step="1">
+      <div class="item"><div class="num">1</div><div>The catalog is a database. The data is Parquet.</div></div>
+      <div class="item"><div class="num">2</div><div>Files are never edited, only added or removed.</div></div>
+      <div class="item"><div class="num">3</div><div>Every change makes a snapshot.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+<!-- closing -->
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 1.5</h1>
+      <h2 style="font-size:92px">The <span class="accent">Ethereum</span> data</h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

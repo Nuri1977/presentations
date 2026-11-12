@@ -1,0 +1,49 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:07.495
+In DBT Studio, in the models folder, create sources dot yml.
+
+00:00:07.775 --> 00:00:14.636
+A source called raw, in database eth lake, schema raw, with the two tables we loaded: blocks and transactions.
+
+00:00:15.586 --> 00:00:20.046
+Make a folder models, staging, and in it stg blocks dot sequel.
+
+00:00:20.326 --> 00:00:27.043
+A view that renames the columns clearly, computes gas used in percent, and turns the base fee from wei into gwei.
+
+00:00:32.007 --> 00:00:39.254
+And stg transactions dot sequel: the value and the fee paid in ether, and a success flag from the receipt status.
+
+00:00:42.452 --> 00:00:45.901
+In the command box, run dbt run, select staging.
+
+00:00:46.181 --> 00:00:48.457
+Two views, created in the lake, in a second.
+
+00:00:54.056 --> 00:01:00.675
+Look at some rows with dbt show: each transaction with its block, date, addresses, and value in ether.
+
+00:01:00.955 --> 00:01:05.919
+The terminal shows the columns that fit; the fee and the success flag are further right.
+
+00:01:06.869 --> 00:01:13.763
+A view in a DuckLake is only a row in the catalog, in ducklake view: its SQL text, and no data files at all.
+
+00:01:14.043 --> 00:01:17.777
+So staging views cost nothing to keep, and are always up to date.
+
+00:01:18.727 --> 00:01:22.228
+dbt is done, so now we can open the lake in Studio.
+
+00:01:22.508 --> 00:01:28.386
+In Data Lake, eth lake, refresh: the two staging views are listed, in schema main, with type view.
+
+00:01:29.336 --> 00:01:32.046
+Commit the source and the staging models, and push.
+
+00:01:47.111 --> 00:01:55.730
+To recap: sources point dbt at the raw tables, two staging views clean them up, and in a lake a view is just a row in the catalog.
+
+00:01:56.010 --> 00:01:59.060
+Next: marts, built incrementally, with a real merge.

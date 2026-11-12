@@ -13,6 +13,24 @@
 
 ---
 
+## Change of 10 Nov 2026 (afternoon): Studio features first, raw data in DuckDB, final run
+
+Nuri, after reviewing the rehearsal cuts: "You should be using dbt-studio compile, sql query tab, dbt history..." and "In settings we have how python, dbt and other configuration for dbt projects."
+
+- **Show Studio's own features, not terminal output**, from 2.2 on:
+  - rows: **Model ▸ Preview** (the Preview window) and the bottom **QUERY RESULTS** tab with its **PREVIEW / SQL (Compiled SQL, Raw SQL) / HISTORY** sub-tabs;
+  - compiled SQL: **Model ▸ Compile** (the "Compiled SQL" window, Original / Compiled tabs);
+  - runs: Project / Model menus, then **RUN HISTORY**;
+  - ad-hoc queries: the **SQL Editor** (one statement per run).
+  `dbt show` in the terminal is dropped. 2.1 keeps its terminal `dbt debug` (Nuri, 10 Nov morning).
+- **Settings tour at the start of 2.1** (Nuri's choice): Settings ▸ General (projects directory), ▸ dbt Core (runtime dbt v1, 1.12.6, dbt Path, Python environment, the dbt-duckdb adapter), ▸ Python (3.10.17 installed, recommended). 1.1 is unchanged.
+- **Raw data lives in DuckDB, not behind a relative path.** Checked in Studio 1.7.6: Model ▸ Preview fails on every model ("No files found that match the pattern data/raw/…") because the source was `external_location: read_parquet('data/raw/…')` and Studio queries DuckDB from its own folder. New design:
+  - 2.2: the 12 parquet files still go in `data/raw` (gitignored); in the SQL Editor the learner runs `create schema raw` and `create table raw.green_trips as select * from read_parquet('<project>/data/raw/green_tripdata_2025-*.parquet', union_by_name = true)` once, then checks `select count(*) from raw.green_trips` (591,375).
+  - `models/sources.yml` declares source `raw` with table `green_trips` (no `external_location`); dbt resolves it to `nyc_taxi_dev.raw.green_trips` (dev) and `prod.raw.green_trips` (CI).
+  - 3.1: `scripts/download_data.py` downloads the files **and loads `raw.green_trips` into the database at `DUCKDB_PATH`** (duckdb comes with dbt-duckdb), so CI builds the same way. The published `prod.duckdb` then holds the raw table, so even `trips` can be queried from the release.
+- **Final run, not a rehearsal** (Nuri, 10 Nov): 2.1–3.2 are recorded again, pushing to the existing empty public **`Nuri1977/nyc-taxi-dbt`** (kept, not deleted). The token has push access there (checked) and none to the rehearsal repo. 2.1's GitHub scene shows the real empty repo page instead of the rehearsal's creation frames. 3.2 sets Pages ▸ Source: GitHub Actions on camera.
+- The rehearsal repo `nyc-taxi-dbt-rehearsal` (public now, Pages on) stays as Nuri left it.
+
 ## Change of 10 Nov 2026: git kept light in the dbt course (overrides the PR design below)
 
 Nuri: "this is a dbt tutorial and we just show that there is a public repo they can get the code."

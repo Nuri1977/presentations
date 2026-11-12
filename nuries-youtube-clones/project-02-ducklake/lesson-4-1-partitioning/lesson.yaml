@@ -1,0 +1,137 @@
+# Lesson 4.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-4-1
+number: "4.1"
+title: "Partitioning"
+module: "Module 4 · Performance and upkeep"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 4.1"
+next: "Lesson 4.2 · Statistics and file pruning"
+summary: "Load the big table the right way: a week of Ethereum transactions, 12.7 million rows from S3, into raw.transactions partitioned by day. See one folder per day on disk, the partition in Studio's table page, and why a query for one day reads one file."
+start_state: lesson-3-5-end
+show_help_links: true
+links:
+  - { title: "DuckLake: partitioning", url: "https://ducklake.select/docs/stable/duckdb/advanced_features/partitioning" }
+tags: [DuckLake, partitioning, Parquet, S3, Ethereum transactions]
+target_minutes: 4.5
+start_notes:
+  - "Start state `lesson-3-5-end`: raw.blocks and raw.blocks_day; no transactions yet."
+draft_changes:
+  - "CREATE TABLE, then ALTER TABLE … SET PARTITIONED BY (date) before the first insert (same effect as partitioning at create time)."
+  - "One insert for the whole week with a glob date=2026-10-0[1-7], instead of seven inserts."
+accuracy_notes:
+  - "Transactions 1 to 7 Oct 2026: 2,036,041 / 1,875,646 / 1,562,292 / 1,526,358 / 1,774,270 / 1,957,602 / 1,963,594; 12,695,803 in total; seven files, one per date= folder; about 1.7 GB. Rehearsal 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 4.1. Partitioning."
+
+  - id: s01
+    kind: slide
+    chapter: "Why partition"
+    slide: why
+    beats:
+      - { id: b01, step: 1, show: "12.7 million rows; most questions ask about one day.", say: "Transactions are big: almost thirteen million rows for one week. And most questions ask about a day or two." }
+      - { id: b02, step: 2, show: "Partition by date: one folder per day; a query for one day only opens that folder.", say: "So we partition the table by date. Every day gets its own folder of files, and a query for one day only opens that day's files." }
+
+  - id: s02
+    kind: app
+    chapter: "Create and load"
+    beats:
+      - id: b03
+        say: "In the SQL Editor, on eth lake: create raw dot transactions, with the columns we need. We leave out input, the largest column. Then set it partitioned by date, before any data goes in."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              create table raw.transactions (hash varchar, block_number bigint, block_timestamp timestamp, transaction_index bigint, from_address varchar, to_address varchar, value double, gas bigint, gas_price bigint, receipt_gas_used bigint, receipt_effective_gas_price bigint, receipt_status bigint, transaction_type bigint, max_fee_per_gas bigint, max_priority_fee_per_gas bigint, date date);
+              alter table raw.transactions set partitioned by (date);
+              insert into raw.transactions select hash, block_number, block_timestamp, transaction_index, from_address, to_address, value, gas, gas_price, receipt_gas_used, receipt_effective_gas_price, receipt_status, transaction_type, max_fee_per_gas, max_priority_fee_per_gas, date from read_parquet('s3://aws-public-blockchain/v1.0/eth/transactions/date=2026-10-0[1-7]/*.parquet');
+              select strftime(date, '%Y-%m-%d') as day, count(*) as transactions from raw.transactions group by all order by 1;
+              select regexp_extract(file, 'transactions/(.*)$', 1) as file from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/transactions/**/*.parquet');
+              select count(*) as transactions from raw.transactions where date = date '2026-10-03';
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Now load the week, the first to the seventh of October, straight from S3. That is about nine hundred megabytes to download, so it takes a few minutes. The video speeds it up."
+        zoom: explorer
+        card: { eyebrow: "Sped up", title: "One week from S3", sub: "7 files, 12.7 million rows", pos: top-right }
+        actions:
+          - sql_run: { line: 3, settleMs: [1000] }
+          - sql_wait
+      - id: b05
+        say: "Transactions per day: between one and a half and two million. Twelve point seven million in total."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 3000] }
+
+  - id: s03
+    kind: app
+    chapter: "One folder per day"
+    beats:
+      - id: b06
+        say: "On disk, under raw transactions, there is now one folder per date, with one Parquet file in each."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+      - id: b07
+        say: "A query for one day, the third of October, only needs the file in that day's folder. The catalog knows which file holds which date, so the rest is never opened."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+      - id: b08
+        say: "In Data Lake, open the transactions table. The Partitions tab shows the key: date."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: button, name: Refresh, label: Refresh, settleMs: [500, 1500, 2500] }
+          - click_at: { text: transactions, label: transactions, settleMs: [500, 1500, 2500] }
+          - click_at: { role: tab, name: Partitions, settleMs: [400, 1200, 2500] }
+
+  - id: s04
+    kind: slide
+    chapter: "Choosing a key"
+    slide: key
+    beats:
+      - { id: b09, step: 1, show: "Good keys: low cardinality, used in filters (date, month). Too fine = many small files.", say: "Choose a key that your queries filter on, with not too many values: a day, or a month. Partition by something like an address, and you get millions of tiny files." }
+      - { id: b10, step: 2, show: "Change it later: ALTER TABLE … SET PARTITIONED BY (year(block_timestamp), month(block_timestamp)); applies to new data only.", say: "You can change the key later. The new key applies to new data only; existing files stay as they are." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b11
+        say: "Save the script as 4 underscore 1 partitioning dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 4_1_partitioning.sql }
+          - paste: |
+              create table raw.transactions (hash varchar, block_number bigint, block_timestamp timestamp, transaction_index bigint, from_address varchar, to_address varchar, value double, gas bigint, gas_price bigint, receipt_gas_used bigint, receipt_effective_gas_price bigint, receipt_status bigint, transaction_type bigint, max_fee_per_gas bigint, max_priority_fee_per_gas bigint, date date);
+              alter table raw.transactions set partitioned by (date);
+              insert into raw.transactions select hash, block_number, block_timestamp, transaction_index, from_address, to_address, value, gas, gas_price, receipt_gas_used, receipt_effective_gas_price, receipt_status, transaction_type, max_fee_per_gas, max_priority_fee_per_gas, date from read_parquet('s3://aws-public-blockchain/v1.0/eth/transactions/date=2026-10-0[1-7]/*.parquet');
+              select strftime(date, '%Y-%m-%d') as day, count(*) as transactions from raw.transactions group by all order by 1;
+              select regexp_extract(file, 'transactions/(.*)$', 1) as file from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/transactions/**/*.parquet');
+              select count(*) as transactions from raw.transactions where date = date '2026-10-03';
+          - click_save
+          - expect_file: { path: sql/4_1_partitioning.sql, snippet: ../snippets/4.1/4_1_partitioning.sql }
+          - close_tab: sql/4_1_partitioning.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Load a week of transactions, partitioned by day
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b12, step: 1, show: "Recap: partitioned by date; one folder per day; a one-day query opens one file; changing the key affects new data.", say: "To recap: raw transactions is partitioned by date, with one folder per day, so a query for one day opens one file. Next: statistics, and how they skip files even without partitions." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 4.2 · Statistics and file pruning."

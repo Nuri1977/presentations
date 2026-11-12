@@ -1,0 +1,181 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:07.329
+In this lesson we create the project for the whole course, and our first lake.
+
+00:00:07.609 --> 00:00:14.498
+On disk, the lake is two things inside one folder: a catalog file, and a data folder for the Parquet files.
+
+00:00:15.448 --> 00:00:16.745
+We call the lake eth lake.
+
+00:00:17.025 --> 00:00:21.720
+Its storage is a local folder, and its catalog is a single DuckDB file.
+
+00:00:22.670 --> 00:00:29.716
+First, the project. dbt needs a connection, so on the home screen click New Connection, and choose DuckDB.
+
+00:00:32.863 --> 00:00:38.212
+Name it ethereum lake dev, with a small DuckDB file next to the projects folder.
+
+00:00:38.492 --> 00:00:41.570
+We point dbt at the lake later, in Module 6.
+
+00:00:41.850 --> 00:00:42.449
+Save.
+
+00:00:43.399 --> 00:00:48.851
+Now open the DBT Project card, click New Project, and call it ethereum lake.
+
+00:00:49.131 --> 00:00:50.659
+Pick the connection, and save.
+
+00:01:01.000 --> 00:01:05.379
+In the project, make a folder called lake, and inside it, a folder called data.
+
+00:01:05.659 --> 00:01:06.710
+The lake lives here.
+
+00:01:13.548 --> 00:01:15.681
+Now open Data Lake from the sidebar.
+
+00:01:15.961 --> 00:01:17.119
+There are no lakes yet.
+
+00:01:17.399 --> 00:01:19.746
+Click Create DataLake, and choose DuckLake.
+
+00:01:23.515 --> 00:01:25.975
+Step one, the name: eth underscore lake.
+
+00:01:26.255 --> 00:01:26.845
+Next.
+
+00:01:27.795 --> 00:01:29.045
+Step two, storage.
+
+00:01:29.325 --> 00:01:33.098
+Keep Local, and give the full path of the data folder we just made.
+
+00:01:33.378 --> 00:01:35.420
+This is where the Parquet files will go.
+
+00:01:36.370 --> 00:01:37.817
+Step three, the catalog.
+
+00:01:38.097 --> 00:01:39.905
+DuckDB is the catalog type.
+
+00:01:40.185 --> 00:01:45.737
+Replace the suggested path with a file in the lake folder: eth catalog dot duckdb.
+
+00:01:46.687 --> 00:01:47.277
+Next.
+
+00:01:47.557 --> 00:01:51.146
+The runtime options, memory and threads, can stay as they are.
+
+00:01:51.426 --> 00:01:56.498
+Next again, and the review shows the name, the data folder, and the DuckDB catalog.
+
+00:01:56.778 --> 00:01:57.959
+Click Create Instance.
+
+00:01:58.909 --> 00:01:59.816
+Here is the lake.
+
+00:02:00.096 --> 00:02:01.218
+No tables yet.
+
+00:02:01.498 --> 00:02:04.938
+Open History: there is already one snapshot, number zero.
+
+00:02:05.218 --> 00:02:07.340
+Creating the lake created the schema main.
+
+00:02:07.620 --> 00:02:09.293
+Every change will add a row here.
+
+00:02:10.243 --> 00:02:11.542
+Now the SQL Editor.
+
+00:02:11.822 --> 00:02:14.842
+The connection list has a new group, DuckLake Instances.
+
+00:02:15.122 --> 00:02:17.379
+Pick eth lake, and ask for its snapshots.
+
+00:02:21.667 --> 00:02:23.067
+Run it with the green arrow.
+
+00:02:23.347 --> 00:02:25.144
+One row: snapshot zero.
+
+00:02:25.424 --> 00:02:26.741
+The lake answers SQL.
+
+00:02:27.691 --> 00:02:36.671
+In plain DuckDB, the wizard stands for three statements: install the extension, attach the catalog file with its data path, and use it.
+
+00:02:36.951 --> 00:02:39.827
+Studio runs them each time it opens the lake.
+
+00:02:40.777 --> 00:02:46.555
+And remember: with a DuckDB file as the catalog, one program at a time can open the lake.
+
+00:02:46.835 --> 00:02:48.405
+For a laptop, that is enough.
+
+00:02:49.355 --> 00:02:50.475
+Back in the project.
+
+00:02:50.755 --> 00:02:57.778
+Add a dot gitignore file, so build output, logs, the database files, and the whole lake folder stay out of git.
+
+00:02:58.058 --> 00:02:59.776
+The lake is data, not code.
+
+00:03:01.829 --> 00:03:02.979
+And a short README.
+
+00:03:13.978 --> 00:03:22.953
+On GitHub, create a new, empty, public repository called ethereum ducklake dbt, with no README, gitignore or license.
+
+00:03:23.233 --> 00:03:24.784
+Here is ours, still empty.
+
+00:03:25.064 --> 00:03:27.034
+Copy its HTTPS address.
+
+00:03:27.984 --> 00:03:32.303
+Back in Studio, open the Git tab, and click Initialize Repository.
+
+00:03:34.547 --> 00:03:39.691
+Stage all the changes, type a message, create the ethereum lake project, and commit.
+
+00:03:43.898 --> 00:03:47.338
+Click Publish Branch, paste the repository address, and add it.
+
+00:03:47.618 --> 00:03:49.857
+Studio pushes the main branch to GitHub.
+
+00:03:51.482 --> 00:03:53.337
+Refresh the repository page.
+
+00:03:53.617 --> 00:03:55.060
+The project is on GitHub.
+
+00:03:55.340 --> 00:03:57.682
+The lake folder is not: git ignores it.
+
+00:03:58.631 --> 00:04:05.433
+To recap: we created the ethereum lake project, and the eth lake DuckLake inside it, with the Data Lake wizard.
+
+00:04:05.713 --> 00:04:12.222
+It is a catalog file and a data folder, it starts with snapshot zero, and the SQL Editor can query it.
+
+00:04:12.502 --> 00:04:13.946
+The project is on GitHub.
+
+00:04:14.226 --> 00:04:16.873
+Next, we load three months of blocks into the lake.

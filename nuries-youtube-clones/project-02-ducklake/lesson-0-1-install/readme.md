@@ -1,0 +1,46 @@
+# Lesson 0.1 · Install Rosetta DBT Studio from rosettadb.io
+
+Data Lakes with DuckLake in Rosetta DBT Studio · Welcome. Rendered 2:13, 3840x2160 H.264 + AAC, 31 MB.
+
+## Files
+
+| File | What it is |
+|---|---|
+| `lesson.yaml` | **The source.** Edit this, then re-render |
+| `slides.html` | Slide scenes (open in a browser: arrows step through builds) |
+| `lesson-0-1.mp4` | The 4K video for YouTube (not in git) |
+| `lesson-0-1-1080p.mp4` | 1080p copy for phones and sharing (not in git) |
+| `lesson-0-1.srt`, `lesson-0-1.vtt` | Captions, one cue per sentence |
+| `voiceover-script.md` | Beat sheet with measured start times |
+| `voiceover-kokoro.txt` | Exact spoken forms sent to the voice |
+| `RECORDING-cue-sheet.md` | Steps for a human retake of the app scenes |
+| `lesson-0-1-slides.pptx` | One image per slide state, narration in speaker notes (not in git) |
+| `youtube.md`, `thumbnail.png` | Upload package |
+| `timeline.json` | Start and length of every scene and beat |
+| `render/` | Frames, audio and intermediates; kept only on the machine that rendered (not in git) |
+
+## Versions
+
+Rosetta DBT Studio 1.7.6 (official release), dbt-core 1.12.6, dbt-duckdb 1.11.1, Python 3.10.17. Voice: Kokoro `af_heart` at 1.0.
+
+## Changes from the draft
+
+- The download starts from rosettadb.io instead of the GitHub releases page (Project 1 used GitHub).
+
+## Accuracy notes
+
+- rosettadb.io → Download Now → rosettadb.io/download-dbtstudio.html, cards Windows, Linux, macOS; links to the GitHub 1.7.6 assets (Windows .exe, Linux .deb and .rpm, Mac ARM64 and Mac Intel .dmg), checked 11 Nov 2026.
+- Listen once for pronunciation (see `voiceover-kokoro.txt` for the exact spoken forms).
+
+## Re-render
+
+```sh
+cd ../../_academy-video-tooling
+NODE_PATH=$(npm root -g) ./run-headless.sh record.cjs ../project-02-ducklake ../project-02-ducklake/lesson-0-1-install
+python3 scripts/tts.py ../project-02-ducklake ../project-02-ducklake/lesson-0-1-install     # --human to use voice-human/<beat>.wav
+python3 scripts/render_stills.py ../project-02-ducklake ../project-02-ducklake/lesson-0-1-install
+python3 scripts/compose.py ../project-02-ducklake ../project-02-ducklake/lesson-0-1-install
+python3 scripts/package.py ../project-02-ducklake ../project-02-ducklake/lesson-0-1-install
+```
+
+Only the narration changed: skip `record.cjs`. Only a slide changed: run `render_stills.py`, `compose.py`, `package.py`.

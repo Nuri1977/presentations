@@ -1,0 +1,118 @@
+# Lesson 5.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-5-2
+number: "5.2"
+title: "Inside the catalog: files and statistics"
+module: "Module 5 · Inside the catalog"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 5.2"
+next: "Lesson 5.3 · Read the lake by hand"
+summary: "The catalog's file tables: ducklake_data_file with the path and row count of every file, ducklake_file_column_stats with the min and max that made pruning work in 4.2, ducklake_file_partition_value from 4.1, table statistics, and the inlined rows table from 4.3."
+start_state: lesson-5-1-end
+show_help_links: true
+links:
+  - { title: "DuckLake specification: tables", url: "https://ducklake.select/docs/stable/specification/tables/overview" }
+tags: [DuckLake, catalog, file statistics, partitions, specification]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-5-1-end`."
+draft_changes: []
+accuracy_notes:
+  - "raw.transactions (table id 5): data files 11 to 17, one per day; block_number min and max per file 26,093,738–26,100,913 (file 11) to 26,136,783–26,143,955 (file 17); partition values 2026-10-01 to 2026-10-07. Inlined data table for watchlist (id 8). Rehearsed with DuckDB 1.5.2, 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 5.2. Inside the catalog: files, statistics, partitions."
+
+  - id: s01
+    kind: app
+    chapter: "Data files"
+    beats:
+      - id: b01
+        say: "In the SQL Editor, on eth lake. Ducklake data file has one row per Parquet file. Here are the files of transactions, table five: one per day, with its row count, its size, and its path, relative to the data folder."
+        zoom: sql-results
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select data_file_id, record_count, file_size_bytes, path from __ducklake_metadata_eth_lake.ducklake_data_file where table_id = 5 and end_snapshot is null order by 1;
+              select f.data_file_id, s.min_value, s.max_value from __ducklake_metadata_eth_lake.ducklake_file_column_stats s join __ducklake_metadata_eth_lake.ducklake_data_file f using (data_file_id) join __ducklake_metadata_eth_lake.ducklake_column c on c.column_id = s.column_id and c.table_id = f.table_id where f.table_id = 5 and c.column_name = 'block_number' and f.end_snapshot is null and c.end_snapshot is null order by 1;
+              select data_file_id, partition_value from __ducklake_metadata_eth_lake.ducklake_file_partition_value where table_id = 5 order by 1;
+              select table_id, record_count, file_size_bytes from __ducklake_metadata_eth_lake.ducklake_table_stats order by 1;
+              select table_id, table_name from __ducklake_metadata_eth_lake.ducklake_inlined_data_tables;
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+
+  - id: s02
+    kind: app
+    chapter: "Statistics per file"
+    beats:
+      - id: b02
+        say: "Ducklake file column stats holds the min and max of every column of every file. For block number, each file covers its own narrow range, one day after the other. This is exactly what let the query in Lesson 4.2 skip six files out of seven."
+        zoom: sql-results
+        card: { eyebrow: "ducklake_file_column_stats", title: "min and max per file", sub: "the data behind file pruning (4.2)", pos: top-right }
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Partitions, table stats, inlined rows"
+    beats:
+      - id: b03
+        say: "Ducklake file partition value: the date each file belongs to, from the partitioning in Lesson 4.1."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Ducklake table stats keeps totals per table, so counting rows needs no file at all. Transactions: twelve point seven million rows, one point seven gigabytes."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "And ducklake inlined data tables: the watchlist from Lesson 4.3 has a table inside the catalog, where inlined rows wait to be flushed."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+
+  - id: s04
+    kind: slide
+    chapter: "The file tables"
+    slide: tables
+    beats:
+      - { id: b06, step: 1, show: "Table: ducklake_data_file, ducklake_delete_file, ducklake_file_column_stats, ducklake_file_partition_value, ducklake_table_stats, ducklake_inlined_data_tables, ducklake_files_scheduled_for_deletion.", say: "So these are the file tables: data files and delete files, statistics per file, partition values, table totals, inlined rows, and files scheduled for deletion by maintenance." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b07
+        say: "Save the queries as 5 underscore 2 catalog files dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 5_2_catalog_files.sql }
+          - paste: |
+              select data_file_id, record_count, file_size_bytes, path from __ducklake_metadata_eth_lake.ducklake_data_file where table_id = 5 and end_snapshot is null order by 1;
+              select f.data_file_id, s.min_value, s.max_value from __ducklake_metadata_eth_lake.ducklake_file_column_stats s join __ducklake_metadata_eth_lake.ducklake_data_file f using (data_file_id) join __ducklake_metadata_eth_lake.ducklake_column c on c.column_id = s.column_id and c.table_id = f.table_id where f.table_id = 5 and c.column_name = 'block_number' and f.end_snapshot is null and c.end_snapshot is null order by 1;
+              select data_file_id, partition_value from __ducklake_metadata_eth_lake.ducklake_file_partition_value where table_id = 5 order by 1;
+              select table_id, record_count, file_size_bytes from __ducklake_metadata_eth_lake.ducklake_table_stats order by 1;
+              select table_id, table_name from __ducklake_metadata_eth_lake.ducklake_inlined_data_tables;
+          - click_save
+          - expect_file: { path: sql/5_2_catalog_files.sql, snippet: ../snippets/5.2/5_2_catalog_files.sql }
+          - close_tab: sql/5_2_catalog_files.sql
+          - git_tab
+          - git_stage_all
+          - git_message: "Catalog tables for files, statistics and partitions"
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b08, step: 1, show: "Recap: every file is a row; min and max per column per file; partition values; table totals; inlined rows.", say: "To recap: every file is a row, with its statistics and partition value, and tables keep totals. Next, the final proof: we read the lake by hand, with nothing but these tables and read parquet." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 5.3 · Read the lake by hand."

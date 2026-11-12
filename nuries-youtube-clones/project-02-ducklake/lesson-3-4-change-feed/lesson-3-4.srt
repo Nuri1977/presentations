@@ -1,0 +1,67 @@
+1
+00:00:03,350 --> 00:00:05,003
+Remember Lesson 3.1?
+
+2
+00:00:05,283 --> 00:00:11,113
+We deleted seven rows of blocks day at snapshot nine, and updated seventy-two at snapshot ten.
+
+3
+00:00:11,393 --> 00:00:14,097
+Ask the lake what changed between those two snapshots.
+
+4
+00:00:15,047 --> 00:00:19,592
+Ducklake table changes, for schema raw, table blocks day, from nine to ten.
+
+5
+00:00:19,872 --> 00:00:30,805
+Grouped by type, Studio's DuckDB, version 1.5.2, shows the update as a delete plus an insert: seventy-nine deletes, and seventy-two inserts at ten.
+
+6
+00:00:31,755 --> 00:00:39,734
+Look at the rows: each updated block appears twice, the old value in lower case, deleted, and the new value in upper case, inserted.
+
+7
+00:00:40,014 --> 00:00:49,976
+Newer DuckDB, like the 1.5.6 inside dbt, labels these as update pre-image and post-image, and puts both at snapshot ten.
+
+8
+00:00:50,257 --> 00:00:52,798
+Change feeds are young: check them on your version.
+
+9
+00:00:53,748 --> 00:01:03,307
+And two shortcuts: table insertions, seven thousand one hundred seventy-six rows at snapshot eight, and table deletions, seven at snapshot nine.
+
+10
+00:01:04,257 --> 00:01:09,286
+Four change types: insert, delete, and for updates, the pre-image and the post-image.
+
+11
+00:01:10,236 --> 00:01:15,429
+This works because every row in a DuckLake has a stable row id, kept across updates.
+
+12
+00:01:15,709 --> 00:01:17,163
+That is called row lineage.
+
+13
+00:01:18,113 --> 00:01:18,997
+What is it for?
+
+14
+00:01:19,277 --> 00:01:24,645
+Downstream jobs that only process what changed since their last run, instead of everything.
+
+15
+00:01:25,595 --> 00:01:30,673
+Save the queries as 3 underscore 4 change feed dot sequel, commit, and push.
+
+16
+00:01:53,175 --> 00:02:00,927
+To recap: ducklake table changes tells you every row that changed between two snapshots, with before and after values.
+
+17
+00:02:01,207 --> 00:02:04,478
+Next: transactions, and what happens with two writers.

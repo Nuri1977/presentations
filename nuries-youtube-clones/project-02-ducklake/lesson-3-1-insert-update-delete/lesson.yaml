@@ -1,0 +1,142 @@
+# Lesson 3.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-3-1
+number: "3.1"
+title: "Insert, update, delete, and delete files"
+module: "Module 3 · Changing data"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 3.1"
+next: "Lesson 3.2 · Daily loads without duplicates"
+summary: "Change data in a lake without rewriting Parquet files: a small working copy of one day of blocks, a DELETE and an UPDATE, and what they leave behind: a delete file that lists row positions, and a new data file for the updated rows. Seen in SQL and in Studio's Data Files tab."
+start_state: lesson-2-5-end
+show_help_links: true
+links:
+  - { title: "DuckLake: deletion vectors", url: "https://ducklake.select/docs/stable/duckdb/advanced_features/deletion_vectors" }
+tags: [DuckLake, update, delete, delete files, Parquet, Rosetta DBT Studio]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-2-5-end`: raw.blocks with three months plus 1 November; snapshots 0 to 7."
+draft_changes:
+  - "The update changes extra_data on every hundredth block (miner is already lower case in the data)."
+  - "Studio's row edit screens are not used: the SQL shows the same thing more clearly."
+accuracy_notes:
+  - "blocks_day (1 Oct 2026): 7,176 rows; 7 blocks with fewer than 50 transactions deleted; 72 rows updated (number % 100 = 0). After the update: one data file with a delete file, plus a new data file for the updated rows. Snapshots 8, 9, 10. Rehearsal 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 3.1. Insert, update, delete, and delete files."
+
+  - id: s01
+    kind: slide
+    chapter: "Files never change"
+    slide: rule
+    beats:
+      - { id: b01, step: 1, show: "Rule: Parquet files are never edited.", say: "Parquet files cannot be edited in place. So how does a lake delete or update a row? Let's watch it happen on a small table." }
+
+  - id: s02
+    kind: app
+    chapter: "A small working copy"
+    beats:
+      - id: b02
+        say: "In the SQL Editor, on eth lake, make a working copy: the blocks of the first of October, seven thousand one hundred seventy-six rows."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              create table raw.blocks_day as select * from raw.blocks where date = date '2026-10-01';
+              select count(*) as blocks, count(*) filter (where transaction_count < 50) as small_blocks from raw.blocks_day;
+              delete from raw.blocks_day where transaction_count < 50;
+              update raw.blocks_day set extra_data = upper(extra_data) where number % 100 = 0;
+              select regexp_extract(data_file, '[^/]+$') as data_file, regexp_extract(delete_file, '[^/]+$') as delete_file from ducklake_list_files('eth_lake', 'blocks_day', schema => 'raw');
+              select distinct regexp_extract(file_path, '[^/]+$') as data_file, pos from read_parquet('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/blocks_day/*-delete.parquet') order by pos limit 5;
+          - sql_run: { line: 1, settleMs: [800, 2500, 4000] }
+          - sql_wait
+      - id: b03
+        say: "Seven of those blocks hold fewer than fifty transactions."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Delete and update"
+    beats:
+      - id: b04
+        say: "Delete those seven. Then update every hundredth block of the day, seventy-two of them. Studio just reports that the command ran."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "Now list the table's files. The original data file is still there, untouched, but it now has a delete file. And there is a second data file: the seventy-two updated rows, written fresh."
+        zoom: sql-results
+        card: { eyebrow: "raw.blocks_day", title: "2 data files + 1 delete file", sub: "the original file is never rewritten", pos: top-right }
+        actions:
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "The delete file is Parquet too. It lists row positions in the data file: rows the reader must skip."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+
+  - id: s04
+    kind: app
+    chapter: "The same in Studio"
+    beats:
+      - id: b07
+        say: "In Data Lake, open eth lake, refresh, and click blocks day. Data Files shows the same two files."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: button, name: Refresh, label: Refresh, settleMs: [500, 1500, 2500] }
+          - click_at: { text: blocks_day, label: blocks_day, settleMs: [500, 1500, 2500] }
+          - click_at: { role: tab, name: Data Files, settleMs: [400, 1200, 2500] }
+
+  - id: s05
+    kind: slide
+    chapter: "How it works"
+    slide: how
+    beats:
+      - { id: b08, step: 1, show: "Delete: write a delete file with the positions to skip.", say: "So, a delete writes a small delete file, with the positions to skip." }
+      - { id: b09, step: 2, show: "Update: a delete of the old rows plus an insert of the new rows.", say: "An update is a delete of the old rows, plus an insert of the new ones in a new data file." }
+      - { id: b10, step: 3, show: "Option: ALTER TABLE … SET (write_deletion_vectors = true) for a compact format; maintenance rewrites files later (4.4).", say: "There is also a more compact format, deletion vectors, that you can switch on per table. And over time, maintenance rewrites files with many deletes, in Lesson 4.4." }
+
+  - id: s06
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b11
+        say: "Save the script as 3 underscore 1 update delete dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 3_1_update_delete.sql }
+          - paste: |
+              create table raw.blocks_day as select * from raw.blocks where date = date '2026-10-01';
+              select count(*) as blocks, count(*) filter (where transaction_count < 50) as small_blocks from raw.blocks_day;
+              delete from raw.blocks_day where transaction_count < 50;
+              update raw.blocks_day set extra_data = upper(extra_data) where number % 100 = 0;
+              select regexp_extract(data_file, '[^/]+$') as data_file, regexp_extract(delete_file, '[^/]+$') as delete_file from ducklake_list_files('eth_lake', 'blocks_day', schema => 'raw');
+              select distinct regexp_extract(file_path, '[^/]+$') as data_file, pos from read_parquet('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/blocks_day/*-delete.parquet') order by pos limit 5;
+          - click_save
+          - expect_file: { path: sql/3_1_update_delete.sql, snippet: ../snippets/3.1/3_1_update_delete.sql }
+          - close_tab: sql/3_1_update_delete.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Update and delete in the lake
+          - git_commit
+          - git_push
+
+  - id: s07
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b12, step: 1, show: "Recap: files are never edited; a delete adds a delete file; an update is delete plus insert.", say: "To recap: the lake never edits a Parquet file. A delete adds a delete file, and an update is a delete plus an insert. Next: a daily load that can run twice without making duplicates." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 3.2 · Daily loads without duplicates."

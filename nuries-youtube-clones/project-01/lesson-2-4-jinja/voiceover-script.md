@@ -63,23 +63,26 @@ Project 1 · Lesson 2.4. Dependencies & Jinja. Badges: dbt seed, ref(), Jinja.
 |---|---|---|---|---|
 | b18 @2:11 | Now run the whole project: Project menu, Run. | Open the **Project** menu → **Run**<br>Zoom: project-menu | 8 | 4 |
 | b19 @2:15 | dbt builds trips first, and only then the two models that depend on it. Three models, no errors. | Wait for “PASS=3”<br>Zoom: terminal-close<br>Card: *dbt run* — **trips first, then the marts** — PASS=3 ERROR=0 | 18 | 7 |
+| b19b @2:22 | Now look at the result. With top pickup zones open, choose Model, Preview. | model_menu: Preview<br>Wait for “^Preview: top_pickup_zones$”<br>Zoom: model-menu | 13 | 7 |
+| b19c @2:28 | Ten rows, because of top n. East Harlem North is the busiest pickup zone of 2025, with a hundred forty-three thousand trips. | Wait 0.8 s<br>Zoom: center-wide<br>Card: *top_pickup_zones · 2025 data, as of 9 Nov 2026* — **East Harlem North: 143,115** — 10 rows: limit {{ top_n }} | 23 | 10 |
+| b19d @2:38 | Close it, and open Run History: the seed and the run are listed, with their status. | Click **Close**<br>Click **Run History**<br>Zoom: terminal | 16 | 6 |
 
 ## s08 · app — Rosetta DBT Studio
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b20 @2:22 | Open the Git tab. The two new models are listed. | Close the editor tab for `models/top_pickup_zones.sql`<br>Open the **Git** tab in the sidebar<br>Zoom: git-panel | 10 | 5 |
-| b21 @2:27 | Stage all, type a message, add trips per month and top pickup zones, and commit. | Hover CHANGES and click **+** (Stage All Changes)<br>Type the commit message “Add trips per month and top pickup zones”<br>Click **Commit**<br>Zoom: git-panel | 15 | 8 |
-| b22 @2:35 | Sync Changes pushes it to GitHub. | git_push: None<br>Zoom: git-panel | 6 | 5 |
+| b20 @2:44 | Open the Git tab. The two new models are listed. | Close the editor tab for `models/top_pickup_zones.sql`<br>Open the **Git** tab in the sidebar<br>Zoom: git-panel | 10 | 5 |
+| b21 @2:49 | Stage all, type a message, add trips per month and top pickup zones, and commit. | Hover CHANGES and click **+** (Stage All Changes)<br>Type the commit message “Add trips per month and top pickup zones”<br>Click **Commit**<br>Zoom: git-panel | 15 | 8 |
+| b22 @2:57 | Sync Changes pushes it to GitHub. | git_push: None<br>Zoom: git-panel | 6 | 5 |
 
 ## s09 · slide — slide `recap`
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b23 @2:40 | To recap: a seed loads a CSV. Ref names a model and records the dependency, so dbt runs things in the right order. Jinja adds variables and logic, and compile shows the plain SQL. Next, we describe our models with properties. | Recap: seed loaded; ref() names models and draws the graph; Jinja {{ }} {% %} {# #}; compile shows plain SQL; run in dependency order; pushed. | 41 | 16 |
+| b23 @3:02 | To recap: a seed loads a CSV. Ref names a model and records the dependency, so dbt runs things in the right order. Jinja adds variables and logic, and compile shows the plain SQL. Next, we describe our models with properties. | Recap: seed loaded; ref() names models and draws the graph; Jinja {{ }} {% %} {# #}; compile shows plain SQL; run in dependency order; pushed. | 41 | 16 |
 
 ## s10 · closing card (4 s, no voice)
 
 Next · Lesson 2.5 · Properties. Code: github.com/Nuri1977/nyc-taxi-dbt.
 
-**Total: 386 spoken words, 3:00 rendered.**
+**Total: 438 spoken words, 3:23 rendered.**

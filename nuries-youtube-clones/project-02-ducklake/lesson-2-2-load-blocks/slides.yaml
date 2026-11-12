@@ -1,0 +1,26 @@
+number: "2.2"
+title: Load three months of blocks from S3
+slides:
+  - { id: title, type: title, h1: 'Load three months of <span class="accent">blocks</span>', lead: "From the public S3 bucket into the lake.", badges: [S3, read_parquet, raw.blocks] }
+  - id: plan
+    type: html
+    eyebrow: The plan
+    h2: One month per statement
+    html: |
+      <div class="codecard s" data-step="1" style="margin-top:30px"><div class="filetab"><span class="ic"></span>source</div><div class="code" style="font-size:32px"><span class="str">s3://aws-public-blockchain/v1.0/eth/blocks/</span>
+        <span class="dir" style="color:var(--orange-2)">date=2026-08-01/</span>part-00000-….snappy.parquet
+        <span class="dir" style="color:var(--orange-2)">date=2026-08-02/</span>…</div></div>
+      <div class="timeline s" data-step="2" style="margin-top:46px">
+        <div class="snap"><div class="dot">2</div><div class="what">create table</div><div class="note">August</div></div>
+        <div class="snap"><div class="dot">3</div><div class="what">insert</div><div class="note">September</div></div>
+        <div class="snap now"><div class="dot">4</div><div class="what">insert</div><div class="note">October</div></div>
+      </div>
+      <div class="card hot s" data-step="3" style="padding:24px 32px;font-size:34px;font-weight:700;margin-top:34px">First: <span class="mono">data_inlining_row_limit = 0</span>, so every write makes Parquet files (Lesson 4.3).</div>
+  - id: recap
+    type: recap
+    items:
+      - "Inlining off, schema <span class=\"mono\">raw</span>."
+      - "<span class=\"mono\">raw.blocks</span> from S3, one month per statement."
+      - "659,896 blocks, four new snapshots."
+      - "The script is committed; the lake is not."
+  - { id: closing, type: closing, lesson: Lesson 2.3, h2: 'Look <span class="accent">inside</span> the lake' }

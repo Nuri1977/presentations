@@ -4,7 +4,7 @@ For a human retake of the app scenes (the automated recording follows the same s
 
 ## Before you start
 
-- Start state `lesson-2-2-end`: a clone of what Lesson 2.2 pushed to nyc-taxi-dbt-rehearsal (`.gitignore`, README, `models/sources.yml`, `seeds/taxi_zone_lookup.csv`), the 12 Green Taxi 2025 parquet files in `data/raw`, and the nyc_taxi_dev connection.
+- Start state `lesson-2-2-end`: a clone of what Lesson 2.2 pushed to nyc-taxi-dbt (`.gitignore`, README, `models/sources.yml`, `seeds/taxi_zone_lookup.csv`), the 12 Green Taxi 2025 parquet files in `data/raw`, and the nyc_taxi_dev connection.
 - No `target/` or `logs/` folders yet, so the run in s04 creates them on camera.
 - Start on the home screen with no editor tabs open. Bottom panel open on TERMINAL.
 
@@ -27,26 +27,27 @@ For a human retake of the app scenes (the automated recording follows the same s
 | "Let's run it. Above the editor, open the…" | model_menu: Run |
 | "The terminal shows one model, trips, created as…" | Wait for “OK created sql view model main.trips” |
 
-## s05 · Look at the rows with dbt show
+## s05 · Preview the rows
 
 | Listen for | Do this |
 |---|---|
-| "To look at the rows, use the command…" | Click the command box under the terminal, type `dbt show --select trips --limit 10`, press Enter |
-| "dbt runs the model's select, and prints the…" | Hold; nothing moves |
+| "To look at the rows, open the Model…" | model_menu: Preview<br>Wait for “^Preview: trips$” |
+| "Eleven columns, and five hundred sixty-five thousand trips,…" | dialog_scroll_right: None |
+| "Close it. The same rows stay in the…" | Click **Close**<br>Click **SQL tab**<br>Click **History tab** |
 
-## s06 · The SQL dbt wrote
+## s06 · The SQL dbt wrote, and the run history
 
 | Listen for | Do this |
 |---|---|
-| "Want to see exactly what dbt sent to…" | refresh_explorer: None<br>In the Explorer, open `target/run/nyc_taxi/models/trips.sql` (expand each folder on the way) |
-| "There it is: create view, followed by your…" | Point at line 3 |
-| "And the source call became read parquet, with…" | Point at line 17 |
+| "Want to see exactly what dbt sends to…" | model_menu: Compile<br>Wait for “^Compiled SQL: trips$” |
+| "The Compiled SQL tab shows your select, with…" | Click **Compiled SQL tab** |
+| "Close it, and open Run History. Every dbt…" | Click **Close**<br>Click **Run History** |
 
 ## s07 · Commit the model
 
 | Listen for | Do this |
 |---|---|
-| "Last step: commit and push. Open the Git…" | Close the editor tab for `target/run/nyc_taxi/models/trips.sql` (its ×)<br>Click the **Git** tab at the top of the sidebar |
+| "Last step: commit and push. Open the Git…" | Click the **Git** tab at the top of the sidebar |
 | "Stage it with the plus button, type a…" | Hover `trips.sql` in Changes and click its **+** (Stage Changes)<br>Click the message box and type: Add the trips staging model<br>Click **Commit** |
 | "Click Sync Changes, and the commit goes to…" | git_push: None |
 
@@ -54,4 +55,4 @@ For a human retake of the app scenes (the automated recording follows the same s
 
 | Listen for | Do this |
 |---|---|
-| "On GitHub, the models folder now holds trips…" | In the browser, open https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/tree/main/models |
+| "On GitHub, the models folder now holds trips…" | In the browser, open https://github.com/Nuri1977/nyc-taxi-dbt/tree/main/models |

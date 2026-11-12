@@ -109,8 +109,8 @@
         <div class="snip"><span class="j">{{</span> <span class="f">source</span>(<span class="str">'raw'</span>,
    <span class="str">'green_trips'</span>) <span class="j">}}</span>
         <span class="accent">↓</span>
-<span class="f">read_parquet</span>(
-  <span class="str">'data/raw/…'</span>)</div>
+<span class="str">"nyc_taxi_dev"</span>
+  .<span class="str">"raw"."green_trips"</span></div>
         <div class="cap">Jinja becomes plain SQL.</div>
       </div>
       <div class="chev s" data-step="2">›</div>
@@ -118,7 +118,7 @@
         <div class="top"><span class="num">2</span><h3>Wrap</h3></div>
         <div class="snip"><span class="k">create view</span> trips <span class="k">as</span> (
   <span class="k">select</span> <span class="dimc">…</span>
-  <span class="k">from</span> <span class="f">read_parquet</span>(<span class="dimc">…</span>)
+  <span class="k">from</span> <span class="dimc">raw.green_trips</span>
 )</div>
         <span class="pill" style="align-self:flex-start">dbt writes this</span>
         <div class="cap">Your select, inside a create view.</div>
@@ -144,7 +144,7 @@
     <div class="checks s" data-step="1">
       <div class="card check"><span class="tick">✓</span><div><h3>One select, one file</h3><p><span class="mono">trips.sql</span> builds the view <span class="mono">trips</span>.</p></div></div>
       <div class="card check"><span class="tick">✓</span><div><h3>Run = compile, wrap, execute</h3><p>dbt writes the <span class="mono">create view</span> for you.</p></div></div>
-      <div class="card check"><span class="tick">✓</span><div><h3><span class="mono" style="font-size:.9em">dbt show</span> prints the rows</h3><p>Typed in the box under Studio's terminal.</p></div></div>
+      <div class="card check"><span class="tick">✓</span><div><h3>Preview, Compile, Run History</h3><p>Rows, compiled SQL and past runs, all in Studio.</p></div></div>
       <div class="card check"><span class="tick">✓</span><div><h3>Committed and pushed</h3><p>Stage, commit, Sync Changes.</p></div></div>
     </div>
   </div>

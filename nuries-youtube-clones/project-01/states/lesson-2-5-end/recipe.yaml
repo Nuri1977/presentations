@@ -4,12 +4,12 @@
 # (dbt seed + dbt run, off camera).
 name: lesson-2-5-end
 project_name: nyc_taxi
-clone: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git
+clone: https://github.com/Nuri1977/nyc-taxi-dbt.git
 dirs: [analysis, macros, models, seeds, snapshots, tests]
 copy:
   - { from: ../../.cache/data/raw, to: data/raw }
 database_file: ../nyc_taxi_dev.duckdb
-sql: []
+sql: [../sql/load_raw.sql]   # raw.green_trips, loaded in Lesson 2.2
 dbt: [seed, run]
 connection_name: nyc_taxi_dev
 git:

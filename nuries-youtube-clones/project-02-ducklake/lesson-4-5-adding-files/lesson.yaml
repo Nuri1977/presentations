@@ -1,0 +1,121 @@
+# Lesson 4.5 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-4-5
+number: "4.5"
+title: "Adding existing Parquet files"
+module: "Module 4 · Performance and upkeep"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 4.5"
+next: "Lesson 5.1 · Inside the catalog: snapshots, schemas, tables, columns"
+summary: "Register a Parquet file that already exists without copying it: write one day of blocks to a landing folder with COPY, in the table's current shape, then attach it to raw.blocks with ducklake_add_data_files. The file now belongs to the lake."
+start_state: lesson-4-4-end
+show_help_links: true
+links:
+  - { title: "DuckLake: adding files", url: "https://ducklake.select/docs/stable/duckdb/metadata/adding_files" }
+tags: [DuckLake, ducklake_add_data_files, Parquet, COPY, migration]
+target_minutes: 3.5
+start_notes:
+  - "Start state `lesson-4-4-end`: raw.blocks has 1 and 2 November; the table has fee_recipient and gas_used_pct since 3.3."
+draft_changes:
+  - "Studio's result pane re-runs a statement to page through its rows, so a CALL that returns rows runs twice; the first take registered the file twice. The call is wrapped in CREATE TEMP TABLE … AS SELECT, which runs once. The repo has two commits for this lesson (the first take, then the fix)."
+  - "The landing folder is lake/landing, inside the ignored lake folder, so the file is never committed."
+  - "The COPY writes the file in the table's current shape (fee_recipient, gas_used_pct), so no allow_missing or ignore_extra_columns is needed; those options are on a slide."
+accuracy_notes:
+  - "3 November 2026: 7,182 blocks. After ducklake_add_data_files the file is listed by ducklake_list_files at its landing path. Rehearsed with DuckDB 1.5.2, 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 4.5. Adding existing Parquet files."
+
+  - id: s01
+    kind: slide
+    chapter: "Why add files"
+    slide: why
+    beats:
+      - { id: b01, step: 1, show: "Files already exist (another tool wrote them, a migration): register instead of copy.", say: "Sometimes the Parquet files already exist: another tool wrote them, or you are moving an old data lake. Instead of reading and writing them again, you can register them in the catalog." }
+
+  - id: s02
+    kind: app
+    chapter: "A file in a landing folder"
+    beats:
+      - id: b02
+        say: "In the project, inside the lake folder, make a folder called landing. Git ignores everything under lake."
+        zoom: explorer
+        actions:
+          - nav: DBT Studio
+          - new_folder: { parent: lake, name: landing }
+      - id: b03
+        say: "In the SQL Editor, on eth lake: copy one day of blocks from S3, the third of November, into a Parquet file in landing. We give it the table's current shape: fee recipient instead of miner, and gas used percent."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              copy (select * exclude (logs_bloom, last_modified, miner), miner as fee_recipient, round(100.0 * gas_used / gas_limit, 2) as gas_used_pct from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-11-03/*.parquet')) to '/Users/Shared/academy/learner/projects/ethereum_lake/lake/landing/blocks_2026-11-03.parquet';
+              create temp table added_files as select * from ducklake_add_data_files('eth_lake', 'blocks', '/Users/Shared/academy/learner/projects/ethereum_lake/lake/landing/blocks_2026-11-03.parquet', schema => 'raw');
+              select strftime(date, '%Y-%m-%d') as day, count(*) as blocks from raw.blocks where date >= date '2026-11-01' group by all order by 1;
+              select data_file from ducklake_list_files('eth_lake', 'blocks', schema => 'raw');
+          - sql_run: { line: 1, settleMs: [1000, 3000] }
+          - sql_wait
+
+  - id: s03
+    kind: app
+    chapter: "Register it"
+    beats:
+      - id: b04
+        say: "Now ducklake add data files: the lake, the table, the file, and the schema. Nothing is copied: the catalog just records the file. One Studio detail: the result pane runs a statement again to show its rows, which would register the file twice. So we wrap the call in create temp table, which runs once."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 2, settleMs: [800, 2500, 4000] }
+          - sql_wait
+      - id: b05
+        say: "Blocks per day: the third of November is there, seven thousand one hundred eighty-two blocks."
+        zoom: sql-results
+        card: { eyebrow: "raw.blocks", title: "3 Nov: 7,182 blocks", sub: "from a file the lake did not write", pos: top-right }
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "And the table's file list now includes the landing file, at its own path."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+
+  - id: s04
+    kind: slide
+    chapter: "Careful"
+    slide: careful
+    beats:
+      - { id: b07, step: 1, show: "The file now belongs to the lake: maintenance may rewrite or delete it.", say: "One thing to know: from now on, the file belongs to the lake. Maintenance can merge it, and clean it up. Do not keep using it from outside." }
+      - { id: b08, step: 2, show: "Different shape? allow_missing => true (missing columns become NULL), ignore_extra_columns => true.", say: "If a file has a different shape, two options help: allow missing for columns the file does not have, and ignore extra columns for columns the table does not have." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b09
+        say: "Save the script as 4 underscore 5 add files dot sequel in the sql folder, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - open_file: sql/4_5_add_files.sql
+          - paste: { replace: true, text: "copy (select * exclude (logs_bloom, last_modified, miner), miner as fee_recipient, round(100.0 * gas_used / gas_limit, 2) as gas_used_pct from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-11-03/*.parquet')) to '/Users/Shared/academy/learner/projects/ethereum_lake/lake/landing/blocks_2026-11-03.parquet';\ncreate temp table added_files as select * from ducklake_add_data_files('eth_lake', 'blocks', '/Users/Shared/academy/learner/projects/ethereum_lake/lake/landing/blocks_2026-11-03.parquet', schema => 'raw');\nselect strftime(date, '%Y-%m-%d') as day, count(*) as blocks from raw.blocks where date >= date '2026-11-01' group by all order by 1;\nselect data_file from ducklake_list_files('eth_lake', 'blocks', schema => 'raw');\n" }
+          - click_save
+          - expect_file: { path: sql/4_5_add_files.sql, snippet: ../snippets/4.5/4_5_add_files.sql }
+          - close_tab: sql/4_5_add_files.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Register the landing file once
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b10, step: 1, show: "Recap: COPY to a landing folder; ducklake_add_data_files registers without copying; the file now belongs to the lake.", say: "To recap: ducklake add data files registers an existing Parquet file without copying it, and from then on the lake owns it. That ends Module 4. Next, we open the catalog itself." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 5.1 · Inside the catalog."

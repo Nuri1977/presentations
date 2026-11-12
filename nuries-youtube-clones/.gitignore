@@ -1,0 +1,22 @@
+# Covers every course folder here (project-01, project-02-ducklake, future ones).
+# Sources (lesson.yaml, slides.html, snippets, plans, youtube.md, captions) are committed;
+# everything generated or downloaded stays out of git. GitHub rejects files over 100 MB.
+
+# caches, recordings, downloaded data
+.cache/
+render/
+*.parquet
+*.duckdb
+*.duckdb.wal
+*.ducklake
+lake/
+
+# generated media
+*.mp4
+*.mov
+*.wav
+*.pptx
+rehearsal-cuts/
+full-course/*.mp4
+
+.DS_Store

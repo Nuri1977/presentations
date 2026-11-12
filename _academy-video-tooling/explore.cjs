@@ -21,7 +21,8 @@ const T0 = Date.now();
 const log = (...a) => console.log(`[${((Date.now() - T0) / 1000).toFixed(1)}s]`, ...a);
 
 (async () => {
-  const seeded = seedProfile({ stateDir: path.join(courseDir, 'states', stateName), home: HOME, dbtEnv: path.join(T, '.cache', 'dbt-env'),
+  // KEEP_PROFILE=1: reuse the profile left by the previous run (e.g. to see what a restart of Studio does)
+  const seeded = process.env.KEEP_PROFILE ? { userData: path.join(HOME, 'Library', 'Application Support', 'rosetta-dbt-studio'), projectDir: null, recipe: {} } : seedProfile({ stateDir: path.join(courseDir, 'states', stateName), home: HOME, dbtEnv: path.join(T, '.cache', 'dbt-env'),
     python: path.join(T, '.cache', 'dbt-env', 'bin', 'python'), mac: MAC, projectsDir: course.projects_dir });
   log('seeded', seeded.projectDir);
   const app = await launchStudio({ appBin: APP_BIN, home: HOME, userData: seeded.userData, scale: 2, theme: course.theme, mac: MAC });

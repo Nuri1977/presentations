@@ -1,0 +1,20 @@
+number: "6.2"
+title: Staging models
+slides:
+  - { id: title, type: title, h1: '<span class="accent">Staging</span> models', lead: "Clean views on top of the raw tables.", badges: [sources.yml, stg_blocks, stg_transactions] }
+  - id: views
+    type: cards
+    eyebrow: Views in a lake
+    h2: A view is a catalog row
+    cols: 2
+    cards:
+      - { step: 1, cls: hot, k: ducklake_view, t: SQL text only, d: "no Parquet files at all" }
+      - { step: 1, k: So, t: Cheap and current, d: "nothing to store, always the latest data" }
+    checked: DuckLake specification, checked 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "<span class=\"mono\">sources.yml</span> points dbt at the raw tables."
+      - "Two staging views clean them up."
+      - "A view in a lake is just a catalog row."
+  - { id: closing, type: closing, lesson: Lesson 6.3, h2: 'Marts, built <span class="accent">incrementally</span>' }

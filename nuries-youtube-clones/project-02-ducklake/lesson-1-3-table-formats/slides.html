@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.3 · Table formats and catalogs</title>
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .chain { flex: 1; display: flex; align-items: center; gap: 18px; margin-top: 30px; }
+  .chain .node { flex: 1; }
+  .chain .node .n { font-size: 36px; }
+  .bucket { border: 2px dashed #9db5f3; border-radius: 26px; padding: 26px 30px 30px; background: #fbfcff; }
+  .bucket .k { font-size: 26px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+  .svc { margin-top: 26px; display: flex; align-items: center; gap: 22px; font-size: 36px; font-weight: 800; }
+  .svc .node { flex: none; padding: 22px 28px; }
+  .log { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  .log .file { min-width: 0; }
+  .qs { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 50px; align-content: center; }
+  .qs .card { padding: 46px 40px; }
+  .qs .t { font-size: 56px; }
+  table.t td, table.t th { font-size: 32px; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 1.3</div>
+      <h1 style="margin-top:28px;font-size:124px">Table formats and <span class="accent">catalogs</span></h1>
+      <p class="lead">Iceberg, Delta Lake, and DuckLake's different idea.</p>
+      <div class="badges"><span class="badge">Apache Iceberg</span><span class="badge">Delta Lake</span><span class="badge">DuckLake</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="track">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What a table format tracks</div>
+    <h2>Three questions</h2>
+    <div class="qs s" data-step="1">
+      <div class="card hot"><div class="k">Files</div><div class="t">Which files are the table now?</div></div>
+      <div class="card"><div class="k">Schema</div><div class="t">Which columns, which types?</div></div>
+      <div class="card"><div class="k">Versions</div><div class="t">Which version is this?</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:12%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+</section>
+
+<section class="stage" data-id="iceberg">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Apache Iceberg</div>
+    <h2>A tree of metadata files</h2>
+    <div class="bucket s" data-step="1" style="margin-top:34px">
+      <div class="k">In the bucket</div>
+      <div class="chain" style="margin-top:0">
+        <div class="node hot"><div class="k">Metadata</div><div class="n mono">v3.metadata.json</div></div><div class="arrow">→</div>
+        <div class="node"><div class="k">Manifest list</div><div class="n mono">snap-…avro</div></div><div class="arrow">→</div>
+        <div class="node"><div class="k">Manifests</div><div class="n mono">…-m0.avro</div></div><div class="arrow">→</div>
+        <div class="node blue"><div class="k">Data</div><div class="n mono">….parquet</div></div>
+      </div>
+    </div>
+    <div class="svc s" data-step="2"><div class="node green"><div class="k">Catalog service</div><div class="n">pointer per table</div></div>→ the current metadata file</div>
+  </div>
+  <div class="footer"><div class="bar" style="width:24%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+</section>
+
+<section class="stage" data-id="delta">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Delta Lake</div>
+    <h2>A log of commit files</h2>
+    <div class="bucket s" data-step="1" style="margin-top:44px">
+      <div class="k">_delta_log/</div>
+      <div class="log">
+        <div class="file">000…00.json<small>commit 0</small></div>
+        <div class="file">000…01.json<small>commit 1</small></div>
+        <div class="file">000…02.json<small>commit 2</small></div>
+        <div class="file">…<small>&nbsp;</small></div>
+        <div class="file new">000…10.checkpoint<small>Parquet summary</small></div>
+        <div class="file">000…11.json<small>commit 11</small></div>
+      </div>
+      <div class="k" style="margin-top:30px">Data</div>
+      <div class="files-strip" style="margin-top:0"><div class="file">part-0001.parquet</div><div class="file">part-0002.parquet</div><div class="file">part-0003.parquet</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+</section>
+
+<section class="stage" data-id="cost">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What both designs pay</div>
+    <h2>The shared cost</h2>
+    <div class="row three">
+      <div class="card s" data-step="1"><div class="k">Writes</div><div class="t">Many small files</div><div class="d">Every change writes new metadata files.</div></div>
+      <div class="card s" data-step="2"><div class="k">Reads</div><div class="t">Round trips</div><div class="d">File after file before the first row of data.</div></div>
+      <div class="card hot s" data-step="3"><div class="k">Operations</div><div class="t">A catalog anyway</div><div class="d">A service to run, often backed by a database.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:50%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+</section>
+
+<section class="stage" data-id="idea">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">DuckLake's idea</div>
+    <h2>Put the metadata in the database</h2>
+    <div class="lake">
+      <div class="box catalog s" data-step="1"><div class="k">Catalog database</div><div class="n">Plain SQL tables</div><div class="d">files, schemas, snapshots, statistics</div></div>
+      <div class="link s" data-step="2">⟷</div>
+      <div class="box files s" data-step="2"><div class="k">Data</div><div class="n">Parquet files</div><div class="d">on a disk or in a bucket, as before</div></div>
+    </div>
+    <div class="note s card hot" data-step="3" style="padding:26px 34px;font-size:38px;font-weight:700;margin-bottom:10px">A change is one transaction. Finding the files is one query.</div>
+  </div>
+  <div class="footer"><div class="bar" style="width:66%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+</section>
+
+<section class="stage" data-id="compare">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Side by side</div>
+    <h2>Three table formats</h2>
+    <table class="t s" data-step="1">
+      <tr><th></th><th>Iceberg</th><th>Delta Lake</th><th class="hot">DuckLake</th></tr>
+      <tr><td>Metadata</td><td>JSON and Avro files in the bucket</td><td>JSON log in the bucket</td><td class="hot">tables in a SQL database</td></tr>
+      <tr><td>Catalog</td><td>a separate service</td><td>a separate service</td><td class="hot">the same database</td></tr>
+      <tr><td>Engines</td><td>many</td><td>many</td><td class="hot">DuckDB today</td></tr>
+      <tr><td>In production</td><td>for years</td><td>for years</td><td class="hot">younger</td></tr>
+    </table>
+  </div>
+  <div class="footer"><div class="bar" style="width:82%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+  <div class="checked">From each project's own documentation, 11 Nov 2026</div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What to remember</h2>
+    <div class="recap s" data-step="1">
+      <div class="item"><div class="num">1</div><div>A table format tracks files, schema and versions.</div></div>
+      <div class="item"><div class="num">2</div><div>Iceberg and Delta keep that as files next to the data.</div></div>
+      <div class="item"><div class="num">3</div><div>DuckLake keeps it as tables in a database.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.3</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 1.4</h1>
+      <h2 style="font-size:92px">How <span class="accent">DuckLake</span> works</h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

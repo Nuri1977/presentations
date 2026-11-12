@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2.1 · Create a DuckLake in Studio</title>
+<!-- Slide scenes for Lesson 2.1. Each section's data-id matches `slide:` in lesson.yaml; elements with
+     data-step="n" appear when the beat's step reaches n. Theme: ../slides-theme (white). -->
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .side { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex: 1; align-items: center; margin-top: 20px; }
+  .tree { font-size: 40px; line-height: 1.7; }
+  .facts { display: flex; flex-direction: column; gap: 22px; }
+  .fact { padding: 28px 34px; border-radius: 20px; border: 1px solid var(--line); background: var(--card); }
+  .fact .k { font-size: 28px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .fact .v { font-size: 46px; font-weight: 850; margin-top: 6px; }
+  .fact.hot { border: 2px solid var(--orange); background: var(--orange-soft); }
+  .note { margin-top: 34px; padding: 28px 36px; border-radius: 20px; border: 2px solid var(--orange); background: var(--orange-soft); font-size: 40px; font-weight: 650; line-height: 1.3; }
+  .code.big { font-size: 42px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 2.1</div>
+      <h1 style="margin-top:28px;font-size:128px">Create a <span class="accent">DuckLake</span> in Studio</h1>
+      <p class="lead">A catalog file, a data folder, and the first query.</p>
+      <div class="badges"><span class="badge">Data Lake wizard</span><span class="badge">DuckDB catalog</span><span class="badge">First query</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="plan">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What we create</div>
+    <h2>One folder, two things inside</h2>
+    <div class="side">
+      <div class="codecard s" data-step="1"><div class="filetab"><span class="ic"></span>ethereum_lake/   the project</div><div class="tree"><span class="dir">lake/</span>
+  <span class="pq">eth_catalog.duckdb</span>   <span class="dimc">the catalog</span>
+  <span class="dir">data/</span>                <span class="dimc">Parquet files</span></div></div>
+      <div class="facts s" data-step="2">
+        <div class="fact hot"><div class="k">Name</div><div class="v mono">eth_lake</div></div>
+        <div class="fact"><div class="k">Storage</div><div class="v">A local folder</div></div>
+        <div class="fact"><div class="k">Catalog</div><div class="v">One DuckDB file</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:12%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 2.1</b></div></div>
+</section>
+
+<section class="stage" data-id="sql">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What the wizard did</div>
+    <h2>Three statements in plain DuckDB</h2>
+    <div class="codecard s" data-step="1" style="margin-top:40px"><div class="filetab"><span class="ic"></span>what Studio runs for you</div><div class="code big"><span class="k">INSTALL</span> ducklake;
+<span class="k">ATTACH</span> <span class="str">'ducklake:lake/eth_catalog.duckdb'</span> <span class="k">AS</span> eth_lake
+  (<span class="k">DATA_PATH</span> <span class="str">'lake/data/'</span>);
+<span class="k">USE</span> eth_lake;</div></div>
+    <div class="note s" data-step="2">With a DuckDB file as the catalog, one program at a time can open the lake.</div>
+  </div>
+  <div class="footer"><div class="bar" style="width:80%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 2.1</b></div></div>
+  <div class="checked">Checked against the DuckLake docs on 11 Nov 2026</div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What we did</h2>
+    <div class="recap s" data-step="1">
+      <div class="item"><div class="num">1</div><div>Created the project and <span class="mono">eth_lake</span>.</div></div>
+      <div class="item"><div class="num">2</div><div>It is a catalog file and a data folder.</div></div>
+      <div class="item"><div class="num">3</div><div>It starts with snapshot 0.</div></div>
+      <div class="item"><div class="num">4</div><div>The SQL Editor can query it.</div></div>
+      <div class="item"><div class="num">5</div><div>The project is on GitHub.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 2.1</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 2.2</h1>
+      <h2 style="font-size:88px">Load three months of <span class="accent">blocks</span></h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

@@ -82,3 +82,13 @@ UI labels are fixed automatically and logged. Factual claims are flagged and tha
 ## Git
 `presentations/` is its own git repo; Claude writes files only and never commits.
 Renders, MP4s, WAVs, frames and caches are ignored.
+
+## UI zoom instead of crop zoom (10 Nov 2026)
+
+Nuri asked to use Studio's Cmd +/- zoom "as much as possible". `course.yaml` → `ui_zoom` (Studio, Electron zoom
+factor, 1.25 max for Studio 1.7.6 at 1920x1080 DIP: at 1.5 the layout overflows to the right) and `browser_zoom`
+(browser pages: viewport 1920/z x 1080/z at device scale 2z). Studio frames come from `webContents.capturePage()`
+(native 3840x2160; Playwright would give CSS px x 2). Mouse coordinates are CSS px; `ev()` writes them x z, so
+events stay in 1920x1080 DIP. `compose.py` caps crop zooms at 1.35x for UI-zoomed lessons (2.4x otherwise,
+`video.max_crop_zoom` overrides). Per-beat action `ui_zoom: <factor|default>`. Test lesson:
+`project-01/.cache/zoomtest`.

@@ -1,0 +1,67 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:08.428
+Our lake lives on a laptop: a DuckDB file as catalog, and a local folder.
+
+00:00:08.708 --> 00:00:10.201
+For a team, swap both.
+
+00:00:10.481 --> 00:00:15.683
+Use PostgreSQL as the catalog, and object storage like S3 for the data.
+
+00:00:15.963 --> 00:00:17.809
+Same lake format, same SQL.
+
+00:00:18.759 --> 00:00:23.703
+Now many people and many machines can attach the same lake, and write at the same time.
+
+00:00:24.653 --> 00:00:32.783
+We tested S3 compatible storage too: it works from DuckDB and dbt, but Studio's wizard does not support it yet.
+
+00:00:33.063 --> 00:00:37.158
+A follow-up tutorial covers PostgreSQL with cloud storage.
+
+00:00:38.108 --> 00:00:40.725
+Running a lake for real means a few more things.
+
+00:00:41.005 --> 00:00:47.341
+Access control comes from two places: permissions in the catalog database, and policies on the bucket.
+
+00:00:48.291 --> 00:00:52.472
+Backups: back up the catalog database, and turn on versioning for the bucket.
+
+00:00:53.422 --> 00:00:58.339
+Encryption: DuckLake can encrypt every data file, and keeps the keys in the catalog.
+
+00:00:59.289 --> 00:01:04.168
+And an existing DuckDB database can be moved into a DuckLake, table by table.
+
+00:01:05.118 --> 00:01:11.163
+Some things are not supported today, like primary keys, unique and foreign key constraints, and indexes.
+
+00:01:11.443 --> 00:01:15.985
+Check the docs page on unsupported features: it changes with each release.
+
+00:01:16.935 --> 00:01:17.870
+Let's look back.
+
+00:01:18.150 --> 00:01:21.487
+A DuckLake is a catalog database plus Parquet files.
+
+00:01:21.767 --> 00:01:24.584
+Every change is a snapshot you can travel back to.
+
+00:01:24.864 --> 00:01:27.168
+Updates and deletes never rewrite files.
+
+00:01:27.448 --> 00:01:31.041
+Partitions, statistics and maintenance keep it fast and small.
+
+00:01:31.321 --> 00:01:34.294
+The catalog is plain SQL you can read yourself.
+
+00:01:34.574 --> 00:01:37.552
+And dbt builds tested models right on top.
+
+00:01:37.832 --> 00:01:40.423
+Thanks for watching, and see you in the next course.

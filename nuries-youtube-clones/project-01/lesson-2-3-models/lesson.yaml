@@ -6,24 +6,22 @@ title: "Models: your first dbt model"
 module: "Module 2 · dbt basics"
 draft_section: "plan-dbt-project01.md, section 9, Lesson 3.3 Models (pilot lesson)"
 next: "Lesson 2.4 · Dependencies & Jinja"
-summary: "Build the first dbt model of the NYC taxi project: trips.sql, one select over the raw 2025 green taxi parquet files. Run it from the Model menu in Rosetta DBT Studio, look at the rows with dbt show, read the create view statement dbt wrote, then commit and push the model from Studio's Git tab."
+summary: "Build the first dbt model of the NYC taxi project: trips.sql, one select over the raw 2025 green taxi parquet files. Run it from the Model menu in Rosetta DBT Studio, preview the rows, read the compiled SQL, check the run history, then commit and push the model from Studio's Git tab."
 start_state: lesson-2-2-end
-rehearsal: true
-tags: [dbt models, dbt run, dbt show, DuckDB, parquet, NYC taxi]
+rehearsal: false
+tags: [dbt models, dbt run, preview, compiled SQL, DuckDB, NYC taxi]
 target_minutes: 5
 start_notes:
-  - "Start state `lesson-2-2-end`: a clone of what Lesson 2.2 pushed to nyc-taxi-dbt-rehearsal (`.gitignore`, README, `models/sources.yml`, `seeds/taxi_zone_lookup.csv`), the 12 Green Taxi 2025 parquet files in `data/raw`, and the nyc_taxi_dev connection."
+  - "Start state `lesson-2-2-end`: a clone of what Lesson 2.2 pushed to nyc-taxi-dbt (`.gitignore`, README, `models/sources.yml`, `seeds/taxi_zone_lookup.csv`), the 12 Green Taxi 2025 parquet files in `data/raw`, and the nyc_taxi_dev connection."
   - "No `target/` or `logs/` folders yet, so the run in s04 creates them on camera."
   - "Start on the home screen with no editor tabs open. Bottom panel open on TERMINAL."
 draft_changes:
-  - "The plan's s05 queried `trips` in the SQL Editor. In Studio 1.7.6 the SQL Editor, Execute Query and Model > Preview all run DuckDB from Studio's own folder, so the view's relative parquet path fails (\"No files found\"). The lesson uses `dbt show` in Studio's terminal instead, which runs in the project folder. Logged in studio-notes.md."
-  - "dbt commands from Studio's dropdowns (Nuri, 10 Nov): the model runs from Model ▸ Run. Model ▸ Preview cannot read the view's relative parquet path in 1.7.6, so the rows still come from dbt show in the terminal."
-  - "Ends with commit + Sync Changes (push to main) and the models folder on GitHub (rehearsal repo)."
-  - "The Source Control panel is the Git tab in the Explorer sidebar in 1.7.6; a new file must be staged with + before Commit is enabled."
+  - "Studio features first (Nuri, 10 Nov): Model ▸ Run, Model ▸ Preview (Preview window + Query Results tab with SQL and History), Model ▸ Compile (Compiled SQL window), and the Run History tab. No dbt show, no target/run file."
+  - "Preview and Query Results show TIMESTAMP columns as [object Object] / {micros} in Studio 1.7.6; the lesson scrolls the preview to the number columns and does not read the timestamps."
+  - "Ends with commit + Sync Changes (push to main) and the models folder on GitHub."
 accuracy_notes:
   - "Measured on 9 Nov 2026 from the TLC files downloaded that day: 591,375 raw rows in green_tripdata_2025-01..12; 565,039 rows in `trips` after the filter."
-  - "Run output `OK created sql view model main.trips` and the `create view \"nyc_taxi_dev\".\"main\".\"trips__dbt_tmp\"` statement in target/run are the real outputs of this recording (dbt-core 1.12.6, dbt-duckdb 1.11.1)."
-  - "dbt's view materialization creates the view under a temporary name and then renames it, which is why target/run shows trips__dbt_tmp."
+  - "Run output `OK created sql view model main.trips` and the Preview count (565039 rows, 11 columns) are the real outputs of this recording (dbt-core 1.12.6, dbt-duckdb 1.11.1)."
 
 scenes:
   - id: s00
@@ -78,7 +76,7 @@ scenes:
                   tip_amount,
                   total_amount
       - id: b07
-        say: "Read them from the raw green trips source. The source function points at the parquet files we declared in the last lesson."
+        say: "Read them from the raw green trips source. The source function points at the table we loaded and declared in the last lesson."
         zoom: code-close
         card: { eyebrow: "source()", title: "No file paths in the model", sub: "sources.yml says where raw.green_trips lives.", pos: top-right }
         actions:
@@ -104,9 +102,9 @@ scenes:
     chapter: "How dbt runs a model"
     slide: flow
     beats:
-      - { id: b10, step: 1, show: "Step 1, Compile: the Jinja in curly braces becomes SQL; source('raw','green_trips') becomes read_parquet('data/raw/...').", say: "So what happens when you run it? First, dbt compiles the file. The Jinja in curly braces becomes plain SQL, and the source call becomes the real read parquet call." }
+      - { id: b10, step: 1, show: "Step 1, Compile: the Jinja in curly braces becomes SQL; source('raw','green_trips') becomes \"nyc_taxi_dev\".\"raw\".\"green_trips\".", say: "So what happens when you run it? First, dbt compiles the file. The Jinja in curly braces becomes plain SQL, and the source call becomes the real table name." }
       - { id: b11, step: 2, show: "Step 2, Wrap: create view trips as ( your select ). Label: dbt writes this.", say: "Then dbt wraps your select in a create view statement. That is the part you never write." }
-      - { id: b12, step: 3, show: "Step 3, Execute: the statement goes to DuckDB; data/dev.duckdb now holds the view main.trips.", say: "And it sends the statement to DuckDB, which saves the view in the dev database file." }
+      - { id: b12, step: 3, show: "Step 3, Execute: the statement goes to DuckDB; nyc_taxi_dev.duckdb now holds the view main.trips.", say: "And it sends the statement to DuckDB, which saves the view in the dev database file." }
 
   - id: s04
     kind: app
@@ -126,39 +124,50 @@ scenes:
 
   - id: s05
     kind: app
-    chapter: "Look at the rows with dbt show"
+    chapter: "Preview the rows"
     beats:
       - id: b15
-        say: "To look at the rows, use the command box under the terminal. The model's Preview runs outside the project folder, so it can't find the parquet files yet. Type: dbt show, select trips, limit ten. Then press Enter."
-        zoom: terminal-close
+        say: "To look at the rows, open the Model menu again, and choose Preview. Studio compiles the model, runs its select, and opens the result."
+        zoom: model-menu
         actions:
-          - terminal: { cmd: "dbt show --select trips --limit 10", until: "Previewing node 'trips'" }
+          - model_menu: Preview
+          - wait_text: { text: "^Preview: trips$", regex: true, label: preview window, timeoutMs: 90000 }
       - id: b16
-        say: "dbt runs the model's select, and prints the first ten trips: New Year's Day, 2025, with the pickup and drop-off times and zones. Across the whole year, the model keeps more than half a million trips."
-        zoom: terminal-close
+        say: "Eleven columns, and five hundred sixty-five thousand trips, out of five hundred ninety-one thousand raw rows. Scroll right for the distance, the payment type and the amounts."
+        zoom: center-wide
         card: { eyebrow: "2025 data, as of 9 Nov 2026", title: "565,039 trips", sub: "kept from 591,375 raw rows", pos: top-right }
+        actions:
+          - dialog_scroll_right
+      - id: b16b
+        say: "Close it. The same rows stay in the Query Results tab, next to the SQL that ran, and a history of your previews."
+        zoom: terminal
+        actions:
+          - click_at: { role: button, name: Close, label: Close, settleMs: [300, 800] }
+          - click_at: { role: tab, name: SQL, label: SQL tab, settleMs: [300, 900] }
+          - click_at: { role: tab, name: History, label: History tab, settleMs: [300, 900] }
 
   - id: s06
     kind: app
-    chapter: "The SQL dbt wrote"
+    chapter: "The SQL dbt wrote, and the run history"
     beats:
       - id: b17
-        say: "Want to see exactly what dbt sent to DuckDB? Refresh the Explorer, and open target, then run, nyc taxi, models, and trips.sql."
-        zoom: explorer
+        say: "Want to see exactly what dbt sends to DuckDB? Model menu, Compile."
+        zoom: model-menu
         actions:
-          - refresh_explorer
-          - open_file: target/run/nyc_taxi/models/trips.sql
+          - model_menu: Compile
+          - wait_text: { text: "^Compiled SQL: trips$", regex: true, label: compiled window, timeoutMs: 60000 }
       - id: b18
-        say: "There it is: create view, followed by your select. dbt builds the view under a temporary name, then swaps it in."
-        zoom: code-mid
-        card: { eyebrow: "target/run", title: "create view … as (", sub: "dbt wrote this line, not you.", pos: top-right }
+        say: "The Compiled SQL tab shows your select, with the source call replaced by the real table: nyc taxi dev, raw, green trips."
+        zoom: center-wide
+        card: { eyebrow: "Compiled SQL", title: "source() → raw.green_trips", sub: "Jinja became plain SQL.", pos: bottom-right }
         actions:
-          - point: { editor_line: 3 }
+          - click_at: { role: tab, name: "Compiled SQL", label: Compiled SQL tab, settleMs: [300, 900] }
       - id: b19
-        say: "And the source call became read parquet, with the file pattern from sources.yml."
-        zoom: code-mid
+        say: "Close it, and open Run History. Every dbt command Studio ran is here: dbt run, select trips, one of one passed."
+        zoom: terminal
         actions:
-          - point: { editor_line: 17 }
+          - click_at: { role: button, name: Close, label: Close, settleMs: [300, 800] }
+          - click_at: { role: button, name: "RUN HISTORY", label: Run History, settleMs: [400, 1200, 2200] }
 
   - id: s07
     kind: app
@@ -168,7 +177,6 @@ scenes:
         say: "Last step: commit and push. Open the Git tab. Trips.sql is listed as a new file. The target and logs folders are not, because git ignores them."
         zoom: git-panel
         actions:
-          - close_tab: target/run/nyc_taxi/models/trips.sql
           - git_tab
       - id: b21
         say: "Stage it with the plus button, type a message, add the trips staging model, and click Commit."
@@ -191,14 +199,14 @@ scenes:
         say: "On GitHub, the models folder now holds trips dot sql, next to sources dot yml."
         zoom: center-wide
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/tree/main/models
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt/tree/main/models
 
   - id: s08
     kind: slide
     chapter: "Recap"
     slide: recap
     beats:
-      - { id: b23, step: 1, show: "Recap: A model is one select in one .sql file. Run: compile, wrap in create view, execute in DuckDB. dbt show prints the rows. Commit and push in the Git tab.", say: "To recap. A model is one select in one file. dbt compiles it, wraps it in create view, and runs it in DuckDB. dbt show prints the rows, and the Git tab sends it to GitHub. Next, we add two more models that build on trips." }
+      - { id: b23, step: 1, show: "Recap: A model is one select in one .sql file. Run: compile, wrap in create view, execute in DuckDB. Preview shows the rows, Compile the SQL, Run History the runs. Commit and push in the Git tab.", say: "To recap. A model is one select in one file. dbt compiles it, wraps it in create view, and runs it in DuckDB. Preview shows the rows, and the Git tab sends it to GitHub. Next, we add two more models that build on trips." }
 
   - id: s09
     kind: closing

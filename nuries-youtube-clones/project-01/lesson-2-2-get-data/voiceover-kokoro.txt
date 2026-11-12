@@ -1,7 +1,7 @@
 # Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
 b01	Our raw data is twelve par-kay files, one per month of 2025.
 b01	They are too big for git, so they stay in a data folder that git ignores.
-b01	duck D B reads them in place, and a source, in sources dot yammel, gives them a name D B T can use.
+b01	We load them once into a duck D B table, raw green trips, and a source, in sources dot yammel, tells D B T about it.
 b02	The second file is small: a lookup of the 265 taxi zones.
 b02	Small C S V files like this one are seeds.
 b02	They live in the repository, and D B T loads them as tables.
@@ -14,17 +14,21 @@ b05	Right-click the project, choose New Folder, and call it data.
 b06	Inside data, make a folder called raw.
 b07	Now move the twelve par-kay files into data, raw, and the zone lookup C S V into seeds.
 b07	Refresh the explorer, and there they are.
-b08	Next, tell D B T about the raw files.
-b08	Right-click models, New File, and call it sources dot yammel.
-b09	A source called raw, with a short description.
-b10	It has one table, green trips: one row per green taxi trip.
-b11	And where the table lives: external location, a read par-kay call over all twelve files.
-b11	Union by name lines up the columns, even if a month's file has them in a different order.
-b11	Save.
-b12	Does D B T find the data?
-b12	In the command box, type D B T show, inline, and a query that counts the rows of the source.
-b12	Press Enter.
-b13	D B T turns the source into the read par-kay call, and duck D B counts five hundred ninety-one thousand, three hundred seventy-five trips, in 2025.
+b08	Now load the files into duck D B.
+b08	Open the sequel Editor, and pick the N Y C taxi dev connection.
+b09	Three statements, one per line.
+b09	Create a schema called raw.
+b09	Create the table raw green trips, from read par-kay over all twelve files: use the full path of your data raw folder.
+b09	Then count the rows.
+b10	Run them one by one, with the green arrow next to each line.
+b10	Union by name lines up the columns, even if a month's file has them in a different order.
+b11	Five hundred ninety-one thousand, three hundred seventy-five trips in 2025, now in one duck D B table.
+b12	Back in the project, tell D B T about the table.
+b12	Right-click models, New File, and call it sources dot yammel.
+b13	A source called raw, the schema we just made, with a short description.
+b13b	It has one table, green trips: one row per green taxi trip.
+b13b	Save.
+b13b	In a model, source raw, green trips, now points at that table.
 b14	Now the Git tab.
 b14	Only two files changed: sources dot yammel and the C S V.
 b14	The par-kay files are not here, because the git ignore leaves out the data folder.
@@ -32,7 +36,7 @@ b15	Stage all, type a message, declare the raw trips source and add the zone loo
 b16	Then click Sync Changes.
 b16	Studio pushes the commit to git hub.
 b17	On git hub, the repository now has the models and seeds folders, and the latest commit message.
-b18	To recap: the trip files sit in data raw, outside git.
+b18	To recap: the trip files sit in data raw, outside git, and live in duck D B as raw green trips.
 b18	The zone lookup is a seed.
-b18	And sources dot yammel names the raw files, raw dot green trips, which D B T can read.
+b18	And sources dot yammel declares the source.
 b18	Next, we build our first model on top of it.

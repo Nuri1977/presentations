@@ -1,0 +1,162 @@
+{
+ "total": 140.6,
+ "fps": 30,
+ "size": [
+  3840,
+  2160
+ ],
+ "scenes": [
+  {
+   "id": "s00",
+   "kind": "title",
+   "start": 0.0,
+   "dur": 3
+  },
+  {
+   "id": "s01",
+   "kind": "slide",
+   "start": 3.0,
+   "dur": 8.2
+  },
+  {
+   "id": "s02",
+   "kind": "app",
+   "start": 11.2,
+   "dur": 17.68
+  },
+  {
+   "id": "s03",
+   "kind": "app",
+   "start": 28.88,
+   "dur": 27.37
+  },
+  {
+   "id": "s04",
+   "kind": "app",
+   "start": 56.25,
+   "dur": 16.7
+  },
+  {
+   "id": "s05",
+   "kind": "slide",
+   "start": 72.95,
+   "dur": 22.68
+  },
+  {
+   "id": "s06",
+   "kind": "app",
+   "start": 95.63,
+   "dur": 28.62
+  },
+  {
+   "id": "s07",
+   "kind": "slide",
+   "start": 124.25,
+   "dur": 12.35
+  },
+  {
+   "id": "s08",
+   "kind": "closing",
+   "start": 136.6,
+   "dur": 4
+  }
+ ],
+ "beats": [
+  {
+   "id": "b01",
+   "scene": "s01",
+   "start": 3.0,
+   "dur": 8.2,
+   "voice_start": 3.35,
+   "voice": 7.253
+  },
+  {
+   "id": "b02",
+   "scene": "s02",
+   "start": 11.2,
+   "dur": 13.53,
+   "voice_start": 11.55,
+   "voice": 8.251
+  },
+  {
+   "id": "b03",
+   "scene": "s02",
+   "start": 24.74,
+   "dur": 4.15,
+   "voice_start": 25.09,
+   "voice": 3.196
+  },
+  {
+   "id": "b04",
+   "scene": "s03",
+   "start": 28.88,
+   "dur": 8.37,
+   "voice_start": 29.23,
+   "voice": 7.421
+  },
+  {
+   "id": "b05",
+   "scene": "s03",
+   "start": 37.25,
+   "dur": 12.31,
+   "voice_start": 37.6,
+   "voice": 11.364
+  },
+  {
+   "id": "b06",
+   "scene": "s03",
+   "start": 49.57,
+   "dur": 6.68,
+   "voice_start": 49.92,
+   "voice": 5.731
+  },
+  {
+   "id": "b07",
+   "scene": "s04",
+   "start": 56.25,
+   "dur": 16.7,
+   "voice_start": 56.6,
+   "voice": 6.039
+  },
+  {
+   "id": "b08",
+   "scene": "s05",
+   "start": 72.95,
+   "dur": 4.85,
+   "voice_start": 73.3,
+   "voice": 3.901
+  },
+  {
+   "id": "b09",
+   "scene": "s05",
+   "start": 77.8,
+   "dur": 6.34,
+   "voice_start": 78.15,
+   "voice": 5.388
+  },
+  {
+   "id": "b10",
+   "scene": "s05",
+   "start": 84.13,
+   "dur": 11.49,
+   "voice_start": 84.48,
+   "voice": 10.541
+  },
+  {
+   "id": "b11",
+   "scene": "s06",
+   "start": 95.63,
+   "dur": 28.62,
+   "voice_start": 95.98,
+   "voice": 4.953
+  },
+  {
+   "id": "b12",
+   "scene": "s07",
+   "start": 124.25,
+   "dur": 12.35,
+   "voice_start": 124.6,
+   "voice": 11.404
+  }
+ ]
+}

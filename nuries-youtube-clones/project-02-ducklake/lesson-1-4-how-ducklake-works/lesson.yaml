@@ -1,0 +1,82 @@
+# Lesson 1.4 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only: theory, no start state and no recording. Pilot cut for the white theme.
+id: lesson-1-4
+number: "1.4"
+title: "How DuckLake works"
+module: "Module 1 · Data lakes explained"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 1.4 How DuckLake works"
+next: "Lesson 1.5 · The Ethereum data"
+summary: "The mental model for the whole course: a DuckLake is a catalog database plus a folder of Parquet files. See what happens on a write and on a read, what that design gives you (transactions, snapshots, time travel), and who can read a DuckLake."
+tags: [DuckLake, lakehouse, data lake, Parquet, catalog, snapshots, time travel, DuckDB]
+target_minutes: 3.5
+show_help_links: true
+links:
+  - { title: "DuckLake documentation", url: "https://ducklake.select/docs/stable/" }
+  - { title: "DuckLake specification", url: "https://ducklake.select/docs/stable/specification/introduction" }
+draft_changes:
+  - "Pilot lesson for the white slide theme (slides-theme/)."
+accuracy_notes:
+  - "Catalog database choices (DuckDB, SQLite, PostgreSQL, MySQL), writes as Parquet files plus one catalog transaction, snapshots and time travel: DuckLake docs, checked 11 Nov 2026 (plan section 2.1)."
+  - "Reading today is through DuckDB's ducklake extension; the catalog is plain SQL tables (specification), so any SQL client can read the metadata."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 1.4. How DuckLake works. Badges: Catalog, Parquet files, Snapshots."
+
+  - id: s01
+    kind: slide
+    chapter: "Two parts"
+    slide: parts
+    beats:
+      - { id: b01, step: 0, show: "Heading: A catalog and a folder of files.", say: "A DuckLake has two parts, and only two." }
+      - { id: b02, step: 1, show: "Catalog box: a normal SQL database with tables, columns, snapshots and the list of files. Choices: DuckDB file, SQLite, PostgreSQL, MySQL.", say: "The first part is the catalog. It is a normal SQL database. It knows the tables, their columns, and exactly which files belong to each table. It can be a DuckDB file, SQLite, PostgreSQL, or MySQL." }
+      - { id: b03, step: 2, show: "Data box: a folder or a bucket of Parquet files, never edited.", say: "The second part is the data: a folder, or a bucket, of Parquet files. These files are never edited. They are only added, or removed." }
+
+  - id: s02
+    kind: slide
+    chapter: "A write"
+    slide: write
+    beats:
+      - { id: b04, step: 1, show: "Step 1: write new Parquet files into the data folder.", say: "Here is what happens when you insert rows. First, DuckLake writes the new rows as Parquet files in the data folder. Nobody can see them yet." }
+      - { id: b05, step: 2, show: "Step 2: one transaction in the catalog records the files and creates a snapshot.", say: "Then, in one database transaction, the catalog records those files and creates a new snapshot. That commit is the moment the change becomes visible." }
+      - { id: b06, step: 3, show: "Step 3: if anything fails, the catalog does not change.", say: "If anything fails on the way, the catalog does not change, and readers never see half a write." }
+
+  - id: s03
+    kind: slide
+    chapter: "A read"
+    slide: read
+    beats:
+      - { id: b07, step: 1, show: "Ask the catalog which files make up the table now.", say: "A read goes the other way. The query first asks the catalog which files make up the table right now." }
+      - { id: b08, step: 2, show: "Skip files by statistics: min and max per column.", say: "The catalog also keeps statistics for every file, like the smallest and largest value of each column. So files that cannot match the filter are skipped." }
+      - { id: b09, step: 3, show: "Read only the Parquet files that are left.", say: "Only then does it read the Parquet files that are left." }
+
+  - id: s04
+    kind: slide
+    chapter: "What you get"
+    slide: gets
+    beats:
+      - { id: b10, step: 1, show: "Card: ACID transactions, across tables.", say: "This simple design gives you a lot. Changes are real transactions, even across several tables." }
+      - { id: b11, step: 2, show: "Card: snapshots and time travel.", say: "Every change is a snapshot, so you can query a table as it was yesterday, or last week." }
+      - { id: b12, step: 3, show: "Card: small changes stay small: a few rows in the catalog.", say: "And a small change stays small. It is a few rows in the catalog, not a pile of new metadata files." }
+
+  - id: s05
+    kind: slide
+    chapter: "Who can read it"
+    slide: readers
+    beats:
+      - { id: b13, step: 1, show: "DuckDB with the ducklake extension reads and writes the lake.", say: "Who can read a DuckLake? Today, DuckDB does, through the ducklake extension. That is what Rosetta DBT Studio uses under the hood." }
+      - { id: b14, step: 2, show: "The catalog is plain SQL tables; the data is plain Parquet.", say: "And because the catalog is plain SQL tables, and the data is plain Parquet, nothing is locked away. Any SQL client can look inside the catalog." }
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b15, step: 1, show: "Recap: catalog is a database, data is Parquet; files are never edited; every change is a snapshot.", say: "To recap: the catalog is a database, and the data is Parquet. Files are never edited, only added or removed. And every change makes a snapshot. Next, we meet the data for this course: Ethereum blocks and transactions." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.5 · The Ethereum data. Code: github.com/Nuri1977/ethereum-ducklake-dbt."

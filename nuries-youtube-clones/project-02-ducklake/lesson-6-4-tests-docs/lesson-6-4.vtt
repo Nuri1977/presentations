@@ -1,0 +1,58 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:09.283
+A DuckLake supports not null, but no primary keys, no unique constraints, and no foreign keys.
+
+00:00:09.563 --> 00:00:12.094
+Nothing stops a duplicate block from getting in.
+
+00:00:13.044 --> 00:00:16.999
+So we check those rules with dbt tests, every time we build.
+
+00:00:17.949 --> 00:00:20.115
+In models, create schema dot yml.
+
+00:00:20.395 --> 00:00:32.308
+Descriptions for the models, unique and not null on the keys, accepted values on the success flag, and a relationship: every transaction's block number must exist in stg blocks.
+
+00:00:33.258 --> 00:00:39.340
+Run dbt build: it builds every model in order, and runs each model's tests right after it.
+
+00:00:39.620 --> 00:00:43.043
+Five models and nine tests: fourteen passes in all.
+
+00:00:47.577 --> 00:00:48.515
+Now the docs.
+
+00:00:48.795 --> 00:00:56.128
+Project menu, Generate Docs. dbt reads the project and the lake, and writes a small website into target.
+
+00:00:58.687 --> 00:01:00.254
+Then Project, Serve Docs.
+
+00:01:00.534 --> 00:01:03.706
+Studio starts a local web server, on port eighty eighty.
+
+00:01:05.979 --> 00:01:10.760
+Open it in the browser, on the daily gas model: its description, and its columns.
+
+00:01:11.710 --> 00:01:19.776
+And the lineage graph for this model: daily gas is built from stg transactions, the staging view on the raw transactions table.
+
+00:01:20.055 --> 00:01:25.994
+The full graph of the project, from both raw tables to all three marts, opens with the button at the top.
+
+00:01:26.944 --> 00:01:29.243
+Commit the tests and descriptions, and push.
+
+00:01:41.602 --> 00:01:49.407
+To recap: the lake does not enforce unique keys, so dbt tests do, and dbt build runs them with every model.
+
+00:01:49.687 --> 00:01:53.575
+And the docs show each model, its columns and tests, and its lineage.
+
+00:01:53.855 --> 00:01:55.300
+That ends Module 6.
+
+00:01:55.580 --> 00:01:57.745
+One lesson left: where to go from here.

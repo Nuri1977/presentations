@@ -1,0 +1,20 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A duck lake supports not null, but no primary keys, no unique constraints, and no foreign keys.
+b01	Nothing stops a duplicate block from getting in.
+b02	So we check those rules with D B T tests, every time we build.
+b03	In models, create schema dot yammel.
+b03	Descriptions for the models, unique and not null on the keys, accepted values on the success flag, and a relationship: every transaction's block number must exist in stg blocks.
+b04	Run D B T build: it builds every model in order, and runs each model's tests right after it.
+b04	Five models and nine tests: fourteen passes in all.
+b05	Now the docs.
+b05	Project menu, Generate Docs. D B T reads the project and the lake, and writes a small website into target.
+b06	Then Project, Serve Docs.
+b06	Studio starts a local web server, on port eighty eighty.
+b07	Open it in the browser, on the daily gas model: its description, and its columns.
+b08	And the lineage graph for this model: daily gas is built from stg transactions, the staging view on the raw transactions table.
+b08	The full graph of the project, from both raw tables to all three marts, opens with the button at the top.
+b09	Commit the tests and descriptions, and push.
+b10	To recap: the lake does not enforce unique keys, so D B T tests do, and D B T build runs them with every model.
+b10	And the docs show each model, its columns and tests, and its lineage.
+b10	That ends Module 6.
+b10	One lesson left: where to go from here.

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project 2 · white theme demo</title>
+<!-- One slide of each type, to check the white theme. Not part of any lesson. -->
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 0 · Welcome</div>
+      <h1 style="margin-top:28px">Data lakes and <span class="accent">DuckLake</span></h1>
+      <p class="lead">Build a lakehouse on your laptop with real Ethereum data.</p>
+      <div class="badges"><span class="badge">Rosetta DBT Studio</span><span class="badge">DuckLake 1.0</span><span class="badge">DuckDB</span><span class="badge">dbt Core</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="statement">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The idea</div>
+    <div class="statement">
+      <div class="big">A lakehouse is <span class="accent">files</span> plus a <span class="accent">catalog</span> that knows which files are the table.</div>
+      <div class="badges s" data-step="1"><span class="pill">Parquet files</span><span class="pill grey">any storage</span><span class="pill blue">SQL database as catalog</span></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:12%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+<section class="stage" data-id="cards">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Three ways to store analytics data</div>
+    <h2>Warehouse, lake, lakehouse</h2>
+    <div class="row three">
+      <div class="card"><div class="k">Warehouse</div><div class="t">One system owns everything</div><div class="d">Fast and safe, but the data lives in its format.</div></div>
+      <div class="card"><div class="k">Data lake</div><div class="t">Just files</div><div class="d">Cheap and open, but no transactions and no schema.</div></div>
+      <div class="card hot"><div class="k">Lakehouse</div><div class="t">Open files, table rules</div><div class="d">Transactions, schema and history on top of files.</div>
+        <ul class="ticks"><li>ACID changes</li><li>Time travel</li><li class="no">Not a server you must run</li></ul></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:20%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="lake">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">DuckLake in one picture</div>
+    <h2>A catalog and a folder of files</h2>
+    <div class="lake">
+      <div class="box catalog"><div class="k">Catalog</div><div class="n mono">eth_catalog.duckdb</div><div class="d">Tables, columns, snapshots and the list of files. A normal SQL database.</div></div>
+      <div class="link">⟷</div>
+      <div class="box files"><div class="k">Data</div><div class="n mono">lake/data/</div><div class="d">Parquet files. Never changed, only added or removed.</div>
+        <div class="files-strip">
+          <div class="file">blocks-01.parquet<small>7,176 rows</small></div>
+          <div class="file new">blocks-02.parquet<small>new in snapshot 3</small></div>
+          <div class="file del">blocks-01-delete<small>1 row removed</small></div>
+          <div class="file gone">old.parquet<small>expired</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:28%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+<section class="stage" data-id="timeline">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Snapshots</div>
+    <h2>Every change is a version</h2>
+    <div class="timeline">
+      <div class="snap"><div class="dot">1</div><div class="what">Create schema</div><div class="note">raw</div></div>
+      <div class="snap"><div class="dot">2</div><div class="what">Create table</div><div class="note">raw.blocks, 7,176 rows</div></div>
+      <div class="snap"><div class="dot">3</div><div class="what">Insert</div><div class="note">one more day</div></div>
+      <div class="snap now"><div class="dot">4</div><div class="what">Delete</div><div class="note">one block removed</div></div>
+    </div>
+    <p class="lead" style="margin-top:70px">Time travel reads the table as it was at any of these points.</p>
+  </div>
+  <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 2.4</b></div></div>
+  <div class="checked">Checked against the DuckLake docs on 11 Nov 2026</div>
+</section>
+
+<section class="stage" data-id="code">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Time travel</div>
+    <h2>Ask for an older version</h2>
+    <div class="split">
+      <div class="codecard"><div class="filetab"><span class="ic"></span>now</div><div class="code"><span class="k">select</span> <span class="f">count</span>(*)
+<span class="k">from</span> raw.blocks;
+<span class="cm">-- 14,348</span></div></div>
+      <div class="codecard"><div class="filetab"><span class="ic"></span>as of snapshot 2</div><div class="code"><span class="k">select</span> <span class="f">count</span>(*)
+<span class="k">from</span> raw.blocks
+<span class="hl"><span class="k">at</span> (<span class="k">version</span> => <span class="str">2</span>);</span>
+<span class="cm">-- 7,176</span></div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:44%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 2.5</b></div></div>
+</section>
+
+<section class="stage" data-id="table">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Table formats compared</div>
+    <h2>Where the metadata lives</h2>
+    <table class="t">
+      <tr><th></th><th>Iceberg</th><th>Delta Lake</th><th class="hot">DuckLake</th></tr>
+      <tr><td>Metadata</td><td>JSON and Avro files</td><td>JSON log files</td><td class="hot">Tables in a SQL database</td></tr>
+      <tr><td>Data</td><td>Parquet</td><td>Parquet</td><td class="hot">Parquet</td></tr>
+      <tr><td>A small change</td><td>several new files</td><td>a new log file</td><td class="hot">a few rows in the catalog</td></tr>
+    </table>
+  </div>
+  <div class="footer"><div class="bar" style="width:52%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.5</b></div></div>
+</section>
+
+<section class="stage" data-id="flow">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What we build</div>
+    <h2>From raw blocks to daily numbers</h2>
+    <div class="flow">
+      <div class="node blue"><div class="k">Source</div><div class="n">Ethereum on S3</div><div class="d">public Parquet, one folder a day</div></div>
+      <div class="arrow">→</div>
+      <div class="node hot"><div class="k">Lake</div><div class="n">raw.blocks</div><div class="d">DuckLake tables</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="k">dbt</div><div class="n">staging views</div><div class="d">clean names and units</div></div>
+      <div class="arrow">→</div>
+      <div class="node green"><div class="k">Marts</div><div class="n">daily_gas</div><div class="d">incremental, merged</div></div>
+    </div>
+    <div class="lanes">
+      <div class="who">Studio</div><div class="lane"><div class="tx ok" style="left:2%;width:30%">insert, commit</div></div>
+      <div class="who">dbt</div><div class="lane"><div class="tx fail" style="left:20%;width:26%">blocked by the lock</div><div class="tx retry" style="left:60%;width:30%">run again, passes</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:60%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 0</b></div></div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What to remember</h2>
+    <div class="split" style="align-items:center">
+      <div class="recap">
+        <div class="item"><div class="num">1</div><div>The catalog is a database. The data is Parquet.</div></div>
+        <div class="item"><div class="num">2</div><div>Files are never edited, only added or removed.</div></div>
+        <div class="item"><div class="num">3</div><div>Every change makes a snapshot.</div></div>
+      </div>
+      <div class="codecard"><div class="filetab"><span class="ic"></span>lake/data/</div><div class="tree"><span class="dir">raw/</span>
+  <span class="dir">transactions/</span>
+    <span class="dir">date=2026-10-01/</span>
+      <span class="pq">ducklake-01a1.parquet</span>
+    <span class="dir">date=2026-10-02/</span>
+      <span class="pq">ducklake-01a2.parquet</span></div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.4</b></div></div>
+</section>
+
+</div>
+<script src="theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In the sequel Editor, on eth lake: add a column to blocks, gas used percent, a double.
+b02	It is instant: no file is rewritten.
+b02	Old rows simply have no value.
+b02	Fill it for one day, the second of November: gas used divided by the gas limit.
+b03	Miner is an old name; today the field means the fee recipient.
+b03	Rename it.
+b04	And make number required: not null.
+b05	Query the new shape: number, fee recipient, and gas used percent.
+b06	Now time travel to version eleven, before these changes.
+b06	The column is still called miner there.
+b06	Each snapshot keeps its own schema.
+b07	In Data Lake, open the blocks table and its Schema tab: fee recipient in place of miner, and the new column at the end.
+b08	How does this work without touching files?
+b08	Every column has an id in the catalog.
+b08	A rename changes the name, not the id, so old files still map to the right column.
+b09	You can add, drop and rename columns, promote types the safe way, like integer to big integer, and add not null.
+b09	And every version keeps its own schema.
+b10	Save the script as 3 underscore 3 schema evolution dot sequel, commit, and push.
+b11	To recap: we added a column, renamed one, and added a constraint, without rewriting a single file.
+b11	And time travel still sees the old schema.
+b11	Next: asking the lake what changed between two versions.

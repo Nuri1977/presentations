@@ -1,0 +1,32 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Rosetta D B T Studio is free and open source.
+b01	Go to rosetta D B dot I O, and click Download Now.
+b02	The download page has a card for each system: Windows, Linux, and macOS.
+b03	On Windows, take the E X E installer.
+b03	On Linux, the deb or R P M package.
+b03	On a Mac, pick your processor: arm sixty-four for Apple silicon, or Intel.
+b03	This Mac has an Intel chip, so click Mac Intel.
+b04	When the download finishes, open the file.
+b04	A window shows the app on the left, and your Applications folder on the right.
+b05	Drag Rosetta D B T Studio onto Applications, and wait for the copy.
+b06	Then open it from Applications.
+b06	The first time, macOS asks if you want to open an app from the internet.
+b06	Click Open.
+b07	Studio starts with a short setup.
+b07	First, the D B T version: D B T 1.x, the recommended one.
+b08	Then the exact version.
+b08	Keep the latest, 1.12.6.
+b09	Next, the adapters.
+b09	For this course we only need duck D B, so uncheck the others, keep D B T duck D B, and click Continue.
+b10	Skip the optional tools, and click Install.
+b11	Studio downloads its own Python, then installs D B T Core and the duck D B adapter, inside its own folder.
+b11	It takes a minute or two; the video speeds it up.
+b12	Done: Python 3.10.17, and D B T 1.12.6.
+b12	Click Finish.
+b13	This is Studio's home screen.
+b13	Among the modules is Data Lake: that is where our lake will live.
+b14	The status bar shows what was installed: D B T, Python, and the duck D B version Studio runs inside.
+b14	We come back to that one in Lesson 1.6.
+b15	To recap: one app, with its own Python and D B T, and duck D B built in.
+b15	You did not install any of them yourself.
+b16	Next, before we touch a lake, we explain what a data lake is, starting with warehouses and lakehouses.

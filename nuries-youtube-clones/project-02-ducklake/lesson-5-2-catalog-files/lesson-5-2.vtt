@@ -1,0 +1,43 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:05.245
+In the SQL Editor, on eth lake.
+
+00:00:05.525 --> 00:00:08.523
+Ducklake data file has one row per Parquet file.
+
+00:00:08.803 --> 00:00:17.166
+Here are the files of transactions, table five: one per day, with its row count, its size, and its path, relative to the data folder.
+
+00:00:18.116 --> 00:00:23.259
+Ducklake file column stats holds the min and max of every column of every file.
+
+00:00:23.539 --> 00:00:28.412
+For block number, each file covers its own narrow range, one day after the other.
+
+00:00:28.692 --> 00:00:33.627
+This is exactly what let the query in Lesson 4.2 skip six files out of seven.
+
+00:00:34.577 --> 00:00:41.343
+Ducklake file partition value: the date each file belongs to, from the partitioning in Lesson 4.1.
+
+00:00:42.293 --> 00:00:47.441
+Ducklake table stats keeps totals per table, so counting rows needs no file at all.
+
+00:00:47.721 --> 00:00:52.437
+Transactions: twelve point seven million rows, one point seven gigabytes.
+
+00:00:53.387 --> 00:01:02.724
+And ducklake inlined data tables: the watchlist from Lesson 4.3 has a table inside the catalog, where inlined rows wait to be flushed.
+
+00:01:03.674 --> 00:01:15.310
+So these are the file tables: data files and delete files, statistics per file, partition values, table totals, inlined rows, and files scheduled for deletion by maintenance.
+
+00:01:16.260 --> 00:01:21.494
+Save the queries as 5 underscore 2 catalog files dot sequel, commit, and push.
+
+00:01:44.255 --> 00:01:50.270
+To recap: every file is a row, with its statistics and partition value, and tables keep totals.
+
+00:01:50.550 --> 00:01:56.252
+Next, the final proof: we read the lake by hand, with nothing but these tables and read parquet.

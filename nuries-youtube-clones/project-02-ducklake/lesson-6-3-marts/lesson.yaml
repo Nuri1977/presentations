@@ -1,0 +1,133 @@
+# Lesson 6.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-6-3
+number: "6.3"
+title: "Marts, built incrementally"
+module: "Module 6 · dbt on DuckLake"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 6.3"
+next: "Lesson 6.4 · Tests and docs on the lake"
+summary: "Three marts on the lake: daily_network_activity and top_senders as tables, and daily_gas as an incremental model with the merge strategy, which runs a real MERGE INTO on the lake, plus a post-hook that writes a commit message. Run dbt twice, read the compiled MERGE, and find dbt's snapshots and commit message in Studio's History."
+start_state: lesson-6-2-end
+show_help_links: true
+links:
+  - { title: "dbt: incremental models", url: "https://docs.getdbt.com/docs/build/incremental-models" }
+  - { title: "DuckLake: snapshots and commit messages", url: "https://ducklake.select/docs/stable/duckdb/usage/snapshots" }
+tags: [dbt, incremental models, MERGE, DuckLake, commit message, marts]
+target_minutes: 4.5
+start_notes:
+  - "Start state `lesson-6-2-end`: staging models in the project; Studio freshly opened, the lake not opened yet. The marts folder exists (empty)."
+draft_changes:
+  - "The second run of daily_gas re-merges the last day instead of loading a new day of raw data: it shows the MERGE without a load between two dbt runs."
+accuracy_notes:
+  - "incremental_strategy='merge' compiles to MERGE INTO \"eth_lake\".\"main\".\"daily_gas\" in target/run (dbt-duckdb 1.11.1); the post_hook call eth_lake.set_commit_message('dbt', …) sets author and message on dbt's snapshot. Rehearsal 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 6.3. Marts, built incrementally."
+
+  - id: s01
+    kind: app
+    chapter: "Two table marts"
+    beats:
+      - id: b01
+        say: "In the marts folder, daily network activity: per day, the number of blocks and transactions, how full the blocks were, and the average base fee. A table."
+        zoom: code-mid
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: models/marts, name: daily_network_activity.sql }
+          - paste: { text: "{{ config(materialized='table') }}\n\nselect\n    block_date,\n    count(*) as blocks,\n    sum(transaction_count) as transactions,\n    round(avg(gas_used_pct), 1) as avg_gas_used_pct,\n    round(avg(base_fee_gwei), 3) as avg_base_fee_gwei\nfrom {{ ref('stg_blocks') }}\ngroup by block_date\n" }
+          - click_save
+          - expect_file: { path: models/marts/daily_network_activity.sql, snippet: ../snippets/6.3/daily_network_activity.sql }
+      - id: b02
+        say: "And top senders: the hundred addresses that sent the most transactions, with the fees they paid."
+        zoom: code-mid
+        actions:
+          - close_tab: models/marts/daily_network_activity.sql
+          - new_file: { folder: models/marts, name: top_senders.sql }
+          - paste: { text: "{{ config(materialized='table') }}\n\nselect\n    from_address,\n    count(*) as transactions,\n    round(sum(fee_eth), 4) as fees_paid_eth\nfrom {{ ref('stg_transactions') }}\ngroup by from_address\norder by transactions desc\nlimit 100\n" }
+          - click_save
+          - expect_file: { path: models/marts/top_senders.sql, snippet: ../snippets/6.3/top_senders.sql }
+
+  - id: s02
+    kind: app
+    chapter: "An incremental merge"
+    beats:
+      - id: b03
+        say: "Now daily gas, incremental, with the merge strategy and block date as the unique key. On later runs it only processes days from the last one it has, and merges them in. The post hook calls set commit message, so the snapshots daily gas makes get an author and a message."
+        zoom: code-mid
+        actions:
+          - close_tab: models/marts/top_senders.sql
+          - new_file: { folder: models/marts, name: daily_gas.sql }
+          - paste: { text: "{{ config(\n    materialized='incremental',\n    incremental_strategy='merge',\n    unique_key='block_date',\n    post_hook=\"call eth_lake.set_commit_message('dbt', 'daily_gas: incremental merge')\"\n) }}\n\nselect\n    block_date,\n    count(*) as transactions,\n    round(sum(fee_eth), 4) as total_fee_eth,\n    round(median(fee_eth), 8) as median_fee_eth,\n    round(100.0 * avg(succeeded::int), 2) as success_pct\nfrom {{ ref('stg_transactions') }}\n{% if is_incremental() %}\nwhere block_date >= (select max(block_date) from {{ this }})\n{% endif %}\ngroup by block_date\n" }
+          - click_save
+          - expect_file: { path: models/marts/daily_gas.sql, snippet: ../snippets/6.3/daily_gas.sql }
+
+  - id: s03
+    kind: app
+    chapter: "Run, twice"
+    beats:
+      - id: b04
+        say: "Run everything: dbt run. Two views, two tables, and the incremental model, built in the lake."
+        zoom: terminal-close
+        actions:
+          - close_tab: models/marts/daily_gas.sql
+          - terminal: { cmd: "dbt run", until: "Completed successfully", timeoutMs: 300000 }
+      - id: b05
+        say: "Run daily gas again. This time it is incremental: dbt recomputes the last day into a temporary table, and merges it into daily gas."
+        zoom: terminal-close
+        actions:
+          - terminal: { cmd: "dbt run --select daily_gas", until: "Completed successfully", timeoutMs: 300000 }
+      - id: b06
+        say: "Here is what dbt ran, in the target folder: merge into eth lake dot main dot daily gas. The merge Studio's SQL Editor could not run in Lesson 3.2, running on our lake."
+        zoom: code-mid
+        card: { eyebrow: "target/run/…/daily_gas.sql", title: "MERGE INTO", sub: "run by dbt on the lake", pos: top-right }
+        actions:
+          - refresh_explorer
+          - open_file: target/run/ethereum_lake/models/marts/daily_gas.sql
+      - id: b07
+        say: "And the result, with dbt show: one row per day, from August to early November."
+        zoom: terminal-close
+        actions:
+          - close_tab: target/run/ethereum_lake/models/marts/daily_gas.sql
+          - terminal: { cmd: "dbt show --select daily_network_activity --limit 5", until: "Previewing node", timeoutMs: 180000 }
+
+  - id: s04
+    kind: app
+    chapter: "dbt's snapshots"
+    beats:
+      - id: b08
+        say: "dbt is done, so open the lake in Studio: Data Lake, eth lake, History. dbt's work is a series of snapshots. And the incremental merge has an author, dbt, and our commit message."
+        zoom: center-wide
+        card: { eyebrow: "eth_lake · History", title: "Author: dbt", sub: "daily_gas: incremental merge", pos: top-right }
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: tab, name: History, settleMs: [400, 1200, 2500] }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b09
+        say: "Commit the marts, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - git_tab
+          - git_stage_all
+          - git_message: Marts on the lake
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b10, step: 1, show: "Recap: table marts; incremental merge = MERGE INTO on the lake; post_hook sets a commit message; dbt runs are snapshots.", say: "To recap: two table marts, and an incremental model whose merge strategy runs a real merge into on the lake. A post hook adds a commit message, and every dbt run shows up as snapshots. Next: tests and docs." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 6.4 · Tests and docs."

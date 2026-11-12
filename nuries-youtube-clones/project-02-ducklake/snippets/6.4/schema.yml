@@ -1,0 +1,41 @@
+models:
+  - name: stg_blocks
+    description: One row per Ethereum block, with clear names and units.
+    columns:
+      - name: block_number
+        description: The block's height in the chain.
+        data_tests:
+          - unique
+          - not_null
+  - name: stg_transactions
+    description: One row per transaction, with values and fees in ether.
+    columns:
+      - name: transaction_hash
+        data_tests:
+          - not_null
+      - name: block_number
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_blocks')
+                field: block_number
+      - name: succeeded
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+                quote: false
+  - name: daily_network_activity
+    description: One row per day with blocks, transactions, gas use and the average base fee.
+    columns:
+      - name: block_date
+        data_tests:
+          - unique
+          - not_null
+  - name: daily_gas
+    description: One row per day with transaction fees; built incrementally with a merge.
+    columns:
+      - name: block_date
+        data_tests:
+          - unique
+          - not_null

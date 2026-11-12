@@ -1,0 +1,145 @@
+# Lesson 2.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-2
+number: "2.2"
+title: "Load three months of blocks from S3"
+module: "Module 2 · Your first lake in Studio"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 2.2"
+next: "Lesson 2.3 · Look inside: data files and tables"
+summary: "The first table in the lake: three months of Ethereum blocks read straight from the public S3 bucket into eth_lake.raw.blocks, one month per statement, from Rosetta DBT Studio's SQL Editor. Then the table in the Data Lake screens, and the script committed to the project."
+start_state: lesson-2-1-end
+show_help_links: true
+links:
+  - { title: "DuckLake: introduction", url: "https://ducklake.select/docs/stable/duckdb/introduction" }
+  - { title: "DuckDB: reading Parquet from S3", url: "https://duckdb.org/docs/stable/core_extensions/httpfs/s3api" }
+tags: [DuckLake, S3, Parquet, DuckDB, SQL Editor, Ethereum]
+target_minutes: 4.5
+start_notes:
+  - "Start state `lesson-2-1-end`: the project as 2.1 pushed it, the ethereum_lake_dev connection, and the empty lake eth_lake (snapshot 0) registered in Studio."
+draft_changes:
+  - "Three full months (August to October, 92 days) instead of 90 days: one statement per month."
+  - "The Import Data screen is not used: the SQL shows what happens and gives three separate snapshots."
+accuracy_notes:
+  - "Rows: August 222,412, September 215,033, October 222,451; 659,896 in total (rehearsal 12 Nov 2026, same files as S3)."
+  - "set_option does not create a snapshot; create schema is snapshot 1, the August table snapshot 2, September 3, October 4."
+  - "Studio reads the public bucket without any secret; the region is found automatically."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 2.2. Load three months of blocks from S3."
+
+  - id: s01
+    kind: slide
+    chapter: "The plan"
+    slide: plan
+    beats:
+      - { id: b01, step: 1, show: "Source: s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-08-01/ … one folder per day.", say: "The blocks live in the public bucket, one folder per day. We read them straight from S3, with read parquet and a wildcard: one month at a time." }
+      - { id: b02, step: 2, show: "Three statements: create table with August, insert September, insert October: three snapshots.", say: "Three statements: create the table with August, then insert September, then October. Each one becomes a snapshot of its own, which we use later for time travel." }
+      - { id: b03, step: 3, show: "First: turn data inlining off, so every write makes Parquet files we can see (explained in 4.3).", say: "One setting first. DuckLake can keep small writes inside the catalog, which is called data inlining. We turn it off, so every write becomes Parquet files we can look at. Lesson 4.3 explains it." }
+
+  - id: s02
+    kind: app
+    chapter: "Load the blocks"
+    beats:
+      - id: b04
+        say: "Open the SQL Editor, and pick the eth lake connection. Here is the script: one statement per line."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              call eth_lake.set_option('data_inlining_row_limit', 0);
+              create schema raw;
+              create table raw.blocks as select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-08-*/*.parquet');
+              insert into raw.blocks select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-09-*/*.parquet');
+              insert into raw.blocks select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-10-*/*.parquet');
+              select strftime(date, '%Y-%m') as month, count(*) as blocks from raw.blocks group by all order by 1;
+      - id: b05
+        say: "Run the first two lines: inlining off, and a schema called raw, for the data as it comes in."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 1, settleMs: [400, 1200, 2200] }
+          - sql_run: { line: 2, settleMs: [400, 1200, 2200] }
+      - id: b06
+        say: "Line three creates raw dot blocks from every file of August. Star exclude drops two columns we do not need, like the big logs bloom. Run it: Studio downloads the month from S3 and writes it into the lake."
+        zoom: explorer
+        card: { eyebrow: "Sped up", title: "One month from S3", sub: "31 files, about 220,000 blocks", pos: top-right }
+        actions:
+          - sql_run: { line: 3, settleMs: [800] }
+          - sql_wait
+      - id: b07
+        say: "Then September, and October, with insert into."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 4, settleMs: [800] }
+          - sql_wait
+          - sql_run: { line: 5, settleMs: [800] }
+          - sql_wait
+      - id: b08
+        say: "Check the result: blocks per month. About two hundred twenty thousand each, almost six hundred sixty thousand in total."
+        zoom: sql-results
+        card: { eyebrow: "raw.blocks", title: "659,896 blocks", sub: "August 222,412 · September 215,033 · October 222,451", pos: top-right }
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 3000] }
+
+  - id: s03
+    kind: app
+    chapter: "The table in Studio"
+    beats:
+      - id: b09
+        say: "Now open Data Lake, and the eth lake instance. Refresh. The new table is listed: blocks, in schema raw, with its rows and size."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: button, name: Refresh, label: Refresh, settleMs: [500, 1500, 2500] }
+          - point_at: { text: blocks, label: blocks table, hold: 900 }
+      - id: b10
+        say: "And History has four new snapshots: the schema, then one for each month."
+        zoom: center-wide
+        actions:
+          - click_at: { role: tab, name: History, settleMs: [400, 1200, 2500] }
+
+  - id: s04
+    kind: app
+    chapter: "Keep the script, commit, push"
+    beats:
+      - id: b11
+        say: "Keep the script in the project. In DBT Studio, add a folder called sql, and in it a file called 2 underscore 2 load blocks dot sequel, with the same statements. Save."
+        zoom: explorer
+        actions:
+          - nav: DBT Studio
+          - new_root_folder: sql
+          - new_file: { folder: sql, name: 2_2_load_blocks.sql }
+          - paste: |
+              call eth_lake.set_option('data_inlining_row_limit', 0);
+              create schema raw;
+              create table raw.blocks as select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-08-*/*.parquet');
+              insert into raw.blocks select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-09-*/*.parquet');
+              insert into raw.blocks select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-10-*/*.parquet');
+              select strftime(date, '%Y-%m') as month, count(*) as blocks from raw.blocks group by all order by 1;
+          - click_save
+          - expect_file: { path: sql/2_2_load_blocks.sql, snippet: ../snippets/2.2/2_2_load_blocks.sql }
+      - id: b12
+        say: "Git tab: stage all, commit with load three months of blocks, and Sync Changes to push. The lake itself stays out of git; the script is enough to rebuild it."
+        zoom: git-panel
+        actions:
+          - close_tab: sql/2_2_load_blocks.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Load three months of blocks
+          - git_commit
+          - git_push
+
+  - id: s05
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b13, step: 1, show: "Recap: inlining off; schema raw; raw.blocks from S3, one month per statement; 659,896 blocks; four snapshots; script committed.", say: "To recap: we turned inlining off, made the raw schema, and loaded three months of blocks from S3, one month per statement. That is six hundred sixty thousand blocks, and four new snapshots. Next, we look inside the lake: the files on disk." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.3 · Look inside: data files and tables."

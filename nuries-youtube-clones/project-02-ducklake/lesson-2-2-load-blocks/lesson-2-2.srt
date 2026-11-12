@@ -1,0 +1,115 @@
+1
+00:00:03,350 --> 00:00:06,476
+The blocks live in the public bucket, one folder per day.
+
+2
+00:00:06,756 --> 00:00:11,893
+We read them straight from S3, with read parquet and a wildcard: one month at a time.
+
+3
+00:00:12,843 --> 00:00:17,813
+Three statements: create the table with August, then insert September, then October.
+
+4
+00:00:18,093 --> 00:00:22,250
+Each one becomes a snapshot of its own, which we use later for time travel.
+
+5
+00:00:23,200 --> 00:00:24,346
+One setting first.
+
+6
+00:00:24,626 --> 00:00:29,135
+DuckLake can keep small writes inside the catalog, which is called data inlining.
+
+7
+00:00:29,415 --> 00:00:33,066
+We turn it off, so every write becomes Parquet files we can look at.
+
+8
+00:00:33,346 --> 00:00:35,198
+Lesson 4.3 explains it.
+
+9
+00:00:36,148 --> 00:00:39,276
+Open the SQL Editor, and pick the eth lake connection.
+
+10
+00:00:39,556 --> 00:00:41,912
+Here is the script: one statement per line.
+
+11
+00:00:45,166 --> 00:00:50,640
+Run the first two lines: inlining off, and a schema called raw, for the data as it comes in.
+
+12
+00:00:51,590 --> 00:00:55,289
+Line three creates raw dot blocks from every file of August.
+
+13
+00:00:55,569 --> 00:00:59,726
+Star exclude drops two columns we do not need, like the big logs bloom.
+
+14
+00:01:00,006 --> 00:01:04,292
+Run it: Studio downloads the month from S3 and writes it into the lake.
+
+15
+00:01:20,071 --> 00:01:22,643
+Then September, and October, with insert into.
+
+16
+00:02:16,357 --> 00:02:18,234
+Check the result: blocks per month.
+
+17
+00:02:18,514 --> 00:02:23,059
+About two hundred twenty thousand each, almost six hundred sixty thousand in total.
+
+18
+00:02:24,009 --> 00:02:26,760
+Now open Data Lake, and the eth lake instance.
+
+19
+00:02:27,040 --> 00:02:27,719
+Refresh.
+
+20
+00:02:27,999 --> 00:02:32,346
+The new table is listed: blocks, in schema raw, with its rows and size.
+
+21
+00:02:34,992 --> 00:02:39,190
+And History has four new snapshots: the schema, then one for each month.
+
+22
+00:02:40,140 --> 00:02:41,737
+Keep the script in the project.
+
+23
+00:02:42,017 --> 00:02:50,875
+In DBT Studio, add a folder called sql, and in it a file called 2 underscore 2 load blocks dot sequel, with the same statements.
+
+24
+00:02:51,155 --> 00:02:51,754
+Save.
+
+25
+00:02:56,501 --> 00:03:01,272
+Git tab: stage all, commit with load three months of blocks, and Sync Changes to push.
+
+26
+00:03:01,552 --> 00:03:05,148
+The lake itself stays out of git; the script is enough to rebuild it.
+
+27
+00:03:14,141 --> 00:03:21,655
+To recap: we turned inlining off, made the raw schema, and loaded three months of blocks from S3, one month per statement.
+
+28
+00:03:21,935 --> 00:03:25,816
+That is six hundred sixty thousand blocks, and four new snapshots.
+
+29
+00:03:26,097 --> 00:03:28,963
+Next, we look inside the lake: the files on disk.

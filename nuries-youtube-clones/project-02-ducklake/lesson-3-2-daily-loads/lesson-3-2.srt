@@ -1,0 +1,83 @@
+1
+00:00:03,350 --> 00:00:09,122
+Real pipelines run every day, and sometimes twice: a retry after an error, or a click too many.
+
+2
+00:00:09,402 --> 00:00:11,902
+A plain insert would load the same day twice.
+
+3
+00:00:12,852 --> 00:00:17,099
+We want an idempotent load: one you can run again, and nothing changes.
+
+4
+00:00:18,049 --> 00:00:26,354
+In the SQL Editor, on eth lake: insert the blocks of the second of November, but only those where no block with the same number exists yet.
+
+5
+00:00:30,591 --> 00:00:31,490
+Count by day.
+
+6
+00:00:31,770 --> 00:00:43,251
+Studio 1.7.6 shows a date column as a day number, so read the rows in order: the first and the second of November, seven thousand one hundred seventy-six blocks each.
+
+7
+00:00:44,201 --> 00:00:46,934
+Now run the load again, as if a job retried.
+
+8
+00:00:47,884 --> 00:00:51,228
+Count again: still seven thousand one hundred seventy-six.
+
+9
+00:00:51,508 --> 00:00:52,573
+No duplicates.
+
+10
+00:00:53,523 --> 00:00:56,590
+And the snapshots: one new snapshot for the first run.
+
+11
+00:00:56,870 --> 00:01:00,700
+The second run inserted nothing, so it did not even create a snapshot.
+
+12
+00:01:01,649 --> 00:01:03,471
+The general tool is merge into.
+
+13
+00:01:03,751 --> 00:01:09,557
+It matches new rows to existing ones on a key, updates the rows that match, and inserts the rest.
+
+14
+00:01:09,837 --> 00:01:11,046
+DuckLake supports it.
+
+15
+00:01:11,996 --> 00:01:17,226
+Studio's SQL Editor does not accept merge, so here we used insert where not exists.
+
+16
+00:01:17,506 --> 00:01:22,040
+In Lesson 6.3, dbt runs a real merge on this lake for us.
+
+17
+00:01:22,990 --> 00:01:27,693
+Save the load as 3 underscore 2 daily load dot sequel, commit, and push.
+
+18
+00:01:51,131 --> 00:01:56,092
+To recap: insert only rows whose key is new, and the load can run twice safely.
+
+19
+00:01:56,372 --> 00:01:59,074
+A change that changes nothing makes no snapshot.
+
+20
+00:01:59,354 --> 00:02:01,550
+And merge does the same, with updates too.
+
+21
+00:02:01,830 --> 00:02:03,893
+Next: changing a table's columns.

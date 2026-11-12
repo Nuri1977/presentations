@@ -1,0 +1,40 @@
+number: "2.4"
+title: Snapshots
+slides:
+  - { id: title, type: title, h1: 'Every change is a <span class="accent">snapshot</span>', lead: "Versions of the whole lake, for free.", badges: [History, snapshots(), Commit messages] }
+  - id: what
+    type: html
+    eyebrow: What a snapshot is
+    h2: A numbered version of the lake
+    html: |
+      <div class="timeline s" data-step="1">
+        <div class="snap"><div class="dot">0</div><div class="what">schema main</div><div class="note">lake created</div></div>
+        <div class="snap"><div class="dot">1</div><div class="what">schema raw</div></div>
+        <div class="snap"><div class="dot">2</div><div class="what">blocks</div><div class="note">August</div></div>
+        <div class="snap"><div class="dot">3</div><div class="what">insert</div><div class="note">September</div></div>
+        <div class="snap now"><div class="dot">4</div><div class="what">insert</div><div class="note">October</div></div>
+      </div>
+      <div class="card hot s" data-step="2" style="padding:26px 34px;font-size:38px;font-weight:700;margin-top:60px">A snapshot is a few rows in the catalog, not a copy of the data.</div>
+  - id: tx
+    type: code
+    eyebrow: Transactions and commit messages
+    h2: Many statements, one snapshot
+    codeblock:
+      step: 1
+      file: a transaction (DuckDB SQL)
+      size: 36
+      code: |
+        <span class="k">BEGIN</span>;
+        <span class="k">INSERT INTO</span> eth_lake.raw.blocks <span class="k">SELECT</span> … ;
+        <span class="k">CALL</span> eth_lake.<span class="f">set_commit_message</span>(<span class="str">'Nuri'</span>, <span class="str">'Load blocks for 1 Nov'</span>);
+        <span class="k">COMMIT</span>;
+    note: { step: 2, cls: bad, text: "Studio's SQL Editor runs one statement at a time. We set a commit message live from dbt in Lesson 6.3." }
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "Every change makes a snapshot."
+      - "Studio's History tab, and <span class=\"mono\">snapshots()</span> in SQL."
+      - "<span class=\"mono\">current_snapshot()</span> says where the lake is."
+      - "A transaction groups changes into one snapshot."
+  - { id: closing, type: closing, lesson: Lesson 2.5, h2: '<span class="accent">Time travel</span>' }

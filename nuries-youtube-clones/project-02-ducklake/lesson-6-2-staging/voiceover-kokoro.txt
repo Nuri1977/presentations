@@ -1,0 +1,17 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In D B T Studio, in the models folder, create sources dot yammel.
+b01	A source called raw, in database eth lake, schema raw, with the two tables we loaded: blocks and transactions.
+b02	Make a folder models, staging, and in it stg blocks dot sequel.
+b02	A view that renames the columns clearly, computes gas used in percent, and turns the base fee from way into gway.
+b03	And stg transactions dot sequel: the value and the fee paid in ether, and a success flag from the receipt status.
+b04	In the command box, run D B T run, select staging.
+b04	Two views, created in the lake, in a second.
+b05	Look at some rows with D B T show: each transaction with its block, date, addresses, and value in ether.
+b05	The terminal shows the columns that fit; the fee and the success flag are further right.
+b06	A view in a duck lake is only a row in the catalog, in duck lake view: its sequel text, and no data files at all.
+b06	So staging views cost nothing to keep, and are always up to date.
+b07	D B T is done, so now we can open the lake in Studio.
+b07	In Data Lake, eth lake, refresh: the two staging views are listed, in schema main, with type view.
+b08	Commit the source and the staging models, and push.
+b09	To recap: sources point D B T at the raw tables, two staging views clean them up, and in a lake a view is just a row in the catalog.
+b09	Next: marts, built incrementally, with a real merge.

@@ -1,0 +1,127 @@
+# Lesson 5.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-5-1
+number: "5.1"
+title: "Inside the catalog: snapshots, tables, columns"
+module: "Module 5 · Inside the catalog"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 5.1"
+next: "Lesson 5.2 · Inside the catalog: files, statistics, partitions"
+summary: "The catalog is an ordinary DuckDB database, attached next to the lake. Open its tables from the SQL Editor: ducklake_snapshot and ducklake_snapshot_changes, ducklake_table, and ducklake_column, where the column renamed in Lesson 3.3 shows up as two rows. Versioning is two columns on every row: begin_snapshot and end_snapshot."
+start_state: lesson-4-5-end
+show_help_links: true
+links:
+  - { title: "DuckLake specification: tables", url: "https://ducklake.select/docs/stable/specification/tables/overview" }
+tags: [DuckLake, catalog, metadata, specification, snapshots]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-4-5-end`: the lake after Module 4."
+draft_changes:
+  - "The catalog is read through the database Studio already attaches, __ducklake_metadata_eth_lake, instead of opening the catalog file as a second connection."
+  - "No commit message in the catalog: Studio's SQL Editor cannot set one (2.4); the snapshot changes column is shown instead."
+accuracy_notes:
+  - "duckdb_databases() on the lake connection lists __ducklake_metadata_eth_lake (duckdb) and eth_lake (ducklake). ducklake_table: blocks (id 2, from snapshot 2), blocks_day (4, 8), transactions (5, 16), watchlist (8, 20); id 3 (the October copy) is gone after 4.4. ducklake_column: column 3 is miner from 2 to 14, fee_recipient from 14. Rehearsed with DuckDB 1.5.2, 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 5.1. Inside the catalog: snapshots, tables, columns."
+
+  - id: s01
+    kind: app
+    chapter: "The catalog is a database"
+    beats:
+      - id: b01
+        say: "In the SQL Editor, on eth lake, list the databases this connection has attached. Two matter: eth lake, the lake, and underscore underscore ducklake metadata eth lake: the catalog file, as a plain DuckDB database."
+        zoom: sql-results
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select database_name, type from duckdb_databases();
+              select table_name from duckdb_tables() where database_name = '__ducklake_metadata_eth_lake' order by 1;
+              select snapshot_id, schema_version from __ducklake_metadata_eth_lake.ducklake_snapshot order by 1;
+              select snapshot_id, changes_made from __ducklake_metadata_eth_lake.ducklake_snapshot_changes order by 1 desc limit 5;
+              select table_id, table_name, begin_snapshot, end_snapshot from __ducklake_metadata_eth_lake.ducklake_table order by 1;
+              select column_id, column_name, begin_snapshot, end_snapshot from __ducklake_metadata_eth_lake.ducklake_column where table_id = 2 and column_id = 3 order by begin_snapshot;
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b02
+        say: "Its tables all start with ducklake. These are the tables the DuckLake specification defines. Nothing else: the whole lake's metadata is in them."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+
+  - id: s02
+    kind: app
+    chapter: "Snapshots and changes"
+    beats:
+      - id: b03
+        say: "Ducklake snapshot has one row per snapshot, with its schema version. Six and seven are missing: we expired them in Lesson 4.4."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Ducklake snapshot changes says what each snapshot did: the November file we added, the merge, the inlining flush. This is what Studio's History tab shows. A commit message would be stored here too."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Tables and columns"
+    beats:
+      - id: b05
+        say: "Ducklake table: one row per table, with an id, and the snapshot it was created in. Begin snapshot, end snapshot: a table that was dropped gets an end snapshot."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "And ducklake column, for column three of the blocks table. Two rows: miner, valid from snapshot two until fourteen, and fee recipient from fourteen on. That is the rename from Lesson 3.3. Same id, new name, and the old name is kept for time travel."
+        zoom: sql-results
+        card: { eyebrow: "ducklake_column · column 3", title: "miner 2 → 14 · fee_recipient 14 →", sub: "a rename is a new row, same id", pos: top-right }
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+
+  - id: s04
+    kind: slide
+    chapter: "The pattern"
+    slide: pattern
+    beats:
+      - { id: b07, step: 1, show: "Every catalog row has begin_snapshot and end_snapshot; 'valid at snapshot s' = begin <= s and (end > s or end is null).", say: "That is the whole trick of the catalog. Every row has a begin snapshot and an end snapshot. The lake at snapshot s is simply every row where begin is at most s, and end is after s, or empty." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b08
+        say: "Save the queries as 5 underscore 1 catalog tables dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 5_1_catalog_tables.sql }
+          - paste: |
+              select database_name, type from duckdb_databases();
+              select table_name from duckdb_tables() where database_name = '__ducklake_metadata_eth_lake' order by 1;
+              select snapshot_id, schema_version from __ducklake_metadata_eth_lake.ducklake_snapshot order by 1;
+              select snapshot_id, changes_made from __ducklake_metadata_eth_lake.ducklake_snapshot_changes order by 1 desc limit 5;
+              select table_id, table_name, begin_snapshot, end_snapshot from __ducklake_metadata_eth_lake.ducklake_table order by 1;
+              select column_id, column_name, begin_snapshot, end_snapshot from __ducklake_metadata_eth_lake.ducklake_column where table_id = 2 and column_id = 3 order by begin_snapshot;
+          - click_save
+          - expect_file: { path: sql/5_1_catalog_tables.sql, snippet: ../snippets/5.1/5_1_catalog_tables.sql }
+          - close_tab: sql/5_1_catalog_tables.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Catalog tables for snapshots, tables and columns
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b09, step: 1, show: "Recap: the catalog is a DuckDB database; ducklake_snapshot, _snapshot_changes, _table, _column; begin and end snapshot on every row.", say: "To recap: the catalog is a plain database of ducklake tables. Snapshots, tables and columns are rows, and begin and end snapshot version all of them. Next: the files, their statistics, and partitions." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 5.2 · Files, statistics, partitions."

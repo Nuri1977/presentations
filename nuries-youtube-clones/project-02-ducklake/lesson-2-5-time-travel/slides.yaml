@@ -1,0 +1,23 @@
+number: "2.5"
+title: Time travel
+slides:
+  - { id: title, type: title, h1: '<span class="accent">Time travel</span>', lead: "Query the lake as it was.", badges: ["AT (VERSION => n)", By timestamp, Recover data] }
+  - id: more
+    type: html
+    eyebrow: More ways to travel
+    h2: By time, by lake, and the cost
+    html: |
+      <div class="steps">
+        <div class="step s" data-step="1"><div class="num">1</div><div><div class="t mono" style="font-size:36px">AT (TIMESTAMP => now() - INTERVAL '1 day')</div><div class="d">the table as it was one day ago</div></div></div>
+        <div class="step s" data-step="2"><div class="num">2</div><div><div class="t mono" style="font-size:36px">ATTACH 'ducklake:…' AS eth_then (SNAPSHOT_VERSION 2)</div><div class="d">the whole lake at one snapshot, read only</div></div></div>
+        <div class="step hot s" data-step="3"><div class="num">3</div><div><div class="t">The cost</div><div class="d">old files stay on disk until old snapshots are expired (Lesson 4.4)</div></div></div>
+      </div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "<span class=\"mono\">AT (VERSION => n)</span> reads a table in the past."
+      - "Any query works on the past."
+      - "<span class=\"mono\">CREATE TABLE … AS SELECT … AT</span> brings data back."
+      - "The past costs disk until it is expired."
+  - { id: closing, type: closing, lesson: Lesson 3.1, h2: 'Insert, update, <span class="accent">delete</span>' }

@@ -5,17 +5,18 @@ title: "Showcase: docs site, README and a public warehouse"
 module: "Module 3 · Ship it"
 draft_section: "plan-dbt-project01.md, section 9, Lesson 4.2 Showcase (now 3.2)"
 next: "Project 1 complete"
-summary: "Turn the nyc_taxi dbt project into a portfolio piece: deploy the dbt docs to GitHub Pages from the CI workflow, write a README with a build badge, and query the published DuckDB warehouse straight from GitHub in Rosetta DBT Studio's SQL Editor."
+summary: "Turn the nyc_taxi dbt project into a portfolio piece: deploy the dbt docs to GitHub Pages from the CI workflow, write a README with a build badge, and see how anyone can query the published DuckDB warehouse straight from the GitHub release."
 start_state: lesson-3-1-end
 tags: [GitHub Pages, dbt docs, README, DuckDB, httpfs, portfolio, NYC taxi]
 target_minutes: 6
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `lesson-3-1-end`: a clone of what Lesson 3.1 pushed (CI workflow), the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt build (off camera)."
-  - "Rehearsal repo made public by Nuri on 10 Nov 2026 for this lesson; Pages was on 'Deploy from a branch' and is switched to GitHub Actions on camera."
+  - "Rehearsal repo made public by Nuri on 10 Nov 2026 for this lesson; Final run on the public Nuri1977/nyc-taxi-dbt; Pages Source is switched to GitHub Actions on camera."
 draft_changes:
   - "Action pins: actions/upload-pages-artifact@v5, actions/deploy-pages@v5 (current majors on 10 Nov 2026)."
-  - "README is pasted in full (owner/repo already filled in for the rehearsal repo); no DAG image."
+  - "README is pasted in full (owner/repo filled in); no DAG image."
+  - "The plan's s05 (attach the release in Studio's SQL Editor) is a slide: in Studio 1.7.6 each SQL Editor run uses a new connection, so an ATTACH does not carry over to the next statement (Binder Error: Catalog taxi does not exist), and only the first statement of a line runs. The query and its result were checked with DuckDB off camera."
 accuracy_notes:
   - "The public attach was checked off camera on 10 Nov 2026: top_pickup_zones from the release prod.duckdb gives 74 East Harlem North, 143,115 trips."
 
@@ -37,12 +38,12 @@ scenes:
     chapter: "Turn on GitHub Pages"
     beats:
       - id: b02
-        say: "On GitHub, open the repository's Settings, then Pages. Under Source, choose GitHub Actions, so the workflow can publish the docs."
+        say: "On GitHub, open the repository's Settings, then Pages. Under Source, choose GitHub Actions, so our workflow can publish the docs."
         zoom: center-wide
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/settings/pages
-          - click_at: { role: button, name: "Source Deploy from a branch", label: Source, settleMs: [400, 1000] }
-          - click_at: { text: "GitHub Actions", label: GitHub Actions, settleMs: [600, 1500, 3000] }
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt/settings/pages
+          - click_at: { role: button, name: "^Source", regex: true, label: Source, settleMs: [400, 1000] }
+          - click_at: { role: menuitemradio, name: "GitHub Actions", regex: true, label: GitHub Actions, settleMs: [600, 1500, 3000] }
 
   - id: s03
     kind: app
@@ -67,7 +68,7 @@ scenes:
         actions:
           - close_tab: .github/workflows/dbt_build.yml
           - open_file: README.md
-          - paste: { replace: true, text: "# NYC taxi dbt project\n\n[![dbt build & publish](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions/workflows/dbt_build.yml/badge.svg)](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions/workflows/dbt_build.yml)\n[![docs](https://img.shields.io/badge/docs-live-ff7a1a)](https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/)\n\nA dbt + DuckDB project on the NYC TLC green taxi trips of 2025, built in Rosetta DBT Studio.\nGitHub Actions builds and tests it on every push, publishes the warehouse, and deploys the docs.\n\n| What | How | Where to look |\n|---|---|---|\n| Pipeline | source \u2192 `trips` view \u2192 three mart tables | `models/` |\n| Tests | unique, not_null, accepted_values | `models/schema.yml`, `seeds/seeds.yml` |\n| Docs | dbt docs, lineage graph | [docs site](https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/) |\n| CI | `dbt build` on every push and every Monday | `.github/workflows/dbt_build.yml` |\n| Environments | dev in Studio, prod in CI | `profiles.yml`, `ci/profiles.yml` |\n| Warehouse | `prod.duckdb`, a release asset | [Releases](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/tag/warehouse) |\n\n## Query the warehouse\n\nIn DuckDB (or the SQL Editor of Rosetta DBT Studio):\n\n```sql\ninstall httpfs; load httpfs;\nattach 'https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/download/warehouse/prod.duckdb' as taxi (read_only);\nselect * from taxi.main.top_pickup_zones;\n```\n\nThe marts are tables; `trips` is a view over local files, so query the marts.\n\n## Run it yourself\n\nOpen the folder in [Rosetta DBT Studio](https://rosettadb.io/download-dbtstudio.html), or:\n\n```bash\npip install -r requirements.txt\npython scripts/download_data.py\ndbt build\n```\n\n## Data\n\nNYC Taxi & Limousine Commission trip records: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page\n\nCourse: dbt + DuckDB in Rosetta DBT Studio, Project 1. One commit per lesson.\n" }
+          - paste: { replace: true, text: "# NYC taxi dbt project\n\n[![dbt build & publish](https://github.com/Nuri1977/nyc-taxi-dbt/actions/workflows/dbt_build.yml/badge.svg)](https://github.com/Nuri1977/nyc-taxi-dbt/actions/workflows/dbt_build.yml)\n[![docs](https://img.shields.io/badge/docs-live-ff7a1a)](https://nuri1977.github.io/nyc-taxi-dbt/)\n\nA dbt + DuckDB project on the NYC TLC green taxi trips of 2025, built in Rosetta DBT Studio.\nGitHub Actions builds and tests it on every push, publishes the warehouse, and deploys the docs.\n\n| What | How | Where to look |\n|---|---|---|\n| Pipeline | raw table \u2192 `trips` view \u2192 three mart tables | `models/` |\n| Tests | unique, not_null, accepted_values | `models/schema.yml`, `seeds/seeds.yml` |\n| Docs | dbt docs, lineage graph | [docs site](https://nuri1977.github.io/nyc-taxi-dbt/) |\n| CI | `dbt build` on every push and every Monday | `.github/workflows/dbt_build.yml` |\n| Environments | dev in Studio, prod in CI | `profiles.yml`, `ci/profiles.yml` |\n| Warehouse | `prod.duckdb`, a release asset | [Releases](https://github.com/Nuri1977/nyc-taxi-dbt/releases/tag/warehouse) |\n\n## Query the warehouse\n\nIn the DuckDB CLI or any DuckDB client:\n\n```sql\ninstall httpfs; load httpfs;\nattach 'https://github.com/Nuri1977/nyc-taxi-dbt/releases/download/warehouse/prod.duckdb' as taxi (read_only);\nselect * from taxi.main.top_pickup_zones;\n```\n\nThe file holds the raw trips, the `trips` view and the three mart tables.\n\n## Run it yourself\n\nOpen the folder in [Rosetta DBT Studio](https://rosettadb.io/download-dbtstudio.html), or:\n\n```bash\npip install -r requirements.txt\npython scripts/download_data.py\ndbt build\n```\n\n## Data\n\nNYC Taxi & Limousine Commission trip records: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page\n\nCourse: dbt + DuckDB in Rosetta DBT Studio, Project 1. One commit per lesson.\n" }
           - click_save
           - expect_file: { path: README.md, snippet: ../snippets/3.2/README.md }
 
@@ -97,7 +98,8 @@ scenes:
       - id: b08
         say: "On GitHub, the Actions tab shows the run, now with two jobs: build, then docs."
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt/actions
+          - wait_text: { text: "Publish docs and README", timeoutMs: 90000, label: run listed }
           - click_at: { role: link, name: "Publish docs and README", label: the run, settleMs: [800, 2500] }
       - id: b09
         say: "A minute later, both are green."
@@ -106,34 +108,21 @@ scenes:
       - id: b10
         say: "The docs are live on GitHub Pages, for anyone, with the lineage graph of the whole project."
         actions:
-          - goto: https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/
+          - goto: https://nuri1977.github.io/nyc-taxi-dbt/
           - click_at: { selector: "a[title='View Lineage Graph']", label: View Lineage Graph, settleMs: [500, 1500, 3000] }
       - id: b11
         say: "And the repository page shows the README, with the green build badge."
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt
           - scroll_to: { text: "NYC taxi dbt project", at: 0.15 }
 
   - id: s06
-    kind: app
+    kind: slide
     chapter: "Query the warehouse from anywhere"
+    slide: query
     beats:
-      - id: b12
-        say: "Finally, anyone can query the warehouse. In Studio's SQL Editor, load DuckDB's web extension, attach prod dot duckdb straight from the GitHub release, and select the top pickup zones."
-        zoom: explorer
-        actions:
-          - nav: SQL Editor
-          - sql_connection: nyc_taxi_dev
-          - type: "install httpfs; load httpfs; attach 'https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/download/warehouse/prod.duckdb' as taxi (read_only); select * from taxi.main.top_pickup_zones;"
-      - id: b13
-        say: "Run it."
-        zoom: explorer
-        actions:
-          - sql_run
-      - id: b14
-        say: "East Harlem North leads, with a hundred forty-three thousand trips: built by CI, read over the internet."
-        zoom: sql-results
-        card: { eyebrow: "taxi.main.top_pickup_zones", title: "East Harlem North: 143,115", sub: "read from the GitHub release", pos: top-right }
+      - { id: b12, step: 1, show: "README query block: install httpfs; load httpfs; attach the release URL as taxi (read_only); select * from taxi.main.top_pickup_zones.", say: "And anyone can query the warehouse. With DuckDB, attach prod dot duckdb straight from the GitHub release, read only, and select from the marts." }
+      - { id: b13, step: 2, show: "Result: 74 East Harlem North, Manhattan, 143,115 trips; 75 East Harlem South, 82,011; 43 Central Park, 27,348.", say: "East Harlem North leads, with a hundred forty-three thousand trips: built by CI, and read over the internet." }
 
   - id: s07
     kind: slide

@@ -1,0 +1,61 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:09.656
+Sometimes the Parquet files already exist: another tool wrote them, or you are moving an old data lake.
+
+00:00:09.936 --> 00:00:14.243
+Instead of reading and writing them again, you can register them in the catalog.
+
+00:00:15.193 --> 00:00:19.046
+In the project, inside the lake folder, make a folder called landing.
+
+00:00:19.326 --> 00:00:21.114
+Git ignores everything under lake.
+
+00:00:25.806 --> 00:00:33.485
+In the SQL Editor, on eth lake: copy one day of blocks from S3, the third of November, into a Parquet file in landing.
+
+00:00:33.765 --> 00:00:39.110
+We give it the table's current shape: fee recipient instead of miner, and gas used percent.
+
+00:00:40.060 --> 00:00:44.430
+Now ducklake add data files: the lake, the table, the file, and the schema.
+
+00:00:44.710 --> 00:00:47.975
+Nothing is copied: the catalog just records the file.
+
+00:00:48.255 --> 00:00:55.249
+One Studio detail: the result pane runs a statement again to show its rows, which would register the file twice.
+
+00:00:55.529 --> 00:00:58.827
+So we wrap the call in create temp table, which runs once.
+
+00:00:59.777 --> 00:01:04.959
+Blocks per day: the third of November is there, seven thousand one hundred eighty-two blocks.
+
+00:01:05.909 --> 00:01:10.112
+And the table's file list now includes the landing file, at its own path.
+
+00:01:11.062 --> 00:01:14.421
+One thing to know: from now on, the file belongs to the lake.
+
+00:01:14.701 --> 00:01:16.843
+Maintenance can merge it, and clean it up.
+
+00:01:17.123 --> 00:01:18.937
+Do not keep using it from outside.
+
+00:01:19.887 --> 00:01:29.725
+If a file has a different shape, two options help: allow missing for columns the file does not have, and ignore extra columns for columns the table does not have.
+
+00:01:30.675 --> 00:01:36.943
+Save the script as 4 underscore 5 add files dot sequel in the sql folder, commit, and push.
+
+00:01:55.353 --> 00:02:03.039
+To recap: ducklake add data files registers an existing Parquet file without copying it, and from then on the lake owns it.
+
+00:02:03.319 --> 00:02:04.664
+That ends Module 4.
+
+00:02:04.944 --> 00:02:06.880
+Next, we open the catalog itself.

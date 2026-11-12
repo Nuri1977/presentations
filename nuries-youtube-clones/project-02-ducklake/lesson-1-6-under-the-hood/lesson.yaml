@@ -1,0 +1,90 @@
+# Lesson 1.6 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-1-6
+number: "1.6"
+title: "Under the hood: DuckDB and DuckLake in Studio"
+module: "Module 1 · Data lakes explained"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 1.6"
+next: "Lesson 2.1 · Create a DuckLake in Studio"
+summary: "What runs when Rosetta DBT Studio shows a lake: DuckDB inside the app through its official Node.js package, the ducklake extension, and the ATTACH statement Studio runs for you. With short quotes from Studio's own source code, and why dbt is a second DuckDB reading the same lake."
+start_state: after-setup
+show_help_links: true
+links:
+  - { title: "@duckdb/node-api on npm", url: "https://www.npmjs.com/package/@duckdb/node-api" }
+  - { title: "DuckLake: connecting", url: "https://ducklake.select/docs/stable/duckdb/usage/connecting" }
+  - { title: "Rosetta DBT Studio source", url: "https://github.com/rosettadb/dbt-studio" }
+tags: [DuckDB, Node.js, DuckLake extension, Electron, Rosetta DBT Studio]
+target_minutes: 4.5
+start_notes:
+  - "Start state `after-setup`: Studio set up, no project, no lake."
+draft_changes:
+  - "The SQL Editor part (version and extension queries) is a slide with the real output: there is no lake yet in this lesson; Lesson 2.1 runs the first query on the lake."
+accuracy_notes:
+  - "Code quoted from the 1.7.6 tag of rosettadb/dbt-studio: src/main/services/duckdb.service.ts (DuckDBInstance.create, instance.connect), duckLake/adapters/duckdb.adapter.ts and base.adapter.ts (INSTALL/LOAD ducklake, ATTACH … AS \"name\" (DATA_PATH …, AUTOMATIC_MIGRATION TRUE), USE), release/app/package.json (@duckdb/node-api ^1.5.2-r.1)."
+  - "dbt runtime: dbt-duckdb 1.11.1 with Python DuckDB 1.5.6; reading and writing a lake made by Studio's 1.5.2 checked on 11 Nov 2026 (studio-notes.md)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 1.6. Under the hood. Badges: Electron, @duckdb/node-api, ducklake extension."
+
+  - id: s01
+    kind: slide
+    chapter: "Two processes"
+    slide: electron
+    beats:
+      - { id: b01, step: 1, show: "Studio is an Electron app: a window (renderer) and a Node.js process (main).", say: "Before we build a lake, let's look under the hood. Rosetta DBT Studio is an Electron app. That means two parts: the window you see, and a Node.js process behind it." }
+      - { id: b02, step: 2, show: "The window sends a request; the main process runs the SQL and sends back rows.", say: "The window never touches a database. When you run a query, it sends a request to the main process, which runs the SQL and sends back the rows." }
+
+  - id: s02
+    kind: slide
+    chapter: "DuckDB inside the app"
+    slide: node
+    beats:
+      - { id: b03, step: 1, show: "@duckdb/node-api 1.5.2: DuckDB's official Node.js package, in Studio's package.json.", say: "The main process uses DuckDB's official Node package, duck D B slash node A P I. Studio 1.7.6 ships version 1.5.2. DuckDB runs inside Studio itself: no server, nothing else to install." }
+      - { id: b04, step: 2, show: "Code: DuckDBInstance.create(path) → instance.connect() → connection.run(sql).", say: "In Studio's code, it is three calls. Create a DuckDB instance. Connect to it. And run SQL on the connection." }
+
+  - id: s03
+    kind: slide
+    chapter: "The DuckLake extension"
+    slide: extension
+    beats:
+      - { id: b05, step: 1, show: "INSTALL ducklake; LOAD ducklake;", say: "DuckLake is not built into DuckDB. It is an extension. So on that connection, Studio first runs install ducklake, and load ducklake." }
+      - { id: b06, step: 2, show: "ATTACH 'ducklake:<catalog file>' AS \"eth_lake\" (DATA_PATH '<folder>', AUTOMATIC_MIGRATION TRUE); USE \"eth_lake\";", say: "Then it attaches the lake: the catalog file, a name, and the data path. And it makes the lake the current database. That is exactly what you could type yourself." }
+      - { id: b07, step: 3, show: "One adapter per catalog type: DuckDB (offered), SQLite and PostgreSQL (Soon). DETACH when the lake is closed.", say: "There is one adapter per catalog type. In 1.7.6 the wizard offers DuckDB; SQLite and PostgreSQL are marked as coming soon. When a lake is closed, Studio detaches it." }
+
+  - id: s04
+    kind: app
+    chapter: "See it in Studio"
+    beats:
+      - id: b08
+        say: "You can see the engine in Studio. Open Settings, then DuckDB. This is Studio's own DuckDB database, for caching and previews."
+        zoom: center-wide
+        actions:
+          - nav: Settings
+          - click_at: { role: link, name: DuckDB, label: DuckDB, settleMs: [400, 1200, 2200] }
+      - id: b09
+        say: "And the status bar always shows the DuckDB version inside the app: 1.5.2."
+        zoom: statusbar
+        actions:
+          - point_at: { text: "DuckDB: 1.5.2-r.1", label: "DuckDB version", hold: 900 }
+
+  - id: s05
+    kind: slide
+    chapter: "Two engines, one lake"
+    slide: twoengines
+    beats:
+      - { id: b10, step: 1, show: "Studio: DuckDB 1.5.2 (Node). dbt: DuckDB 1.5.6 (Python, inside dbt-duckdb). Both read and write the same lake.", say: "One more thing for later. When dbt runs, it uses its own DuckDB, the Python package inside dbt duckdb, version 1.5.6. So two engines read and write the same lake. We checked that they agree." }
+      - { id: b11, step: 2, show: "With a DuckDB catalog file, only one of them can open the lake at a time.", say: "But with a DuckDB file as the catalog, only one of them can open it at a time. Keep that in mind for Module 6." }
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b12, step: 1, show: "Recap: DuckDB runs inside Studio; ducklake is an extension; the Data Lake screens run plain SQL.", say: "To recap: DuckDB runs inside Studio, through its Node package. DuckLake is an extension that Studio loads. And everything the Data Lake screens do is plain SQL. Now, let's create our lake." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.1 · Create a DuckLake in Studio."

@@ -24,6 +24,63 @@ function copyDir(src, dst) {
 //   projectsDir: folder name under home for projects (default: rosetta-dbt-studio-projects)
 // Recipe extras (optional): copy: [{from, to}] copies files/folders into the project (e.g. data not in git);
 //   git: {user, email, commits: [{message, paths}]} builds a local history (never pushed).
+// lake: a DuckLake at the learner path, as the earlier lessons left it, registered in Studio but not yet opened.
+//   lake: { name: eth_lake, dir: lake, catalog: eth_catalog.duckdb, sql: [../sql/a.sql, ...], vars: {key: path} }
+// The catalog stores the data folder's absolute path, so the lake is always built in place (never copied).
+// SQL files run in order with the lake attached and selected; {{project}}, {{cache}} and vars are replaced.
+function seedLake({ recipe, opts, userData, projectDir }) {
+  const lk = recipe.lake;
+  const dir = path.join(projectDir, lk.dir || 'lake');
+  const catalog = path.join(dir, lk.catalog || `${lk.name}_catalog.duckdb`);
+  const data = path.join(dir, 'data');
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(data, { recursive: true });
+  for (const d of lk.dirs || []) fs.mkdirSync(path.join(dir, d), { recursive: true }); // e.g. landing (4.5)
+  const vars = { project: projectDir, cache: path.resolve(opts.stateDir, '..', '..', '.cache'), ...(lk.vars || {}) };
+  // S3 reads in the lesson scripts are rewritten to the local cache (same files, no network, seconds not minutes)
+  const cacheEth = path.join(vars.cache, 'data', 'eth');
+  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'lake-seed-'));
+  const sqlFiles = (lk.sql || []).map((f, i) => {
+    let t = fs.readFileSync(path.resolve(opts.stateDir, f), 'utf8');
+    t = t.replace(/read_parquet\('s3:\/\/aws-public-blockchain\/v1\.0\/eth\/(blocks|transactions)\/date=([^/']+)\/\*\.parquet'\)/g,
+      (m, tb, d) => `read_parquet('${cacheEth}/${tb}/${tb}_${d}.parquet')`);
+    t = t.replace(/\*\s+exclude\s*\(logs_bloom,\s*last_modified(,\s*)?/gi, (m, more) => (more ? '* exclude (' : '* exclude ('));
+    t = t.replace(/\*\s+exclude\s*\(\s*\)/gi, '*');
+    const out = path.join(tmp, `${String(i).padStart(2, '0')}.sql`);
+    fs.writeFileSync(out, t);
+    return out;
+  });
+  const py = [
+    'import duckdb,sys,json,re',
+    'cat,data,name,vars=sys.argv[1],sys.argv[2],sys.argv[3],json.loads(sys.argv[4])',
+    'con=duckdb.connect()',
+    'con.execute(f"attach \'ducklake:{cat}\' as {name} (data_path \'{data}/\')")',
+    'con.execute(f"use {name}")',
+    'for f in sys.argv[5:]:',
+    '    t=open(f).read()',
+    '    for k,v in vars.items(): t=t.replace("{{"+k+"}}",str(v))',
+    '    t=chr(10).join(l for l in t.splitlines() if not l.strip().startswith("--"))',
+    '    for st in [x.strip() for x in t.split(";") if x.strip()]: con.execute(st)',
+    'con.execute("use memory"); con.execute(f"detach {name}"); con.close()',
+  ].join('\n');
+  // build the lake with the same DuckDB + DuckLake version that Studio runs (1.5.2 / 415a9ebd), so Studio
+  // reads exactly what it would have written itself (the dbt runtime's 1.5.6 writes delete files differently)
+  const seedPy = path.join(path.dirname(opts.dbtEnv), 'seed-env', 'bin', 'python');
+  execFileSync(fs.existsSync(seedPy) ? seedPy : opts.python, ['-c', py, catalog, data, lk.name, JSON.stringify(vars), ...sqlFiles], { stdio: 'inherit' });
+  const now = '2026-11-01T09:00:00.000Z';
+  fs.mkdirSync(path.join(userData, 'datalake'), { recursive: true });
+  fs.writeFileSync(path.join(userData, 'datalake', 'instances.json'), JSON.stringify({
+    version: '1.0.0',
+    instances: [{
+      id: `ducklake_1794435029641_${lk.name.replace(/[^a-z0-9]/gi, '').slice(0, 9).padEnd(9, '0')}`, name: lk.name, description: lk.description || '',
+      dataPath: data, storage: { type: 'local', local: { path: data } }, catalog: { type: 'duckdb', duckdb: { metadataPath: catalog } },
+      createdAt: now, updatedAt: now, status: 'inactive',
+      runtimeOptions: { maxMemory: '4GB', threads: 4, enableOptimizer: true, tempDirectory: '/tmp/ducklake' },
+    }],
+    lastModified: now,
+  }, null, 2));
+}
+
 function seedProfile(opts) {
   const recipe = require('js-yaml').load(fs.readFileSync(path.join(opts.stateDir, 'recipe.yaml'), 'utf8'));
   const home = opts.home;
@@ -42,6 +99,7 @@ function seedProfile(opts) {
     fs.mkdirSync(userData, { recursive: true });
     for (const d of recipe.clean || []) fs.rmSync(path.join(home, d), { recursive: true, force: true });
     fs.mkdirSync(projectsDir, { recursive: true });
+    for (const d of recipe.mkdirs || []) fs.mkdirSync(path.join(home, d), { recursive: true }); // folders the learner made by hand
     if (recipe.git) {
       const g = recipe.git;
       fs.writeFileSync(path.join(home, '.gitconfig'), `[user]\n\tname = ${g.user}\n\temail = ${g.email}\n[init]\n\tdefaultBranch = main\n[credential]\n\thelper =\n\thelper = store\n`);
@@ -61,7 +119,9 @@ function seedProfile(opts) {
       },
       projects: [], connections: [],
     }, null, 2));
-    return { userData, projectDir: recipe.project_name ? path.join(projectsDir, recipe.project_name) : null, dbPath: null, recipe };
+    const pd = recipe.project_name ? path.join(projectsDir, recipe.project_name) : null;
+    if (recipe.lake) seedLake({ recipe, opts, userData, projectDir: pd });
+    return { userData, projectDir: pd, dbPath: null, recipe };
   }
   const projectDir = path.join(projectsDir, recipe.project_name);
   fs.rmSync(userData, { recursive: true, force: true });
@@ -88,6 +148,8 @@ function seedProfile(opts) {
     if (fs.statSync(src).isDirectory()) copyDir(src, dst);
     else { fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.copyFileSync(src, dst); }
   }
+
+  for (const d of recipe.mkdirs || []) fs.mkdirSync(path.join(projectDir, d), { recursive: true });
 
   // DuckDB file next to the project, loaded with the recipe's SQL.
   const dbPath = path.join(projectDir, recipe.database_file);
@@ -164,6 +226,7 @@ function seedProfile(opts) {
     selectedProject: project,
   };
   fs.writeFileSync(path.join(userData, 'database.json'), JSON.stringify(db, null, 2));
+  if (recipe.lake) seedLake({ recipe, opts, userData, projectDir });
   return { userData, projectDir, dbPath, recipe };
 }
 
@@ -217,14 +280,31 @@ async function sizeWindow(electronApp, page) {
     if (process.platform !== 'darwin') return 'skip';
     const d = screen.getPrimaryDisplay().bounds;
     if (d.width !== s.W || d.height !== s.H) return `display ${d.width}x${d.height}`;
-    for (const b of BrowserWindow.getAllWindows()) if (b.isVisible() && !b.isSimpleFullScreen()) b.setSimpleFullScreen(true);
+    // the window can open on another display (e.g. the laptop screen): put it on the primary one first
+    for (const b of BrowserWindow.getAllWindows()) {
+      if (!b.isVisible()) continue;
+      const wb = b.getBounds();
+      if (wb.x < d.x || wb.y < d.y || wb.x >= d.x + d.width || wb.y >= d.y + d.height) {
+        if (b.isSimpleFullScreen()) b.setSimpleFullScreen(false);
+        b.setBounds({ x: d.x + 40, y: d.y + 60, width: 1200, height: 800 });
+      }
+      if (!b.isSimpleFullScreen()) b.setSimpleFullScreen(true);
+    }
     return 'simple-fullscreen';
   }, { W, H });
   if (fit === 'simple-fullscreen') {
-    for (let k = 0; k < 20; k++) {
-      const vp = await page.evaluate(() => [window.innerWidth, window.innerHeight]);
-      if (vp[0] === W && vp[1] === H) return;
-      await new Promise((r) => setTimeout(r, 300));
+    for (let attempt = 0; attempt < 4; attempt++) {
+      for (let k = 0; k < 20; k++) {
+        // with a UI zoom the CSS viewport is smaller; the window itself must still be 1920x1080 DIP
+        const vp = await page.evaluate(() => [Math.round(window.innerWidth * window.devicePixelRatio / 2), Math.round(window.innerHeight * window.devicePixelRatio / 2)]);
+        if (Math.abs(vp[0] - W) <= 2 && Math.abs(vp[1] - H) <= 2) return;
+        await new Promise((r) => setTimeout(r, 300));
+      }
+      // sometimes the first switch does not take: leave simple full screen and enter it again
+      await electronApp.evaluate(({ BrowserWindow }) => { for (const b of BrowserWindow.getAllWindows()) { if (b.isVisible()) b.setSimpleFullScreen(false); } });
+      await new Promise((r) => setTimeout(r, 1200));
+      await electronApp.evaluate(({ BrowserWindow }) => { for (const b of BrowserWindow.getAllWindows()) { if (b.isVisible()) b.setSimpleFullScreen(true); } });
+      await new Promise((r) => setTimeout(r, 1500));
     }
     throw new Error('simple full screen did not give 1920x1080');
   }

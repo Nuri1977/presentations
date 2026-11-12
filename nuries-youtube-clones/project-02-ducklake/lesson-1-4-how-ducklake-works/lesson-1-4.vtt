@@ -1,0 +1,100 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:05.513
+A DuckLake has two parts, and only two.
+
+00:00:06.463 --> 00:00:08.167
+The first part is the catalog.
+
+00:00:08.447 --> 00:00:10.333
+It is a normal SQL database.
+
+00:00:10.613 --> 00:00:15.488
+It knows the tables, their columns, and exactly which files belong to each table.
+
+00:00:15.768 --> 00:00:20.438
+It can be a DuckDB file, SQLite, PostgreSQL, or MySQL.
+
+00:00:21.388 --> 00:00:25.903
+The second part is the data: a folder, or a bucket, of Parquet files.
+
+00:00:26.183 --> 00:00:27.898
+These files are never edited.
+
+00:00:28.178 --> 00:00:29.946
+They are only added, or removed.
+
+00:00:30.896 --> 00:00:33.128
+Here is what happens when you insert rows.
+
+00:00:33.408 --> 00:00:37.800
+First, DuckLake writes the new rows as Parquet files in the data folder.
+
+00:00:38.080 --> 00:00:39.489
+Nobody can see them yet.
+
+00:00:40.439 --> 00:00:46.398
+Then, in one database transaction, the catalog records those files and creates a new snapshot.
+
+00:00:46.678 --> 00:00:49.607
+That commit is the moment the change becomes visible.
+
+00:00:50.557 --> 00:00:55.741
+If anything fails on the way, the catalog does not change, and readers never see half a write.
+
+00:00:56.691 --> 00:00:58.161
+A read goes the other way.
+
+00:00:58.441 --> 00:01:02.597
+The query first asks the catalog which files make up the table right now.
+
+00:01:03.547 --> 00:01:09.819
+The catalog also keeps statistics for every file, like the smallest and largest value of each column.
+
+00:01:10.099 --> 00:01:12.657
+So files that cannot match the filter are skipped.
+
+00:01:13.607 --> 00:01:16.507
+Only then does it read the Parquet files that are left.
+
+00:01:17.457 --> 00:01:19.408
+This simple design gives you a lot.
+
+00:01:19.688 --> 00:01:23.341
+Changes are real transactions, even across several tables.
+
+00:01:24.291 --> 00:01:29.501
+Every change is a snapshot, so you can query a table as it was yesterday, or last week.
+
+00:01:30.451 --> 00:01:31.950
+And a small change stays small.
+
+00:01:32.230 --> 00:01:36.406
+It is a few rows in the catalog, not a pile of new metadata files.
+
+00:01:37.356 --> 00:01:38.589
+Who can read a DuckLake?
+
+00:01:38.869 --> 00:01:41.991
+Today, DuckDB does, through the ducklake extension.
+
+00:01:42.271 --> 00:01:45.784
+That is what Rosetta DBT Studio uses under the hood.
+
+00:01:46.734 --> 00:01:52.880
+And because the catalog is plain SQL tables, and the data is plain Parquet, nothing is locked away.
+
+00:01:53.160 --> 00:01:55.949
+Any SQL client can look inside the catalog.
+
+00:01:56.899 --> 00:02:00.891
+To recap: the catalog is a database, and the data is Parquet.
+
+00:02:01.171 --> 00:02:04.177
+Files are never edited, only added or removed.
+
+00:02:04.457 --> 00:02:06.318
+And every change makes a snapshot.
+
+00:02:06.598 --> 00:02:10.858
+Next, we meet the data for this course: Ethereum blocks and transactions.

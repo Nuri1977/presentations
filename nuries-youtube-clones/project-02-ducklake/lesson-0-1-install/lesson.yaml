@@ -1,0 +1,129 @@
+# Lesson 0.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-0-1
+number: "0.1"
+title: "Install Rosetta DBT Studio from rosettadb.io"
+module: "Welcome"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 0.1"
+next: "Lesson 1.1 · Warehouse, data lake, lakehouse"
+summary: "Install Rosetta DBT Studio from its website, rosettadb.io: pick the build for your computer on the Download page, copy the app to Applications, and let the first-run setup install Python, dbt Core and the DuckDB adapter for you."
+start_state: fresh-install
+show_help_links: false
+links:
+  - { title: "Download Rosetta DBT Studio", url: "https://rosettadb.io/download-dbtstudio.html" }
+  - { title: "Releases on GitHub", url: "https://github.com/rosettadb/dbt-studio/releases" }
+tags: [Rosetta DBT Studio, install, dbt Core, DuckDB, Mac, Windows, Linux]
+target_minutes: 4
+start_notes:
+  - "Start state `fresh-install`: empty Studio profile, no Python or dbt runtime."
+draft_changes:
+  - "The download starts from rosettadb.io instead of the GitHub releases page (Project 1 used GitHub)."
+accuracy_notes:
+  - "rosettadb.io → Download Now → rosettadb.io/download-dbtstudio.html, cards Windows, Linux, macOS; links to the GitHub 1.7.6 assets (Windows .exe, Linux .deb and .rpm, Mac ARM64 and Mac Intel .dmg), checked 11 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 0.1. Install Rosetta DBT Studio. Badges: rosettadb.io, Mac · Windows · Linux, version 1.7.6."
+
+  - id: s01
+    kind: browser
+    chapter: "The download page"
+    beats:
+      - id: b01
+        say: "Rosetta DBT Studio is free and open source. Go to rosetta D B dot I O, and click Download Now."
+        zoom: center-wide
+        actions:
+          - goto: https://rosettadb.io/
+          - point_at: { role: link, name: "Download Now", label: Download Now, hold: 600 }
+          - click_at: { role: link, name: "Download Now", label: Download Now, settleMs: [800, 2000, 3500] }
+      - id: b02
+        say: "The download page has a card for each system: Windows, Linux, and macOS."
+        zoom: center-wide
+        actions:
+          - scroll_to: { selector: '#dbt-card-windows', label: Download cards, at: 0.18 }
+      - id: b03
+        say: "On Windows, take the E X E installer. On Linux, the deb or R P M package. On a Mac, pick your processor: arm sixty-four for Apple silicon, or Intel. This Mac has an Intel chip, so click Mac Intel."
+        zoom: center-wide
+        card: { eyebrow: "This Mac: Intel", title: "Mac Intel .dmg", sub: "Apple silicon: Mac ARM64", pos: top-right }
+        actions:
+          - point_at: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-x64.exe"]', label: ".exe", hold: 500 }
+          - point_at: { selector: 'a[href$="/Rosetta-DBT-Studio-1.7.6-amd64.deb"]', label: ".deb", hold: 500 }
+          - point_at: { role: link, name: "Mac ARM64", label: "Mac ARM64", hold: 500 }
+          - click_download: { role: link, name: "Mac Intel", label: "Mac Intel" }
+
+  - id: s02
+    kind: slide
+    chapter: "Copy it to Applications"
+    slide: dmg
+    beats:
+      - { id: b04, step: 1, show: "The disk window: the app on the left, Applications on the right.", say: "When the download finishes, open the file. A window shows the app on the left, and your Applications folder on the right." }
+      - { id: b05, step: 2, show: "A cursor drags the app onto Applications.", say: "Drag Rosetta DBT Studio onto Applications, and wait for the copy." }
+      - { id: b06, step: 3, show: "macOS prompt: an app downloaded from the internet; Open.", say: "Then open it from Applications. The first time, macOS asks if you want to open an app from the internet. Click Open." }
+
+  - id: s03
+    kind: app
+    chapter: "First-run setup"
+    beats:
+      - id: b07
+        say: "Studio starts with a short setup. First, the dbt version: dbt 1.x, the recommended one."
+        zoom: setup
+        actions:
+          - click_at: { role: radio, name: "^dbt 1\\.x", regex: true, label: "dbt 1.x", dx: 0.08 }
+      - id: b08
+        say: "Then the exact version. Keep the latest, 1.12.6."
+        zoom: setup
+        actions:
+          - click_at: { role: radio, name: "^1\\.12\\.6", regex: true, label: "1.12.6 latest", dx: 0.08 }
+      - id: b09
+        say: "Next, the adapters. For this course we only need DuckDB, so uncheck the others, keep dbt duckdb, and click Continue."
+        zoom: setup
+        card: { eyebrow: "Adapters", title: "Only dbt-duckdb", sub: "You can add others later in Settings.", pos: top-right }
+        actions:
+          - uncheck: [dbt-postgres, dbt-snowflake, dbt-bigquery, dbt-redshift, dbt-databricks, dbt-kinetica]
+          - check: dbt-duckdb
+          - click_at: { role: button, name: Continue, label: Continue }
+      - id: b10
+        say: "Skip the optional tools, and click Install."
+        actions:
+          - click_at: { role: button, name: Continue, label: Continue }
+          - click_at: { role: button, name: Install, label: Install }
+      - id: b11
+        say: "Studio downloads its own Python, then installs dbt Core and the DuckDB adapter, inside its own folder. It takes a minute or two; the video speeds it up."
+        zoom: setup
+        card: { eyebrow: "Sped up", title: "About 90 seconds", sub: "Python 3.10.17, then dbt Core 1.12.6 + dbt-duckdb", pos: top-right }
+        actions:
+          - wait_enabled: { role: button, name: Finish }
+      - id: b12
+        say: "Done: Python 3.10.17, and dbt 1.12.6. Click Finish."
+        actions:
+          - click_at: { role: button, name: Finish, label: Finish, closes: true }
+          - follow_window
+
+  - id: s04
+    kind: app
+    chapter: "The home screen"
+    beats:
+      - id: b13
+        say: "This is Studio's home screen. Among the modules is Data Lake: that is where our lake will live."
+        actions:
+          - point_at: { text: "Data Lake", label: Data Lake, hold: 900 }
+      - id: b14
+        say: "The status bar shows what was installed: dbt, Python, and the DuckDB version Studio runs inside. We come back to that one in Lesson 1.6."
+        zoom: statusbar
+        actions:
+          - point_at: { text: "dbt: 1.12.6", label: "dbt: 1.12.6" }
+          - point_at: { text: "DuckDB: 1.5.2-r.1", label: "DuckDB version" }
+
+  - id: s05
+    kind: slide
+    chapter: "What was installed"
+    slide: installed
+    beats:
+      - { id: b15, step: 1, show: "Rosetta DBT Studio 1.7.6 in Applications; Studio's own folder: Python 3.10.17, dbt Core 1.12.6, dbt-duckdb 1.11.1; DuckDB inside the app.", say: "To recap: one app, with its own Python and dbt, and DuckDB built in. You did not install any of them yourself." }
+      - { id: b16, step: 2, show: "Next: Module 1, data lakes explained.", say: "Next, before we touch a lake, we explain what a data lake is, starting with warehouses and lakehouses." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.1 · Warehouse, data lake, lakehouse."

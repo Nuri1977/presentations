@@ -1,0 +1,118 @@
+# Lesson 6.4 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-6-4
+number: "6.4"
+title: "Tests and docs on the lake"
+module: "Module 6 · dbt on DuckLake"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 6.4"
+next: "Lesson 7.1 · Going further, and recap"
+summary: "DuckLake does not enforce unique keys, so dbt tests check them: a schema.yml with descriptions, unique and not_null on the keys, accepted_values on the success flag, and a relationship from transactions to blocks. dbt build runs 5 models and 9 tests on the lake; then the docs site with the lineage from the raw tables to the marts."
+start_state: lesson-6-3-end
+show_help_links: true
+links:
+  - { title: "dbt: data tests", url: "https://docs.getdbt.com/docs/build/data-tests" }
+  - { title: "DuckLake: unsupported features", url: "https://ducklake.select/docs/stable/duckdb/unsupported_features" }
+tags: [dbt tests, dbt docs, lineage, DuckLake, data quality]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-6-3-end`: staging and marts in the project (not built in the lake yet: dbt build builds them); Studio freshly opened."
+draft_changes:
+  - "Generic test arguments use the arguments: block (dbt 1.10+ style)."
+  - "Docs: Project ▸ Generate Docs and Serve Docs, opened in the recording browser at 127.0.0.1:8080 (as in Project 1)."
+accuracy_notes:
+  - "dbt build on the lake: 5 models and 9 data tests, PASS=14 (rehearsal 12 Nov 2026)."
+  - "DuckLake supports NOT NULL but no primary keys, unique or foreign key constraints (docs: Constraints, Unsupported Features)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 6.4. Tests and docs on the lake."
+
+  - id: s01
+    kind: slide
+    chapter: "Why tests"
+    slide: why
+    beats:
+      - { id: b01, step: 1, show: "DuckLake: NOT NULL yes; primary keys, unique, foreign keys no.", say: "A DuckLake supports not null, but no primary keys, no unique constraints, and no foreign keys. Nothing stops a duplicate block from getting in." }
+      - { id: b02, step: 2, show: "dbt tests check them after each build.", say: "So we check those rules with dbt tests, every time we build." }
+
+  - id: s02
+    kind: app
+    chapter: "schema.yml"
+    beats:
+      - id: b03
+        say: "In models, create schema dot yml. Descriptions for the models, unique and not null on the keys, accepted values on the success flag, and a relationship: every transaction's block number must exist in stg blocks."
+        zoom: code-mid
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: models, name: schema.yml }
+          - paste: { text: "models:\n  - name: stg_blocks\n    description: One row per Ethereum block, with clear names and units.\n    columns:\n      - name: block_number\n        description: The block's height in the chain.\n        data_tests:\n          - unique\n          - not_null\n  - name: stg_transactions\n    description: One row per transaction, with values and fees in ether.\n    columns:\n      - name: transaction_hash\n        data_tests:\n          - not_null\n      - name: block_number\n        data_tests:\n          - relationships:\n              arguments:\n                to: ref('stg_blocks')\n                field: block_number\n      - name: succeeded\n        data_tests:\n          - accepted_values:\n              arguments:\n                values: [true, false]\n                quote: false\n  - name: daily_network_activity\n    description: One row per day with blocks, transactions, gas use and the average base fee.\n    columns:\n      - name: block_date\n        data_tests:\n          - unique\n          - not_null\n  - name: daily_gas\n    description: One row per day with transaction fees; built incrementally with a merge.\n    columns:\n      - name: block_date\n        data_tests:\n          - unique\n          - not_null\n" }
+          - click_save
+          - expect_file: { path: models/schema.yml, snippet: ../snippets/6.4/schema.yml }
+
+  - id: s03
+    kind: app
+    chapter: "dbt build"
+    beats:
+      - id: b04
+        say: "Run dbt build: it builds every model in order, and runs each model's tests right after it. Five models and nine tests: fourteen passes in all."
+        zoom: terminal-close
+        card: { eyebrow: "dbt build", title: "PASS=14", sub: "5 models + 9 tests, on the lake", pos: top-right }
+        actions:
+          - close_tab: models/schema.yml
+          - terminal: { cmd: "dbt build", until: "Completed successfully", timeoutMs: 400000 }
+
+  - id: s04
+    kind: app
+    chapter: "Docs"
+    beats:
+      - id: b05
+        say: "Now the docs. Project menu, Generate Docs. dbt reads the project and the lake, and writes a small website into target."
+        actions:
+          - project_menu: Generate Docs
+          - wait_text: { text: "Catalog written", label: docs generate, timeoutMs: 180000 }
+      - id: b06
+        say: "Then Project, Serve Docs. Studio starts a local web server, on port eighty eighty."
+        actions:
+          - project_menu: Serve Docs
+          - wait_text: { text: "Serving docs at", label: docs serve, timeoutMs: 60000 }
+
+  - id: s05
+    kind: browser
+    chapter: "The lineage"
+    beats:
+      - id: b07
+        say: "Open it in the browser, on the daily gas model: its description, and its columns."
+        zoom: center-wide
+        actions:
+          - goto: "http://127.0.0.1:8080/#!/model/model.ethereum_lake.daily_gas"
+      - id: b08
+        say: "And the lineage graph for this model: daily gas is built from stg transactions, the staging view on the raw transactions table. The full graph of the project, from both raw tables to all three marts, opens with the button at the top."
+        actions:
+          - click_at: { selector: "a[title='View Lineage Graph']", label: View Lineage Graph, settleMs: [500, 1500, 3000] }
+
+  - id: s06
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b09
+        say: "Commit the tests and descriptions, and push."
+        zoom: git-panel
+        actions:
+          - git_tab
+          - git_stage_all
+          - git_message: Tests and docs
+          - git_commit
+          - git_push
+
+  - id: s07
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b10, step: 1, show: "Recap: the lake does not enforce uniqueness; dbt tests do; dbt build = models + tests; docs and lineage.", say: "To recap: the lake does not enforce unique keys, so dbt tests do, and dbt build runs them with every model. And the docs show each model, its columns and tests, and its lineage. That ends Module 6. One lesson left: where to go from here." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 7.1 · Going further."

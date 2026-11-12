@@ -9,7 +9,7 @@ summary: "Add monthly_summary, a model with two refs, and describe it. Learn wha
 start_state: lesson-2-5-end
 tags: [dbt docs, DAG, lineage, ref, documentation, DuckDB, NYC taxi]
 target_minutes: 5
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `lesson-2-5-end`: a clone of what Lesson 2.5 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera)."
 draft_changes:

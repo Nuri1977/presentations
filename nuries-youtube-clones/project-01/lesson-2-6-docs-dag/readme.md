@@ -1,6 +1,6 @@
 # Lesson 2.6 · Docs & the DAG
 
-dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 2:28, 3840x2160 H.264 + AAC, 32 MB.
+dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 2:32, 3840x2160 H.264 + AAC, 38 MB.
 
 ## Files
 

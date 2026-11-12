@@ -1,6 +1,6 @@
 # YouTube upload: Docs & the DAG
 
-- **File:** `lesson-2-6.mp4` (3840x2160, 2:28). Upload the 4K file; YouTube shows HD and 4K only after processing finishes, which can take from minutes to an hour, so the first view may look blurry.
+- **File:** `lesson-2-6.mp4` (3840x2160, 2:32). Upload the 4K file; YouTube shows HD and 4K only after processing finishes, which can take from minutes to an hour, so the first view may look blurry.
 - **Visibility:** unlisted (embedded only in Academy)
 - **Captions:** upload `lesson-2-6.srt` (English)
 - **Thumbnail:** `thumbnail.png` (1280x720)
@@ -8,7 +8,7 @@
 
 ## Title
 
-Docs & the DAG | dbt + DuckDB in Rosetta DBT Studio 2.6 | Rosetta DBT Studio
+Docs & the DAG | dbt + DuckDB in Rosetta DBT Studio 2.6
 
 ## Description
 
@@ -21,14 +21,16 @@ Chapters
 0:40 The DAG
 0:57 Run a model and everything upstream
 1:11 Generate and serve the docs
-1:29 The docs site
-1:48 Commit and push
-2:08 Recap
+1:31 The docs site
+1:52 Commit and push
+2:11 Recap
 
 Recorded in Rosetta DBT Studio 1.7.6 with dbt Core 1.12.6 and dbt-duckdb 1.11.1.
 Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html
 Source code: https://github.com/rosettadb/dbt-studio
 Lesson order inspired by Luke Barousse's dbt course: https://www.youtube.com/watch?v=1Bf049kXV2g
+
+Code for this course (one commit per lesson): https://github.com/Nuri1977/nyc-taxi-dbt
 
 ## Tags
 

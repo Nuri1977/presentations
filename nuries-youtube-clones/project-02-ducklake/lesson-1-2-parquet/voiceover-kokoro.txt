@@ -1,0 +1,23 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A C S V file stores data row by row.
+b01	Each line is a whole record: every column of one Ethereum block.
+b02	Par-kay stores it column by column.
+b02	All the block numbers together, then all the miners, then all the transaction counts.
+b03	Why does that matter?
+b03	Analytics queries use a few columns out of many.
+b03	With columns stored apart, the engine reads only the ones it needs.
+b04	Here is a real file: one day of Ethereum blocks from the public bucket.
+b04	Seven thousand one hundred seventy-six rows, in one row group, compressed with Snappy.
+b05	A big file is split into row groups, chunks of rows.
+b05	Inside each chunk, every column is stored on its own.
+b06	The file is five point six megabytes.
+b06	More than half of it is one column, logs bloom, that we do not need.
+b06	Later we simply leave it out.
+b07	The most useful part: for every column in every row group, the file stores the smallest and the largest value.
+b07	Block numbers in this file go from twenty-six million ninety-three thousand to twenty-six million one hundred thousand.
+b08	So if you ask for block twenty-six million two hundred thousand, the engine looks at those two numbers and skips the whole file, without reading a single row.
+b09	duck lake goes one step further: it copies these statistics into its catalog, so it can skip files before even opening them.
+b09	We see that in Modules 4 and 5.
+b10	To recap: Par-kay stores columns, not rows.
+b10	It splits rows into row groups, compresses each column, and keeps the min and max of every column, so engines can skip what they do not need.
+b10	Next: how table formats turn these files into tables.

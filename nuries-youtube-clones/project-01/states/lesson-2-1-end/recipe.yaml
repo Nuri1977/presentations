@@ -4,7 +4,7 @@
 # DuckDB connection nyc_taxi_dev with its file next to the project folder.
 name: lesson-2-1-end
 project_name: nyc_taxi
-clone: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git
+clone: https://github.com/Nuri1977/nyc-taxi-dbt.git
 dirs: [analysis, macros, models, seeds, snapshots, tests]
 database_file: ../nyc_taxi_dev.duckdb
 sql: []

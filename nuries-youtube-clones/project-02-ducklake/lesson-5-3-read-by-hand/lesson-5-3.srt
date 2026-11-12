@@ -1,0 +1,95 @@
+1
+00:00:03,350 --> 00:00:06,688
+To end the catalog module, let's read the lake without the lake.
+
+2
+00:00:06,968 --> 00:00:16,862
+The DuckLake specification describes the steps: find the current snapshot, find the table, find the data path, list the files valid at that snapshot, and read them.
+
+3
+00:00:17,812 --> 00:00:19,707
+In the SQL Editor, on eth lake.
+
+4
+00:00:19,987 --> 00:00:23,653
+Step one: the current snapshot is the largest snapshot id.
+
+5
+00:00:23,933 --> 00:00:24,720
+Twenty-four.
+
+6
+00:00:29,846 --> 00:00:32,497
+Step two: the transactions table, valid now.
+
+7
+00:00:32,777 --> 00:00:35,710
+Table id five, and its folder, transactions.
+
+8
+00:00:36,660 --> 00:00:41,066
+Step three: the lake's data path, from ducklake metadata: our data folder.
+
+9
+00:00:41,346 --> 00:00:45,804
+Each file's path is relative to it, under the schema and the table's folder.
+
+10
+00:00:46,754 --> 00:00:56,490
+Step four: the data files of table five that are valid at snapshot twenty-four: begin snapshot at most twenty-four, end snapshot after it, or empty.
+
+11
+00:00:56,770 --> 00:00:57,745
+Seven files.
+
+12
+00:00:58,695 --> 00:01:02,689
+Step five: read exactly those files with read parquet, and count.
+
+13
+00:01:02,969 --> 00:01:06,354
+Twelve million six hundred ninety-five thousand eight hundred three.
+
+14
+00:01:07,304 --> 00:01:10,581
+And the same count, the normal way, from raw transactions.
+
+15
+00:01:10,861 --> 00:01:11,635
+Identical.
+
+16
+00:01:11,915 --> 00:01:14,612
+The lake is nothing but these tables and these files.
+
+17
+00:01:15,562 --> 00:01:20,648
+With deletes, one more step: read the delete files too, and skip the positions they list.
+
+18
+00:01:21,598 --> 00:01:27,732
+And that is all any engine needs to read DuckLake: some SQL against the catalog, and a Parquet reader.
+
+19
+00:01:28,012 --> 00:01:29,049
+Nothing is hidden.
+
+20
+00:01:29,999 --> 00:01:35,202
+Save the queries as 5 underscore 3 read by hand dot sequel, commit, and push.
+
+21
+00:01:57,729 --> 00:02:02,023
+To recap: snapshot, table, data path, valid files, read parquet.
+
+22
+00:02:02,303 --> 00:02:03,711
+Same answer as the lake.
+
+23
+00:02:03,991 --> 00:02:05,466
+That ends Module 5.
+
+24
+00:02:05,746 --> 00:02:08,185
+Next, we put dbt on top of the lake.

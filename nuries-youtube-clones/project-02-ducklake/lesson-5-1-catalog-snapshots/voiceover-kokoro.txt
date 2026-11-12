@@ -1,0 +1,24 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In the sequel Editor, on eth lake, list the databases this connection has attached.
+b01	Two matter: eth lake, the lake, and underscore underscore duck lake metadata eth lake: the catalog file, as a plain duck D B database.
+b02	Its tables all start with duck lake.
+b02	These are the tables the duck lake specification defines.
+b02	Nothing else: the whole lake's metadata is in them.
+b03	Ducklake snapshot has one row per snapshot, with its schema version.
+b03	Six and seven are missing: we expired them in Lesson 4.4.
+b04	Ducklake snapshot changes says what each snapshot did: the November file we added, the merge, the inlining flush.
+b04	This is what Studio's History tab shows.
+b04	A commit message would be stored here too.
+b05	Ducklake table: one row per table, with an id, and the snapshot it was created in.
+b05	Begin snapshot, end snapshot: a table that was dropped gets an end snapshot.
+b06	And duck lake column, for column three of the blocks table.
+b06	Two rows: miner, valid from snapshot two until fourteen, and fee recipient from fourteen on.
+b06	That is the rename from Lesson 3.3.
+b06	Same id, new name, and the old name is kept for time travel.
+b07	That is the whole trick of the catalog.
+b07	Every row has a begin snapshot and an end snapshot.
+b07	The lake at snapshot s is simply every row where begin is at most s, and end is after s, or empty.
+b08	Save the queries as 5 underscore 1 catalog tables dot sequel, commit, and push.
+b09	To recap: the catalog is a plain database of duck lake tables.
+b09	Snapshots, tables and columns are rows, and begin and end snapshot version all of them.
+b09	Next: the files, their statistics, and partitions.

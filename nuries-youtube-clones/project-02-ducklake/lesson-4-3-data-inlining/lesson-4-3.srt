@@ -1,0 +1,75 @@
+1
+00:00:03,350 --> 00:00:09,741
+Lakes have a classic problem: many small inserts, like a stream of events, make many tiny Parquet files.
+
+2
+00:00:10,021 --> 00:00:12,685
+Tiny files are slow to list and slow to read.
+
+3
+00:00:13,635 --> 00:00:15,801
+DuckLake's answer is data inlining.
+
+4
+00:00:16,081 --> 00:00:20,000
+Small inserts are stored as rows inside the catalog database.
+
+5
+00:00:20,280 --> 00:00:23,279
+Later, they are flushed into one proper Parquet file.
+
+6
+00:00:24,229 --> 00:00:29,596
+In the SQL Editor, on eth lake: a small table, a watchlist of addresses with a label.
+
+7
+00:00:29,876 --> 00:00:32,307
+Remember, inlining is off for the whole lake.
+
+8
+00:00:32,587 --> 00:00:36,922
+Turn it on for this one table: up to a hundred rows stay in the catalog.
+
+9
+00:00:39,174 --> 00:00:43,374
+Insert two addresses: the staking deposit contract, and wrapped ether.
+
+10
+00:00:43,654 --> 00:00:45,516
+And read them back, like any table.
+
+11
+00:00:46,466 --> 00:00:48,880
+But count the table's data files: zero.
+
+12
+00:00:49,160 --> 00:00:51,354
+The two rows live inside the catalog.
+
+13
+00:00:52,304 --> 00:00:56,976
+Flush the inlined data, and count again: one Parquet file, with both rows.
+
+14
+00:00:58,824 --> 00:01:01,477
+Inlining is on by default for small inserts.
+
+15
+00:01:01,757 --> 00:01:06,529
+We turned it off in Lesson 2.2 only so that every write would show up as files.
+
+16
+00:01:07,479 --> 00:01:13,936
+Keep it on for frequent small writes, and flush on a schedule, or let maintenance do it, which is the next lesson.
+
+17
+00:01:14,886 --> 00:01:19,564
+Save the script as 4 underscore 3 inlining dot sequel, commit, and push.
+
+18
+00:01:42,311 --> 00:01:51,014
+To recap: with inlining, small inserts become rows in the catalog, not tiny files, and a flush writes them out as one Parquet file.
+
+19
+00:01:51,294 --> 00:01:54,289
+Next: maintenance, to keep the lake small and fast.

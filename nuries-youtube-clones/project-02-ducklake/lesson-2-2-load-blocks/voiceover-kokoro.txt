@@ -1,0 +1,30 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	The blocks live in the public bucket, one folder per day.
+b01	We read them straight from S three, with read par-kay and a wildcard: one month at a time.
+b02	Three statements: create the table with August, then insert September, then October.
+b02	Each one becomes a snapshot of its own, which we use later for time travel.
+b03	One setting first.
+b03	duck lake can keep small writes inside the catalog, which is called data inlining.
+b03	We turn it off, so every write becomes Par-kay files we can look at.
+b03	Lesson 4.3 explains it.
+b04	Open the sequel Editor, and pick the eth lake connection.
+b04	Here is the script: one statement per line.
+b05	Run the first two lines: inlining off, and a schema called raw, for the data as it comes in.
+b06	Line three creates raw dot blocks from every file of August.
+b06	Star exclude drops two columns we do not need, like the big logs bloom.
+b06	Run it: Studio downloads the month from S three and writes it into the lake.
+b07	Then September, and October, with insert into.
+b08	Check the result: blocks per month.
+b08	About two hundred twenty thousand each, almost six hundred sixty thousand in total.
+b09	Now open Data Lake, and the eth lake instance.
+b09	Refresh.
+b09	The new table is listed: blocks, in schema raw, with its rows and size.
+b10	And History has four new snapshots: the schema, then one for each month.
+b11	Keep the script in the project.
+b11	In D B T Studio, add a folder called sql, and in it a file called 2 underscore 2 load blocks dot sequel, with the same statements.
+b11	Save.
+b12	Git tab: stage all, commit with load three months of blocks, and Sync Changes to push.
+b12	The lake itself stays out of git; the script is enough to rebuild it.
+b13	To recap: we turned inlining off, made the raw schema, and loaded three months of blocks from S three, one month per statement.
+b13	That is six hundred sixty thousand blocks, and four new snapshots.
+b13	Next, we look inside the lake: the files on disk.

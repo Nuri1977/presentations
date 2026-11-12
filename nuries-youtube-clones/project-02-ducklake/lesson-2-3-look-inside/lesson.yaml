@@ -1,0 +1,119 @@
+# Lesson 2.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-3
+number: "2.3"
+title: "Look inside: data files and tables"
+module: "Module 2 · Your first lake in Studio"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 2.3"
+next: "Lesson 2.4 · Snapshots: every change is a version"
+summary: "Open the blocks table in Studio's Data Lake screens: its schema and its Data Files tab. Then the same from SQL with ducklake_list_files, the Parquet files on disk with glob, and a direct read_parquet on them. The files are ordinary Parquet; the catalog is what makes them a table."
+start_state: lesson-2-2-end
+show_help_links: true
+links:
+  - { title: "DuckLake: list files", url: "https://ducklake.select/docs/stable/duckdb/metadata/list_files" }
+tags: [DuckLake, Parquet, ducklake_list_files, catalog, Rosetta DBT Studio]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-2-2-end`: project as pushed by 2.2; the lake rebuilt from snippets/2.2 (raw.blocks, three files, snapshots 0 to 4)."
+draft_changes:
+  - "Absolute paths in glob and read_parquet: Studio's SQL Editor does not run from the project folder."
+accuracy_notes:
+  - "raw.blocks: three data files of about 73, 71 and 73 MB (222,412, 215,033 and 222,451 rows); Studio's table page has the tabs Overview, Schema, Data, Statistics, Data Files, Partitions, History, Tags (1.7.6)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 2.3. Look inside: data files and tables."
+
+  - id: s01
+    kind: app
+    chapter: "The table in Studio"
+    beats:
+      - id: b01
+        say: "Open Data Lake, then eth lake, and click the blocks table. Studio opens the table's own page."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { text: blocks, label: blocks, settleMs: [500, 1500, 2500] }
+      - id: b02
+        say: "The Schema tab lists the columns and their types, as the catalog stores them."
+        zoom: center-wide
+        actions:
+          - click_at: { role: tab, name: Schema, settleMs: [400, 1200, 2200] }
+      - id: b03
+        say: "And Data Files: three Parquet files, one per load. August, September, and October, each about seventy megabytes, with its row count and the snapshot that added it."
+        zoom: center-wide
+        card: { eyebrow: "raw.blocks", title: "3 data files", sub: "one per month, one per snapshot", pos: top-right }
+        actions:
+          - click_at: { role: tab, name: Data Files, settleMs: [400, 1200, 2500] }
+
+  - id: s02
+    kind: app
+    chapter: "The same in SQL"
+    beats:
+      - id: b04
+        say: "The same list is one function in SQL. In the SQL Editor, on eth lake, ducklake list files gives each data file of the table, and its size."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select data_file, data_file_size_bytes from ducklake_list_files('eth_lake', 'blocks', schema => 'raw');
+              select file from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              select count(*) as blocks from read_parquet('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/blocks/*.parquet');
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "The files are on your disk. Glob lists every Parquet file under the lake's data folder: the same three, in a folder per schema and table."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "And they are plain Parquet. Read them directly, without the lake, and you get the same six hundred sixty thousand rows."
+        zoom: sql-results
+        card: { eyebrow: "read_parquet on the files", title: "659,896 rows", sub: "the same as raw.blocks", pos: top-right }
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 3000] }
+
+  - id: s03
+    kind: slide
+    chapter: "Files and catalog"
+    slide: point
+    beats:
+      - { id: b07, step: 1, show: "Any tool can read the files.", say: "So any tool that reads Parquet can read these files." }
+      - { id: b08, step: 2, show: "Only the catalog knows which files are the table now: after a delete or an update, reading all files gives the wrong answer.", say: "But only the catalog knows which files make up the table right now. After a delete or an update, the folder also holds files that are no longer current, and delete files. Reading the folder directly would give the wrong answer. That is what the catalog is for." }
+
+  - id: s04
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b09
+        say: "Save the queries as sql, 2 underscore 3 look inside dot sequel, then commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 2_3_look_inside.sql }
+          - paste: |
+              select data_file, data_file_size_bytes from ducklake_list_files('eth_lake', 'blocks', schema => 'raw');
+              select file from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              select count(*) as blocks from read_parquet('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/blocks/*.parquet');
+          - click_save
+          - expect_file: { path: sql/2_3_look_inside.sql, snippet: ../snippets/2.3/2_3_look_inside.sql }
+          - close_tab: sql/2_3_look_inside.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Look inside the lake
+          - git_commit
+          - git_push
+
+  - id: s05
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b10, step: 1, show: "Recap: the table page (Schema, Data Files); ducklake_list_files; glob; read_parquet; the catalog decides.", say: "To recap: Studio's table page shows the schema and the data files. In SQL, ducklake list files gives the same list, and the files are plain Parquet on disk. But the catalog decides which files are the table. Next: snapshots." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.4 · Snapshots."

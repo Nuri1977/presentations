@@ -1,0 +1,49 @@
+number: "3.5"
+title: Transactions and conflicts
+slides:
+  - { id: title, type: title, h1: 'Transactions and <span class="accent">conflicts</span>', lead: "All or nothing, and what happens with two writers.", badges: [ACID, Optimistic concurrency, One writer] }
+  - id: tx
+    type: code
+    eyebrow: One transaction, many changes
+    h2: One snapshot, or nothing
+    codeblock:
+      step: 1
+      file: a transaction (DuckDB SQL)
+      size: 38
+      code: |
+        <span class="k">BEGIN</span>;
+        <span class="k">DELETE FROM</span> raw.blocks_day <span class="k">WHERE</span> number % <span class="str">2</span> = <span class="str">0</span>;
+        <span class="k">CREATE TABLE</span> raw.scratch <span class="k">AS SELECT</span> <span class="str">1</span> <span class="k">AS</span> x;
+        <span class="k">COMMIT</span>;   <span class="cm">-- one snapshot for both</span>
+    note: { step: 2, text: "<span class=\"mono\">ROLLBACK</span> instead of <span class=\"mono\">COMMIT</span>: nothing happened, and no snapshot." }
+  - id: writers
+    type: html
+    eyebrow: Two writers
+    h2: Optimistic concurrency
+    html: |
+      <div class="lanes s" data-step="1">
+        <div class="who">Writer A</div><div class="lane"><div class="tx ok" style="left:2%;width:40%">insert … commit</div></div>
+        <div class="who">Writer B</div><div class="lane"><div class="tx wait" style="left:12%;width:44%">work … commit: checked</div></div>
+      </div>
+      <div class="row two" style="margin-top:34px">
+        <div class="card good s" data-step="2"><div class="k">No conflict</div><div class="t">Appends, other tables</div><div class="d">retried on top of the first commit</div></div>
+        <div class="card bad s" data-step="3"><div class="k">Conflict</div><div class="t">Deletes in the same file, schema changes</div><div class="d">the second commit fails; try again</div></div>
+      </div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: lock
+    type: cards
+    eyebrow: One writer at a time
+    h2: The catalog decides who can write
+    cols: 2
+    cards:
+      - { step: 1, cls: hot, k: Our catalog, t: A DuckDB file, d: "one program at a time" }
+      - { step: 1, k: Shared catalog, t: PostgreSQL or MySQL, d: "many writers, on many machines" }
+    note: { step: 2, cls: bad, text: "Module 6: while Studio has the lake open, dbt gets “Conflicting lock is held”." }
+  - id: recap
+    type: recap
+    items:
+      - "A transaction is all or nothing, one snapshot."
+      - "Studio's SQL Editor: one statement, one transaction."
+      - "Appends don't conflict; deletes in the same file do."
+      - "A DuckDB catalog file: one program at a time."
+  - { id: closing, type: closing, lesson: Lesson 4.1, h2: '<span class="accent">Partitioning</span>' }

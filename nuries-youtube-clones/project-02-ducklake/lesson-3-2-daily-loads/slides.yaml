@@ -1,0 +1,36 @@
+number: "3.2"
+title: Daily loads without duplicates
+slides:
+  - { id: title, type: title, h1: 'Daily loads, <span class="accent">no duplicates</span>', lead: "A load you can run twice.", badges: [WHERE NOT EXISTS, MERGE INTO, Idempotent] }
+  - id: problem
+    type: cards
+    eyebrow: The problem
+    h2: Jobs run twice
+    cols: 2
+    cards:
+      - { step: 1, cls: bad, k: Plain insert, t: Twice = doubled, d: "A retry or a second click loads the same day again." }
+      - { step: 2, cls: good, k: Idempotent load, t: Twice = the same, d: "Insert only the rows whose key is new." }
+  - id: merge
+    type: code
+    eyebrow: MERGE INTO
+    h2: Update what matches, insert the rest
+    codeblock:
+      step: 1
+      file: upsert (DuckDB SQL)
+      size: 34
+      code: |
+        <span class="k">MERGE INTO</span> raw.blocks <span class="k">AS</span> t
+        <span class="k">USING</span> (<span class="k">SELECT</span> … <span class="k">FROM</span> <span class="f">read_parquet</span>(<span class="str">'…/date=2026-11-02/*.parquet'</span>)) <span class="k">AS</span> s
+        <span class="k">ON</span> (t.number = s.number)
+        <span class="k">WHEN MATCHED THEN UPDATE</span>
+        <span class="k">WHEN NOT MATCHED THEN INSERT</span>;
+    note: { step: 2, text: "Studio's SQL Editor does not accept MERGE. dbt runs a real MERGE on this lake in Lesson 6.3." }
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "Insert only rows whose key is new."
+      - "Run twice: the table does not change."
+      - "An empty change makes no snapshot."
+      - "MERGE INTO upserts: update and insert."
+  - { id: closing, type: closing, lesson: Lesson 3.3, h2: 'Schema <span class="accent">evolution</span>' }

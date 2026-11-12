@@ -1,0 +1,28 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Every table format answers the same three questions.
+b01	Which files make up the table right now?
+b01	What is its schema?
+b01	And which version is this, so we can go back?
+b02	Apache Iceberg keeps its answers as files, in the same bucket as the data.
+b02	A metadata file in JSON points to a manifest list, which points to manifest files, which finally list the Par-kay data files.
+b03	And you still need a catalog service, which holds one pointer: the current metadata file of each table.
+b04	Delta Lake also uses files.
+b04	Each change is a numbered JSON file in a folder called delta log, and every so often a checkpoint file sums up the log.
+b05	Both designs work, and both are widely used.
+b05	But they share some costs.
+b05	Every change writes new small metadata files.
+b06	A query needs several round trips, file after file, before it reads a single row of data.
+b07	And for real use you run a catalog service anyway, often backed by a database.
+b08	duck lake starts from that last point.
+b08	If you need a database for the catalog anyway, why not put all the metadata in it?
+b08	Files, schemas, snapshots, statistics: all plain sequel tables.
+b09	The data itself stays exactly where it was: Par-kay files, on a disk or in a bucket.
+b10	Now a change is one database transaction, and finding the files for a query is one sequel query.
+b11	Side by side.
+b11	Iceberg and Delta keep metadata as files in the bucket, have many engines, and years of production use.
+b11	duck lake keeps metadata in a database, is read by duck D B today, and is younger.
+b11	In this course, we use duck lake: it runs on a laptop with no services at all.
+b12	To recap: a table format tracks files, schema and versions.
+b12	Iceberg and Delta store that as files next to the data.
+b12	duck lake stores it as tables in a database.
+b12	Next: how duck lake works, step by step.

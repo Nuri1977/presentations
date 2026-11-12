@@ -1,0 +1,87 @@
+1
+00:00:03,350 --> 00:00:08,019
+Every change to a DuckLake creates a snapshot: a numbered version of the whole lake.
+
+2
+00:00:08,299 --> 00:00:10,618
+So far we have five: zero to four.
+
+3
+00:00:11,568 --> 00:00:13,750
+A snapshot is not a copy of the data.
+
+4
+00:00:14,030 --> 00:00:18,658
+It is a few rows in the catalog that say which files were valid from that moment on.
+
+5
+00:00:19,608 --> 00:00:22,576
+In Data Lake, open eth lake, and its History tab.
+
+6
+00:00:22,856 --> 00:00:27,316
+Each row is a snapshot: its number, time, schema version, and what changed.
+
+7
+00:00:29,901 --> 00:00:33,855
+In the SQL Editor, the same list comes from eth lake dot snapshots.
+
+8
+00:00:34,135 --> 00:00:36,847
+Changes says, in words, what each snapshot did.
+
+9
+00:00:41,840 --> 00:00:45,278
+Current snapshot tells you where the lake is now: snapshot four.
+
+10
+00:00:46,228 --> 00:00:47,338
+Now change something.
+
+11
+00:00:47,618 --> 00:00:52,056
+Insert one more day of blocks, the first of November, straight from S3.
+
+12
+00:00:53,006 --> 00:00:54,755
+And list the newest snapshots again.
+
+13
+00:00:55,035 --> 00:00:57,914
+Snapshot five: inserted into the blocks table.
+
+14
+00:00:58,194 --> 00:00:59,906
+One statement, one snapshot.
+
+15
+00:01:00,856 --> 00:01:07,160
+You can also group several statements into one snapshot, with a transaction: begin, your changes, commit.
+
+16
+00:01:07,440 --> 00:01:11,957
+Inside it, set commit message adds an author and a message, like a git commit.
+
+17
+00:01:12,907 --> 00:01:18,158
+Studio's SQL Editor runs one statement at a time, so we cannot type a transaction there.
+
+18
+00:01:18,438 --> 00:01:23,123
+We set a real commit message later, from dbt, in Lesson 6.3.
+
+19
+00:01:24,073 --> 00:01:28,998
+Save the queries as 2 underscore 4 snapshots dot sequel, commit, and push.
+
+20
+00:01:51,930 --> 00:01:54,225
+To recap: every change is a snapshot.
+
+21
+00:01:54,505 --> 00:02:02,126
+Studio shows them in History, SQL shows them with snapshots and current snapshot, and a transaction groups changes into one.
+
+22
+00:02:02,406 --> 00:02:05,175
+Next: we use snapshots to travel back in time.

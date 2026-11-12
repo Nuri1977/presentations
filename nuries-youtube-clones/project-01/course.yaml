@@ -95,3 +95,6 @@ pronunciation:
   - [ '\bREADME\b', 'read me' ]
   - [ '\bgitignore\b', 'git ignore' ]
   - [ '\bHTTPS\b', 'H T T P S' ]
+# Studio and browser drawn larger (like Cmd +), so frames stay sharp; crop zooms are capped (compose.py)
+ui_zoom: 1.25
+browser_zoom: 1.5

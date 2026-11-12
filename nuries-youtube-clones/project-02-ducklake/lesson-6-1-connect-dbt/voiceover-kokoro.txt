@@ -1,0 +1,30 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In this module, D B T builds models on top of our lake.
+b01	It reads the raw tables, and writes its models into the lake too, in the schema main.
+b02	D B T runs its own duck D B, inside D B T duck D B.
+b02	So it needs to attach the lake itself.
+b02	That is one change, in profiles dot yammel.
+b03	In D B T Studio, open profiles dot yammel.
+b03	Today it points at the small dev database from Lesson 2.1.
+b04	Replace the output.
+b04	Path is a small local duck D B file for D B T's own session.
+b04	Attach adds the lake: the duck lake prefix and the catalog file, as eth lake.
+b04	Database eth lake makes the lake D B T's target, in schema main.
+b04	And one thread, the safe choice with a single-file catalog: several D B T threads writing to one duck lake can still trip over each other.
+b05	Check it: in the command box under the terminal, run D B T debug. D B T finds the project and the profile, attaches the lake, and connects.
+b05	All checks passed.
+b06	Commit the profile: point D B T at the lake.
+b06	And push.
+b07	Now the rule for this module.
+b07	Open Data Lake, and the eth lake instance.
+b07	Studio opens the lake, and keeps it open.
+b08	Back in D B T Studio, run D B T debug again.
+b08	This time it fails: conflicting lock is held in Rosetta D B T Studio.
+b08	A duck D B catalog file can be opened by one program at a time.
+b09	So in this module, we always run D B T first, and open the lake in Studio afterwards, to look at the result.
+b10	Studio keeps the lake open until you quit it.
+b10	To run D B T again after looking at the lake, quit Studio, and open it again.
+b10	With a PostgreSQL catalog, this limit goes away.
+b11	To recap: profiles dot yammel attaches the lake and makes it D B T's database, and D B T debug passes.
+b11	One program at a time: D B T first, then the lake screens.
+b11	Next: staging models.

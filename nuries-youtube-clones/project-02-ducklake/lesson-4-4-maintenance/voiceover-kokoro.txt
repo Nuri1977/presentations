@@ -1,0 +1,28 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A lake grows untidy.
+b01	Every load adds files, old files stay around for time travel, and delete files pile up.
+b02	duck lake's recommended routine has three steps: merge small files, expire old snapshots, and clean up files nobody needs.
+b02	Checkpoint runs them all together.
+b03	In the sequel Editor, on eth lake: count the Par-kay files on disk.
+b03	Nineteen.
+b04	Merge adjacent files.
+b04	Studio shows no result rows for this call, but behind it, the four files of the blocks table, the three months and the November days, became one.
+b05	Count again: twenty.
+b05	One more, not fewer: the new file is written, and the four old ones are still on disk.
+b06	Snapshots six and seven are the October copy we made and dropped in Lesson 2.5.
+b06	We will never travel back to them.
+b06	Expire them.
+b06	Again Studio shows no rows, but they are gone.
+b07	Now clean up old files.
+b07	First a dry run, which only lists what it would delete: the files of that October copy, and the files the merge replaced.
+b08	Run it for real, and count: fourteen files.
+b08	And time travel still works: the merged file keeps every row's history.
+b09	In practice, you just run checkpoint, now and then.
+b09	It flushes inlined data, merges, expires and cleans up, following the lake's options.
+b10	Be careful with two things.
+b10	Expiring a snapshot ends time travel to it, for good.
+b10	And cleanup really deletes files.
+b11	Files that no snapshot ever knew about, for example after a crash in the middle of a write, are removed with delete orphaned files.
+b12	Save the script as 4 underscore 4 maintenance dot sequel, commit, and push.
+b13	To recap: merge small files, expire snapshots you do not need, clean up, or simply run checkpoint.
+b13	Next: registering Par-kay files that already exist, without copying them.

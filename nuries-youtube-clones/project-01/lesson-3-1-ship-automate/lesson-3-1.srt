@@ -1,0 +1,135 @@
+1
+00:00:03,350 --> 00:00:06,912
+So far, everything ran on our laptop, in the dev target.
+
+2
+00:00:07,192 --> 00:00:10,698
+Production should be built somewhere clean, only from what is in git.
+
+3
+00:00:11,648 --> 00:00:12,898
+That is what CI does.
+
+4
+00:00:13,178 --> 00:00:22,698
+On every push, GitHub Actions starts a fresh machine, installs dbt, downloads the data, runs dbt build, and publishes the warehouse.
+
+5
+00:00:23,648 --> 00:00:24,833
+Open the project.
+
+6
+00:00:25,113 --> 00:00:31,074
+First, requirements dot text in the project root: the same dbt versions Studio uses.
+
+7
+00:00:37,945 --> 00:00:46,324
+Next, a folder called c i, with its own profiles dot yml: a prod target, and the database path from an environment variable.
+
+8
+00:00:51,517 --> 00:00:58,714
+Type the profile: nyc taxi, target prod, type duckdb, and the path from env var duckdb path.
+
+9
+00:00:59,664 --> 00:01:03,883
+The parquet files are not in git, so CI has to get the data itself.
+
+10
+00:01:04,163 --> 00:01:07,109
+A folder called scripts, and download data dot py.
+
+11
+00:01:13,854 --> 00:01:14,803
+Paste the script.
+
+12
+00:01:15,083 --> 00:01:24,761
+It downloads the twelve files into data raw, then loads them into raw green trips in the DuckDB file, the same load we did by hand in the SQL Editor.
+
+13
+00:01:25,041 --> 00:01:25,641
+Save.
+
+14
+00:01:26,591 --> 00:01:27,426
+And the workflow.
+
+15
+00:01:27,706 --> 00:01:30,442
+GitHub looks for it in dot github, workflows.
+
+16
+00:01:30,722 --> 00:01:34,392
+Make both folders, and a file: dbt build dot yml.
+
+17
+00:01:47,141 --> 00:01:48,700
+Paste the workflow, and save.
+
+18
+00:01:49,650 --> 00:01:53,635
+It runs on every push to main, every Monday morning, or by hand.
+
+19
+00:01:53,915 --> 00:01:55,158
+It may write releases.
+
+20
+00:01:56,108 --> 00:02:09,268
+The steps: check out the code, set up Python, install dbt, download and load the data, run dbt build with the c i profile, and upload prod dot duckdb to a release called warehouse.
+
+21
+00:02:10,218 --> 00:02:12,389
+Open the Git tab: four new files.
+
+22
+00:02:15,153 --> 00:02:19,916
+Stage all, type a message, add CI: build, test and publish the warehouse.
+
+23
+00:02:20,196 --> 00:02:20,761
+Commit.
+
+24
+00:02:23,610 --> 00:02:24,585
+Sync Changes.
+
+25
+00:02:24,865 --> 00:02:26,468
+This push starts the first run.
+
+26
+00:02:28,710 --> 00:02:30,810
+On GitHub, open the Actions tab.
+
+27
+00:02:31,090 --> 00:02:32,612
+The run for our commit is there.
+
+28
+00:02:33,562 --> 00:02:34,731
+Open it, and wait.
+
+29
+00:02:35,011 --> 00:02:40,706
+A fresh machine installs dbt, downloads and loads the files, and builds the project.
+
+30
+00:02:40,986 --> 00:02:42,744
+Under a minute later: success.
+
+31
+00:02:48,865 --> 00:02:55,403
+And under Releases, the warehouse release, with prod dot duckdb attached: the whole warehouse, built by CI.
+
+32
+00:02:56,353 --> 00:03:01,077
+To recap: a prod profile, pinned versions, a download script, and one workflow.
+
+33
+00:03:01,357 --> 00:03:07,085
+From now on, every push builds and tests the project on a clean machine, and publishes the warehouse.
+
+34
+00:03:07,365 --> 00:03:08,909
+Next, we make it a showcase.

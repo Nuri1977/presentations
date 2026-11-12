@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.5 · The Ethereum data</title>
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .chainrow { display: flex; align-items: center; gap: 16px; margin-top: 60px; }
+  .blk { width: 260px; border-radius: 18px; border: 2px solid var(--line); background: var(--card); padding: 22px 24px; }
+  .blk .k { font-size: 24px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .blk .n { font-family: var(--mono); font-size: 30px; font-weight: 700; margin-top: 6px; }
+  .blk .txs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-top: 14px; }
+  .blk .txs i { height: 16px; border-radius: 4px; background: #c9d4f5; display: block; }
+  .blk.hot { border-color: var(--orange); background: var(--orange-soft); }
+  .link12 { font-size: 26px; font-weight: 800; color: var(--orange-2); text-align: center; width: 90px; }
+  .big3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; }
+  .big3 .card { padding: 30px 34px; } .big3 .v { font-size: 66px; font-weight: 900; margin-top: 6px; }
+  .units { font-family: var(--mono); font-size: 44px; line-height: 1.7; padding: 30px 40px; }
+  .gasbar { height: 90px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); overflow: hidden; display: flex; margin-top: 24px; }
+  .gasbar div { background: var(--orange); width: 50.5%; display: grid; place-items: center; color: #fff; font-size: 34px; font-weight: 850; }
+  .two { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 34px; align-content: center; }
+  .tblcard { padding: 30px 36px; }
+  .tblcard .t { font-family: var(--mono); }
+  .tblcard ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; font-family: var(--mono); font-size: 28px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 1.5</div>
+      <h1 style="margin-top:28px;font-size:132px">The <span class="accent">Ethereum</span> data</h1>
+      <p class="lead">Blocks, transactions and gas, in five minutes.</p>
+      <div class="badges"><span class="badge">Blocks</span><span class="badge">Transactions</span><span class="badge">Gas</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="blocks">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Blocks</div>
+    <h2>A new block every 12 seconds</h2>
+    <div class="chainrow s" data-step="1">
+      <div class="blk"><div class="k">Block</div><div class="n">26,093,738</div><div class="txs"><i></i><i></i></div></div><div class="link12">12 s →</div>
+      <div class="blk"><div class="k">Block</div><div class="n">26,093,739</div><div class="txs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="link12">12 s →</div>
+      <div class="blk hot"><div class="k">Block</div><div class="n">26,093,740</div><div class="txs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    </div>
+    <div class="big3">
+      <div class="card hot s" data-step="1"><div class="k">Blocks on 1 Oct 2026</div><div class="v">7,176</div></div>
+      <div class="card s" data-step="2"><div class="k">Transactions per block</div><div class="v">284</div></div>
+      <div class="card s" data-step="2"><div class="k">Transactions that day</div><div class="v">2,036,041</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:18%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.5</b></div></div>
+  <div class="checked">Counted from the AWS public blockchain bucket, 12 Nov 2026</div>
+</section>
+
+<section class="stage" data-id="gas">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Gas and fees</div>
+    <h2>Work, priced in gas</h2>
+    <div class="two" style="grid-template-columns:1.1fr .9fr">
+      <div>
+        <div class="card s" data-step="1" style="padding:30px 36px"><div class="k">Gas limit per block</div><div class="t">60 million</div><div class="gasbar"><div>50.5% used</div></div></div>
+        <div class="card hot s" data-step="2" style="padding:30px 36px;margin-top:22px"><div class="k">Base fee per gas</div><div class="t">0.639 gwei on average</div><div class="d">set by the network from how busy it is</div></div>
+      </div>
+      <div>
+        <div class="codecard s" data-step="3"><div class="filetab"><span class="ic"></span>units</div><div class="units">1 ether = 10<sup>18</sup> wei
+1 gwei  = 10<sup>9</sup> wei</div></div>
+        <div class="card s" data-step="4" style="padding:26px 32px;margin-top:22px"><div class="k">Addresses and hashes</div><div class="mono" style="font-size:30px;margin-top:10px">0x4838b106fce9…bad5f97</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.5</b></div></div>
+  <div class="checked">1 October 2026 averages, from the bucket</div>
+</section>
+
+<section class="stage" data-id="tables">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Two tables</div>
+    <h2>What each row is</h2>
+    <div class="two">
+      <div class="card hot tblcard s" data-step="1"><div class="k">One row per block</div><div class="t">blocks</div>
+        <ul><li>number</li><li>timestamp</li><li>miner</li><li>gas_used</li><li>gas_limit</li><li>base_fee_per_gas</li><li>transaction_count</li><li>date</li></ul></div>
+      <div class="card tblcard s" data-step="2"><div class="k">One row per transaction</div><div class="t">transactions</div>
+        <ul><li>hash</li><li>block_number</li><li>from_address</li><li>to_address</li><li>value</li><li>receipt_gas_used</li><li>…effective_gas_price</li><li>receipt_status</li></ul></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:70%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.5</b></div></div>
+</section>
+
+<section class="stage" data-id="load">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What we load</div>
+    <h2>Enough to be real</h2>
+    <div class="row two">
+      <div class="card hot s" data-step="1"><div class="k">Blocks · Aug to Oct 2026</div><div class="t">659,896 rows</div><div class="d">three months, about 230 MB in the lake</div></div>
+      <div class="card s" data-step="2"><div class="k">Transactions · 1 to 7 Oct 2026</div><div class="t">12.7 million rows</div><div class="d">one week, about 1.7 GB, without the large input column</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:90%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.5</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 1.6</h1>
+      <h2 style="font-size:92px">Under the <span class="accent">hood</span></h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

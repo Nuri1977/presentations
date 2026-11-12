@@ -1,0 +1,18 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Remember Lesson 3.1?
+b01	We deleted seven rows of blocks day at snapshot nine, and updated seventy-two at snapshot ten.
+b01	Ask the lake what changed between those two snapshots.
+b02	Ducklake table changes, for schema raw, table blocks day, from nine to ten.
+b02	Grouped by type, Studio's duck D B, version 1.5.2, shows the update as a delete plus an insert: seventy-nine deletes, and seventy-two inserts at ten.
+b03	Look at the rows: each updated block appears twice, the old value in lower case, deleted, and the new value in upper case, inserted.
+b03	Newer duck D B, like the 1.5.6 inside D B T, labels these as update pre-image and post-image, and puts both at snapshot ten.
+b03	Change feeds are young: check them on your version.
+b04	And two shortcuts: table insertions, seven thousand one hundred seventy-six rows at snapshot eight, and table deletions, seven at snapshot nine.
+b05	Four change types: insert, delete, and for updates, the pre-image and the post-image.
+b06	This works because every row in a duck lake has a stable row id, kept across updates.
+b06	That is called row lineage.
+b07	What is it for?
+b07	Downstream jobs that only process what changed since their last run, instead of everything.
+b08	Save the queries as 3 underscore 4 change feed dot sequel, commit, and push.
+b09	To recap: duck lake table changes tells you every row that changed between two snapshots, with before and after values.
+b09	Next: transactions, and what happens with two writers.

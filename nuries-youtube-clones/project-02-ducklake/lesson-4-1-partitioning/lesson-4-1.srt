@@ -1,0 +1,95 @@
+1
+00:00:03,350 --> 00:00:07,139
+Transactions are big: almost thirteen million rows for one week.
+
+2
+00:00:07,419 --> 00:00:09,761
+And most questions ask about a day or two.
+
+3
+00:00:10,711 --> 00:00:12,609
+So we partition the table by date.
+
+4
+00:00:12,889 --> 00:00:18,606
+Every day gets its own folder of files, and a query for one day only opens that day's files.
+
+5
+00:00:19,556 --> 00:00:24,971
+In the SQL Editor, on eth lake: create raw dot transactions, with the columns we need.
+
+6
+00:00:25,252 --> 00:00:27,500
+We leave out input, the largest column.
+
+7
+00:00:27,780 --> 00:00:31,132
+Then set it partitioned by date, before any data goes in.
+
+8
+00:00:34,501 --> 00:00:38,579
+Now load the week, the first to the seventh of October, straight from S3.
+
+9
+00:00:38,859 --> 00:00:43,122
+That is about nine hundred megabytes to download, so it takes a few minutes.
+
+10
+00:00:43,402 --> 00:00:44,652
+The video speeds it up.
+
+11
+00:05:20,993 --> 00:05:24,179
+Transactions per day: between one and a half and two million.
+
+12
+00:05:24,459 --> 00:05:26,422
+Twelve point seven million in total.
+
+13
+00:05:27,372 --> 00:05:33,534
+On disk, under raw transactions, there is now one folder per date, with one Parquet file in each.
+
+14
+00:05:34,484 --> 00:05:39,363
+A query for one day, the third of October, only needs the file in that day's folder.
+
+15
+00:05:39,643 --> 00:05:43,892
+The catalog knows which file holds which date, so the rest is never opened.
+
+16
+00:05:44,842 --> 00:05:47,506
+In Data Lake, open the transactions table.
+
+17
+00:05:47,786 --> 00:05:49,918
+The Partitions tab shows the key: date.
+
+18
+00:06:01,603 --> 00:06:06,353
+Choose a key that your queries filter on, with not too many values: a day, or a month.
+
+19
+00:06:06,633 --> 00:06:10,851
+Partition by something like an address, and you get millions of tiny files.
+
+20
+00:06:11,801 --> 00:06:13,257
+You can change the key later.
+
+21
+00:06:13,537 --> 00:06:17,766
+The new key applies to new data only; existing files stay as they are.
+
+22
+00:06:18,716 --> 00:06:23,494
+Save the script as 4 underscore 1 partitioning dot sequel, commit, and push.
+
+23
+00:06:46,751 --> 00:06:54,288
+To recap: raw transactions is partitioned by date, with one folder per day, so a query for one day opens one file.
+
+24
+00:06:54,568 --> 00:06:58,714
+Next: statistics, and how they skip files even without partitions.

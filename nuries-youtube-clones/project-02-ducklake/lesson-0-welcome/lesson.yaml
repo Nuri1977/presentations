@@ -1,0 +1,77 @@
+# Lesson 0 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only: nothing is built yet, so there is no start state and no recording.
+id: lesson-0
+number: "0"
+title: "Welcome: an Ethereum data lake on your laptop"
+module: "Welcome"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 0"
+next: "Lesson 0.1 · Install Rosetta DBT Studio"
+summary: "Welcome to Project 2. Build a real data lake on your laptop with DuckLake and Rosetta DBT Studio: three months of Ethereum blocks and a week of transactions from a public S3 bucket, with snapshots, time travel and maintenance, and dbt models on top."
+tags: [DuckLake, data lake, lakehouse, DuckDB, dbt, Ethereum, Rosetta DBT Studio]
+target_minutes: 3
+show_help_links: true
+links:
+  - { title: "DuckLake documentation", url: "https://ducklake.select/docs/stable/" }
+  - { title: "AWS Public Blockchain Data", url: "https://registry.opendata.aws/aws-public-blockchain/" }
+  - { title: "Project 1: dbt + DuckDB in Rosetta DBT Studio", url: "https://github.com/Nuri1977/nyc-taxi-dbt" }
+draft_changes:
+  - "Three full months of blocks (August to October 2026, 92 days) instead of 90 days, so each month is one load."
+accuracy_notes:
+  - "Rows measured on 12 Nov 2026 from the AWS public blockchain bucket: blocks 2026-08-01 to 2026-10-31, 659,896 rows; transactions 2026-10-01 to 2026-10-07, 12,695,803 rows."
+  - "Lake size after Module 4 in the rehearsal: about 1.9 GB (transactions 1.7 GB)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 0 · Welcome. Data lakes and DuckLake. Badges: Rosetta DBT Studio, DuckLake, DuckDB, dbt."
+
+  - id: s01
+    kind: slide
+    chapter: "Welcome"
+    slide: promise
+    beats:
+      - { id: b01, step: 1, show: "Statement: a real data lake on your laptop, with versions, time travel and dbt on top.", say: "Welcome to Project 2. In this course, you build a real data lake, on your own laptop. Not a toy: a lake with versions, time travel, maintenance, and dbt models on top." }
+      - { id: b02, step: 2, show: "Pills: no cloud account, no server, open source.", say: "You need no cloud account and no server. Everything runs inside Rosetta DBT Studio, with open source tools." }
+
+  - id: s02
+    kind: slide
+    chapter: "What you will build"
+    slide: build
+    beats:
+      - { id: b03, step: 1, show: "Source node: Ethereum data on S3, public Parquet files, one folder a day.", say: "We start from a public bucket on Amazon S3, with the Ethereum blockchain as Parquet files, one folder a day." }
+      - { id: b04, step: 2, show: "Lake node: DuckLake, a catalog file and a folder of Parquet files.", say: "We load it into a DuckLake: a catalog database, and a folder of Parquet files that the catalog manages." }
+      - { id: b05, step: 3, show: "dbt node: staging views and marts, built incrementally.", say: "Then dbt builds clean models on top: staging views, and marts that grow day by day." }
+      - { id: b06, step: 4, show: "Answers node: daily activity, gas fees, the busiest senders.", say: "And at the end, answers: how busy the network was each day, what gas cost, and who sent the most transactions." }
+
+  - id: s03
+    kind: slide
+    chapter: "The data"
+    slide: data
+    beats:
+      - { id: b07, step: 1, show: "Blocks: August to October 2026, 92 days, 659,896 blocks.", say: "The data is real. Three months of Ethereum blocks: August to October 2026, almost six hundred sixty thousand blocks." }
+      - { id: b08, step: 2, show: "Transactions: 1 to 7 October 2026, 12.7 million rows.", say: "And one week of transactions: twelve point seven million rows." }
+      - { id: b09, step: 3, show: "Disk: about 3 GB free is enough.", say: "Big enough to feel real, small enough for a laptop. About three gigabytes of free disk is plenty." }
+
+  - id: s04
+    kind: slide
+    chapter: "The tools"
+    slide: tools
+    beats:
+      - { id: b10, step: 1, show: "Rosetta DBT Studio: one app, Data Lake screens, SQL Editor, dbt, git.", say: "One app does it all: Rosetta DBT Studio. It has screens for data lakes, a SQL editor, dbt, and git, in one window." }
+      - { id: b11, step: 2, show: "DuckDB and DuckLake: the engine, and the lake format.", say: "Underneath, DuckDB is the engine, and DuckLake is the lake format. And dbt builds the models." }
+
+  - id: s05
+    kind: slide
+    chapter: "The course map"
+    slide: map
+    beats:
+      - { id: b12, step: 1, show: "Modules 0 and 1: install, and data lakes explained.", say: "Here is the route. First, we install Studio, and explain data lakes: warehouses, lakehouses, Parquet, table formats, and how DuckLake works." }
+      - { id: b13, step: 2, show: "Modules 2 to 5: first lake, changing data, performance and upkeep, inside the catalog.", say: "Then hands on. We create the lake and load it, change data safely, make it fast and keep it tidy, and look inside the catalog." }
+      - { id: b14, step: 3, show: "Modules 6 and 7: dbt on DuckLake, and going further.", say: "Finally, dbt on the lake, and where to go next." }
+      - { id: b15, step: 4, show: "What you need: a computer, basic SQL, a GitHub account; the code repo github.com/Nuri1977/ethereum-ducklake-dbt.", say: "You need a computer, some basic SQL, and a GitHub account. Every hands-on lesson ends with a commit to the course repository, linked in the description. See you in the next lesson." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 0.1 · Install Rosetta DBT Studio."

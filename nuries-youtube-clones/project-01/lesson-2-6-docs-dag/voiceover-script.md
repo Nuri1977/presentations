@@ -38,32 +38,32 @@ Project 1 · Lesson 2.6. Docs & the DAG. Badges: ref() x2, lineage, dbt docs.
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b10 @1:11 | Now the docs. Open the Project menu, and choose Generate Docs. dbt reads the project and the database, and writes a small website into target. | Open the **Project** menu → **Generate Docs**<br>Wait for “Catalog written”<br>Zoom: project-menu | 25 | 11 |
-| b11 @1:22 | Then Project, Serve Docs. Studio starts a local web server, on port eighty eighty. | Open the **Project** menu → **Serve Docs**<br>Wait for “Serving docs at”<br>Zoom: project-menu | 14 | 6 |
+| b10 @1:11 | Now the docs. Open the Project menu, and choose Generate Docs. dbt reads the project and the database, and writes a small website into target. | Open the **Project** menu → **Generate Docs**<br>Wait for “Catalog written” | 25 | 12 |
+| b11 @1:23 | Then Project, Serve Docs. Studio starts a local web server, on port eighty eighty. | Open the **Project** menu → **Serve Docs**<br>Wait for “Serving docs at” | 14 | 7 |
 
 ## s05 · browser — Browser
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b12 @1:29 | In the browser, open localhost, port eighty eighty, and pick monthly summary. Here is the description from schema dot yml, every column, and what the model depends on. | Browser: open http://127.0.0.1:8080/#!/model/model.nyc_taxi.monthly_summary | 28 | 11 |
-| b13 @1:40 | The button at the bottom right opens the lineage graph: the whole DAG, from the raw source and the seed, to monthly summary. | Click **View Lineage Graph** | 23 | 8 |
+| b12 @1:31 | In the browser, open localhost, port eighty eighty, and pick monthly summary. Here is the description from schema dot yml, every column, and what the model depends on. | Browser: open http://127.0.0.1:8080/#!/model/model.nyc_taxi.monthly_summary<br>Zoom: center-wide | 28 | 11 |
+| b13 @1:42 | The button at the bottom right opens the lineage graph for this model: trips, then trips per month, then monthly summary. The same order dbt just ran. | Click **View Lineage Graph** | 27 | 10 |
 
 ## s06 · app — Rosetta DBT Studio
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b14 @1:48 | Back in Studio, the Git tab shows the new model, and the change to schema dot yml. | Close the editor tab for `models/monthly_summary.sql`<br>Open the **Git** tab in the sidebar<br>Zoom: git-panel | 17 | 6 |
-| b15 @1:54 | Stage all, type a message, add the monthly summary, and commit. | Hover CHANGES and click **+** (Stage All Changes)<br>Type the commit message “Add the monthly summary”<br>Click **Commit**<br>Zoom: git-panel | 11 | 9 |
-| b16 @2:02 | Sync Changes, and it's on GitHub. | git_push: None<br>Zoom: git-panel | 6 | 5 |
+| b14 @1:52 | Back in Studio, the Git tab shows the new model, and the change to schema dot yml. | Close the editor tab for `models/monthly_summary.sql`<br>Open the **Git** tab in the sidebar<br>Zoom: git-panel | 17 | 6 |
+| b15 @1:58 | Stage all, type a message, add the monthly summary, and commit. | Hover CHANGES and click **+** (Stage All Changes)<br>Type the commit message “Add the monthly summary”<br>Click **Commit**<br>Zoom: git-panel | 11 | 9 |
+| b16 @2:06 | Sync Changes, and it's on GitHub. | git_push: None<br>Zoom: git-panel | 6 | 5 |
 
 ## s07 · slide — slide `recap`
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b17 @2:08 | To recap: refs form the DAG, and dbt uses it for order and impact. Run plus model builds a model with everything upstream. And two clicks give you a docs site, with descriptions and the lineage graph. Next, views or tables: materializations. | Recap: refs form the DAG; run +model runs everything upstream; Generate Docs + Serve Docs; lineage graph; pushed. | 42 | 17 |
+| b17 @2:11 | To recap: refs form the DAG, and dbt uses it for order and impact. Run plus model builds a model with everything upstream. And two clicks give you a docs site, with descriptions and the lineage graph. Next, views or tables: materializations. | Recap: refs form the DAG; run +model runs everything upstream; Generate Docs + Serve Docs; lineage graph; pushed. | 42 | 17 |
 
 ## s08 · closing card (4 s, no voice)
 
 Next · Lesson 2.7 · Materializations. Code: github.com/Nuri1977/nyc-taxi-dbt.
 
-**Total: 321 spoken words, 2:28 rendered.**
+**Total: 325 spoken words, 2:32 rendered.**

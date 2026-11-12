@@ -59,49 +59,53 @@ Now the docs.
 Open the Project menu, and choose Generate Docs. dbt reads the project and the database, and writes a small website into target.
 
 16
-00:01:22,994 --> 00:01:24,561
+00:01:24,214 --> 00:01:25,781
 Then Project, Serve Docs.
 
 17
-00:01:24,841 --> 00:01:28,013
+00:01:26,061 --> 00:01:29,233
 Studio starts a local web server, on port eighty eighty.
 
 18
-00:01:29,476 --> 00:01:34,212
+00:01:31,452 --> 00:01:36,188
 In the browser, open localhost, port eighty eighty, and pick monthly summary.
 
 19
-00:01:34,492 --> 00:01:39,754
+00:01:36,468 --> 00:01:41,730
 Here is the description from schema dot yml, every column, and what the model depends on.
 
 20
-00:01:40,704 --> 00:01:47,940
-The button at the bottom right opens the lineage graph: the whole DAG, from the raw source and the seed, to monthly summary.
+00:01:42,680 --> 00:01:49,500
+The button at the bottom right opens the lineage graph for this model: trips, then trips per month, then monthly summary.
 
 21
-00:01:48,890 --> 00:01:53,734
-Back in Studio, the Git tab shows the new model, and the change to schema dot yml.
+00:01:49,780 --> 00:01:51,855
+The same order dbt just ran.
 
 22
-00:01:54,684 --> 00:01:58,384
-Stage all, type a message, add the monthly summary, and commit.
+00:01:52,805 --> 00:01:57,649
+Back in Studio, the Git tab shows the new model, and the change to schema dot yml.
 
 23
-00:02:03,284 --> 00:02:05,319
-Sync Changes, and it's on GitHub.
+00:01:58,599 --> 00:02:02,299
+Stage all, type a message, add the monthly summary, and commit.
 
 24
-00:02:08,384 --> 00:02:13,103
-To recap: refs form the DAG, and dbt uses it for order and impact.
+00:02:07,198 --> 00:02:09,233
+Sync Changes, and it's on GitHub.
 
 25
-00:02:13,383 --> 00:02:16,720
-Run plus model builds a model with everything upstream.
+00:02:12,298 --> 00:02:17,017
+To recap: refs form the DAG, and dbt uses it for order and impact.
 
 26
-00:02:16,000 --> 00:02:20,990
-And two clicks give you a docs site, with descriptions and the lineage graph.
+00:02:17,297 --> 00:02:20,634
+Run plus model builds a model with everything upstream.
 
 27
-00:02:21,270 --> 00:02:24,084
+00:02:20,914 --> 00:02:24,904
+And two clicks give you a docs site, with descriptions and the lineage graph.
+
+28
+00:02:25,184 --> 00:02:27,998
 Next, views or tables: materializations.

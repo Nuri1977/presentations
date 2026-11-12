@@ -1,0 +1,34 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A duck lake has two parts, and only two.
+b02	The first part is the catalog.
+b02	It is a normal sequel database.
+b02	It knows the tables, their columns, and exactly which files belong to each table.
+b02	It can be a duck D B file, SQLite, PostgreSQL, or MySQL.
+b03	The second part is the data: a folder, or a bucket, of Par-kay files.
+b03	These files are never edited.
+b03	They are only added, or removed.
+b04	Here is what happens when you insert rows.
+b04	First, duck lake writes the new rows as Par-kay files in the data folder.
+b04	Nobody can see them yet.
+b05	Then, in one database transaction, the catalog records those files and creates a new snapshot.
+b05	That commit is the moment the change becomes visible.
+b06	If anything fails on the way, the catalog does not change, and readers never see half a write.
+b07	A read goes the other way.
+b07	The query first asks the catalog which files make up the table right now.
+b08	The catalog also keeps statistics for every file, like the smallest and largest value of each column.
+b08	So files that cannot match the filter are skipped.
+b09	Only then does it read the Par-kay files that are left.
+b10	This simple design gives you a lot.
+b10	Changes are real transactions, even across several tables.
+b11	Every change is a snapshot, so you can query a table as it was yesterday, or last week.
+b12	And a small change stays small.
+b12	It is a few rows in the catalog, not a pile of new metadata files.
+b13	Who can read a duck lake?
+b13	Today, duck D B does, through the duck lake extension.
+b13	That is what Rosetta D B T Studio uses under the hood.
+b14	And because the catalog is plain sequel tables, and the data is plain Par-kay, nothing is locked away.
+b14	Any sequel client can look inside the catalog.
+b15	To recap: the catalog is a database, and the data is Par-kay.
+b15	Files are never edited, only added or removed.
+b15	And every change makes a snapshot.
+b15	Next, we meet the data for this course: Ethereum blocks and transactions.

@@ -5,13 +5,21 @@ For a human retake of the app scenes (the automated recording follows the same s
 ## Before you start
 
 - Start state `after-setup`: Studio with Python and dbt installed (as after Lesson 1.1), no project, no connection; learner git config uses the stored token.
-- Rehearsal: pushes to the private Nuri1977/nyc-taxi-dbt-rehearsal. The repo-creation scene reuses the Lesson 1.2 recording; the final run creates the public Nuri1977/nyc-taxi-dbt.
+- Final run: pushes to the public Nuri1977/nyc-taxi-dbt, created empty before the lesson (kept from 9 Nov). The GitHub scene shows that empty repository page.
+
+## s01b · Where Studio keeps Python and dbt
+
+| Listen for | Do this |
+|---|---|
+| "Before we start, a quick look at Settings.…" | In the left bar, click **Settings**<br>Point at **Projects directory** |
+| "Under dbt Core: the dbt runtime, dbt version…" | Click **dbt Core**<br>Point at **dbt-duckdb** |
+| "And Python: Studio runs dbt with its own…" | Click **Python**<br>Point at **Python Installation** |
 
 ## s02 · A DuckDB connection
 
 | Listen for | Do this |
 |---|---|
-| "First, the database. On the home screen, click…" | Click **New Connection**<br>Click **DuckDB** |
+| "Now, the database. On the home screen, click…" | In the left bar, click **Home**<br>Click **New Connection**<br>Click **DuckDB** |
 | "Name it nyc taxi dev. For the file,…" | Click **Connection Name**<br>Press Meta+A<br>Type `nyc_taxi_dev`<br>Click **Database File Path** and type `/Users/Shared/academy/learner/projects/nyc_taxi_dev.duckdb`<br>Click **Save** |
 
 ## s03 · Create the project
@@ -41,9 +49,8 @@ For a human retake of the app scenes (the automated recording follows the same s
 
 | Listen for | Do this |
 |---|---|
-| "Now create an empty repository on GitHub: the…" | GitHub (built-in browser): github.com → + → New repository (frames from Lesson 1.2's recording) |
-| "Name it nyc taxi dbt, and make it…" | GitHub (built-in browser): Repository name, visibility, Create repository |
-| "Copy the HTTPS address of the new, empty…" | GitHub (built-in browser): Quick setup → copy the HTTPS URL |
+| "Now a repository on GitHub. Create a new,…" | In the browser, open https://github.com/Nuri1977/nyc-taxi-dbt |
+| "GitHub shows its HTTPS address. Copy it.…" | Point at **HTTPS address** |
 
 ## s07 · First commit and push
 
@@ -51,10 +58,10 @@ For a human retake of the app scenes (the automated recording follows the same s
 |---|---|
 | "Back in Studio, open the Git tab, and…" | Click the **Git** tab at the top of the sidebar<br>Click **Initialize Repository** |
 | "Stage all the changes, type a message, create…" | Hover CHANGES and click **+** (Stage All Changes)<br>Click the message box and type: Create the nyc_taxi dbt project<br>Click **Commit** |
-| "Click Publish Branch. Studio asks for the remote:…" | Click **Publish Branch**, paste `https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git`, add the remote |
+| "Click Publish Branch. Studio asks for the remote:…" | Click **Publish Branch**, paste `https://github.com/Nuri1977/nyc-taxi-dbt.git`, add the remote |
 
 ## s08 · The code is on GitHub
 
 | Listen for | Do this |
 |---|---|
-| "Refresh the repository page. The project is on…" | In the browser, open https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal |
+| "Refresh the repository page. The project is on…" | In the browser, open https://github.com/Nuri1977/nyc-taxi-dbt |

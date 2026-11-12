@@ -1,0 +1,58 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:11.813
+In the marts folder, daily network activity: per day, the number of blocks and transactions, how full the blocks were, and the average base fee.
+
+00:00:12.093 --> 00:00:12.747
+A table.
+
+00:00:16.062 --> 00:00:21.543
+And top senders: the hundred addresses that sent the most transactions, with the fees they paid.
+
+00:00:26.180 --> 00:00:31.357
+Now daily gas, incremental, with the merge strategy and block date as the unique key.
+
+00:00:31.637 --> 00:00:36.495
+On later runs it only processes days from the last one it has, and merges them in.
+
+00:00:36.775 --> 00:00:42.719
+The post hook calls set commit message, so the snapshots daily gas makes get an author and a message.
+
+00:00:43.669 --> 00:00:45.689
+Run everything: dbt run.
+
+00:00:45.969 --> 00:00:49.743
+Two views, two tables, and the incremental model, built in the lake.
+
+00:00:54.133 --> 00:00:55.392
+Run daily gas again.
+
+00:00:55.672 --> 00:01:03.312
+This time it is incremental: dbt recomputes the last day into a temporary table, and merges it into daily gas.
+
+00:01:06.320 --> 00:01:12.604
+Here is what dbt ran, in the target folder: merge into eth lake dot main dot daily gas.
+
+00:01:12.884 --> 00:01:17.954
+The merge Studio's SQL Editor could not run in Lesson 3.2, running on our lake.
+
+00:01:18.904 --> 00:01:23.963
+And the result, with dbt show: one row per day, from August to early November.
+
+00:01:29.411 --> 00:01:37.383
+dbt is done, so open the lake in Studio: Data Lake, eth lake, History. dbt's work is a series of snapshots.
+
+00:01:37.663 --> 00:01:41.942
+And the incremental merge has an author, dbt, and our commit message.
+
+00:01:42.892 --> 00:01:44.225
+Commit the marts, and push.
+
+00:02:00.787 --> 00:02:07.599
+To recap: two table marts, and an incremental model whose merge strategy runs a real merge into on the lake.
+
+00:02:07.879 --> 00:02:12.913
+A post hook adds a commit message, and every dbt run shows up as snapshots.
+
+00:02:13.193 --> 00:02:14.723
+Next: tests and docs.

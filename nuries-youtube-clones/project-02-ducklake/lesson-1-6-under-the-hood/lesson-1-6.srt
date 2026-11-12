@@ -1,0 +1,139 @@
+1
+00:00:03,350 --> 00:00:05,629
+Before we build a lake, let's look under the hood.
+
+2
+00:00:05,909 --> 00:00:08,831
+Rosetta DBT Studio is an Electron app.
+
+3
+00:00:09,111 --> 00:00:13,907
+That means two parts: the window you see, and a Node.js process behind it.
+
+4
+00:00:14,857 --> 00:00:16,929
+The window never touches a database.
+
+5
+00:00:17,209 --> 00:00:23,410
+When you run a query, it sends a request to the main process, which runs the SQL and sends back the rows.
+
+6
+00:00:24,360 --> 00:00:30,051
+The main process uses DuckDB's official Node package, duck D B slash node A P I.
+
+7
+00:00:30,331 --> 00:00:34,522
+Studio 1.7.6 ships version 1.5.2.
+
+8
+00:00:34,802 --> 00:00:39,781
+DuckDB runs inside Studio itself: no server, nothing else to install.
+
+9
+00:00:40,731 --> 00:00:42,831
+In Studio's code, it is three calls.
+
+10
+00:00:43,111 --> 00:00:44,701
+Create a DuckDB instance.
+
+11
+00:00:44,981 --> 00:00:45,794
+Connect to it.
+
+12
+00:00:46,074 --> 00:00:47,735
+And run SQL on the connection.
+
+13
+00:00:48,685 --> 00:00:51,053
+DuckLake is not built into DuckDB.
+
+14
+00:00:51,333 --> 00:00:52,491
+It is an extension.
+
+15
+00:00:52,770 --> 00:00:57,446
+So on that connection, Studio first runs install ducklake, and load ducklake.
+
+16
+00:00:58,396 --> 00:01:02,747
+Then it attaches the lake: the catalog file, a name, and the data path.
+
+17
+00:01:03,027 --> 00:01:04,958
+And it makes the lake the current database.
+
+18
+00:01:05,238 --> 00:01:07,478
+That is exactly what you could type yourself.
+
+19
+00:01:08,428 --> 00:01:10,444
+There is one adapter per catalog type.
+
+20
+00:01:10,724 --> 00:01:18,287
+In 1.7.6 the wizard offers DuckDB; SQLite and PostgreSQL are marked as coming soon.
+
+21
+00:01:18,567 --> 00:01:20,945
+When a lake is closed, Studio detaches it.
+
+22
+00:01:21,895 --> 00:01:23,638
+You can see the engine in Studio.
+
+23
+00:01:23,918 --> 00:01:25,966
+Open Settings, then DuckDB.
+
+24
+00:01:26,246 --> 00:01:30,287
+This is Studio's own DuckDB database, for caching and previews.
+
+25
+00:01:31,237 --> 00:01:36,892
+And the status bar always shows the DuckDB version inside the app: 1.5.2.
+
+26
+00:01:37,842 --> 00:01:39,144
+One more thing for later.
+
+27
+00:01:39,424 --> 00:01:48,649
+When dbt runs, it uses its own DuckDB, the Python package inside dbt duckdb, version 1.5.6.
+
+28
+00:01:48,929 --> 00:01:51,372
+So two engines read and write the same lake.
+
+29
+00:01:51,652 --> 00:01:52,986
+We checked that they agree.
+
+30
+00:01:53,936 --> 00:01:58,666
+But with a DuckDB file as the catalog, only one of them can open it at a time.
+
+31
+00:01:58,946 --> 00:02:00,888
+Keep that in mind for Module 6.
+
+32
+00:02:01,838 --> 00:02:06,120
+To recap: DuckDB runs inside Studio, through its Node package.
+
+33
+00:02:06,400 --> 00:02:08,754
+DuckLake is an extension that Studio loads.
+
+34
+00:02:09,034 --> 00:02:12,223
+And everything the Data Lake screens do is plain SQL.
+
+35
+00:02:12,503 --> 00:02:13,959
+Now, let's create our lake.

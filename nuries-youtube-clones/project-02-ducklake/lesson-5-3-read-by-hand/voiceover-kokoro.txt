@@ -1,0 +1,25 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	To end the catalog module, let's read the lake without the lake.
+b01	The duck lake specification describes the steps: find the current snapshot, find the table, find the data path, list the files valid at that snapshot, and read them.
+b02	In the sequel Editor, on eth lake.
+b02	Step one: the current snapshot is the largest snapshot id.
+b02	Twenty-four.
+b03	Step two: the transactions table, valid now.
+b03	Table id five, and its folder, transactions.
+b04	Step three: the lake's data path, from duck lake metadata: our data folder.
+b04	Each file's path is relative to it, under the schema and the table's folder.
+b05	Step four: the data files of table five that are valid at snapshot twenty-four: begin snapshot at most twenty-four, end snapshot after it, or empty.
+b05	Seven files.
+b06	Step five: read exactly those files with read par-kay, and count.
+b06	Twelve million six hundred ninety-five thousand eight hundred three.
+b07	And the same count, the normal way, from raw transactions.
+b07	Identical.
+b07	The lake is nothing but these tables and these files.
+b08	With deletes, one more step: read the delete files too, and skip the positions they list.
+b09	And that is all any engine needs to read duck lake: some sequel against the catalog, and a Par-kay reader.
+b09	Nothing is hidden.
+b10	Save the queries as 5 underscore 3 read by hand dot sequel, commit, and push.
+b11	To recap: snapshot, table, data path, valid files, read par-kay.
+b11	Same answer as the lake.
+b11	That ends Module 5.
+b11	Next, we put D B T on top of the lake.

@@ -1,0 +1,127 @@
+1
+00:00:03,350 --> 00:00:05,565
+Let's start with the classic data warehouse.
+
+2
+00:00:05,845 --> 00:00:10,496
+One system owns everything: the storage, and the engine that runs your queries.
+
+3
+00:00:10,776 --> 00:00:13,319
+Data goes in through the warehouse's own door.
+
+4
+00:00:14,269 --> 00:00:17,224
+That makes it fast and safe, with real transactions.
+
+5
+00:00:17,504 --> 00:00:24,561
+But the data lives in the warehouse's own format, only its engine can read it, and you pay for storage and compute together.
+
+6
+00:00:25,511 --> 00:00:27,172
+A data lake turns this around.
+
+7
+00:00:27,452 --> 00:00:32,061
+The data is just files, on cheap storage: a folder, or a bucket on S3.
+
+8
+00:00:32,341 --> 00:00:34,165
+In open formats, like Parquet.
+
+9
+00:00:35,115 --> 00:00:40,181
+Any engine can read those files: DuckDB, Spark, Trino, or a Python script.
+
+10
+00:00:40,461 --> 00:00:42,205
+Storage and compute are separate.
+
+11
+00:00:43,155 --> 00:00:44,833
+But plain files have problems.
+
+12
+00:00:45,113 --> 00:00:49,050
+There are no transactions: a reader can see a write that is only half done.
+
+13
+00:00:50,000 --> 00:00:51,973
+There are no safe updates or deletes.
+
+14
+00:00:52,253 --> 00:00:57,153
+To change one row, you rewrite a whole file, and hope nobody reads it at that moment.
+
+15
+00:00:58,103 --> 00:01:00,226
+And there is no schema and no history.
+
+16
+00:01:00,506 --> 00:01:04,203
+Which columns does the table have, and what did it look like yesterday?
+
+17
+00:01:04,483 --> 00:01:05,713
+The files do not say.
+
+18
+00:01:06,663 --> 00:01:12,807
+Even finding the files is slow: listing thousands of objects in a bucket, just to plan one query.
+
+19
+00:01:13,757 --> 00:01:16,887
+The lakehouse fixes this, without giving up open files.
+
+20
+00:01:17,167 --> 00:01:24,040
+It adds a table format on top: a small layer of metadata that says which files make up each table, right now.
+
+21
+00:01:24,990 --> 00:01:33,681
+With that layer you get the warehouse features back: transactions, safe updates and deletes, schema changes, and a history you can travel back in.
+
+22
+00:01:33,961 --> 00:01:35,770
+The data stays in open files.
+
+23
+00:01:36,720 --> 00:01:38,802
+Four words we use through the whole course.
+
+24
+00:01:39,082 --> 00:01:41,538
+The lake: the data files, on some storage.
+
+25
+00:01:42,488 --> 00:01:48,292
+The table format: the rules for keeping track of which files make up a table, and how it changes.
+
+26
+00:01:49,242 --> 00:01:52,117
+The catalog: where that tracking information is stored.
+
+27
+00:01:53,067 --> 00:01:56,642
+And the engine: the program that reads it all and runs your queries.
+
+28
+00:01:56,922 --> 00:01:58,838
+In this course, that is DuckDB.
+
+29
+00:01:59,788 --> 00:02:02,923
+To recap: a warehouse is one system for everything.
+
+30
+00:02:03,203 --> 00:02:04,612
+A lake is open files.
+
+31
+00:02:04,892 --> 00:02:09,971
+A lakehouse is open files, plus a table format that makes them behave like tables.
+
+32
+00:02:10,251 --> 00:02:12,542
+Next: why lakes store data in Parquet.

@@ -1,0 +1,118 @@
+# Lesson 3.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-3-2
+number: "3.2"
+title: "Daily loads without duplicates"
+module: "Module 3 · Changing data"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 3.2"
+next: "Lesson 3.3 · Schema evolution"
+summary: "A daily load you can run twice: insert one day of blocks from S3, but only the blocks the table does not have yet. Run it again and nothing changes, not even a new snapshot. Plus MERGE INTO, the general tool for upserts, which we run live from dbt in Lesson 6.3."
+start_state: lesson-3-1-end
+show_help_links: true
+links:
+  - { title: "DuckLake: upserting", url: "https://ducklake.select/docs/stable/duckdb/usage/upserting" }
+tags: [DuckLake, idempotent load, MERGE, upsert, S3, DuckDB]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-3-1-end`: raw.blocks with three months plus 1 November; raw.blocks_day; snapshots 0 to 10."
+draft_changes:
+  - "MERGE is a slide: Studio's SQL Editor accepts only some statement types and rejects MERGE. The same idempotent load runs live as INSERT … WHERE NOT EXISTS; a real MERGE runs from dbt in Lesson 6.3."
+accuracy_notes:
+  - "2 November 2026: 7,176 blocks. The second run inserts nothing and creates no snapshot (snapshot 11 is the only new one). Rehearsal 12 Nov 2026."
+  - "Studio 1.7.6 shows DATE values as {days: n} in the result grid (20758 = 2026-11-01); later lessons format dates with strftime."
+  - "MERGE INTO … WHEN MATCHED / WHEN NOT MATCHED: DuckLake docs, Upserting page, checked 11 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 3.2. Daily loads without duplicates."
+
+  - id: s01
+    kind: slide
+    chapter: "The problem"
+    slide: problem
+    beats:
+      - { id: b01, step: 1, show: "A daily load that runs twice (a retry, a mistake) doubles the day.", say: "Real pipelines run every day, and sometimes twice: a retry after an error, or a click too many. A plain insert would load the same day twice." }
+      - { id: b02, step: 2, show: "Idempotent: running it again changes nothing.", say: "We want an idempotent load: one you can run again, and nothing changes." }
+
+  - id: s02
+    kind: app
+    chapter: "Insert what is new"
+    beats:
+      - id: b03
+        say: "In the SQL Editor, on eth lake: insert the blocks of the second of November, but only those where no block with the same number exists yet."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              insert into raw.blocks select s.* exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-11-02/*.parquet') as s where not exists (select 1 from raw.blocks as t where t.number = s.number);
+              select date, count(*) as blocks from raw.blocks where date >= date '2026-11-01' group by all order by 1;
+              select snapshot_id, changes from eth_lake.snapshots() order by 1 desc limit 3;
+          - sql_run: { line: 1, settleMs: [800] }
+          - sql_wait
+      - id: b04
+        say: "Count by day. Studio 1.7.6 shows a date column as a day number, so read the rows in order: the first and the second of November, seven thousand one hundred seventy-six blocks each."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "Now run the load again, as if a job retried."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 1, settleMs: [800] }
+          - sql_wait
+      - id: b06
+        say: "Count again: still seven thousand one hundred seventy-six. No duplicates."
+        zoom: sql-results
+        card: { eyebrow: "2 November 2026", title: "7,176 blocks", sub: "after two runs", pos: top-right }
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b07
+        say: "And the snapshots: one new snapshot for the first run. The second run inserted nothing, so it did not even create a snapshot."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: slide
+    chapter: "MERGE INTO"
+    slide: merge
+    beats:
+      - { id: b08, step: 1, show: "Code: MERGE INTO raw.blocks AS t USING (…) AS s ON t.number = s.number WHEN MATCHED THEN UPDATE … WHEN NOT MATCHED THEN INSERT.", say: "The general tool is merge into. It matches new rows to existing ones on a key, updates the rows that match, and inserts the rest. DuckLake supports it." }
+      - { id: b09, step: 2, show: "Studio's SQL Editor does not accept MERGE; dbt runs a real MERGE on the lake in Lesson 6.3.", say: "Studio's SQL Editor does not accept merge, so here we used insert where not exists. In Lesson 6.3, dbt runs a real merge on this lake for us." }
+
+  - id: s04
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b10
+        say: "Save the load as 3 underscore 2 daily load dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 3_2_daily_load.sql }
+          - paste: |
+              insert into raw.blocks select s.* exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-11-02/*.parquet') as s where not exists (select 1 from raw.blocks as t where t.number = s.number);
+              select date, count(*) as blocks from raw.blocks where date >= date '2026-11-01' group by all order by 1;
+              select snapshot_id, changes from eth_lake.snapshots() order by 1 desc limit 3;
+          - click_save
+          - expect_file: { path: sql/3_2_daily_load.sql, snippet: ../snippets/3.2/3_2_daily_load.sql }
+          - close_tab: sql/3_2_daily_load.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Daily load without duplicates
+          - git_commit
+          - git_push
+
+  - id: s05
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b11, step: 1, show: "Recap: insert only new keys; run twice, nothing changes; no snapshot for an empty change; MERGE for upserts.", say: "To recap: insert only rows whose key is new, and the load can run twice safely. A change that changes nothing makes no snapshot. And merge does the same, with updates too. Next: changing a table's columns." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 3.3 · Schema evolution."

@@ -1,0 +1,120 @@
+{
+ "total": 129.08,
+ "fps": 30,
+ "size": [
+  3840,
+  2160
+ ],
+ "scenes": [
+  {
+   "id": "s00",
+   "kind": "title",
+   "start": 0.0,
+   "dur": 3
+  },
+  {
+   "id": "s01",
+   "kind": "app",
+   "start": 3.0,
+   "dur": 60.91
+  },
+  {
+   "id": "s02",
+   "kind": "slide",
+   "start": 63.91,
+   "dur": 21.34
+  },
+  {
+   "id": "s03",
+   "kind": "app",
+   "start": 85.24,
+   "dur": 27.58
+  },
+  {
+   "id": "s04",
+   "kind": "slide",
+   "start": 112.82,
+   "dur": 12.25
+  },
+  {
+   "id": "s05",
+   "kind": "closing",
+   "start": 125.08,
+   "dur": 4
+  }
+ ],
+ "beats": [
+  {
+   "id": "b01",
+   "scene": "s01",
+   "start": 3.0,
+   "dur": 11.7,
+   "voice_start": 3.35,
+   "voice": 10.747
+  },
+  {
+   "id": "b02",
+   "scene": "s01",
+   "start": 14.7,
+   "dur": 16.71,
+   "voice_start": 15.05,
+   "voice": 15.758
+  },
+  {
+   "id": "b03",
+   "scene": "s01",
+   "start": 31.41,
+   "dur": 21.99,
+   "voice_start": 31.76,
+   "voice": 21.043
+  },
+  {
+   "id": "b04",
+   "scene": "s01",
+   "start": 53.4,
+   "dur": 10.51,
+   "voice_start": 53.75,
+   "voice": 9.559
+  },
+  {
+   "id": "b05",
+   "scene": "s02",
+   "start": 63.91,
+   "dur": 5.98,
+   "voice_start": 64.26,
+   "voice": 5.029
+  },
+  {
+   "id": "b06",
+   "scene": "s02",
+   "start": 69.89,
+   "dur": 7.88,
+   "voice_start": 70.24,
+   "voice": 6.927
+  },
+  {
+   "id": "b07",
+   "scene": "s02",
+   "start": 77.76,
+   "dur": 7.48,
+   "voice_start": 78.11,
+   "voice": 6.532
+  },
+  {
+   "id": "b08",
+   "scene": "s03",
+   "start": 85.24,
+   "dur": 27.58,
+   "voice_start": 85.59,
+   "voice": 5.078
+  },
+  {
+   "id": "b09",
+   "scene": "s04",
+   "start": 112.82,
+   "dur": 12.25,
+   "voice_start": 113.17,
+   "voice": 11.303
+  }
+ ]
+}

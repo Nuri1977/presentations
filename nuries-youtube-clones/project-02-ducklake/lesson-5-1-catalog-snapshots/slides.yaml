@@ -1,0 +1,24 @@
+number: "5.1"
+title: Inside the catalog
+slides:
+  - { id: title, type: title, h1: 'Inside the <span class="accent">catalog</span>', lead: "Snapshots, tables and columns are just rows.", badges: [ducklake_snapshot, ducklake_table, ducklake_column] }
+  - id: pattern
+    type: html
+    eyebrow: The pattern
+    h2: Two columns version everything
+    html: |
+      <div class="codecard s" data-step="1" style="margin-top:34px"><div class="filetab"><span class="ic"></span>valid at snapshot s</div><div class="code" style="font-size:40px"><span class="k">WHERE</span> begin_snapshot &lt;= s
+        <span class="k">AND</span> (end_snapshot &gt; s <span class="k">OR</span> end_snapshot <span class="k">IS NULL</span>)</div></div>
+      <table class="t s" data-step="1" style="margin-top:30px">
+        <tr><th>column_id</th><th>column_name</th><th>begin_snapshot</th><th>end_snapshot</th></tr>
+        <tr><td>3</td><td class="mono">miner</td><td>2</td><td>14</td></tr>
+        <tr><td>3</td><td class="mono">fee_recipient</td><td>14</td><td>–</td></tr>
+      </table>
+    checked: DuckLake specification, checked 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "The catalog is a plain DuckDB database."
+      - "Snapshots, tables and columns are rows."
+      - "<span class=\"mono\">begin_snapshot</span> and <span class=\"mono\">end_snapshot</span> version every row."
+  - { id: closing, type: closing, lesson: Lesson 5.2, h2: 'Files, statistics, <span class="accent">partitions</span>' }

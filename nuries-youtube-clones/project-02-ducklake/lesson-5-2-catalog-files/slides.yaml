@@ -1,0 +1,43 @@
+number: '5.2'
+title: Files, statistics, partitions
+slides:
+- id: title
+  type: title
+  h1: Files, statistics, <span class="accent">partitions</span>
+  lead: Every file is a row in the catalog.
+  badges:
+  - ducklake_data_file
+  - Column stats
+  - Partition values
+- id: tables
+  type: table
+  step: 1
+  eyebrow: The file tables
+  h2: What the catalog knows about files
+  head:
+  - Table
+  - What it holds
+  rows:
+  - - <span class="mono">ducklake_data_file</span>
+    - path, row count and size of each data file
+  - - <span class="mono">ducklake_delete_file</span>
+    - delete files and the data file they belong to
+  - - <span class="mono">ducklake_file_column_stats</span>
+    - min and max per column per file
+  - - <span class="mono">ducklake_file_partition_value</span>
+    - the partition each file belongs to
+  - - <span class="mono">ducklake_table_stats</span>
+    - totals per table
+  - - <span class="mono">ducklake_inlined_data_tables</span>
+    - tables of inlined rows
+  checked: DuckLake specification, checked 11 Nov 2026
+- id: recap
+  type: recap
+  items:
+  - Every Parquet file is a row.
+  - Min and max per column, per file.
+  - Partition values, table totals, inlined rows.
+- id: closing
+  type: closing
+  lesson: Lesson 5.3
+  h2: Read the lake <span class="accent">by hand</span>

@@ -1,0 +1,61 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:07.449
+In Data Lake, open the transactions table and its Statistics tab.
+
+00:00:07.729 --> 00:00:11.821
+For every column, the catalog keeps the smallest and the largest value.
+
+00:00:12.101 --> 00:00:18.964
+Block numbers go from about twenty-six million ninety-three thousand to twenty-six million one hundred forty-four thousand.
+
+00:00:19.914 --> 00:00:25.733
+The catalog keeps the same numbers for every single file, so it can rule out files without opening them.
+
+00:00:26.683 --> 00:00:30.901
+In the SQL Editor, on eth lake: the first and last block number of the week.
+
+00:00:38.565 --> 00:00:42.083
+Now ask for a hundred blocks, with explain analyze in front.
+
+00:00:42.363 --> 00:00:52.297
+It runs the query and returns the plan as text; Studio puts it on one line, so here is the part that matters, from the table scan: total files read, one.
+
+00:00:52.577 --> 00:00:56.447
+Six of the seven files were skipped, using only their statistics.
+
+00:00:57.397 --> 00:01:00.169
+Pruning works when each file covers a narrow range.
+
+00:01:00.449 --> 00:01:04.647
+Here it does: block numbers grow with time, and each day is its own file.
+
+00:01:05.597 --> 00:01:11.544
+If rows arrive in random order, every file covers almost everything, and nothing can be skipped.
+
+00:01:12.494 --> 00:01:17.777
+Sorted by tells DuckLake to sort rows when it writes new files, so their ranges stay narrow.
+
+00:01:18.727 --> 00:01:21.531
+Set it for transactions: sorted by block number.
+
+00:01:21.811 --> 00:01:25.746
+It applies to new writes, and to files that maintenance rewrites later.
+
+00:01:26.696 --> 00:01:31.380
+Other settings live in the lake's options, like the inlining limit we set to zero.
+
+00:01:31.660 --> 00:01:36.275
+Others, like target file size and Parquet compression, are set with set option.
+
+00:01:37.225 --> 00:01:41.921
+Save the script as 4 underscore 2 statistics dot sequel, commit, and push.
+
+00:02:05.721 --> 00:02:12.991
+To recap: the catalog keeps min and max for every column of every file, so queries skip files without opening them.
+
+00:02:13.271 --> 00:02:15.102
+Sorted by keeps ranges narrow.
+
+00:02:15.382 --> 00:02:18.071
+Next: what DuckLake does with very small writes.

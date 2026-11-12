@@ -29,6 +29,59 @@ and run here. Pilot (approved 5 Nov 2026): dbt Fundamentals Lesson 3.2, 2:54, 4K
 - **Every lesson ships two videos** (see "Two video files"). Anything Nuri watches or shares uses the 1080p copy.
 - Claude cannot hear audio: always ask Nuri to listen once for pronunciation.
 
+## Visual rules (Nuri's review of Project 2, 12 Nov 2026; apply from Project 3 on)
+
+Project 2 (DuckLake) is finished and stays as it is. Every course from Project 3 on follows these rules.
+
+### Slides: icons on every content slide
+
+- **Every content slide shows icons or logos** for the things it names: DuckLake, DuckDB, dbt, Parquet,
+  Iceberg, Delta Lake, PostgreSQL, SQLite, S3, GitHub, Python, Rosetta DBT Studio, and so on. A slide with
+  only text and plain boxes is not finished.
+- **Where icons come from, in this order:**
+  1. **Studio's own assets** (read only, copy them into the course's `brand/icons/`; never edit `dbt-studio/`):
+     `dbt-studio/assets/icons/` (`duck-lake.svg`, `duckdb.svg`, `dbt-bit_tm.svg`, `dbt-black.svg`,
+     `data-lake.svg`, `apache-iceberg-lake.png`, `apache-hudi-lake.png`, `delta-lake.png`, `rosetta.png`) and
+     `dbt-studio/assets/connectionIcons/` (`ducklake.png`, `duckdb.png`, `postgresql.png`, `sqlite.png`,
+     `s3.png`, `snowflake.png`, `lakekeeper.png`).
+  2. **Free, open-license icon sets**, downloaded into `brand/icons/`: Simple Icons (CC0, brand logos),
+     Lucide (ISC), Tabler Icons (MIT), Material Symbols (Apache 2.0), and each project's own brand kit
+     (e.g. the DuckDB and DuckLake logos from duckdb.org / ducklake.select).
+  3. **An existing web URL** only when a download is not possible. Prefer a local copy: renders must work
+     offline, and a URL can change or disappear.
+- Write each downloaded icon's source and licence in `brand/icons/SOURCES.md`.
+- Use icons at a readable size (at least 64 px on a 1920x1080 slide; 96 to 160 px on cards and diagrams).
+  Keep one style per slide (all logos, or all line icons).
+
+### Slides: no empty pages
+
+- **Cards, diagrams and code together cover more than 60% of the content area** (the space between the
+  heading and the footer). No half-empty slides, no small cards floating in white space.
+- When there is little to say, make the cards bigger: larger titles and text, an icon on each card, a
+  diagram, or a real Studio screenshot. Do not leave the space empty.
+- Check this on the contact sheet of slide stills before the approval gate: any slide where more than about
+  40% of the content area is empty gets fixed.
+
+### App recordings: one UI zoom, full screen first
+
+- **Readability comes from Studio's own zoom (Cmd +/-), not from cropping the video.** Claude chooses the
+  zoom level once per course and saves it in `course.yaml` (`ui_zoom`, e.g. 1.25; `browser_zoom` for web
+  pages). Check at that level that the sidebar, header, editor, terminal and status bar all fit and are
+  readable on a phone in the 1080p copy. Never change the zoom level in the middle of a course.
+- **The default is no crop zoom at all** (`zoom: none` on every app beat): the viewer sees the whole Studio
+  window.
+- **Always show the full screen first.** Every app scene, and every return from a slide, starts on the full,
+  unzoomed window and holds it for at least 1.5 to 2 seconds, so the viewer knows where they are.
+- **Only then zoom, once, into one region**, and only when a detail is too small to read even with the UI
+  zoom (one line of terminal output, a single result cell). Zoom back out to the full screen before moving to
+  another region.
+- **Never:** start a beat already zoomed; zoom from one cropped region straight to another; stack a crop
+  zoom on top of a crop zoom; or show a crop where the sidebar, header or terminal are cut in half.
+  These are what made the Project 2 videos confusing.
+- **Tooling to change before Project 3** (not done yet): `compose.py` should default to no crop, insert a
+  full-screen hold at the start of every app scene, and force a full-screen step between two zoomed beats.
+  Until then, write `zoom: none` explicitly in `lesson.yaml`.
+
 ## Two video files
 
 | File | For | Format |
@@ -105,7 +158,7 @@ scenes:
       - id: b04
         say: "..."
         actions: [ { open_project: dbt_course }, { open_file: models/staging/stg_orders.sql } ]
-        zoom: editor-code   # editor-code | terminal | bottom-panel | lineage-wide (add rects in compose.py ZOOMS)
+        zoom: none          # default from Project 3 on; a crop zoom only after the full screen (see Visual rules)
         card: { eyebrow: "A model", title: "One file, one select", sub: "...", pos: top-right }
   - { id: s08, kind: closing, slide: closing, show: "..." }
 ```
@@ -143,7 +196,8 @@ appear at step n (`data-until` hides after a step); use `.pad.v` to center verti
    you will use, to get real labels and behaviour (see Pitfalls). Write `slides.html`.
 3. Generate the beat sheet and slide stills:
    `python3 scripts/script_from_lesson.py <lesson>` and `python3 scripts/render_stills.py <course> <lesson>`.
-   Make a contact sheet of the slide states and view it (check overlaps, clipped text, empty halves).
+   Make a contact sheet of the slide states and view it (check overlaps, clipped text, empty halves, icons
+   on every content slide, cards covering more than 60% of the content area).
 4. **Send the beat sheet (`voiceover-script.md`) + slide contact sheet; wait for approval.**
 5. Record (app scenes only): `NODE_PATH=$(npm root -g) ./run-headless.sh record.cjs <course> <lesson>`
    (run in the background; ~2.5 min for 3.2; it exits 2 and names the beat on failure; fix and rerun).

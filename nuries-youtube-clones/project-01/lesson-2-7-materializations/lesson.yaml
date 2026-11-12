@@ -9,7 +9,7 @@ summary: "Views or tables? Make the three marts of the nyc_taxi project tables w
 start_state: lesson-2-6-end
 tags: [dbt materializations, view, table, dbt_project.yml, config, DuckDB, NYC taxi]
 target_minutes: 4
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `lesson-2-6-end`: a clone of what Lesson 2.6 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera): every model is a view."
 draft_changes:

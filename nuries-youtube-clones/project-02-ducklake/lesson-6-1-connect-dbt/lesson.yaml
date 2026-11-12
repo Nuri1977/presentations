@@ -1,0 +1,114 @@
+# Lesson 6.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-6-1
+number: "6.1"
+title: "Connect a dbt project to the lake"
+module: "Module 6 · dbt on DuckLake"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 6.1"
+next: "Lesson 6.2 · Staging models for blocks and transactions"
+summary: "Point the ethereum_lake dbt project at the DuckLake: a profiles.yml that attaches the lake and makes it dbt's database, checked with dbt debug. Then the one rule for this module, seen live: while Studio has the lake open, dbt cannot open it."
+start_state: lesson-5-3-end
+show_help_links: true
+links:
+  - { title: "dbt-duckdb: attaching databases", url: "https://github.com/duckdb/dbt-duckdb#attaching-additional-databases" }
+  - { title: "DuckLake: connecting", url: "https://ducklake.select/docs/stable/duckdb/usage/connecting" }
+tags: [dbt, DuckLake, dbt-duckdb, profiles.yml, Rosetta DBT Studio]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-5-3-end`: Studio freshly opened; the lake is registered but not opened yet."
+draft_changes:
+  - "Relative paths (lake/…) and no data_path option: dbt runs in the project folder, and the lake keeps its data path in the catalog."
+  - "The lock demo is the end of this lesson (promised in 3.5): open the lake in Studio, then dbt debug fails."
+accuracy_notes:
+  - "dbt-duckdb 1.11.1 with DuckDB 1.5.6 attaches the lake made by Studio's 1.5.2; dbt debug passes; models build (rehearsal 12 Nov 2026)."
+  - "With the lake open in Studio: IO Error … Could not set lock on file …eth_catalog.duckdb: Conflicting lock is held in … Rosetta DBT Studio (studio-notes.md)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 6.1. Connect a dbt project to the lake."
+
+  - id: s01
+    kind: slide
+    chapter: "dbt on the lake"
+    slide: plan
+    beats:
+      - { id: b01, step: 1, show: "dbt reads raw.blocks and raw.transactions and writes models into eth_lake.main.", say: "In this module, dbt builds models on top of our lake. It reads the raw tables, and writes its models into the lake too, in the schema main." }
+      - { id: b02, step: 2, show: "dbt runs its own DuckDB (1.5.6); it attaches the lake through profiles.yml.", say: "dbt runs its own DuckDB, inside dbt duckdb. So it needs to attach the lake itself. That is one change, in profiles dot yml." }
+
+  - id: s02
+    kind: app
+    chapter: "The profile"
+    beats:
+      - id: b03
+        say: "In DBT Studio, open profiles dot yml. Today it points at the small dev database from Lesson 2.1."
+        zoom: code-mid
+        actions:
+          - nav: DBT Studio
+          - open_file: profiles.yml
+      - id: b04
+        say: "Replace the output. Path is a small local DuckDB file for dbt's own session. Attach adds the lake: the ducklake prefix and the catalog file, as eth lake. Database eth lake makes the lake dbt's target, in schema main. And one thread, the safe choice with a single-file catalog: several dbt threads writing to one DuckLake can still trip over each other."
+        zoom: code-mid
+        actions:
+          - paste: { replace: true, text: "ethereum_lake:\n  target: dev\n  outputs:\n    dev:\n      type: duckdb\n      path: lake/dbt_session.duckdb\n      attach:\n        - path: \"ducklake:lake/eth_catalog.duckdb\"\n          alias: eth_lake\n      database: eth_lake\n      schema: main\n      threads: 1\n" }
+          - click_save
+          - expect_file: { path: profiles.yml, snippet: ../snippets/6.1/profiles.yml }
+      - id: b05
+        say: "Check it: in the command box under the terminal, run dbt debug. dbt finds the project and the profile, attaches the lake, and connects. All checks passed."
+        zoom: terminal-close
+        card: { eyebrow: "dbt debug", title: "All checks passed!", sub: "dbt can open eth_lake", pos: top-right }
+        actions:
+          - terminal: { cmd: "dbt debug", until: "All checks passed", timeoutMs: 120000 }
+
+  - id: s03
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b06
+        say: "Commit the profile: point dbt at the lake. And push."
+        zoom: git-panel
+        actions:
+          - close_tab: profiles.yml
+          - git_tab
+          - git_stage_all
+          - git_message: Point dbt at the lake
+          - git_commit
+          - git_push
+
+  - id: s04
+    kind: app
+    chapter: "One program at a time"
+    beats:
+      - id: b07
+        say: "Now the rule for this module. Open Data Lake, and the eth lake instance. Studio opens the lake, and keeps it open."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+      - id: b08
+        say: "Back in DBT Studio, run dbt debug again. This time it fails: conflicting lock is held in Rosetta DBT Studio. A DuckDB catalog file can be opened by one program at a time."
+        zoom: terminal-close
+        card: { eyebrow: "dbt debug", title: "Conflicting lock is held", sub: "the lake is open in Studio", pos: top-right }
+        actions:
+          - nav: DBT Studio
+          - terminal: { cmd: "dbt debug", until: "Conflicting lock", timeoutMs: 120000 }
+
+  - id: s05
+    kind: slide
+    chapter: "The rule"
+    slide: rule
+    beats:
+      - { id: b09, step: 1, show: "Rule: run dbt first; open the Data Lake screens or the SQL Editor on the lake afterwards.", say: "So in this module, we always run dbt first, and open the lake in Studio afterwards, to look at the result." }
+      - { id: b10, step: 2, show: "To run dbt again after that: quit Studio and open it again.", say: "Studio keeps the lake open until you quit it. To run dbt again after looking at the lake, quit Studio, and open it again. With a PostgreSQL catalog, this limit goes away." }
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b11, step: 1, show: "Recap: profiles.yml attaches the lake as dbt's database; dbt debug passes; one program at a time: dbt first, then Studio's lake screens.", say: "To recap: profiles dot yml attaches the lake and makes it dbt's database, and dbt debug passes. One program at a time: dbt first, then the lake screens. Next: staging models." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 6.2 · Staging models."

@@ -93,26 +93,41 @@ dbt builds trips first, and only then the two models that depend on it.
 00:02:20.075 --> 00:02:21.561
 Three models, no errors.
 
-00:02:22.511 --> 00:02:23.601
+00:02:22.511 --> 00:02:23.745
+Now look at the result.
+
+00:02:24.025 --> 00:02:26.896
+With top pickup zones open, choose Model, Preview.
+
+00:02:29.108 --> 00:02:30.852
+Ten rows, because of top n.
+
+00:02:31.132 --> 00:02:37.908
+East Harlem North is the busiest pickup zone of 2025, with a hundred forty-three thousand trips.
+
+00:02:38.858 --> 00:02:43.787
+Close it, and open Run History: the seed and the run are listed, with their status.
+
+00:02:44.737 --> 00:02:45.827
 Open the Git tab.
 
-00:02:23.881 --> 00:02:25.364
+00:02:46.107 --> 00:02:47.590
 The two new models are listed.
 
-00:02:27.467 --> 00:02:32.254
+00:02:49.569 --> 00:02:54.356
 Stage all, type a message, add trips per month and top pickup zones, and commit.
 
-00:02:35.757 --> 00:02:37.659
+00:02:57.859 --> 00:02:59.761
 Sync Changes pushes it to GitHub.
 
-00:02:40.857 --> 00:02:43.242
+00:03:02.959 --> 00:03:05.344
 To recap: a seed loads a CSV.
 
-00:02:43.522 --> 00:02:49.168
+00:03:05.624 --> 00:03:11.270
 Ref names a model and records the dependency, so dbt runs things in the right order.
 
-00:02:49.448 --> 00:02:53.617
+00:03:11.550 --> 00:03:15.719
 Jinja adds variables and logic, and compile shows the plain SQL.
 
-00:02:53.897 --> 00:02:56.348
+00:03:15.999 --> 00:03:18.450
 Next, we describe our models with properties.

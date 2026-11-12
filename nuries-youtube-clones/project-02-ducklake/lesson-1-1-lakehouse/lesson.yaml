@@ -1,0 +1,77 @@
+# Lesson 1.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only.
+id: lesson-1-1
+number: "1.1"
+title: "Warehouse, data lake, lakehouse"
+module: "Module 1 · Data lakes explained"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 1.1"
+next: "Lesson 1.2 · Parquet: why lakes use column files"
+summary: "Why data lakes exist, what plain files on cheap storage cannot do, and how a lakehouse puts real tables back on top of open files. Ends with four words used through the whole course: lake, table format, catalog and engine."
+tags: [data lake, lakehouse, data warehouse, table format, catalog, DuckLake]
+target_minutes: 4
+show_help_links: true
+draft_changes: []
+accuracy_notes:
+  - "General definitions; no product facts that change with versions."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 1.1. Warehouse, data lake, lakehouse."
+
+  - id: s01
+    kind: slide
+    chapter: "The warehouse"
+    slide: warehouse
+    beats:
+      - { id: b01, step: 1, show: "Warehouse box: storage and compute in one system; data goes in through its own loader.", say: "Let's start with the classic data warehouse. One system owns everything: the storage, and the engine that runs your queries. Data goes in through the warehouse's own door." }
+      - { id: b02, step: 2, show: "Pros: fast, safe, transactions. Cons: the data lives in its format; one engine; you pay for storage and compute together.", say: "That makes it fast and safe, with real transactions. But the data lives in the warehouse's own format, only its engine can read it, and you pay for storage and compute together." }
+
+  - id: s02
+    kind: slide
+    chapter: "The data lake"
+    slide: lake
+    beats:
+      - { id: b03, step: 1, show: "Lake: files on cheap storage (a folder, S3); open formats like Parquet.", say: "A data lake turns this around. The data is just files, on cheap storage: a folder, or a bucket on S3. In open formats, like Parquet." }
+      - { id: b04, step: 2, show: "Engines around it: DuckDB, Spark, Trino, Python, all read the same files.", say: "Any engine can read those files: DuckDB, Spark, Trino, or a Python script. Storage and compute are separate." }
+
+  - id: s03
+    kind: slide
+    chapter: "What plain files lack"
+    slide: lacks
+    beats:
+      - { id: b05, step: 1, show: "No transactions: a reader can see half a write.", say: "But plain files have problems. There are no transactions: a reader can see a write that is only half done." }
+      - { id: b06, step: 2, show: "No safe updates or deletes: you rewrite whole files.", say: "There are no safe updates or deletes. To change one row, you rewrite a whole file, and hope nobody reads it at that moment." }
+      - { id: b07, step: 3, show: "No schema and no history: which columns, which version?", say: "And there is no schema and no history. Which columns does the table have, and what did it look like yesterday? The files do not say." }
+      - { id: b08, step: 4, show: "Slow listing: listing thousands of files in a bucket.", say: "Even finding the files is slow: listing thousands of objects in a bucket, just to plan one query." }
+
+  - id: s04
+    kind: slide
+    chapter: "The lakehouse"
+    slide: lakehouse
+    beats:
+      - { id: b09, step: 1, show: "Lakehouse: open files plus a table format on top.", say: "The lakehouse fixes this, without giving up open files. It adds a table format on top: a small layer of metadata that says which files make up each table, right now." }
+      - { id: b10, step: 2, show: "You get back: transactions, updates and deletes, schema changes, history and time travel.", say: "With that layer you get the warehouse features back: transactions, safe updates and deletes, schema changes, and a history you can travel back in. The data stays in open files." }
+
+  - id: s05
+    kind: slide
+    chapter: "Four words"
+    slide: words
+    beats:
+      - { id: b11, step: 1, show: "Lake: the files, on some storage.", say: "Four words we use through the whole course. The lake: the data files, on some storage." }
+      - { id: b12, step: 2, show: "Table format: the rules for tracking which files are a table.", say: "The table format: the rules for keeping track of which files make up a table, and how it changes." }
+      - { id: b13, step: 3, show: "Catalog: where that tracking information lives.", say: "The catalog: where that tracking information is stored." }
+      - { id: b14, step: 4, show: "Engine: the program that runs your queries, here DuckDB.", say: "And the engine: the program that reads it all and runs your queries. In this course, that is DuckDB." }
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b15, step: 1, show: "Recap: warehouse = one system; lake = open files; lakehouse = open files + a table format.", say: "To recap: a warehouse is one system for everything. A lake is open files. A lakehouse is open files, plus a table format that makes them behave like tables. Next: why lakes store data in Parquet." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.2 · Parquet."

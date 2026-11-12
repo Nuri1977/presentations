@@ -120,6 +120,19 @@
   </div>
   <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 3.2</b></div></div>
 </section>
+<section class="stage" data-id="query">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Query the warehouse · from the README</div>
+    <h2>Read it <span class="accent">over the internet</span></h2>
+    <div class="card s" data-step="1" style="margin-top:30px"><div class="filetab"><span class="ic"></span>DuckDB</div><div class="code" style="font-size:27px"><span class="k">install</span> httpfs; <span class="k">load</span> httpfs;
+<span class="k">attach</span> <span class="str">'https://github.com/Nuri1977/nyc-taxi-dbt/</span>
+<span class="str">        releases/download/warehouse/prod.duckdb'</span> <span class="k">as</span> taxi (read_only);
+<span class="k">select</span> * <span class="k">from</span> taxi.main.top_pickup_zones;</div></div>
+    <div class="card box s" data-step="2" style="margin-top:26px"><div class="k">Result · checked 10 Nov 2026</div><ul><li>74 · East Harlem North <span>143,115</span></li><li>75 · East Harlem South <span>82,011</span></li><li>43 · Central Park <span>27,348</span></li></ul></div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 3.2</b></div></div>
+</section>
 <section class="stage" data-id="recap">
   <div class="bg"></div>
   <div class="pad">

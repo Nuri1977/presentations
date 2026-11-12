@@ -1,0 +1,25 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Transactions are big: almost thirteen million rows for one week.
+b01	And most questions ask about a day or two.
+b02	So we partition the table by date.
+b02	Every day gets its own folder of files, and a query for one day only opens that day's files.
+b03	In the sequel Editor, on eth lake: create raw dot transactions, with the columns we need.
+b03	We leave out input, the largest column.
+b03	Then set it partitioned by date, before any data goes in.
+b04	Now load the week, the first to the seventh of October, straight from S three.
+b04	That is about nine hundred megabytes to download, so it takes a few minutes.
+b04	The video speeds it up.
+b05	Transactions per day: between one and a half and two million.
+b05	Twelve point seven million in total.
+b06	On disk, under raw transactions, there is now one folder per date, with one Par-kay file in each.
+b07	A query for one day, the third of October, only needs the file in that day's folder.
+b07	The catalog knows which file holds which date, so the rest is never opened.
+b08	In Data Lake, open the transactions table.
+b08	The Partitions tab shows the key: date.
+b09	Choose a key that your queries filter on, with not too many values: a day, or a month.
+b09	Partition by something like an address, and you get millions of tiny files.
+b10	You can change the key later.
+b10	The new key applies to new data only; existing files stay as they are.
+b11	Save the script as 4 underscore 1 partitioning dot sequel, commit, and push.
+b12	To recap: raw transactions is partitioned by date, with one folder per day, so a query for one day opens one file.
+b12	Next: statistics, and how they skip files even without partitions.

@@ -1,0 +1,146 @@
+# Lesson 4.4 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-4-4
+number: "4.4"
+title: "Maintenance"
+module: "Module 4 · Performance and upkeep"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 4.4"
+next: "Lesson 4.5 · Adding existing Parquet files"
+summary: "Keep the lake small and fast: merge small files into bigger ones, expire snapshots you no longer need, clean up files that no snapshot uses, and let CHECKPOINT run it all. Count the files on disk before and after each step."
+start_state: lesson-4-3-end
+show_help_links: true
+links:
+  - { title: "DuckLake: recommended maintenance", url: "https://ducklake.select/docs/stable/duckdb/maintenance/recommended_maintenance" }
+  - { title: "DuckLake: expire snapshots", url: "https://ducklake.select/docs/stable/duckdb/maintenance/expire_snapshots" }
+tags: [DuckLake, maintenance, compaction, expire snapshots, cleanup, CHECKPOINT]
+target_minutes: 4.5
+start_notes:
+  - "Start state `lesson-4-3-end`: 19 Parquet files under lake/data."
+draft_changes:
+  - "Snapshots are expired by number (versions => [6, 7], the October copy of 2.5) instead of older_than: the start state's snapshots are all minutes old, and the other snapshots are still used in Module 5."
+accuracy_notes:
+  - "Files: 19 before; 20 after merge_adjacent_files (raw.blocks: 4 files merged into 1); 14 after expire + cleanup. Time travel to versions 3 and 5 still works after the merge and cleanup. Rehearsed with DuckDB 1.5.2, 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 4.4. Maintenance."
+
+  - id: s01
+    kind: slide
+    chapter: "Why maintenance"
+    slide: why
+    beats:
+      - { id: b01, step: 1, show: "Every load adds files; old files stay for time travel; delete files pile up.", say: "A lake grows untidy. Every load adds files, old files stay around for time travel, and delete files pile up." }
+      - { id: b02, step: 2, show: "The recommended order: merge, expire, clean up. CHECKPOINT runs them together.", say: "DuckLake's recommended routine has three steps: merge small files, expire old snapshots, and clean up files nobody needs. Checkpoint runs them all together." }
+
+  - id: s02
+    kind: app
+    chapter: "Merge"
+    beats:
+      - id: b03
+        say: "In the SQL Editor, on eth lake: count the Parquet files on disk. Nineteen."
+        zoom: sql-results
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select count(*) as files from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              call ducklake_merge_adjacent_files('eth_lake');
+              select count(*) as files from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              select snapshot_id, changes from eth_lake.snapshots() where snapshot_id in (6, 7);
+              call ducklake_expire_snapshots('eth_lake', versions => [6, 7]);
+              call ducklake_cleanup_old_files('eth_lake', dry_run => true, cleanup_all => true);
+              call ducklake_cleanup_old_files('eth_lake', cleanup_all => true);
+              select count(*) as files from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              checkpoint;
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Merge adjacent files. Studio shows no result rows for this call, but behind it, the four files of the blocks table, the three months and the November days, became one."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [1000, 3000] }
+          - sql_wait
+      - id: b05
+        say: "Count again: twenty. One more, not fewer: the new file is written, and the four old ones are still on disk."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Expire and clean up"
+    beats:
+      - id: b06
+        say: "Snapshots six and seven are the October copy we made and dropped in Lesson 2.5. We will never travel back to them. Expire them. Again Studio shows no rows, but they are gone."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+      - id: b07
+        say: "Now clean up old files. First a dry run, which only lists what it would delete: the files of that October copy, and the files the merge replaced."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+      - id: b08
+        say: "Run it for real, and count: fourteen files. And time travel still works: the merged file keeps every row's history."
+        zoom: sql-results
+        card: { eyebrow: "Parquet files on disk", title: "19 → 20 → 14", sub: "merge, then expire and clean up", pos: top-right }
+        actions:
+          - sql_run: { line: 7, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 8, settleMs: [500, 1500, 2500] }
+      - id: b09
+        say: "In practice, you just run checkpoint, now and then. It flushes inlined data, merges, expires and cleans up, following the lake's options."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 9, settleMs: [800, 2500, 4500] }
+          - sql_wait
+
+  - id: s04
+    kind: slide
+    chapter: "Careful"
+    slide: careful
+    beats:
+      - { id: b10, step: 1, show: "Expiring a snapshot ends time travel to it. Cleanup deletes files for good.", say: "Be careful with two things. Expiring a snapshot ends time travel to it, for good. And cleanup really deletes files." }
+      - { id: b11, step: 2, show: "Files no snapshot knows (a crash mid-write): ducklake_delete_orphaned_files.", say: "Files that no snapshot ever knew about, for example after a crash in the middle of a write, are removed with delete orphaned files." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b12
+        say: "Save the script as 4 underscore 4 maintenance dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 4_4_maintenance.sql }
+          - paste: |
+              select count(*) as files from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              call ducklake_merge_adjacent_files('eth_lake');
+              select count(*) as files from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              select snapshot_id, changes from eth_lake.snapshots() where snapshot_id in (6, 7);
+              call ducklake_expire_snapshots('eth_lake', versions => [6, 7]);
+              call ducklake_cleanup_old_files('eth_lake', dry_run => true, cleanup_all => true);
+              call ducklake_cleanup_old_files('eth_lake', cleanup_all => true);
+              select count(*) as files from glob('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/**/*.parquet');
+              checkpoint;
+          - click_save
+          - expect_file: { path: sql/4_4_maintenance.sql, snippet: ../snippets/4.4/4_4_maintenance.sql }
+          - close_tab: sql/4_4_maintenance.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Maintenance script
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b13, step: 1, show: "Recap: merge, expire, clean up; CHECKPOINT does it all; expiring ends time travel.", say: "To recap: merge small files, expire snapshots you do not need, clean up, or simply run checkpoint. Next: registering Parquet files that already exist, without copying them." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 4.5 · Adding existing Parquet files."

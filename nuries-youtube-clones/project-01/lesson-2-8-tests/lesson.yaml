@@ -9,7 +9,7 @@ summary: "Add data tests to the nyc_taxi project: not_null and unique on each ta
 start_state: lesson-2-7-end
 tags: [dbt tests, data tests, unique, not_null, accepted_values, dbt build, NYC taxi]
 target_minutes: 5
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `lesson-2-7-end`: a clone of what Lesson 2.7 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt seed + dbt run (off camera)."
 draft_changes:

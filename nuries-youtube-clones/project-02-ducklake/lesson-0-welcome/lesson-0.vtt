@@ -1,0 +1,79 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:04.743
+Welcome to Project 2.
+
+00:00:05.023 --> 00:00:08.569
+In this course, you build a real data lake, on your own laptop.
+
+00:00:08.849 --> 00:00:14.367
+Not a toy: a lake with versions, time travel, maintenance, and dbt models on top.
+
+00:00:15.318 --> 00:00:17.683
+You need no cloud account and no server.
+
+00:00:17.963 --> 00:00:22.492
+Everything runs inside Rosetta DBT Studio, with open source tools.
+
+00:00:23.442 --> 00:00:30.671
+We start from a public bucket on Amazon S3, with the Ethereum blockchain as Parquet files, one folder a day.
+
+00:00:31.621 --> 00:00:38.140
+We load it into a DuckLake: a catalog database, and a folder of Parquet files that the catalog manages.
+
+00:00:39.090 --> 00:00:44.917
+Then dbt builds clean models on top: staging views, and marts that grow day by day.
+
+00:00:45.867 --> 00:00:52.647
+And at the end, answers: how busy the network was each day, what gas cost, and who sent the most transactions.
+
+00:00:53.597 --> 00:00:54.768
+The data is real.
+
+00:00:55.048 --> 00:01:02.474
+Three months of Ethereum blocks: August to October 2026, almost six hundred sixty thousand blocks.
+
+00:01:03.424 --> 00:01:07.174
+And one week of transactions: twelve point seven million rows.
+
+00:01:08.124 --> 00:01:11.103
+Big enough to feel real, small enough for a laptop.
+
+00:01:11.383 --> 00:01:13.886
+About three gigabytes of free disk is plenty.
+
+00:01:14.836 --> 00:01:17.822
+One app does it all: Rosetta DBT Studio.
+
+00:01:18.102 --> 00:01:23.335
+It has screens for data lakes, a SQL editor, dbt, and git, in one window.
+
+00:01:24.285 --> 00:01:28.314
+Underneath, DuckDB is the engine, and DuckLake is the lake format.
+
+00:01:28.594 --> 00:01:30.540
+And dbt builds the models.
+
+00:01:31.490 --> 00:01:32.461
+Here is the route.
+
+00:01:32.741 --> 00:01:40.802
+First, we install Studio, and explain data lakes: warehouses, lakehouses, Parquet, table formats, and how DuckLake works.
+
+00:01:41.752 --> 00:01:42.730
+Then hands on.
+
+00:01:43.010 --> 00:01:49.596
+We create the lake and load it, change data safely, make it fast and keep it tidy, and look inside the catalog.
+
+00:01:50.546 --> 00:01:53.597
+Finally, dbt on the lake, and where to go next.
+
+00:01:54.547 --> 00:01:58.059
+You need a computer, some basic SQL, and a GitHub account.
+
+00:01:58.339 --> 00:02:03.789
+Every hands-on lesson ends with a commit to the course repository, linked in the description.
+
+00:02:04.069 --> 00:02:05.451
+See you in the next lesson.

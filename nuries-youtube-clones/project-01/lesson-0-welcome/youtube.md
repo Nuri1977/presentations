@@ -8,7 +8,7 @@
 
 ## Title
 
-Welcome: build a dbt + DuckDB project | dbt + DuckDB in Rosetta DBT Studio 0 | Rosetta DBT Studio
+Welcome: build a dbt + DuckDB project | dbt + DuckDB in Rosetta DBT Studio 0
 
 ## Description
 
@@ -28,6 +28,8 @@ Screens from Rosetta DBT Studio 1.7.6.
 Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html
 Source code: https://github.com/rosettadb/dbt-studio
 Lesson order inspired by Luke Barousse's dbt course: https://www.youtube.com/watch?v=1Bf049kXV2g
+
+Code for this course (one commit per lesson): https://github.com/Nuri1977/nyc-taxi-dbt
 
 New to git and GitHub? Start here (free videos):
 - Git and GitHub for Beginners - Crash Course (freeCodeCamp): https://www.youtube.com/watch?v=RGOj5yH7evk

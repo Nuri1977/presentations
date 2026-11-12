@@ -1,0 +1,24 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Last step: make the project easy to show.
+b01	A read me that explains it, live docs, a green build badge, and a warehouse anyone can query.
+b02	On git hub, open the repository's Settings, then Pages.
+b02	Under Source, choose git hub Actions, so our workflow can publish the docs.
+b03	In Studio, open the workflow file, and paste three more build steps at the end: generate the docs, copy the site files, and upload them for Pages.
+b04	And a second job, docs, that runs after build and deploys the site.
+b04	Save.
+b05	Now the read me.
+b05	Open it, select all, and paste the new one: a build badge, a docs link, what the project does and where to look, how to query the warehouse, and how to run it yourself.
+b05	Save.
+b06	Git tab: stage all, type a message, publish docs and read me, and commit.
+b07	Sync Changes.
+b07	The push starts the workflow.
+b08	On git hub, the Actions tab shows the run, now with two jobs: build, then docs.
+b09	A minute later, both are green.
+b10	The docs are live on git hub Pages, for anyone, with the lineage graph of the whole project.
+b11	And the repository page shows the read me, with the green build badge.
+b12	And anyone can query the warehouse.
+b12	With duck D B, attach prod dot duckdb straight from the git hub release, read only, and select from the marts.
+b13	East Harlem North leads, with a hundred forty-three thousand trips: built by C I, and read over the internet.
+b15	That's Project 1.
+b15	Raw files and a seed, models with ref, descriptions, docs and the dag, tables where they matter, tests, C I on every push, live docs, and a warehouse anyone can query.
+b15	All built in Rosetta D B T Studio, and all on git hub.

@@ -1,6 +1,6 @@
 # Lesson 2.4 · Dependencies & Jinja
 
-dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 3:00, 3840x2160 H.264 + AAC, 37 MB.
+dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 3:23, 3840x2160 H.264 + AAC, 43 MB.
 
 ## Files
 
@@ -25,7 +25,7 @@ Rosetta DBT Studio 1.7.6 (official release), dbt-core 1.12.6, dbt-duckdb 1.11.1,
 
 ## Changes from the draft
 
-- dbt commands from Studio's dropdowns: Project ▸ Seed, Model ▸ Compile on top_pickup_zones, Project ▸ Run.
+- dbt commands from Studio's dropdowns: Project ▸ Seed, Model ▸ Compile on top_pickup_zones, Project ▸ Run; the result is shown with Model ▸ Preview and the Run History tab (Nuri, 10 Nov).
 - The plan's lineage view (s07) moves to Lesson 2.6, which is about the DAG.
 - Model ▸ Compile opens a Compiled SQL window (Original SQL / Compiled SQL tabs) in Studio 1.7.6; the lesson shows it there instead of opening target/compiled.
 

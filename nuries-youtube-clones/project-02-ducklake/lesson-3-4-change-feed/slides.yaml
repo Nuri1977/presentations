@@ -1,0 +1,21 @@
+number: "3.4"
+title: The data change feed
+slides:
+  - { id: title, type: title, h1: 'The data <span class="accent">change feed</span>', lead: "What changed between two snapshots?", badges: [table_changes, Row lineage, Incremental] }
+  - id: why
+    type: cards
+    eyebrow: How and why
+    h2: Every row, followed
+    cols: 3
+    cards:
+      - { step: 1, k: Change types, t: "insert · delete · update", mono: "update_preimage<br>update_postimage" }
+      - { step: 2, k: Row lineage, t: A stable row id, d: "kept across updates, so a row can be followed" }
+      - { step: 3, cls: hot, k: What for, t: Incremental work, d: "process only what changed since the last run" }
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "<span class=\"mono\">ducklake_table_changes</span> between two snapshots."
+      - "Updates come with a before and an after."
+      - "Row ids make it possible."
+  - { id: closing, type: closing, lesson: Lesson 3.5, h2: 'Transactions and <span class="accent">conflicts</span>' }

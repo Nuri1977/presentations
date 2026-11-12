@@ -1,0 +1,32 @@
+number: "6.1"
+title: Connect dbt to the lake
+slides:
+  - { id: title, type: title, h1: 'dbt on the <span class="accent">lake</span>', lead: "Point the dbt project at eth_lake.", badges: [profiles.yml, ATTACH, dbt debug] }
+  - id: plan
+    type: html
+    eyebrow: dbt on the lake
+    h2: dbt reads raw, writes main
+    html: |
+      <div class="flow s" data-step="1">
+        <div class="node blue"><div class="k">eth_lake.raw</div><div class="n">blocks, transactions</div><div class="d">loaded in Modules 2 to 4</div></div>
+        <div class="arrow">→</div>
+        <div class="node hot"><div class="k">dbt</div><div class="n">models</div><div class="d">staging views, marts</div></div>
+        <div class="arrow">→</div>
+        <div class="node green"><div class="k">eth_lake.main</div><div class="n">tables and views</div><div class="d">in the same lake</div></div>
+      </div>
+      <div class="card s" data-step="2" style="padding:24px 32px;font-size:34px;font-weight:700;margin-bottom:10px">dbt runs its own DuckDB (1.5.6), so <span class="mono">profiles.yml</span> attaches the lake.</div>
+  - id: rule
+    type: cards
+    eyebrow: The rule
+    h2: One program at a time
+    cols: 2
+    cards:
+      - { step: 1, cls: hot, k: Order, t: dbt first, d: "then the Data Lake screens or the SQL Editor on the lake" }
+      - { step: 2, k: "Again?", t: Restart Studio, d: "Studio keeps the lake open until you quit it" }
+  - id: recap
+    type: recap
+    items:
+      - "<span class=\"mono\">profiles.yml</span> attaches the lake as dbt's database."
+      - "<span class=\"mono\">dbt debug</span>: all checks passed."
+      - "One program at a time: dbt first, then Studio."
+  - { id: closing, type: closing, lesson: Lesson 6.2, h2: '<span class="accent">Staging</span> models' }

@@ -101,7 +101,7 @@
     <h2>A <span class="accent">source</span> and a <span class="accent">seed</span></h2>
     <div class="two">
       <div class="card box s" data-step="1"><div class="k">Source</div><h3>Big raw files stay outside git</h3>
-        <p>12 parquet files in <span class="mono">data/raw</span>. DuckDB reads them in place. <b>sources.yml</b> gives them a name dbt can use: <span class="mono">raw.green_trips</span>.</p></div>
+        <p>12 parquet files in <span class="mono">data/raw</span>, loaded once into the DuckDB table <span class="mono">raw.green_trips</span>. <b>sources.yml</b> tells dbt about it.</p></div>
       <div class="card box s" data-step="2"><div class="k">Seed</div><h3>A small CSV that lives in the repo</h3>
         <p><span class="mono">seeds/taxi_zone_lookup.csv</span>: 265 taxi zones with their borough and name. dbt loads it as a table.</p></div>
     </div>
@@ -138,7 +138,7 @@
     <h2>The data is <span class="accent">in place</span></h2>
     <div class="inst s" data-step="1" style="grid-template-columns:1fr 1fr">
       <div class="card box"><div class="k">In the project</div><ul><li>Trips <span>data/raw</span></li><li>Zones <span>seeds/</span></li><li>Source <span>raw.green_trips</span></li></ul></div>
-      <div class="card box"><div class="k">Checked</div><ul><li>dbt show <span>591,375 rows</span></li><li>In git <span>2 files</span></li><li>Pushed <span>Sync Changes</span></li></ul></div>
+      <div class="card box"><div class="k">Checked</div><ul><li>raw.green_trips <span>591,375 rows</span></li><li>In git <span>2 files</span></li><li>Pushed <span>Sync Changes</span></li></ul></div>
     </div>
   </div>
   <div class="footer"><div class="bar" style="width:36%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 2.2</b></div></div>

@@ -14,62 +14,63 @@ Project 1 · Lesson 2.2. Get the data. Badges: Parquet, sources.yml, Seed CSV.
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b01 @0:03 | Our raw data is twelve parquet files, one per month of 2025. They are too big for git, so they stay in a data folder that git ignores. DuckDB reads them in place, and a source, in sources dot yml, gives them a name dbt can use. | Source card: big raw files stay outside git; 12 parquet files in data/raw; DuckDB reads them in place; sources.yml names them raw.green_trips. | 47 | 17 |
-| b02 @0:19 | The second file is small: a lookup of the 265 taxi zones. Small CSV files like this one are seeds. They live in the repository, and dbt loads them as tables. | Seed card: a small CSV that lives in the repo; seeds/taxi_zone_lookup.csv, 265 zones. | 31 | 13 |
+| b01 @0:03 | Our raw data is twelve parquet files, one per month of 2025. They are too big for git, so they stay in a data folder that git ignores. We load them once into a DuckDB table, raw green trips, and a source, in sources dot yml, tells dbt about it. | Source card: big raw files stay outside git; 12 parquet files in data/raw, loaded once into the DuckDB table raw.green_trips; sources.yml declares it. | 50 | 18 |
+| b02 @0:20 | The second file is small: a lookup of the 265 taxi zones. Small CSV files like this one are seeds. They live in the repository, and dbt loads them as tables. | Seed card: a small CSV that lives in the repo; seeds/taxi_zone_lookup.csv, 265 zones. | 31 | 13 |
 
 ## s02 · slide — slide `download`
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b03 @0:32 | The files come from the New York City Taxi and Limousine Commission website. Under 2025, download Green Taxi Trip Records for each month, January to December. The links are in the description. | TLC Trip Record Data page path: 2025, each month, Green Taxi Trip Records; file URL pattern; target tree data/raw. | 32 | 13 |
-| b04 @0:46 | Further down the same page, download the Taxi Zone Lookup Table, as CSV. | Taxi Zone Lookup Table, CSV link; the tree shows seeds/taxi_zone_lookup.csv. | 13 | 6 |
+| b03 @0:33 | The files come from the New York City Taxi and Limousine Commission website. Under 2025, download Green Taxi Trip Records for each month, January to December. The links are in the description. | TLC Trip Record Data page path: 2025, each month, Green Taxi Trip Records; file URL pattern; target tree data/raw. | 32 | 13 |
+| b04 @0:47 | Further down the same page, download the Taxi Zone Lookup Table, as CSV. | Taxi Zone Lookup Table, CSV link; the tree shows seeds/taxi_zone_lookup.csv. | 13 | 6 |
 
 ## s03 · app — Rosetta DBT Studio
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b05 @0:51 | In Studio, open the nyc taxi project. Right-click the project, choose New Folder, and call it data. | Open project **nyc_taxi** from Recent Projects<br>new_root_folder: data | 18 | 10 |
-| b06 @1:01 | Inside data, make a folder called raw. | Right-click `data` → **New Folder** → `raw` → **Save** | 7 | 6 |
-| b07 @1:06 | Now move the twelve parquet files into data, raw, and the zone lookup CSV into seeds. Refresh the explorer, and there they are. | copy_in: {'from': '../.cache/data/raw', 'to': 'data/raw', 'settleMs': 500}<br>copy_in: {'from': '../.cache/data/taxi_zone_lookup.csv', 'to': 'seeds/taxi_zone_lookup.csv', 'settleMs': 500}<br>refresh_explorer: None<br>expand: data/raw<br>expand: seeds<br>Point at `data/raw/green_tripdata_2025-12.parquet` in the Explorer<br>Point at `seeds/taxi_zone_lookup.csv` in the Explorer<br>Zoom: explorer | 23 | 9 |
+| b05 @0:52 | In Studio, open the nyc taxi project. Right-click the project, choose New Folder, and call it data. | Open project **nyc_taxi** from Recent Projects<br>new_root_folder: data | 18 | 10 |
+| b06 @1:02 | Inside data, make a folder called raw. | Right-click `data` → **New Folder** → `raw` → **Save** | 7 | 6 |
+| b07 @1:08 | Now move the twelve parquet files into data, raw, and the zone lookup CSV into seeds. Refresh the explorer, and there they are. | copy_in: {'from': '../.cache/data/raw', 'to': 'data/raw', 'settleMs': 500}<br>copy_in: {'from': '../.cache/data/taxi_zone_lookup.csv', 'to': 'seeds/taxi_zone_lookup.csv', 'settleMs': 500}<br>refresh_explorer: None<br>expand: data/raw<br>expand: seeds<br>Point at `data/raw/green_tripdata_2025-12.parquet` in the Explorer<br>Point at `seeds/taxi_zone_lookup.csv` in the Explorer<br>Zoom: explorer | 23 | 9 |
 
 ## s04 · app — Rosetta DBT Studio
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b08 @1:16 | Next, tell dbt about the raw files. Right-click models, New File, and call it sources dot yml. | Right-click `models` → **New File** → `sources.yml` → **Save**<br>Zoom: explorer | 18 | 7 |
-| b09 @1:23 | A source called raw, with a short description. | Type 111 characters into the editor<br>Zoom: code-close | 8 | 4 |
-| b10 @1:27 | It has one table, green trips: one row per green taxi trip. | Type 112 characters into the editor<br>Zoom: code-close | 12 | 5 |
-| b11 @1:32 | And where the table lives: external location, a read parquet call over all twelve files. Union by name lines up the columns, even if a month's file has them in a different order. Save. | Type 124 characters into the editor<br>Click **Save**<br>(check: `models/sources.yml` equals `../snippets/2.2/sources.yml`)<br>Zoom: code-close<br>Card: *external_location* — **No table to load** — DuckDB reads the parquet files in place. | 34 | 13 |
+| b08 @1:17 | Now load the files into DuckDB. Open the SQL Editor, and pick the nyc taxi dev connection. | Left bar → **SQL Editor**<br>Pick the connection **nyc_taxi_dev**<br>Zoom: explorer | 17 | 9 |
+| b09 @1:25 | Three statements, one per line. Create a schema called raw. Create the table raw green trips, from read parquet over all twelve files: use the full path of your data raw folder. Then count the rows. | Type 237 characters into the editor<br>Zoom: explorer | 36 | 13 |
+| b10 @1:39 | Run them one by one, with the green arrow next to each line. Union by name lines up the columns, even if a month's file has them in a different order. | Click the green run arrow next to line 1<br>Click the green run arrow next to line 1<br>Click the green run arrow next to line 1<br>Zoom: explorer | 31 | 16 |
+| b11 @1:55 | Five hundred ninety-one thousand, three hundred seventy-five trips in 2025, now in one DuckDB table. | Zoom: sql-results<br>Card: *raw.green_trips · 2025 data, as of 9 Nov 2026* — **591,375 trips** — all 12 files, loaded once | 17 | 9 |
 
 ## s05 · app — Rosetta DBT Studio
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b12 @1:45 | Does dbt find the data? In the command box, type dbt show, inline, and a query that counts the rows of the source. Press Enter. | In the command box under the terminal, type `dbt show --inline "select count(*) as trips from {{ source('raw', 'green_trips') }}"` and press Enter<br>Zoom: terminal-close | 25 | 13 |
-| b13 @1:59 | dbt turns the source into the read parquet call, and DuckDB counts five hundred ninety-one thousand, three hundred seventy-five trips, in 2025. | Zoom: terminal-close<br>Card: *2025 data, as of 9 Nov 2026* — **591,375 trips** — raw.green_trips, all 12 files | 24 | 12 |
+| b12 @2:04 | Back in the project, tell dbt about the table. Right-click models, New File, and call it sources dot yml. | Left bar → **DBT Studio**<br>Right-click `models` → **New File** → `sources.yml` → **Save**<br>Zoom: explorer | 20 | 9 |
+| b13 @2:13 | A source called raw, the schema we just made, with a short description. | Type 116 characters into the editor<br>Zoom: code-close | 13 | 5 |
+| b13b @2:18 | It has one table, green trips: one row per green taxi trip. Save. In a model, source raw, green trips, now points at that table. | Type 112 characters into the editor<br>Click **Save**<br>(check: `models/sources.yml` equals `../snippets/2.2/sources.yml`)<br>Zoom: code-close<br>Card: *source('raw', 'green_trips')* — **nyc_taxi_dev.raw.green_trips** — No file paths in the models. | 25 | 10 |
 
 ## s06 · app — Rosetta DBT Studio
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b14 @2:10 | Now the Git tab. Only two files changed: sources dot yml and the CSV. The parquet files are not here, because the gitignore leaves out the data folder. | Close the editor tab for `models/sources.yml`<br>Open the **Git** tab in the sidebar<br>Zoom: git-panel | 28 | 11 |
-| b15 @2:21 | Stage all, type a message, declare the raw trips source and add the zone lookup, and commit. | Hover CHANGES and click **+** (Stage All Changes)<br>Type the commit message “Declare the raw trips source and add the zone lookup”<br>Click **Commit**<br>Zoom: git-panel | 17 | 9 |
-| b16 @2:30 | Then click Sync Changes. Studio pushes the commit to GitHub. | git_push: None<br>Zoom: git-panel | 10 | 5 |
+| b14 @2:27 | Now the Git tab. Only two files changed: sources dot yml and the CSV. The parquet files are not here, because the gitignore leaves out the data folder. | Close the editor tab for `models/sources.yml`<br>Open the **Git** tab in the sidebar<br>Zoom: git-panel | 28 | 11 |
+| b15 @2:38 | Stage all, type a message, declare the raw trips source and add the zone lookup, and commit. | Hover CHANGES and click **+** (Stage All Changes)<br>Type the commit message “Declare the raw trips source and add the zone lookup”<br>Click **Commit**<br>Zoom: git-panel | 17 | 9 |
+| b16 @2:47 | Then click Sync Changes. Studio pushes the commit to GitHub. | git_push: None<br>Zoom: git-panel | 10 | 5 |
 
 ## s07 · browser — Browser
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b17 @2:35 | On GitHub, the repository now has the models and seeds folders, and the latest commit message. | Browser: open https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal<br>Zoom: center-wide | 16 | 7 |
+| b17 @2:52 | On GitHub, the repository now has the models and seeds folders, and the latest commit message. | Browser: open https://github.com/Nuri1977/nyc-taxi-dbt<br>Zoom: center-wide | 16 | 7 |
 
 ## s08 · slide — slide `recap`
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b18 @2:42 | To recap: the trip files sit in data raw, outside git. The zone lookup is a seed. And sources dot yml names the raw files, raw dot green trips, which dbt can read. Next, we build our first model on top of it. | Recap: trips in data/raw, zones in seeds, source raw.green_trips; dbt show counted 591,375 rows; two files in git; pushed with Sync Changes. | 43 | 15 |
+| b18 @2:59 | To recap: the trip files sit in data raw, outside git, and live in DuckDB as raw green trips. The zone lookup is a seed. And sources dot yml declares the source. Next, we build our first model on top of it. | Recap: trips in data/raw, loaded into raw.green_trips (591,375 rows); zones in seeds; sources.yml declares the source; two files in git; pushed with Sync Changes. | 42 | 15 |
 
 ## s09 · closing card (4 s, no voice)
 
 Next · Lesson 2.3 · Models. Code: github.com/Nuri1977/nyc-taxi-dbt.
 
-**Total: 406 spoken words, 3:01 rendered.**
+**Total: 446 spoken words, 3:17 rendered.**

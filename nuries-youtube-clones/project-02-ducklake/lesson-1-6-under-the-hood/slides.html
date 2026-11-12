@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.6 · Under the hood</title>
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .procs { flex: 1; display: grid; grid-template-columns: 1fr 160px 1fr; align-items: center; margin-top: 30px; }
+  .proc { border-radius: 24px; padding: 36px 38px; border: 2px solid var(--line); background: var(--card); min-height: 340px; }
+  .proc.main { border-color: var(--orange); background: var(--orange-soft); }
+  .proc .k { font-size: 28px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .proc.main .k { color: var(--orange-2); }
+  .proc .n { font-size: 52px; font-weight: 900; margin-top: 8px; }
+  .proc .d { font-size: 32px; color: var(--muted); margin-top: 12px; line-height: 1.35; font-weight: 520; }
+  .msgs { display: grid; gap: 22px; text-align: center; font-size: 26px; font-weight: 800; color: var(--orange-2); }
+  .msgs div { font-size: 54px; line-height: .8; }
+  .code { font-size: 34px; }
+  .pkg { font-family: var(--mono); font-size: 40px; padding: 30px 36px; }
+  .engines { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; align-items: center; margin-top: 30px; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 1.6</div>
+      <h1 style="margin-top:28px;font-size:132px">Under the <span class="accent">hood</span></h1>
+      <p class="lead">DuckDB inside Studio, and the DuckLake extension.</p>
+      <div class="badges"><span class="badge">Electron</span><span class="badge">@duckdb/node-api</span><span class="badge">ducklake extension</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="electron">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">An Electron app</div>
+    <h2>A window and a Node.js process</h2>
+    <div class="procs">
+      <div class="proc s" data-step="1"><div class="k">Renderer</div><div class="n">The window</div><div class="d">Screens, the SQL Editor, the Data Lake pages. No database access.</div></div>
+      <div class="msgs s" data-step="2"><div>→</div>request<br>rows<div>←</div></div>
+      <div class="proc main s" data-step="1"><div class="k">Main process</div><div class="n">Node.js</div><div class="d">Runs the SQL, talks to files and the network.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:14%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.6</b></div></div>
+</section>
+
+<section class="stage" data-id="node">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">DuckDB inside the app</div>
+    <h2>DuckDB's official Node package</h2>
+    <div class="split">
+      <div class="codecard s" data-step="1"><div class="filetab"><span class="ic"></span>release/app/package.json</div><div class="pkg"><span class="str">"@duckdb/node-api"</span>: <span class="str">"^1.5.2-r.1"</span></div></div>
+      <div class="codecard s" data-step="2"><div class="filetab"><span class="ic"></span>src/main/services/duckdb.service.ts (shortened)</div><div class="code"><span class="k">import</span> { DuckDBInstance }
+  <span class="k">from</span> <span class="str">'@duckdb/node-api'</span>;
+
+instance = <span class="k">await</span> DuckDBInstance.<span class="f">create</span>(path);
+connection = <span class="k">await</span> instance.<span class="f">connect</span>();
+<span class="k">await</span> connection.<span class="f">run</span>(sql);</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:30%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.6</b></div></div>
+  <div class="checked">Quoted from rosettadb/dbt-studio, tag 1.7.6</div>
+</section>
+
+<section class="stage" data-id="extension">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The DuckLake extension</div>
+    <h2>What Studio runs to open a lake</h2>
+    <div class="codecard s" data-step="1" style="margin-top:34px"><div class="filetab"><span class="ic"></span>duckLake/adapters (shortened)</div><div class="code"><span class="k">INSTALL</span> ducklake;  <span class="k">LOAD</span> ducklake;
+<span class="s" data-step="2"><span class="k">ATTACH</span> <span class="str">'ducklake:…/lake/eth_catalog.duckdb'</span> <span class="k">AS</span> <span class="str">"eth_lake"</span>
+  (<span class="k">DATA_PATH</span> <span class="str">'…/lake/data'</span>, <span class="k">AUTOMATIC_MIGRATION</span> <span class="k">TRUE</span>);
+<span class="k">USE</span> <span class="str">"eth_lake"</span>;</span></div></div>
+    <div class="badges s" data-step="3" style="margin-top:30px"><span class="pill">DuckDB catalog: offered</span><span class="pill grey">SQLite: soon</span><span class="pill grey">PostgreSQL: soon</span><span class="pill blue">DETACH on close</span></div>
+  </div>
+  <div class="footer"><div class="bar" style="width:46%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.6</b></div></div>
+  <div class="checked">Quoted from rosettadb/dbt-studio, tag 1.7.6</div>
+</section>
+
+<section class="stage" data-id="twoengines">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Two engines, one lake</div>
+    <h2>Studio and dbt both use DuckDB</h2>
+    <div class="engines">
+      <div class="card hot s" data-step="1" style="padding:34px 36px"><div class="k">Studio</div><div class="t">DuckDB 1.5.2</div><div class="d">Node package, inside the app</div></div>
+      <div class="lake" style="margin:0;display:block"><div class="box catalog s" data-step="1"><div class="k">Lake</div><div class="n mono" style="font-size:36px">eth_lake</div><div class="d">catalog + Parquet files</div></div></div>
+      <div class="card s" data-step="1" style="padding:34px 36px"><div class="k">dbt</div><div class="t">DuckDB 1.5.6</div><div class="d">Python package, inside dbt-duckdb</div></div>
+    </div>
+    <div class="card bad s" data-step="2" style="padding:26px 34px;font-size:36px;font-weight:750;margin-bottom:10px">With a DuckDB catalog file, only one of them can open the lake at a time.</div>
+  </div>
+  <div class="footer"><div class="bar" style="width:80%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.6</b></div></div>
+  <div class="checked">Both versions checked on the same lake, 11 Nov 2026</div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What to remember</h2>
+    <div class="recap s" data-step="1">
+      <div class="item"><div class="num">1</div><div>DuckDB runs inside Studio, through its Node package.</div></div>
+      <div class="item"><div class="num">2</div><div>DuckLake is an extension that Studio loads.</div></div>
+      <div class="item"><div class="num">3</div><div>The Data Lake screens run plain SQL.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.6</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 2.1</h1>
+      <h2 style="font-size:92px">Create a <span class="accent">DuckLake</span></h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

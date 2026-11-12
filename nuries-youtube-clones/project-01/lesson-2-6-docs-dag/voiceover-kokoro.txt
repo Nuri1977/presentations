@@ -18,7 +18,8 @@ b11	Then Project, Serve Docs.
 b11	Studio starts a local web server, on port eighty eighty.
 b12	In the browser, open localhost, port eighty eighty, and pick monthly summary.
 b12	Here is the description from schema dot yammel, every column, and what the model depends on.
-b13	The button at the bottom right opens the lineage graph: the whole dag, from the raw source and the seed, to monthly summary.
+b13	The button at the bottom right opens the lineage graph for this model: trips, then trips per month, then monthly summary.
+b13	The same order D B T just ran.
 b14	Back in Studio, the Git tab shows the new model, and the change to schema dot yammel.
 b15	Stage all, type a message, add the monthly summary, and commit.
 b16	Sync Changes, and it's on git hub.

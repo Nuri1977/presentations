@@ -1,0 +1,61 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In this lesson we create the project for the whole course, and our first lake.
+b01	On disk, the lake is two things inside one folder: a catalog file, and a data folder for the Par-kay files.
+b02	We call the lake eth lake.
+b02	Its storage is a local folder, and its catalog is a single duck D B file.
+b03	First, the project. D B T needs a connection, so on the home screen click New Connection, and choose duck D B.
+b04	Name it ethereum lake dev, with a small duck D B file next to the projects folder.
+b04	We point D B T at the lake later, in Module 6.
+b04	Save.
+b05	Now open the D B T Project card, click New Project, and call it ethereum lake.
+b05	Pick the connection, and save.
+b06	In the project, make a folder called lake, and inside it, a folder called data.
+b06	The lake lives here.
+b07	Now open Data Lake from the sidebar.
+b07	There are no lakes yet.
+b07	Click Create Data Lake, and choose duck lake.
+b08	Step one, the name: eth underscore lake.
+b08	Next.
+b09	Step two, storage.
+b09	Keep Local, and give the full path of the data folder we just made.
+b09	This is where the Par-kay files will go.
+b10	Step three, the catalog.
+b10	duck D B is the catalog type.
+b10	Replace the suggested path with a file in the lake folder: eth catalog dot duck D B.
+b11	Next.
+b11	The runtime options, memory and threads, can stay as they are.
+b11	Next again, and the review shows the name, the data folder, and the duck D B catalog.
+b11	Click Create Instance.
+b12	Here is the lake.
+b12	No tables yet.
+b12	Open History: there is already one snapshot, number zero.
+b12	Creating the lake created the schema main.
+b12	Every change will add a row here.
+b13	Now the sequel Editor.
+b13	The connection list has a new group, duck lake Instances.
+b13	Pick eth lake, and ask for its snapshots.
+b14	Run it with the green arrow.
+b14	One row: snapshot zero.
+b14	The lake answers sequel.
+b15	In plain duck D B, the wizard stands for three statements: install the extension, attach the catalog file with its data path, and use it.
+b15	Studio runs them each time it opens the lake.
+b16	And remember: with a duck D B file as the catalog, one program at a time can open the lake.
+b16	For a laptop, that is enough.
+b17	Back in the project.
+b17	Add a dot git ignore file, so build output, logs, the database files, and the whole lake folder stay out of git.
+b17	The lake is data, not code.
+b18	And a short read me.
+b19	On git hub, create a new, empty, public repository called ethereum duck lake D B T, with no read me, git ignore or license.
+b19	Here is ours, still empty.
+b19	Copy its H T T P S address.
+b20	Back in Studio, open the Git tab, and click Initialize Repository.
+b21	Stage all the changes, type a message, create the ethereum lake project, and commit.
+b22	Click Publish Branch, paste the repository address, and add it.
+b22	Studio pushes the main branch to git hub.
+b23	Refresh the repository page.
+b23	The project is on git hub.
+b23	The lake folder is not: git ignores it.
+b24	To recap: we created the ethereum lake project, and the eth lake duck lake inside it, with the Data Lake wizard.
+b24	It is a catalog file and a data folder, it starts with snapshot zero, and the sequel Editor can query it.
+b24	The project is on git hub.
+b24	Next, we load three months of blocks into the lake.

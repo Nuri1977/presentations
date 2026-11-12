@@ -1,0 +1,24 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Par-kay files cannot be edited in place.
+b01	So how does a lake delete or update a row?
+b01	Let's watch it happen on a small table.
+b02	In the sequel Editor, on eth lake, make a working copy: the blocks of the first of October, seven thousand one hundred seventy-six rows.
+b03	Seven of those blocks hold fewer than fifty transactions.
+b04	Delete those seven.
+b04	Then update every hundredth block of the day, seventy-two of them.
+b04	Studio just reports that the command ran.
+b05	Now list the table's files.
+b05	The original data file is still there, untouched, but it now has a delete file.
+b05	And there is a second data file: the seventy-two updated rows, written fresh.
+b06	The delete file is Par-kay too.
+b06	It lists row positions in the data file: rows the reader must skip.
+b07	In Data Lake, open eth lake, refresh, and click blocks day.
+b07	Data Files shows the same two files.
+b08	So, a delete writes a small delete file, with the positions to skip.
+b09	An update is a delete of the old rows, plus an insert of the new ones in a new data file.
+b10	There is also a more compact format, deletion vectors, that you can switch on per table.
+b10	And over time, maintenance rewrites files with many deletes, in Lesson 4.4.
+b11	Save the script as 3 underscore 1 update delete dot sequel, commit, and push.
+b12	To recap: the lake never edits a Par-kay file.
+b12	A delete adds a delete file, and an update is a delete plus an insert.
+b12	Next: a daily load that can run twice without making duplicates.

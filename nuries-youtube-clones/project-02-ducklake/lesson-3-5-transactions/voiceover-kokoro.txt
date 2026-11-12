@@ -1,0 +1,26 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	A transaction groups changes.
+b01	Here, a delete in one table and a new table, between begin and commit.
+b01	The lake records both in one snapshot, or nothing at all.
+b02	Change commit to rollback, and it is as if nothing happened: no files are added to the table, and no snapshot is created.
+b03	In Studio's sequel Editor, every statement is its own transaction.
+b03	Try to start one by hand: begin transaction.
+b04	Studio refuses it, and lists the statement types it accepts.
+b04	To group changes, use a sequel client that keeps one session open, or a tool like D B T.
+b05	What about two writers at the same time?
+b05	duck lake is optimistic.
+b05	Both work without locking.
+b05	When the second one commits, it is checked against what the first one already committed.
+b06	Two inserts into the same table do not conflict, and neither do changes to different tables.
+b06	duck lake simply retries the commit on top.
+b07	But if both delete rows from the same data file, or both change the same table's schema, the second commit fails, and that writer must try again.
+b08	All of this needs a catalog that many programs can open, like PostgreSQL.
+b08	Our catalog is a duck D B file, and a duck D B file can be opened by one program at a time.
+b09	We will see that in Module 6: while Studio has the lake open, D B T cannot open it.
+b09	Fine on a laptop, but a shared lake needs a shared catalog.
+b10	To recap: a transaction is all or nothing, and one snapshot.
+b10	In Studio's sequel Editor every statement is its own transaction.
+b10	Appends do not conflict, deletes in the same file do.
+b10	And a duck D B catalog file means one program at a time.
+b10	That ends Module 3.
+b10	Next: performance, starting with partitioning.

@@ -1,0 +1,83 @@
+1
+00:00:03,350 --> 00:00:06,684
+Open Data Lake, then eth lake, and click the blocks table.
+
+2
+00:00:06,964 --> 00:00:09,161
+Studio opens the table's own page.
+
+3
+00:00:13,572 --> 00:00:17,943
+The Schema tab lists the columns and their types, as the catalog stores them.
+
+4
+00:00:18,893 --> 00:00:21,915
+And Data Files: three Parquet files, one per load.
+
+5
+00:00:22,195 --> 00:00:28,751
+August, September, and October, each about seventy megabytes, with its row count and the snapshot that added it.
+
+6
+00:00:29,701 --> 00:00:31,987
+The same list is one function in SQL.
+
+7
+00:00:32,267 --> 00:00:38,344
+In the SQL Editor, on eth lake, ducklake list files gives each data file of the table, and its size.
+
+8
+00:00:41,735 --> 00:00:43,072
+The files are on your disk.
+
+9
+00:00:43,352 --> 00:00:49,943
+Glob lists every Parquet file under the lake's data folder: the same three, in a folder per schema and table.
+
+10
+00:00:50,893 --> 00:00:52,266
+And they are plain Parquet.
+
+11
+00:00:52,546 --> 00:00:57,738
+Read them directly, without the lake, and you get the same six hundred sixty thousand rows.
+
+12
+00:00:58,688 --> 00:01:01,763
+So any tool that reads Parquet can read these files.
+
+13
+00:01:02,713 --> 00:01:06,271
+But only the catalog knows which files make up the table right now.
+
+14
+00:01:06,551 --> 00:01:12,813
+After a delete or an update, the folder also holds files that are no longer current, and delete files.
+
+15
+00:01:13,093 --> 00:01:16,015
+Reading the folder directly would give the wrong answer.
+
+16
+00:01:16,295 --> 00:01:18,030
+That is what the catalog is for.
+
+17
+00:01:18,980 --> 00:01:25,108
+Save the queries as sql, 2 underscore 3 look inside dot sequel, then commit, and push.
+
+18
+00:01:46,553 --> 00:01:50,738
+To recap: Studio's table page shows the schema and the data files.
+
+19
+00:01:51,018 --> 00:01:56,451
+In SQL, ducklake list files gives the same list, and the files are plain Parquet on disk.
+
+20
+00:01:56,731 --> 00:01:59,420
+But the catalog decides which files are the table.
+
+21
+00:01:59,700 --> 00:02:00,964
+Next: snapshots.

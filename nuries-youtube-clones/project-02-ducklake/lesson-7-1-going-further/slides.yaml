@@ -1,0 +1,44 @@
+number: "7.1"
+title: Going further
+slides:
+  - { id: title, type: title, h1: 'Going <span class="accent">further</span>', lead: "From a laptop lake to a shared one, and a recap.", badges: [PostgreSQL catalog, Object storage, Recap] }
+  - id: shared
+    type: html
+    eyebrow: A shared lake
+    h2: Swap the catalog and the storage
+    html: |
+      <div class="codecard s" data-step="1" style="margin-top:30px"><div class="filetab"><span class="ic"></span>a shared lake (DuckDB SQL)</div><div class="code" style="font-size:34px"><span class="k">ATTACH</span> <span class="str">'ducklake:postgres:dbname=ducklake_catalog host=…'</span> <span class="k">AS</span> lake
+        (<span class="k">DATA_PATH</span> <span class="str">'s3://bucket/path/'</span>);</div></div>
+      <div class="row two" style="margin-top:28px">
+        <div class="card good s" data-step="2"><div class="k">Then</div><div class="t">Many writers</div><div class="d">any machine can attach the same lake</div></div>
+        <div class="card s" data-step="3"><div class="k">Tested</div><div class="t">S3-compatible storage</div><div class="d">works from DuckDB and dbt; not in Studio 1.7.6's wizard yet. A follow-up tutorial covers PostgreSQL + cloud S3.</div></div>
+      </div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: ops
+    type: cards
+    eyebrow: Running it for real
+    h2: Four more things
+    cols: 4
+    cards:
+      - { step: 1, k: Access, t: Two places, d: "catalog permissions + bucket policies" }
+      - { step: 2, k: Backups, t: Catalog + bucket, d: "back up the database, version the bucket" }
+      - { step: 3, k: Encryption, t: Per file, d: "keys kept in the catalog" }
+      - { step: 4, k: Migration, t: From DuckDB, d: "move tables into a DuckLake" }
+  - id: notyet
+    type: cards
+    eyebrow: Not yet
+    h2: Check the docs for each release
+    cols: 1
+    cards:
+      - { step: 1, cls: bad, k: Not supported today, ticks: ["!Primary keys", "!Unique and foreign key constraints", "!Indexes"] }
+    checked: DuckLake docs, Unsupported Features, checked 11 Nov 2026
+  - id: recap
+    type: recap
+    h2: The whole course
+    items:
+      - "A DuckLake is a catalog database plus Parquet files."
+      - "Every change is a snapshot; time travel is free."
+      - "Updates and deletes never rewrite files."
+      - "Partitions, statistics and maintenance keep it fast."
+      - "The catalog is plain SQL; dbt builds on top."
+  - { id: closing, type: closing, lesson: Thanks for watching, h2: 'ducklake.select', size: 92 }

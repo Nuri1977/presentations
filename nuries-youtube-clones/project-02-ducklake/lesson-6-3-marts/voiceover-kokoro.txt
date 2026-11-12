@@ -1,0 +1,20 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In the marts folder, daily network activity: per day, the number of blocks and transactions, how full the blocks were, and the average base fee.
+b01	A table.
+b02	And top senders: the hundred addresses that sent the most transactions, with the fees they paid.
+b03	Now daily gas, incremental, with the merge strategy and block date as the unique key.
+b03	On later runs it only processes days from the last one it has, and merges them in.
+b03	The post hook calls set commit message, so the snapshots daily gas makes get an author and a message.
+b04	Run everything: D B T run.
+b04	Two views, two tables, and the incremental model, built in the lake.
+b05	Run daily gas again.
+b05	This time it is incremental: D B T recomputes the last day into a temporary table, and merges it into daily gas.
+b06	Here is what D B T ran, in the target folder: merge into eth lake dot main dot daily gas.
+b06	The merge Studio's sequel Editor could not run in Lesson 3.2, running on our lake.
+b07	And the result, with D B T show: one row per day, from August to early November.
+b08	D B T is done, so open the lake in Studio: Data Lake, eth lake, History. D B T's work is a series of snapshots.
+b08	And the incremental merge has an author, D B T, and our commit message.
+b09	Commit the marts, and push.
+b10	To recap: two table marts, and an incremental model whose merge strategy runs a real merge into on the lake.
+b10	A post hook adds a commit message, and every D B T run shows up as snapshots.
+b10	Next: tests and docs.

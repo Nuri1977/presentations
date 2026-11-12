@@ -1,0 +1,63 @@
+# Lesson 1.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only (the numbers come from the real file, read with DuckDB's parquet_metadata).
+id: lesson-1-2
+number: "1.2"
+title: "Parquet: why lakes use column files"
+module: "Module 1 · Data lakes explained"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 1.2"
+next: "Lesson 1.3 · Table formats and catalogs"
+summary: "What a Parquet file is: columns instead of rows, row groups, compression, and the min and max statistics that let an engine skip data it does not need. With real numbers from one day of Ethereum blocks on S3."
+tags: [Parquet, columnar storage, data lake, row groups, statistics, DuckDB]
+target_minutes: 4
+show_help_links: true
+links:
+  - { title: "DuckDB: Parquet metadata", url: "https://duckdb.org/docs/stable/data/parquet/metadata" }
+draft_changes:
+  - "The SQL Editor demo became slides with the real output: there is no DuckDB connection or lake yet at this point in the course."
+accuracy_notes:
+  - "One file per day: s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-10-01/part-00000-….snappy.parquet; 7,176 rows; 1 row group; SNAPPY; column number min 26,093,738 max 26,100,913; transaction_count 2 to 1,087; 5.6 MB compressed, 6.7 MB uncompressed; largest column logs_bloom, 3.0 MB. Read with parquet_metadata on 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 1.2. Parquet: why lakes use column files."
+
+  - id: s01
+    kind: slide
+    chapter: "Rows or columns"
+    slide: rows
+    beats:
+      - { id: b01, step: 1, show: "A row file: each line holds a whole block, all columns.", say: "A CSV file stores data row by row. Each line is a whole record: every column of one Ethereum block." }
+      - { id: b02, step: 2, show: "A column file: all numbers together, then all miners, then all counts.", say: "Parquet stores it column by column. All the block numbers together, then all the miners, then all the transaction counts." }
+      - { id: b03, step: 3, show: "A query for two columns reads two columns, not the whole file.", say: "Why does that matter? Analytics queries use a few columns out of many. With columns stored apart, the engine reads only the ones it needs." }
+
+  - id: s02
+    kind: slide
+    chapter: "Inside one file"
+    slide: inside
+    beats:
+      - { id: b04, step: 1, show: "One real file: one day of blocks, 7,176 rows, 1 row group, Snappy compression.", say: "Here is a real file: one day of Ethereum blocks from the public bucket. Seven thousand one hundred seventy-six rows, in one row group, compressed with Snappy." }
+      - { id: b05, step: 2, show: "Row groups: chunks of rows; each column stored in each chunk.", say: "A big file is split into row groups, chunks of rows. Inside each chunk, every column is stored on its own." }
+      - { id: b06, step: 3, show: "Biggest column: logs_bloom, 3.0 MB of 5.6 MB. We drop it when we load.", say: "The file is five point six megabytes. More than half of it is one column, logs bloom, that we do not need. Later we simply leave it out." }
+
+  - id: s03
+    kind: slide
+    chapter: "Statistics"
+    slide: stats
+    beats:
+      - { id: b07, step: 1, show: "Per column, per row group: min and max. number: 26,093,738 to 26,100,913.", say: "The most useful part: for every column in every row group, the file stores the smallest and the largest value. Block numbers in this file go from twenty-six million ninety-three thousand to twenty-six million one hundred thousand." }
+      - { id: b08, step: 2, show: "Query for block 26,200,000: skip this file without reading it.", say: "So if you ask for block twenty-six million two hundred thousand, the engine looks at those two numbers and skips the whole file, without reading a single row." }
+      - { id: b09, step: 3, show: "DuckLake keeps these statistics in its catalog (Modules 4 and 5).", say: "DuckLake goes one step further: it copies these statistics into its catalog, so it can skip files before even opening them. We see that in Modules 4 and 5." }
+
+  - id: s04
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b10, step: 1, show: "Recap: columns, row groups, compression, min and max per column.", say: "To recap: Parquet stores columns, not rows. It splits rows into row groups, compresses each column, and keeps the min and max of every column, so engines can skip what they do not need. Next: how table formats turn these files into tables." }
+
+  - id: s05
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.3 · Table formats and catalogs."

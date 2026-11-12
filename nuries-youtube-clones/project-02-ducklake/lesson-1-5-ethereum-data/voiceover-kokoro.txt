@@ -1,0 +1,22 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Ethereum is a chain of blocks.
+b01	A new block is added every twelve seconds.
+b01	On the first of October 2026, that was seven thousand one hundred seventy-six blocks.
+b02	Each block holds a list of transactions, two hundred eighty-four on average that day.
+b03	Every transaction needs some work, measured in gas.
+b03	A block has a gas limit, sixty million, and it was about half full on average.
+b04	For each unit of gas you pay a base fee, set by the network from how busy it is.
+b04	That day it averaged zero point six four gway.
+b05	The units: values are stored in way.
+b05	One ether is ten to the eighteen way, and one gway is a billion way.
+b05	Our staging models convert them.
+b06	Addresses and hashes are long hexadecimal strings, starting with zero x.
+b06	We never read them out loud.
+b07	The data is free and public.
+b07	Amazon publishes it in the AWS Public Blockchain dataset, as Par-kay files on S three, one folder per day, updated every day.
+b08	We use two tables.
+b08	Blocks: one row per block, with its number, time, the address that built it, the gas used, and the base fee.
+b09	And transactions: one row per transaction, with who sent it, to whom, the value, the gas it used, the price paid, and whether it succeeded.
+b10	We load three months of blocks: about six hundred sixty thousand rows.
+b11	And one week of transactions: twelve point seven million rows, about one point seven gigabytes.
+b11	Not every day of the year: just enough to be real, and still fit on a laptop.

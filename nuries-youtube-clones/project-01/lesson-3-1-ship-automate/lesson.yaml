@@ -9,16 +9,16 @@ summary: "Add continuous integration to the nyc_taxi dbt project: a prod profile
 start_state: lesson-2-8-end
 tags: [GitHub Actions, CI, dbt build, prod target, DuckDB, NYC taxi]
 target_minutes: 6
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `lesson-2-8-end`: a clone of what Lesson 2.8 pushed, the parquet files in data/raw, the nyc_taxi_dev connection, and the database after dbt build (off camera)."
 draft_changes:
   - "Action pins updated to the current majors (checked 10 Nov 2026): actions/checkout@v7, actions/setup-python@v7. Python 3.10 in CI to match Studio's runtime (3.10.17)."
   - "The separate dbt seed step is left out: dbt build runs the seed."
   - "requirements.txt and ci/profiles.yml are typed; download_data.py and the workflow are pasted (plan D8)."
-  - "Rehearsal: the workflow runs in the private nyc-taxi-dbt-rehearsal repo."
+  - "Final run: the workflow runs in the public Nuri1977/nyc-taxi-dbt."
 accuracy_notes:
-  - "First CI run in this recording (rehearsal repo, 10 Nov 2026): Success, total duration 40 s; release `warehouse` with prod.duckdb, 1.26 MB."
+  - "scripts/download_data.py also loads raw.green_trips into the DuckDB file at DUCKDB_PATH (plan change of 10 Nov afternoon); checked off camera: loaded 591375 rows, dbt build PASS=12."
   - "ci/profiles.yml + DUCKDB_PATH checked off camera on 10 Nov 2026: dbt build --profiles-dir ci gives PASS=12 and writes prod.duckdb."
 
 scenes:
@@ -63,17 +63,17 @@ scenes:
           - click_save
           - expect_file: { path: ci/profiles.yml, snippet: ../snippets/3.1/profiles.yml }
       - id: b06
-        say: "The parquet files are not in git, so CI needs to download them. A folder called scripts, and download data dot py."
+        say: "The parquet files are not in git, so CI has to get the data itself. A folder called scripts, and download data dot py."
         zoom: explorer
         actions:
           - close_tab: ci/profiles.yml
           - new_root_folder: scripts
           - new_file: { folder: scripts, name: download_data.py }
       - id: b07
-        say: "Paste the script: for each month of 2025, download the green taxi file into data raw, unless it is already there. Save."
+        say: "Paste the script. It downloads the twelve files into data raw, then loads them into raw green trips in the DuckDB file, the same load we did by hand in the SQL Editor. Save."
         zoom: code-mid
         actions:
-          - paste: "\"\"\"Download the 2025 NYC TLC green taxi trip files into data/raw/. Run from the repo root.\"\"\"\nimport urllib.request\nfrom pathlib import Path\n\nBASE = \"https://d37ci6vzurychx.cloudfront.net/trip-data\"\nRAW = Path(\"data/raw\")\n\nRAW.mkdir(parents=True, exist_ok=True)\nfor month in range(1, 13):\n    name = f\"green_tripdata_2025-{month:02d}.parquet\"\n    target = RAW / name\n    if target.exists():\n        print(\"have\", name)\n        continue\n    print(\"downloading\", name)\n    request = urllib.request.Request(f\"{BASE}/{name}\", headers={\"User-Agent\": \"nyc-taxi-dbt-course\"})\n    with urllib.request.urlopen(request) as response:\n        target.write_bytes(response.read())\nprint(\"done\")\n"
+          - paste: "\"\"\"Download the 2025 NYC TLC green taxi trip files into data/raw/ and load them into\nraw.green_trips in the DuckDB file at DUCKDB_PATH. Run from the repo root.\"\"\"\nimport os\nimport urllib.request\nfrom pathlib import Path\n\nimport duckdb\n\nBASE = \"https://d37ci6vzurychx.cloudfront.net/trip-data\"\nRAW = Path(\"data/raw\")\n\nRAW.mkdir(parents=True, exist_ok=True)\nfor month in range(1, 13):\n    name = f\"green_tripdata_2025-{month:02d}.parquet\"\n    target = RAW / name\n    if target.exists():\n        print(\"have\", name)\n        continue\n    print(\"downloading\", name)\n    request = urllib.request.Request(f\"{BASE}/{name}\", headers={\"User-Agent\": \"nyc-taxi-dbt-course\"})\n    with urllib.request.urlopen(request) as response:\n        target.write_bytes(response.read())\n\ncon = duckdb.connect(os.environ[\"DUCKDB_PATH\"])\ncon.execute(\"create schema if not exists raw\")\ncon.execute(\"create or replace table raw.green_trips as \"\n            \"select * from read_parquet('data/raw/green_tripdata_2025-*.parquet', union_by_name = true)\")\nprint(\"loaded\", con.execute(\"select count(*) from raw.green_trips\").fetchone()[0], \"rows\")\ncon.close()\n"
           - click_save
           - expect_file: { path: scripts/download_data.py, snippet: ../snippets/3.1/download_data.py }
       - id: b08
@@ -98,7 +98,7 @@ scenes:
     slide: workflow
     beats:
       - { id: b10, step: 1, show: "Triggers: push to main, every Monday, or by hand. Permission: write releases.", say: "It runs on every push to main, every Monday morning, or by hand. It may write releases." }
-      - { id: b11, step: 2, show: "Steps: checkout; Python 3.10; pip install -r requirements.txt; download the data; dbt build --profiles-dir ci; publish prod.duckdb to the release called warehouse.", say: "The steps: check out the code, set up Python, install dbt, download the data, run dbt build with the c i profile, and upload prod dot duckdb to a release called warehouse." }
+      - { id: b11, step: 2, show: "Steps: checkout; Python 3.10; pip install -r requirements.txt; download and load the data; dbt build --profiles-dir ci; publish prod.duckdb to the release called warehouse.", say: "The steps: check out the code, set up Python, install dbt, download and load the data, run dbt build with the c i profile, and upload prod dot duckdb to a release called warehouse." }
 
   - id: s04
     kind: app
@@ -130,16 +130,17 @@ scenes:
       - id: b15
         say: "On GitHub, open the Actions tab. The run for our commit is there."
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt/actions
       - id: b16
-        say: "Open it, and wait. A fresh machine installs dbt, downloads the files, and builds the project. Forty seconds later: success."
+        say: "Open it, and wait. A fresh machine installs dbt, downloads and loads the files, and builds the project. Under a minute later: success."
         actions:
+          - wait_text: { text: "Add CI: build, test and publish the warehouse", timeoutMs: 90000, label: run listed }
           - click_at: { role: link, name: "Add CI: build, test and publish the warehouse", label: the run, settleMs: [800, 2500] }
           - wait_text: { text: "^Success$", regex: true, timeoutMs: 900000, everyMs: 4000, label: CI run }
       - id: b17
         say: "And under Releases, the warehouse release, with prod dot duckdb attached: the whole warehouse, built by CI."
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/tag/warehouse
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt/releases/tag/warehouse
 
   - id: s06
     kind: slide

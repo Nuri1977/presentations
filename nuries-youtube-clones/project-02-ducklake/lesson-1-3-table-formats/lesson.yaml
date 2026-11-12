@@ -1,0 +1,86 @@
+# Lesson 1.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only.
+id: lesson-1-3
+number: "1.3"
+title: "Table formats: Iceberg, Delta Lake, DuckLake"
+module: "Module 1 · Data lakes explained"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 1.3"
+next: "Lesson 1.4 · How DuckLake works"
+summary: "What a table format has to track, how Apache Iceberg and Delta Lake keep that metadata as files next to the data, what that costs, and DuckLake's different idea: keep all metadata as plain tables in a SQL database."
+tags: [Apache Iceberg, Delta Lake, DuckLake, table format, catalog, lakehouse]
+target_minutes: 4.5
+show_help_links: true
+links:
+  - { title: "DuckLake: the manifesto", url: "https://ducklake.select/manifesto/" }
+  - { title: "Apache Iceberg specification", url: "https://iceberg.apache.org/spec/" }
+  - { title: "Delta Lake protocol", url: "https://github.com/delta-io/delta/blob/master/PROTOCOL.md" }
+draft_changes: []
+accuracy_notes:
+  - "Iceberg: table metadata files (JSON) point to manifest lists and manifests (Avro) in the table location; a catalog stores the pointer to the current metadata file (Iceberg spec)."
+  - "Delta Lake: a transaction log of JSON commit files in _delta_log, with Parquet checkpoints (Delta protocol)."
+  - "DuckLake: all metadata in a SQL database (DuckDB, SQLite, PostgreSQL, MySQL); data in Parquet (DuckLake docs, checked 11 Nov 2026)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 1.3. Table formats and catalogs."
+
+  - id: s01
+    kind: slide
+    chapter: "What a format tracks"
+    slide: track
+    beats:
+      - { id: b01, step: 1, show: "Three questions: which files, which schema, which version.", say: "Every table format answers the same three questions. Which files make up the table right now? What is its schema? And which version is this, so we can go back?" }
+
+  - id: s02
+    kind: slide
+    chapter: "Apache Iceberg"
+    slide: iceberg
+    beats:
+      - { id: b02, step: 1, show: "Iceberg: metadata JSON file → manifest list → manifests (Avro) → Parquet data files, all in the bucket.", say: "Apache Iceberg keeps its answers as files, in the same bucket as the data. A metadata file in JSON points to a manifest list, which points to manifest files, which finally list the Parquet data files." }
+      - { id: b03, step: 2, show: "A catalog service holds the pointer to the current metadata file.", say: "And you still need a catalog service, which holds one pointer: the current metadata file of each table." }
+
+  - id: s03
+    kind: slide
+    chapter: "Delta Lake"
+    slide: delta
+    beats:
+      - { id: b04, step: 1, show: "Delta: a _delta_log folder of numbered JSON commits, plus Parquet checkpoints.", say: "Delta Lake also uses files. Each change is a numbered JSON file in a folder called delta log, and every so often a checkpoint file sums up the log." }
+
+  - id: s04
+    kind: slide
+    chapter: "The cost"
+    slide: cost
+    beats:
+      - { id: b05, step: 1, show: "Many small metadata files.", say: "Both designs work, and both are widely used. But they share some costs. Every change writes new small metadata files." }
+      - { id: b06, step: 2, show: "Several round trips before reading any data.", say: "A query needs several round trips, file after file, before it reads a single row of data." }
+      - { id: b07, step: 3, show: "And a catalog service to run anyway.", say: "And for real use you run a catalog service anyway, often backed by a database." }
+
+  - id: s05
+    kind: slide
+    chapter: "DuckLake's idea"
+    slide: idea
+    beats:
+      - { id: b08, step: 1, show: "If a database is needed anyway, put all the metadata in it: plain SQL tables.", say: "DuckLake starts from that last point. If you need a database for the catalog anyway, why not put all the metadata in it? Files, schemas, snapshots, statistics: all plain SQL tables." }
+      - { id: b09, step: 2, show: "Data stays in Parquet files on any storage.", say: "The data itself stays exactly where it was: Parquet files, on a disk or in a bucket." }
+      - { id: b10, step: 3, show: "A change is one database transaction; a read is one query to the catalog.", say: "Now a change is one database transaction, and finding the files for a query is one SQL query." }
+
+  - id: s06
+    kind: slide
+    chapter: "Side by side"
+    slide: compare
+    beats:
+      - { id: b11, step: 1, show: "Table: metadata location, catalog, engines, age, for Iceberg, Delta Lake, DuckLake.", say: "Side by side. Iceberg and Delta keep metadata as files in the bucket, have many engines, and years of production use. DuckLake keeps metadata in a database, is read by DuckDB today, and is younger. In this course, we use DuckLake: it runs on a laptop with no services at all." }
+
+  - id: s07
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b12, step: 1, show: "Recap: formats track files, schema, versions; Iceberg and Delta use metadata files; DuckLake uses a SQL database.", say: "To recap: a table format tracks files, schema and versions. Iceberg and Delta store that as files next to the data. DuckLake stores it as tables in a database. Next: how DuckLake works, step by step." }
+
+  - id: s08
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.4 · How DuckLake works."

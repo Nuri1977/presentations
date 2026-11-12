@@ -1,0 +1,23 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Our lake lives on a laptop: a duck D B file as catalog, and a local folder.
+b01	For a team, swap both.
+b01	Use PostgreSQL as the catalog, and object storage like S three for the data.
+b01	Same lake format, same sequel.
+b02	Now many people and many machines can attach the same lake, and write at the same time.
+b03	We tested S three compatible storage too: it works from duck D B and D B T, but Studio's wizard does not support it yet.
+b03	A follow-up tutorial covers PostgreSQL with cloud storage.
+b04	Running a lake for real means a few more things.
+b04	Access control comes from two places: permissions in the catalog database, and policies on the bucket.
+b05	Backups: back up the catalog database, and turn on versioning for the bucket.
+b06	Encryption: duck lake can encrypt every data file, and keeps the keys in the catalog.
+b07	And an existing duck D B database can be moved into a duck lake, table by table.
+b08	Some things are not supported today, like primary keys, unique and foreign key constraints, and indexes.
+b08	Check the docs page on unsupported features: it changes with each release.
+b09	Let's look back.
+b09	A duck lake is a catalog database plus Par-kay files.
+b09	Every change is a snapshot you can travel back to.
+b09	Updates and deletes never rewrite files.
+b09	Partitions, statistics and maintenance keep it fast and small.
+b09	The catalog is plain sequel you can read yourself.
+b09	And D B T builds tested models right on top.
+b09	Thanks for watching, and see you in the next course.

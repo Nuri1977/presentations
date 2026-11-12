@@ -1,0 +1,3039 @@
+1
+00:00:03,350 --> 00:00:04,743
+Welcome to Project 2.
+
+2
+00:00:05,023 --> 00:00:08,569
+In this course, you build a real data lake, on your own laptop.
+
+3
+00:00:08,849 --> 00:00:14,367
+Not a toy: a lake with versions, time travel, maintenance, and dbt models on top.
+
+4
+00:00:15,318 --> 00:00:17,683
+You need no cloud account and no server.
+
+5
+00:00:17,963 --> 00:00:22,492
+Everything runs inside Rosetta DBT Studio, with open source tools.
+
+6
+00:00:23,442 --> 00:00:30,671
+We start from a public bucket on Amazon S3, with the Ethereum blockchain as Parquet files, one folder a day.
+
+7
+00:00:31,621 --> 00:00:38,140
+We load it into a DuckLake: a catalog database, and a folder of Parquet files that the catalog manages.
+
+8
+00:00:39,090 --> 00:00:44,917
+Then dbt builds clean models on top: staging views, and marts that grow day by day.
+
+9
+00:00:45,867 --> 00:00:52,647
+And at the end, answers: how busy the network was each day, what gas cost, and who sent the most transactions.
+
+10
+00:00:53,597 --> 00:00:54,768
+The data is real.
+
+11
+00:00:55,048 --> 00:01:02,474
+Three months of Ethereum blocks: August to October 2026, almost six hundred sixty thousand blocks.
+
+12
+00:01:03,424 --> 00:01:07,174
+And one week of transactions: twelve point seven million rows.
+
+13
+00:01:08,124 --> 00:01:11,103
+Big enough to feel real, small enough for a laptop.
+
+14
+00:01:11,383 --> 00:01:13,886
+About three gigabytes of free disk is plenty.
+
+15
+00:01:14,836 --> 00:01:17,822
+One app does it all: Rosetta DBT Studio.
+
+16
+00:01:18,102 --> 00:01:23,335
+It has screens for data lakes, a SQL editor, dbt, and git, in one window.
+
+17
+00:01:24,285 --> 00:01:28,314
+Underneath, DuckDB is the engine, and DuckLake is the lake format.
+
+18
+00:01:28,594 --> 00:01:30,540
+And dbt builds the models.
+
+19
+00:01:31,490 --> 00:01:32,461
+Here is the route.
+
+20
+00:01:32,741 --> 00:01:40,802
+First, we install Studio, and explain data lakes: warehouses, lakehouses, Parquet, table formats, and how DuckLake works.
+
+21
+00:01:41,752 --> 00:01:42,730
+Then hands on.
+
+22
+00:01:43,010 --> 00:01:49,596
+We create the lake and load it, change data safely, make it fast and keep it tidy, and look inside the catalog.
+
+23
+00:01:50,546 --> 00:01:53,597
+Finally, dbt on the lake, and where to go next.
+
+24
+00:01:54,547 --> 00:01:58,059
+You need a computer, some basic SQL, and a GitHub account.
+
+25
+00:01:58,339 --> 00:02:03,789
+Every hands-on lesson ends with a commit to the course repository, linked in the description.
+
+26
+00:02:04,069 --> 00:02:05,451
+See you in the next lesson.
+
+27
+00:02:13,417 --> 00:02:16,630
+Rosetta DBT Studio is free and open source.
+
+28
+00:02:16,910 --> 00:02:20,194
+Go to rosetta D B dot I O, and click Download Now.
+
+29
+00:02:21,144 --> 00:02:25,989
+The download page has a card for each system: Windows, Linux, and macOS.
+
+30
+00:02:26,939 --> 00:02:29,295
+On Windows, take the E X E installer.
+
+31
+00:02:29,575 --> 00:02:32,073
+On Linux, the deb or R P M package.
+
+32
+00:02:32,353 --> 00:02:37,081
+On a Mac, pick your processor: arm sixty-four for Apple silicon, or Intel.
+
+33
+00:02:37,361 --> 00:02:40,211
+This Mac has an Intel chip, so click Mac Intel.
+
+34
+00:02:41,161 --> 00:02:43,401
+When the download finishes, open the file.
+
+35
+00:02:43,681 --> 00:02:47,857
+A window shows the app on the left, and your Applications folder on the right.
+
+36
+00:02:48,807 --> 00:02:53,462
+Drag Rosetta DBT Studio onto Applications, and wait for the copy.
+
+37
+00:02:54,412 --> 00:02:56,234
+Then open it from Applications.
+
+38
+00:02:56,514 --> 00:03:00,926
+The first time, macOS asks if you want to open an app from the internet.
+
+39
+00:03:01,207 --> 00:03:01,989
+Click Open.
+
+40
+00:03:02,939 --> 00:03:04,689
+Studio starts with a short setup.
+
+41
+00:03:04,969 --> 00:03:09,600
+First, the dbt version: dbt 1.x, the recommended one.
+
+42
+00:03:10,550 --> 00:03:11,822
+Then the exact version.
+
+43
+00:03:12,102 --> 00:03:14,701
+Keep the latest, 1.12.6.
+
+44
+00:03:15,651 --> 00:03:16,800
+Next, the adapters.
+
+45
+00:03:17,080 --> 00:03:23,775
+For this course we only need DuckDB, so uncheck the others, keep dbt duckdb, and click Continue.
+
+46
+00:03:24,725 --> 00:03:27,058
+Skip the optional tools, and click Install.
+
+47
+00:03:28,008 --> 00:03:35,508
+Studio downloads its own Python, then installs dbt Core and the DuckDB adapter, inside its own folder.
+
+48
+00:03:35,788 --> 00:03:38,359
+It takes a minute or two; the video speeds it up.
+
+49
+00:03:39,309 --> 00:03:45,102
+Done: Python 3.10.17, and dbt 1.12.6.
+
+50
+00:03:45,382 --> 00:03:46,140
+Click Finish.
+
+51
+00:03:47,090 --> 00:03:48,623
+This is Studio's home screen.
+
+52
+00:03:48,903 --> 00:03:52,374
+Among the modules is Data Lake: that is where our lake will live.
+
+53
+00:03:53,324 --> 00:04:00,461
+The status bar shows what was installed: dbt, Python, and the DuckDB version Studio runs inside.
+
+54
+00:04:00,741 --> 00:04:03,348
+We come back to that one in Lesson 1.6.
+
+55
+00:04:04,298 --> 00:04:09,400
+To recap: one app, with its own Python and dbt, and DuckDB built in.
+
+56
+00:04:09,680 --> 00:04:11,721
+You did not install any of them yourself.
+
+57
+00:04:12,671 --> 00:04:18,629
+Next, before we touch a lake, we explain what a data lake is, starting with warehouses and lakehouses.
+
+58
+00:04:26,583 --> 00:04:28,798
+Let's start with the classic data warehouse.
+
+59
+00:04:29,078 --> 00:04:33,729
+One system owns everything: the storage, and the engine that runs your queries.
+
+60
+00:04:34,009 --> 00:04:36,552
+Data goes in through the warehouse's own door.
+
+61
+00:04:37,502 --> 00:04:40,457
+That makes it fast and safe, with real transactions.
+
+62
+00:04:40,737 --> 00:04:47,794
+But the data lives in the warehouse's own format, only its engine can read it, and you pay for storage and compute together.
+
+63
+00:04:48,744 --> 00:04:50,405
+A data lake turns this around.
+
+64
+00:04:50,685 --> 00:04:55,294
+The data is just files, on cheap storage: a folder, or a bucket on S3.
+
+65
+00:04:55,574 --> 00:04:57,398
+In open formats, like Parquet.
+
+66
+00:04:58,348 --> 00:05:03,414
+Any engine can read those files: DuckDB, Spark, Trino, or a Python script.
+
+67
+00:05:03,694 --> 00:05:05,438
+Storage and compute are separate.
+
+68
+00:05:06,388 --> 00:05:08,066
+But plain files have problems.
+
+69
+00:05:08,346 --> 00:05:12,283
+There are no transactions: a reader can see a write that is only half done.
+
+70
+00:05:13,233 --> 00:05:15,206
+There are no safe updates or deletes.
+
+71
+00:05:15,486 --> 00:05:20,386
+To change one row, you rewrite a whole file, and hope nobody reads it at that moment.
+
+72
+00:05:21,336 --> 00:05:23,459
+And there is no schema and no history.
+
+73
+00:05:23,739 --> 00:05:27,436
+Which columns does the table have, and what did it look like yesterday?
+
+74
+00:05:27,716 --> 00:05:28,946
+The files do not say.
+
+75
+00:05:29,896 --> 00:05:36,040
+Even finding the files is slow: listing thousands of objects in a bucket, just to plan one query.
+
+76
+00:05:36,990 --> 00:05:40,120
+The lakehouse fixes this, without giving up open files.
+
+77
+00:05:40,400 --> 00:05:47,273
+It adds a table format on top: a small layer of metadata that says which files make up each table, right now.
+
+78
+00:05:48,223 --> 00:05:56,914
+With that layer you get the warehouse features back: transactions, safe updates and deletes, schema changes, and a history you can travel back in.
+
+79
+00:05:57,194 --> 00:05:59,003
+The data stays in open files.
+
+80
+00:05:59,953 --> 00:06:02,035
+Four words we use through the whole course.
+
+81
+00:06:02,315 --> 00:06:04,771
+The lake: the data files, on some storage.
+
+82
+00:06:05,721 --> 00:06:11,525
+The table format: the rules for keeping track of which files make up a table, and how it changes.
+
+83
+00:06:12,475 --> 00:06:15,350
+The catalog: where that tracking information is stored.
+
+84
+00:06:16,300 --> 00:06:19,875
+And the engine: the program that reads it all and runs your queries.
+
+85
+00:06:20,155 --> 00:06:22,071
+In this course, that is DuckDB.
+
+86
+00:06:23,021 --> 00:06:26,156
+To recap: a warehouse is one system for everything.
+
+87
+00:06:26,436 --> 00:06:27,845
+A lake is open files.
+
+88
+00:06:28,125 --> 00:06:33,204
+A lakehouse is open files, plus a table format that makes them behave like tables.
+
+89
+00:06:33,484 --> 00:06:35,775
+Next: why lakes store data in Parquet.
+
+90
+00:06:43,726 --> 00:06:46,202
+A CSV file stores data row by row.
+
+91
+00:06:46,482 --> 00:06:50,739
+Each line is a whole record: every column of one Ethereum block.
+
+92
+00:06:51,689 --> 00:06:53,608
+Parquet stores it column by column.
+
+93
+00:06:53,888 --> 00:06:58,593
+All the block numbers together, then all the miners, then all the transaction counts.
+
+94
+00:06:59,543 --> 00:07:00,583
+Why does that matter?
+
+95
+00:07:00,863 --> 00:07:03,626
+Analytics queries use a few columns out of many.
+
+96
+00:07:03,906 --> 00:07:07,742
+With columns stored apart, the engine reads only the ones it needs.
+
+97
+00:07:08,692 --> 00:07:12,950
+Here is a real file: one day of Ethereum blocks from the public bucket.
+
+98
+00:07:13,230 --> 00:07:18,166
+Seven thousand one hundred seventy-six rows, in one row group, compressed with Snappy.
+
+99
+00:07:19,116 --> 00:07:22,208
+A big file is split into row groups, chunks of rows.
+
+100
+00:07:22,488 --> 00:07:25,614
+Inside each chunk, every column is stored on its own.
+
+101
+00:07:26,564 --> 00:07:28,686
+The file is five point six megabytes.
+
+102
+00:07:28,966 --> 00:07:32,807
+More than half of it is one column, logs bloom, that we do not need.
+
+103
+00:07:33,087 --> 00:07:34,727
+Later we simply leave it out.
+
+104
+00:07:35,677 --> 00:07:42,401
+The most useful part: for every column in every row group, the file stores the smallest and the largest value.
+
+105
+00:07:42,681 --> 00:07:49,348
+Block numbers in this file go from twenty-six million ninety-three thousand to twenty-six million one hundred thousand.
+
+106
+00:07:50,298 --> 00:07:59,045
+So if you ask for block twenty-six million two hundred thousand, the engine looks at those two numbers and skips the whole file, without reading a single row.
+
+107
+00:07:59,995 --> 00:08:07,467
+DuckLake goes one step further: it copies these statistics into its catalog, so it can skip files before even opening them.
+
+108
+00:08:07,747 --> 00:08:09,645
+We see that in Modules 4 and 5.
+
+109
+00:08:10,595 --> 00:08:13,423
+To recap: Parquet stores columns, not rows.
+
+110
+00:08:13,703 --> 00:08:22,510
+It splits rows into row groups, compresses each column, and keeps the min and max of every column, so engines can skip what they do not need.
+
+111
+00:08:22,790 --> 00:08:26,005
+Next: how table formats turn these files into tables.
+
+112
+00:08:33,960 --> 00:08:37,083
+Every table format answers the same three questions.
+
+113
+00:08:37,363 --> 00:08:39,343
+Which files make up the table right now?
+
+114
+00:08:39,623 --> 00:08:40,612
+What is its schema?
+
+115
+00:08:40,892 --> 00:08:43,133
+And which version is this, so we can go back?
+
+116
+00:08:44,083 --> 00:08:48,542
+Apache Iceberg keeps its answers as files, in the same bucket as the data.
+
+117
+00:08:48,822 --> 00:08:56,990
+A metadata file in JSON points to a manifest list, which points to manifest files, which finally list the Parquet data files.
+
+118
+00:08:57,940 --> 00:09:03,730
+And you still need a catalog service, which holds one pointer: the current metadata file of each table.
+
+119
+00:09:04,680 --> 00:09:06,681
+Delta Lake also uses files.
+
+120
+00:09:06,960 --> 00:09:14,669
+Each change is a numbered JSON file in a folder called delta log, and every so often a checkpoint file sums up the log.
+
+121
+00:09:15,619 --> 00:09:18,313
+Both designs work, and both are widely used.
+
+122
+00:09:18,593 --> 00:09:19,873
+But they share some costs.
+
+123
+00:09:20,153 --> 00:09:23,006
+Every change writes new small metadata files.
+
+124
+00:09:23,956 --> 00:09:29,332
+A query needs several round trips, file after file, before it reads a single row of data.
+
+125
+00:09:30,282 --> 00:09:35,279
+And for real use you run a catalog service anyway, often backed by a database.
+
+126
+00:09:36,229 --> 00:09:38,094
+DuckLake starts from that last point.
+
+127
+00:09:38,374 --> 00:09:42,821
+If you need a database for the catalog anyway, why not put all the metadata in it?
+
+128
+00:09:43,101 --> 00:09:47,365
+Files, schemas, snapshots, statistics: all plain SQL tables.
+
+129
+00:09:48,315 --> 00:09:53,608
+The data itself stays exactly where it was: Parquet files, on a disk or in a bucket.
+
+130
+00:09:54,558 --> 00:10:01,075
+Now a change is one database transaction, and finding the files for a query is one SQL query.
+
+131
+00:10:02,025 --> 00:10:03,040
+Side by side.
+
+132
+00:10:03,320 --> 00:10:09,687
+Iceberg and Delta keep metadata as files in the bucket, have many engines, and years of production use.
+
+133
+00:10:09,967 --> 00:10:15,031
+DuckLake keeps metadata in a database, is read by DuckDB today, and is younger.
+
+134
+00:10:15,311 --> 00:10:19,881
+In this course, we use DuckLake: it runs on a laptop with no services at all.
+
+135
+00:10:20,831 --> 00:10:24,590
+To recap: a table format tracks files, schema and versions.
+
+136
+00:10:24,870 --> 00:10:27,948
+Iceberg and Delta store that as files next to the data.
+
+137
+00:10:28,228 --> 00:10:30,661
+DuckLake stores it as tables in a database.
+
+138
+00:10:30,941 --> 00:10:33,302
+Next: how DuckLake works, step by step.
+
+139
+00:10:41,260 --> 00:10:43,423
+A DuckLake has two parts, and only two.
+
+140
+00:10:44,373 --> 00:10:46,077
+The first part is the catalog.
+
+141
+00:10:46,357 --> 00:10:48,243
+It is a normal SQL database.
+
+142
+00:10:48,523 --> 00:10:53,398
+It knows the tables, their columns, and exactly which files belong to each table.
+
+143
+00:10:53,678 --> 00:10:58,348
+It can be a DuckDB file, SQLite, PostgreSQL, or MySQL.
+
+144
+00:10:59,298 --> 00:11:03,813
+The second part is the data: a folder, or a bucket, of Parquet files.
+
+145
+00:11:04,093 --> 00:11:05,808
+These files are never edited.
+
+146
+00:11:06,088 --> 00:11:07,856
+They are only added, or removed.
+
+147
+00:11:08,806 --> 00:11:11,038
+Here is what happens when you insert rows.
+
+148
+00:11:11,318 --> 00:11:15,710
+First, DuckLake writes the new rows as Parquet files in the data folder.
+
+149
+00:11:15,990 --> 00:11:17,399
+Nobody can see them yet.
+
+150
+00:11:18,349 --> 00:11:24,308
+Then, in one database transaction, the catalog records those files and creates a new snapshot.
+
+151
+00:11:24,588 --> 00:11:27,517
+That commit is the moment the change becomes visible.
+
+152
+00:11:28,467 --> 00:11:33,651
+If anything fails on the way, the catalog does not change, and readers never see half a write.
+
+153
+00:11:34,601 --> 00:11:36,071
+A read goes the other way.
+
+154
+00:11:36,351 --> 00:11:40,507
+The query first asks the catalog which files make up the table right now.
+
+155
+00:11:41,457 --> 00:11:47,729
+The catalog also keeps statistics for every file, like the smallest and largest value of each column.
+
+156
+00:11:48,009 --> 00:11:50,567
+So files that cannot match the filter are skipped.
+
+157
+00:11:51,517 --> 00:11:54,417
+Only then does it read the Parquet files that are left.
+
+158
+00:11:55,367 --> 00:11:57,318
+This simple design gives you a lot.
+
+159
+00:11:57,598 --> 00:12:01,251
+Changes are real transactions, even across several tables.
+
+160
+00:12:02,201 --> 00:12:07,411
+Every change is a snapshot, so you can query a table as it was yesterday, or last week.
+
+161
+00:12:08,361 --> 00:12:09,860
+And a small change stays small.
+
+162
+00:12:10,140 --> 00:12:14,316
+It is a few rows in the catalog, not a pile of new metadata files.
+
+163
+00:12:15,266 --> 00:12:16,499
+Who can read a DuckLake?
+
+164
+00:12:16,779 --> 00:12:19,901
+Today, DuckDB does, through the ducklake extension.
+
+165
+00:12:20,181 --> 00:12:23,694
+That is what Rosetta DBT Studio uses under the hood.
+
+166
+00:12:24,644 --> 00:12:30,790
+And because the catalog is plain SQL tables, and the data is plain Parquet, nothing is locked away.
+
+167
+00:12:31,070 --> 00:12:33,859
+Any SQL client can look inside the catalog.
+
+168
+00:12:34,809 --> 00:12:38,801
+To recap: the catalog is a database, and the data is Parquet.
+
+169
+00:12:39,081 --> 00:12:42,087
+Files are never edited, only added or removed.
+
+170
+00:12:42,367 --> 00:12:44,228
+And every change makes a snapshot.
+
+171
+00:12:44,508 --> 00:12:48,768
+Next, we meet the data for this course: Ethereum blocks and transactions.
+
+172
+00:12:56,726 --> 00:12:58,572
+Ethereum is a chain of blocks.
+
+173
+00:12:58,852 --> 00:13:01,181
+A new block is added every twelve seconds.
+
+174
+00:13:01,461 --> 00:13:07,186
+On the first of October 2026, that was seven thousand one hundred seventy-six blocks.
+
+175
+00:13:08,136 --> 00:13:12,895
+Each block holds a list of transactions, two hundred eighty-four on average that day.
+
+176
+00:13:13,845 --> 00:13:16,742
+Every transaction needs some work, measured in gas.
+
+177
+00:13:17,022 --> 00:13:21,373
+A block has a gas limit, sixty million, and it was about half full on average.
+
+178
+00:13:22,323 --> 00:13:27,014
+For each unit of gas you pay a base fee, set by the network from how busy it is.
+
+179
+00:13:27,294 --> 00:13:29,980
+That day it averaged zero point six four gwei.
+
+180
+00:13:30,930 --> 00:13:32,988
+The units: values are stored in wei.
+
+181
+00:13:33,268 --> 00:13:37,278
+One ether is ten to the eighteen wei, and one gwei is a billion wei.
+
+182
+00:13:37,558 --> 00:13:39,340
+Our staging models convert them.
+
+183
+00:13:40,290 --> 00:13:44,932
+Addresses and hashes are long hexadecimal strings, starting with zero x.
+
+184
+00:13:45,212 --> 00:13:46,586
+We never read them out loud.
+
+185
+00:13:47,536 --> 00:13:49,127
+The data is free and public.
+
+186
+00:13:49,407 --> 00:13:58,674
+Amazon publishes it in the AWS Public Blockchain dataset, as Parquet files on S3, one folder per day, updated every day.
+
+187
+00:13:59,624 --> 00:14:00,803
+We use two tables.
+
+188
+00:14:01,083 --> 00:14:07,245
+Blocks: one row per block, with its number, time, the address that built it, the gas used, and the base fee.
+
+189
+00:14:08,195 --> 00:14:16,557
+And transactions: one row per transaction, with who sent it, to whom, the value, the gas it used, the price paid, and whether it succeeded.
+
+190
+00:14:17,507 --> 00:14:21,549
+We load three months of blocks: about six hundred sixty thousand rows.
+
+191
+00:14:22,499 --> 00:14:28,528
+And one week of transactions: twelve point seven million rows, about one point seven gigabytes.
+
+192
+00:14:28,808 --> 00:14:33,361
+Not every day of the year: just enough to be real, and still fit on a laptop.
+
+193
+00:14:41,326 --> 00:14:43,605
+Before we build a lake, let's look under the hood.
+
+194
+00:14:43,885 --> 00:14:46,807
+Rosetta DBT Studio is an Electron app.
+
+195
+00:14:47,087 --> 00:14:51,883
+That means two parts: the window you see, and a Node.js process behind it.
+
+196
+00:14:52,833 --> 00:14:54,905
+The window never touches a database.
+
+197
+00:14:55,185 --> 00:15:01,386
+When you run a query, it sends a request to the main process, which runs the SQL and sends back the rows.
+
+198
+00:15:02,336 --> 00:15:08,027
+The main process uses DuckDB's official Node package, duck D B slash node A P I.
+
+199
+00:15:08,307 --> 00:15:12,498
+Studio 1.7.6 ships version 1.5.2.
+
+200
+00:15:12,778 --> 00:15:17,757
+DuckDB runs inside Studio itself: no server, nothing else to install.
+
+201
+00:15:18,707 --> 00:15:20,807
+In Studio's code, it is three calls.
+
+202
+00:15:21,087 --> 00:15:22,677
+Create a DuckDB instance.
+
+203
+00:15:22,957 --> 00:15:23,770
+Connect to it.
+
+204
+00:15:24,050 --> 00:15:25,711
+And run SQL on the connection.
+
+205
+00:15:26,661 --> 00:15:29,029
+DuckLake is not built into DuckDB.
+
+206
+00:15:29,309 --> 00:15:30,467
+It is an extension.
+
+207
+00:15:30,746 --> 00:15:35,422
+So on that connection, Studio first runs install ducklake, and load ducklake.
+
+208
+00:15:36,372 --> 00:15:40,723
+Then it attaches the lake: the catalog file, a name, and the data path.
+
+209
+00:15:41,003 --> 00:15:42,934
+And it makes the lake the current database.
+
+210
+00:15:43,214 --> 00:15:45,454
+That is exactly what you could type yourself.
+
+211
+00:15:46,404 --> 00:15:48,420
+There is one adapter per catalog type.
+
+212
+00:15:48,700 --> 00:15:56,263
+In 1.7.6 the wizard offers DuckDB; SQLite and PostgreSQL are marked as coming soon.
+
+213
+00:15:56,543 --> 00:15:58,921
+When a lake is closed, Studio detaches it.
+
+214
+00:15:59,871 --> 00:16:01,614
+You can see the engine in Studio.
+
+215
+00:16:01,894 --> 00:16:03,942
+Open Settings, then DuckDB.
+
+216
+00:16:04,222 --> 00:16:08,263
+This is Studio's own DuckDB database, for caching and previews.
+
+217
+00:16:09,213 --> 00:16:14,868
+And the status bar always shows the DuckDB version inside the app: 1.5.2.
+
+218
+00:16:15,818 --> 00:16:17,120
+One more thing for later.
+
+219
+00:16:17,400 --> 00:16:26,625
+When dbt runs, it uses its own DuckDB, the Python package inside dbt duckdb, version 1.5.6.
+
+220
+00:16:26,905 --> 00:16:29,348
+So two engines read and write the same lake.
+
+221
+00:16:29,628 --> 00:16:30,962
+We checked that they agree.
+
+222
+00:16:31,912 --> 00:16:36,642
+But with a DuckDB file as the catalog, only one of them can open it at a time.
+
+223
+00:16:36,922 --> 00:16:38,864
+Keep that in mind for Module 6.
+
+224
+00:16:39,814 --> 00:16:44,096
+To recap: DuckDB runs inside Studio, through its Node package.
+
+225
+00:16:44,376 --> 00:16:46,730
+DuckLake is an extension that Studio loads.
+
+226
+00:16:47,010 --> 00:16:50,199
+And everything the Data Lake screens do is plain SQL.
+
+227
+00:16:50,479 --> 00:16:51,935
+Now, let's create our lake.
+
+228
+00:16:59,893 --> 00:17:03,872
+In this lesson we create the project for the whole course, and our first lake.
+
+229
+00:17:04,152 --> 00:17:11,041
+On disk, the lake is two things inside one folder: a catalog file, and a data folder for the Parquet files.
+
+230
+00:17:11,991 --> 00:17:13,288
+We call the lake eth lake.
+
+231
+00:17:13,568 --> 00:17:18,263
+Its storage is a local folder, and its catalog is a single DuckDB file.
+
+232
+00:17:19,213 --> 00:17:26,259
+First, the project. dbt needs a connection, so on the home screen click New Connection, and choose DuckDB.
+
+233
+00:17:29,406 --> 00:17:34,755
+Name it ethereum lake dev, with a small DuckDB file next to the projects folder.
+
+234
+00:17:35,035 --> 00:17:38,113
+We point dbt at the lake later, in Module 6.
+
+235
+00:17:38,393 --> 00:17:38,992
+Save.
+
+236
+00:17:39,942 --> 00:17:45,394
+Now open the DBT Project card, click New Project, and call it ethereum lake.
+
+237
+00:17:45,674 --> 00:17:47,202
+Pick the connection, and save.
+
+238
+00:17:57,543 --> 00:18:01,922
+In the project, make a folder called lake, and inside it, a folder called data.
+
+239
+00:18:02,202 --> 00:18:03,253
+The lake lives here.
+
+240
+00:18:10,091 --> 00:18:12,224
+Now open Data Lake from the sidebar.
+
+241
+00:18:12,504 --> 00:18:13,662
+There are no lakes yet.
+
+242
+00:18:13,942 --> 00:18:16,289
+Click Create DataLake, and choose DuckLake.
+
+243
+00:18:20,058 --> 00:18:22,518
+Step one, the name: eth underscore lake.
+
+244
+00:18:22,798 --> 00:18:23,388
+Next.
+
+245
+00:18:24,338 --> 00:18:25,588
+Step two, storage.
+
+246
+00:18:25,868 --> 00:18:29,641
+Keep Local, and give the full path of the data folder we just made.
+
+247
+00:18:29,921 --> 00:18:31,963
+This is where the Parquet files will go.
+
+248
+00:18:32,913 --> 00:18:34,360
+Step three, the catalog.
+
+249
+00:18:34,640 --> 00:18:36,448
+DuckDB is the catalog type.
+
+250
+00:18:36,728 --> 00:18:42,280
+Replace the suggested path with a file in the lake folder: eth catalog dot duckdb.
+
+251
+00:18:43,230 --> 00:18:43,820
+Next.
+
+252
+00:18:44,100 --> 00:18:47,689
+The runtime options, memory and threads, can stay as they are.
+
+253
+00:18:47,969 --> 00:18:53,041
+Next again, and the review shows the name, the data folder, and the DuckDB catalog.
+
+254
+00:18:53,321 --> 00:18:54,502
+Click Create Instance.
+
+255
+00:18:55,452 --> 00:18:56,359
+Here is the lake.
+
+256
+00:18:56,639 --> 00:18:57,761
+No tables yet.
+
+257
+00:18:58,041 --> 00:19:01,481
+Open History: there is already one snapshot, number zero.
+
+258
+00:19:01,761 --> 00:19:03,883
+Creating the lake created the schema main.
+
+259
+00:19:04,163 --> 00:19:05,836
+Every change will add a row here.
+
+260
+00:19:06,786 --> 00:19:08,085
+Now the SQL Editor.
+
+261
+00:19:08,365 --> 00:19:11,385
+The connection list has a new group, DuckLake Instances.
+
+262
+00:19:11,665 --> 00:19:13,922
+Pick eth lake, and ask for its snapshots.
+
+263
+00:19:18,210 --> 00:19:19,610
+Run it with the green arrow.
+
+264
+00:19:19,890 --> 00:19:21,687
+One row: snapshot zero.
+
+265
+00:19:21,967 --> 00:19:23,284
+The lake answers SQL.
+
+266
+00:19:24,234 --> 00:19:33,214
+In plain DuckDB, the wizard stands for three statements: install the extension, attach the catalog file with its data path, and use it.
+
+267
+00:19:33,494 --> 00:19:36,370
+Studio runs them each time it opens the lake.
+
+268
+00:19:37,320 --> 00:19:43,098
+And remember: with a DuckDB file as the catalog, one program at a time can open the lake.
+
+269
+00:19:43,378 --> 00:19:44,948
+For a laptop, that is enough.
+
+270
+00:19:45,898 --> 00:19:47,018
+Back in the project.
+
+271
+00:19:47,298 --> 00:19:54,321
+Add a dot gitignore file, so build output, logs, the database files, and the whole lake folder stay out of git.
+
+272
+00:19:54,601 --> 00:19:56,319
+The lake is data, not code.
+
+273
+00:19:58,372 --> 00:19:59,522
+And a short README.
+
+274
+00:20:10,521 --> 00:20:19,496
+On GitHub, create a new, empty, public repository called ethereum ducklake dbt, with no README, gitignore or license.
+
+275
+00:20:19,776 --> 00:20:21,327
+Here is ours, still empty.
+
+276
+00:20:21,607 --> 00:20:23,577
+Copy its HTTPS address.
+
+277
+00:20:24,527 --> 00:20:28,846
+Back in Studio, open the Git tab, and click Initialize Repository.
+
+278
+00:20:31,090 --> 00:20:36,234
+Stage all the changes, type a message, create the ethereum lake project, and commit.
+
+279
+00:20:40,441 --> 00:20:43,881
+Click Publish Branch, paste the repository address, and add it.
+
+280
+00:20:44,161 --> 00:20:46,400
+Studio pushes the main branch to GitHub.
+
+281
+00:20:48,025 --> 00:20:49,880
+Refresh the repository page.
+
+282
+00:20:50,160 --> 00:20:51,603
+The project is on GitHub.
+
+283
+00:20:51,883 --> 00:20:54,225
+The lake folder is not: git ignores it.
+
+284
+00:20:55,174 --> 00:21:01,976
+To recap: we created the ethereum lake project, and the eth lake DuckLake inside it, with the Data Lake wizard.
+
+285
+00:21:02,256 --> 00:21:08,765
+It is a catalog file and a data folder, it starts with snapshot zero, and the SQL Editor can query it.
+
+286
+00:21:09,045 --> 00:21:10,489
+The project is on GitHub.
+
+287
+00:21:10,769 --> 00:21:13,416
+Next, we load three months of blocks into the lake.
+
+288
+00:21:21,366 --> 00:21:24,492
+The blocks live in the public bucket, one folder per day.
+
+289
+00:21:24,772 --> 00:21:29,909
+We read them straight from S3, with read parquet and a wildcard: one month at a time.
+
+290
+00:21:30,859 --> 00:21:35,829
+Three statements: create the table with August, then insert September, then October.
+
+291
+00:21:36,109 --> 00:21:40,266
+Each one becomes a snapshot of its own, which we use later for time travel.
+
+292
+00:21:41,216 --> 00:21:42,362
+One setting first.
+
+293
+00:21:42,642 --> 00:21:47,151
+DuckLake can keep small writes inside the catalog, which is called data inlining.
+
+294
+00:21:47,431 --> 00:21:51,082
+We turn it off, so every write becomes Parquet files we can look at.
+
+295
+00:21:51,362 --> 00:21:53,214
+Lesson 4.3 explains it.
+
+296
+00:21:54,164 --> 00:21:57,292
+Open the SQL Editor, and pick the eth lake connection.
+
+297
+00:21:57,572 --> 00:21:59,928
+Here is the script: one statement per line.
+
+298
+00:22:03,182 --> 00:22:08,656
+Run the first two lines: inlining off, and a schema called raw, for the data as it comes in.
+
+299
+00:22:09,606 --> 00:22:13,305
+Line three creates raw dot blocks from every file of August.
+
+300
+00:22:13,585 --> 00:22:17,742
+Star exclude drops two columns we do not need, like the big logs bloom.
+
+301
+00:22:18,022 --> 00:22:22,308
+Run it: Studio downloads the month from S3 and writes it into the lake.
+
+302
+00:22:38,087 --> 00:22:40,659
+Then September, and October, with insert into.
+
+303
+00:23:34,373 --> 00:23:36,250
+Check the result: blocks per month.
+
+304
+00:23:36,530 --> 00:23:41,075
+About two hundred twenty thousand each, almost six hundred sixty thousand in total.
+
+305
+00:23:42,025 --> 00:23:44,776
+Now open Data Lake, and the eth lake instance.
+
+306
+00:23:45,056 --> 00:23:45,735
+Refresh.
+
+307
+00:23:46,015 --> 00:23:50,362
+The new table is listed: blocks, in schema raw, with its rows and size.
+
+308
+00:23:53,008 --> 00:23:57,206
+And History has four new snapshots: the schema, then one for each month.
+
+309
+00:23:58,156 --> 00:23:59,753
+Keep the script in the project.
+
+310
+00:24:00,033 --> 00:24:08,891
+In DBT Studio, add a folder called sql, and in it a file called 2 underscore 2 load blocks dot sequel, with the same statements.
+
+311
+00:24:09,171 --> 00:24:09,770
+Save.
+
+312
+00:24:14,517 --> 00:24:19,288
+Git tab: stage all, commit with load three months of blocks, and Sync Changes to push.
+
+313
+00:24:19,568 --> 00:24:23,164
+The lake itself stays out of git; the script is enough to rebuild it.
+
+314
+00:24:32,157 --> 00:24:39,671
+To recap: we turned inlining off, made the raw schema, and loaded three months of blocks from S3, one month per statement.
+
+315
+00:24:39,951 --> 00:24:43,832
+That is six hundred sixty thousand blocks, and four new snapshots.
+
+316
+00:24:44,113 --> 00:24:46,979
+Next, we look inside the lake: the files on disk.
+
+317
+00:24:54,933 --> 00:24:58,267
+Open Data Lake, then eth lake, and click the blocks table.
+
+318
+00:24:58,547 --> 00:25:00,744
+Studio opens the table's own page.
+
+319
+00:25:05,155 --> 00:25:09,526
+The Schema tab lists the columns and their types, as the catalog stores them.
+
+320
+00:25:10,476 --> 00:25:13,498
+And Data Files: three Parquet files, one per load.
+
+321
+00:25:13,778 --> 00:25:20,334
+August, September, and October, each about seventy megabytes, with its row count and the snapshot that added it.
+
+322
+00:25:21,284 --> 00:25:23,570
+The same list is one function in SQL.
+
+323
+00:25:23,850 --> 00:25:29,927
+In the SQL Editor, on eth lake, ducklake list files gives each data file of the table, and its size.
+
+324
+00:25:33,318 --> 00:25:34,655
+The files are on your disk.
+
+325
+00:25:34,935 --> 00:25:41,526
+Glob lists every Parquet file under the lake's data folder: the same three, in a folder per schema and table.
+
+326
+00:25:42,476 --> 00:25:43,849
+And they are plain Parquet.
+
+327
+00:25:44,129 --> 00:25:49,321
+Read them directly, without the lake, and you get the same six hundred sixty thousand rows.
+
+328
+00:25:50,271 --> 00:25:53,346
+So any tool that reads Parquet can read these files.
+
+329
+00:25:54,296 --> 00:25:57,854
+But only the catalog knows which files make up the table right now.
+
+330
+00:25:58,134 --> 00:26:04,396
+After a delete or an update, the folder also holds files that are no longer current, and delete files.
+
+331
+00:26:04,676 --> 00:26:07,598
+Reading the folder directly would give the wrong answer.
+
+332
+00:26:07,878 --> 00:26:09,613
+That is what the catalog is for.
+
+333
+00:26:10,563 --> 00:26:16,691
+Save the queries as sql, 2 underscore 3 look inside dot sequel, then commit, and push.
+
+334
+00:26:38,136 --> 00:26:42,321
+To recap: Studio's table page shows the schema and the data files.
+
+335
+00:26:42,601 --> 00:26:48,034
+In SQL, ducklake list files gives the same list, and the files are plain Parquet on disk.
+
+336
+00:26:48,314 --> 00:26:51,003
+But the catalog decides which files are the table.
+
+337
+00:26:51,283 --> 00:26:52,547
+Next: snapshots.
+
+338
+00:27:00,499 --> 00:27:05,168
+Every change to a DuckLake creates a snapshot: a numbered version of the whole lake.
+
+339
+00:27:05,448 --> 00:27:07,767
+So far we have five: zero to four.
+
+340
+00:27:08,717 --> 00:27:10,899
+A snapshot is not a copy of the data.
+
+341
+00:27:11,179 --> 00:27:15,807
+It is a few rows in the catalog that say which files were valid from that moment on.
+
+342
+00:27:16,757 --> 00:27:19,725
+In Data Lake, open eth lake, and its History tab.
+
+343
+00:27:20,005 --> 00:27:24,465
+Each row is a snapshot: its number, time, schema version, and what changed.
+
+344
+00:27:27,050 --> 00:27:31,004
+In the SQL Editor, the same list comes from eth lake dot snapshots.
+
+345
+00:27:31,284 --> 00:27:33,996
+Changes says, in words, what each snapshot did.
+
+346
+00:27:38,989 --> 00:27:42,427
+Current snapshot tells you where the lake is now: snapshot four.
+
+347
+00:27:43,377 --> 00:27:44,487
+Now change something.
+
+348
+00:27:44,767 --> 00:27:49,205
+Insert one more day of blocks, the first of November, straight from S3.
+
+349
+00:27:50,155 --> 00:27:51,904
+And list the newest snapshots again.
+
+350
+00:27:52,184 --> 00:27:55,063
+Snapshot five: inserted into the blocks table.
+
+351
+00:27:55,343 --> 00:27:57,055
+One statement, one snapshot.
+
+352
+00:27:58,005 --> 00:28:04,309
+You can also group several statements into one snapshot, with a transaction: begin, your changes, commit.
+
+353
+00:28:04,589 --> 00:28:09,106
+Inside it, set commit message adds an author and a message, like a git commit.
+
+354
+00:28:10,056 --> 00:28:15,307
+Studio's SQL Editor runs one statement at a time, so we cannot type a transaction there.
+
+355
+00:28:15,587 --> 00:28:20,272
+We set a real commit message later, from dbt, in Lesson 6.3.
+
+356
+00:28:21,222 --> 00:28:26,147
+Save the queries as 2 underscore 4 snapshots dot sequel, commit, and push.
+
+357
+00:28:49,079 --> 00:28:51,374
+To recap: every change is a snapshot.
+
+358
+00:28:51,654 --> 00:28:59,275
+Studio shows them in History, SQL shows them with snapshots and current snapshot, and a transaction groups changes into one.
+
+359
+00:28:59,555 --> 00:29:02,324
+Next: we use snapshots to travel back in time.
+
+360
+00:29:10,274 --> 00:29:18,616
+In the SQL Editor, on eth lake, start with the table as it is now: six hundred sixty-seven thousand blocks, three months and one day.
+
+361
+00:29:22,308 --> 00:29:24,190
+Now add at, version equals two.
+
+362
+00:29:24,470 --> 00:29:31,098
+That is the table as it was at snapshot two, right after we loaded August: two hundred twenty-two thousand blocks.
+
+363
+00:29:32,048 --> 00:29:33,687
+Any query works on the past.
+
+364
+00:29:33,967 --> 00:29:38,416
+Blocks per month at version three: August and September, no October yet.
+
+365
+00:29:39,366 --> 00:29:41,970
+Time travel also helps you recover data.
+
+366
+00:29:42,250 --> 00:29:48,166
+Create a table from the past: October, as it was at version four, before the November day came in.
+
+367
+00:29:49,116 --> 00:29:54,356
+It holds exactly the October blocks: two hundred twenty-two thousand four hundred fifty-one.
+
+368
+00:29:54,636 --> 00:29:57,279
+We only needed it for the demo, so drop it again.
+
+369
+00:29:58,229 --> 00:30:02,976
+You can also travel by time: at timestamp, for example now minus one day.
+
+370
+00:30:03,926 --> 00:30:07,650
+Or attach the whole lake, read only, as it was at one snapshot.
+
+371
+00:30:08,600 --> 00:30:12,963
+The cost: as long as an old snapshot exists, its files stay on disk.
+
+372
+00:30:13,243 --> 00:30:17,000
+In Lesson 4.4 we expire old snapshots, and clean up.
+
+373
+00:30:17,950 --> 00:30:23,057
+Save the queries as 2 underscore 5 time travel dot sequel, commit, and push.
+
+374
+00:30:44,885 --> 00:30:49,106
+To recap: add at version to any table to read the past, in any query.
+
+375
+00:30:49,386 --> 00:30:51,859
+Copy past data back with create table as.
+
+376
+00:30:52,139 --> 00:30:53,713
+That is the end of Module 2.
+
+377
+00:30:53,993 --> 00:30:59,110
+Next, in Module 3, we change data: updates, deletes, and what they do to the files.
+
+378
+00:31:07,074 --> 00:31:09,533
+Parquet files cannot be edited in place.
+
+379
+00:31:09,813 --> 00:31:12,096
+So how does a lake delete or update a row?
+
+380
+00:31:12,376 --> 00:31:14,327
+Let's watch it happen on a small table.
+
+381
+00:31:15,277 --> 00:31:23,528
+In the SQL Editor, on eth lake, make a working copy: the blocks of the first of October, seven thousand one hundred seventy-six rows.
+
+382
+00:31:28,811 --> 00:31:32,007
+Seven of those blocks hold fewer than fifty transactions.
+
+383
+00:31:32,957 --> 00:31:34,056
+Delete those seven.
+
+384
+00:31:34,336 --> 00:31:37,829
+Then update every hundredth block of the day, seventy-two of them.
+
+385
+00:31:38,109 --> 00:31:40,378
+Studio just reports that the command ran.
+
+386
+00:31:41,328 --> 00:31:42,898
+Now list the table's files.
+
+387
+00:31:43,178 --> 00:31:47,864
+The original data file is still there, untouched, but it now has a delete file.
+
+388
+00:31:48,144 --> 00:31:52,692
+And there is a second data file: the seventy-two updated rows, written fresh.
+
+389
+00:31:53,642 --> 00:31:55,377
+The delete file is Parquet too.
+
+390
+00:31:55,657 --> 00:31:59,373
+It lists row positions in the data file: rows the reader must skip.
+
+391
+00:32:00,323 --> 00:32:03,821
+In Data Lake, open eth lake, refresh, and click blocks day.
+
+392
+00:32:04,101 --> 00:32:06,362
+Data Files shows the same two files.
+
+393
+00:32:17,020 --> 00:32:20,921
+So, a delete writes a small delete file, with the positions to skip.
+
+394
+00:32:21,871 --> 00:32:27,259
+An update is a delete of the old rows, plus an insert of the new ones in a new data file.
+
+395
+00:32:28,209 --> 00:32:33,316
+There is also a more compact format, deletion vectors, that you can switch on per table.
+
+396
+00:32:33,596 --> 00:32:38,750
+And over time, maintenance rewrites files with many deletes, in Lesson 4.4.
+
+397
+00:32:39,700 --> 00:32:44,653
+Save the script as 3 underscore 1 update delete dot sequel, commit, and push.
+
+398
+00:33:08,321 --> 00:33:11,066
+To recap: the lake never edits a Parquet file.
+
+399
+00:33:11,346 --> 00:33:15,501
+A delete adds a delete file, and an update is a delete plus an insert.
+
+400
+00:33:15,781 --> 00:33:19,725
+Next: a daily load that can run twice without making duplicates.
+
+401
+00:33:27,675 --> 00:33:33,447
+Real pipelines run every day, and sometimes twice: a retry after an error, or a click too many.
+
+402
+00:33:33,727 --> 00:33:36,227
+A plain insert would load the same day twice.
+
+403
+00:33:37,177 --> 00:33:41,424
+We want an idempotent load: one you can run again, and nothing changes.
+
+404
+00:33:42,374 --> 00:33:50,679
+In the SQL Editor, on eth lake: insert the blocks of the second of November, but only those where no block with the same number exists yet.
+
+405
+00:33:54,916 --> 00:33:55,815
+Count by day.
+
+406
+00:33:56,095 --> 00:34:07,576
+Studio 1.7.6 shows a date column as a day number, so read the rows in order: the first and the second of November, seven thousand one hundred seventy-six blocks each.
+
+407
+00:34:08,526 --> 00:34:11,259
+Now run the load again, as if a job retried.
+
+408
+00:34:12,209 --> 00:34:15,553
+Count again: still seven thousand one hundred seventy-six.
+
+409
+00:34:15,833 --> 00:34:16,898
+No duplicates.
+
+410
+00:34:17,848 --> 00:34:20,915
+And the snapshots: one new snapshot for the first run.
+
+411
+00:34:21,195 --> 00:34:25,025
+The second run inserted nothing, so it did not even create a snapshot.
+
+412
+00:34:25,974 --> 00:34:27,796
+The general tool is merge into.
+
+413
+00:34:28,076 --> 00:34:33,882
+It matches new rows to existing ones on a key, updates the rows that match, and inserts the rest.
+
+414
+00:34:34,162 --> 00:34:35,371
+DuckLake supports it.
+
+415
+00:34:36,321 --> 00:34:41,551
+Studio's SQL Editor does not accept merge, so here we used insert where not exists.
+
+416
+00:34:41,831 --> 00:34:46,365
+In Lesson 6.3, dbt runs a real merge on this lake for us.
+
+417
+00:34:47,315 --> 00:34:52,018
+Save the load as 3 underscore 2 daily load dot sequel, commit, and push.
+
+418
+00:35:15,456 --> 00:35:20,417
+To recap: insert only rows whose key is new, and the load can run twice safely.
+
+419
+00:35:20,697 --> 00:35:23,399
+A change that changes nothing makes no snapshot.
+
+420
+00:35:23,679 --> 00:35:25,875
+And merge does the same, with updates too.
+
+421
+00:35:26,155 --> 00:35:28,218
+Next: changing a table's columns.
+
+422
+00:35:36,175 --> 00:35:41,190
+In the SQL Editor, on eth lake: add a column to blocks, gas used percent, a double.
+
+423
+00:35:48,209 --> 00:35:50,595
+It is instant: no file is rewritten.
+
+424
+00:35:50,875 --> 00:35:52,798
+Old rows simply have no value.
+
+425
+00:35:53,078 --> 00:35:57,957
+Fill it for one day, the second of November: gas used divided by the gas limit.
+
+426
+00:35:58,907 --> 00:36:02,644
+Miner is an old name; today the field means the fee recipient.
+
+427
+00:36:02,924 --> 00:36:03,628
+Rename it.
+
+428
+00:36:04,578 --> 00:36:06,684
+And make number required: not null.
+
+429
+00:36:08,189 --> 00:36:12,214
+Query the new shape: number, fee recipient, and gas used percent.
+
+430
+00:36:13,164 --> 00:36:16,574
+Now time travel to version eleven, before these changes.
+
+431
+00:36:16,854 --> 00:36:18,735
+The column is still called miner there.
+
+432
+00:36:19,015 --> 00:36:20,842
+Each snapshot keeps its own schema.
+
+433
+00:36:21,792 --> 00:36:28,995
+In Data Lake, open the blocks table and its Schema tab: fee recipient in place of miner, and the new column at the end.
+
+434
+00:36:38,071 --> 00:36:40,149
+How does this work without touching files?
+
+435
+00:36:40,429 --> 00:36:42,926
+Every column has an id in the catalog.
+
+436
+00:36:43,206 --> 00:36:48,307
+A rename changes the name, not the id, so old files still map to the right column.
+
+437
+00:36:49,257 --> 00:36:56,153
+You can add, drop and rename columns, promote types the safe way, like integer to big integer, and add not null.
+
+438
+00:36:56,433 --> 00:36:58,429
+And every version keeps its own schema.
+
+439
+00:36:59,379 --> 00:37:04,643
+Save the script as 3 underscore 3 schema evolution dot sequel, commit, and push.
+
+440
+00:37:27,728 --> 00:37:33,734
+To recap: we added a column, renamed one, and added a constraint, without rewriting a single file.
+
+441
+00:37:34,014 --> 00:37:36,292
+And time travel still sees the old schema.
+
+442
+00:37:36,572 --> 00:37:39,677
+Next: asking the lake what changed between two versions.
+
+443
+00:37:47,642 --> 00:37:49,295
+Remember Lesson 3.1?
+
+444
+00:37:49,575 --> 00:37:55,405
+We deleted seven rows of blocks day at snapshot nine, and updated seventy-two at snapshot ten.
+
+445
+00:37:55,685 --> 00:37:58,389
+Ask the lake what changed between those two snapshots.
+
+446
+00:37:59,339 --> 00:38:03,884
+Ducklake table changes, for schema raw, table blocks day, from nine to ten.
+
+447
+00:38:04,164 --> 00:38:15,097
+Grouped by type, Studio's DuckDB, version 1.5.2, shows the update as a delete plus an insert: seventy-nine deletes, and seventy-two inserts at ten.
+
+448
+00:38:16,047 --> 00:38:24,026
+Look at the rows: each updated block appears twice, the old value in lower case, deleted, and the new value in upper case, inserted.
+
+449
+00:38:24,306 --> 00:38:34,268
+Newer DuckDB, like the 1.5.6 inside dbt, labels these as update pre-image and post-image, and puts both at snapshot ten.
+
+450
+00:38:34,549 --> 00:38:37,090
+Change feeds are young: check them on your version.
+
+451
+00:38:38,040 --> 00:38:47,599
+And two shortcuts: table insertions, seven thousand one hundred seventy-six rows at snapshot eight, and table deletions, seven at snapshot nine.
+
+452
+00:38:48,549 --> 00:38:53,578
+Four change types: insert, delete, and for updates, the pre-image and the post-image.
+
+453
+00:38:54,528 --> 00:38:59,721
+This works because every row in a DuckLake has a stable row id, kept across updates.
+
+454
+00:39:00,001 --> 00:39:01,455
+That is called row lineage.
+
+455
+00:39:02,405 --> 00:39:03,289
+What is it for?
+
+456
+00:39:03,569 --> 00:39:08,937
+Downstream jobs that only process what changed since their last run, instead of everything.
+
+457
+00:39:09,887 --> 00:39:14,965
+Save the queries as 3 underscore 4 change feed dot sequel, commit, and push.
+
+458
+00:39:37,467 --> 00:39:45,219
+To recap: ducklake table changes tells you every row that changed between two snapshots, with before and after values.
+
+459
+00:39:45,499 --> 00:39:48,770
+Next: transactions, and what happens with two writers.
+
+460
+00:39:56,720 --> 00:39:58,564
+A transaction groups changes.
+
+461
+00:39:58,844 --> 00:40:03,044
+Here, a delete in one table and a new table, between begin and commit.
+
+462
+00:40:03,324 --> 00:40:06,586
+The lake records both in one snapshot, or nothing at all.
+
+463
+00:40:07,536 --> 00:40:15,155
+Change commit to rollback, and it is as if nothing happened: no files are added to the table, and no snapshot is created.
+
+464
+00:40:16,105 --> 00:40:20,093
+In Studio's SQL Editor, every statement is its own transaction.
+
+465
+00:40:20,373 --> 00:40:23,139
+Try to start one by hand: begin transaction.
+
+466
+00:40:26,409 --> 00:40:29,830
+Studio refuses it, and lists the statement types it accepts.
+
+467
+00:40:30,110 --> 00:40:36,099
+To group changes, use a SQL client that keeps one session open, or a tool like dbt.
+
+468
+00:40:37,049 --> 00:40:38,942
+What about two writers at the same time?
+
+469
+00:40:39,222 --> 00:40:40,738
+DuckLake is optimistic.
+
+470
+00:40:41,018 --> 00:40:42,448
+Both work without locking.
+
+471
+00:40:42,728 --> 00:40:46,933
+When the second one commits, it is checked against what the first one already committed.
+
+472
+00:40:47,883 --> 00:40:53,212
+Two inserts into the same table do not conflict, and neither do changes to different tables.
+
+473
+00:40:53,492 --> 00:40:55,753
+DuckLake simply retries the commit on top.
+
+474
+00:40:56,703 --> 00:41:05,704
+But if both delete rows from the same data file, or both change the same table's schema, the second commit fails, and that writer must try again.
+
+475
+00:41:06,654 --> 00:41:11,314
+All of this needs a catalog that many programs can open, like PostgreSQL.
+
+476
+00:41:11,594 --> 00:41:17,617
+Our catalog is a DuckDB file, and a DuckDB file can be opened by one program at a time.
+
+477
+00:41:18,567 --> 00:41:24,037
+We will see that in Module 6: while Studio has the lake open, dbt cannot open it.
+
+478
+00:41:24,317 --> 00:41:27,763
+Fine on a laptop, but a shared lake needs a shared catalog.
+
+479
+00:41:28,713 --> 00:41:32,392
+To recap: a transaction is all or nothing, and one snapshot.
+
+480
+00:41:32,672 --> 00:41:36,668
+In Studio's SQL Editor every statement is its own transaction.
+
+481
+00:41:36,948 --> 00:41:40,022
+Appends do not conflict, deletes in the same file do.
+
+482
+00:41:40,302 --> 00:41:43,865
+And a DuckDB catalog file means one program at a time.
+
+483
+00:41:44,145 --> 00:41:45,517
+That ends Module 3.
+
+484
+00:41:45,797 --> 00:41:48,272
+Next: performance, starting with partitioning.
+
+485
+00:41:56,222 --> 00:42:00,011
+Transactions are big: almost thirteen million rows for one week.
+
+486
+00:42:00,291 --> 00:42:02,633
+And most questions ask about a day or two.
+
+487
+00:42:03,583 --> 00:42:05,481
+So we partition the table by date.
+
+488
+00:42:05,761 --> 00:42:11,478
+Every day gets its own folder of files, and a query for one day only opens that day's files.
+
+489
+00:42:12,428 --> 00:42:17,843
+In the SQL Editor, on eth lake: create raw dot transactions, with the columns we need.
+
+490
+00:42:18,124 --> 00:42:20,372
+We leave out input, the largest column.
+
+491
+00:42:20,652 --> 00:42:24,004
+Then set it partitioned by date, before any data goes in.
+
+492
+00:42:27,373 --> 00:42:31,451
+Now load the week, the first to the seventh of October, straight from S3.
+
+493
+00:42:31,731 --> 00:42:35,994
+That is about nine hundred megabytes to download, so it takes a few minutes.
+
+494
+00:42:36,274 --> 00:42:37,524
+The video speeds it up.
+
+495
+00:47:13,865 --> 00:47:17,051
+Transactions per day: between one and a half and two million.
+
+496
+00:47:17,331 --> 00:47:19,294
+Twelve point seven million in total.
+
+497
+00:47:20,244 --> 00:47:26,406
+On disk, under raw transactions, there is now one folder per date, with one Parquet file in each.
+
+498
+00:47:27,356 --> 00:47:32,235
+A query for one day, the third of October, only needs the file in that day's folder.
+
+499
+00:47:32,515 --> 00:47:36,764
+The catalog knows which file holds which date, so the rest is never opened.
+
+500
+00:47:37,714 --> 00:47:40,378
+In Data Lake, open the transactions table.
+
+501
+00:47:40,658 --> 00:47:42,790
+The Partitions tab shows the key: date.
+
+502
+00:47:54,475 --> 00:47:59,225
+Choose a key that your queries filter on, with not too many values: a day, or a month.
+
+503
+00:47:59,505 --> 00:48:03,723
+Partition by something like an address, and you get millions of tiny files.
+
+504
+00:48:04,673 --> 00:48:06,129
+You can change the key later.
+
+505
+00:48:06,409 --> 00:48:10,638
+The new key applies to new data only; existing files stay as they are.
+
+506
+00:48:11,588 --> 00:48:16,366
+Save the script as 4 underscore 1 partitioning dot sequel, commit, and push.
+
+507
+00:48:39,623 --> 00:48:47,160
+To recap: raw transactions is partitioned by date, with one folder per day, so a query for one day opens one file.
+
+508
+00:48:47,440 --> 00:48:51,586
+Next: statistics, and how they skip files even without partitions.
+
+509
+00:48:59,536 --> 00:49:03,635
+In Data Lake, open the transactions table and its Statistics tab.
+
+510
+00:49:03,915 --> 00:49:08,007
+For every column, the catalog keeps the smallest and the largest value.
+
+511
+00:49:08,287 --> 00:49:15,150
+Block numbers go from about twenty-six million ninety-three thousand to twenty-six million one hundred forty-four thousand.
+
+512
+00:49:16,100 --> 00:49:21,919
+The catalog keeps the same numbers for every single file, so it can rule out files without opening them.
+
+513
+00:49:22,869 --> 00:49:27,087
+In the SQL Editor, on eth lake: the first and last block number of the week.
+
+514
+00:49:34,751 --> 00:49:38,269
+Now ask for a hundred blocks, with explain analyze in front.
+
+515
+00:49:38,549 --> 00:49:48,483
+It runs the query and returns the plan as text; Studio puts it on one line, so here is the part that matters, from the table scan: total files read, one.
+
+516
+00:49:48,763 --> 00:49:52,633
+Six of the seven files were skipped, using only their statistics.
+
+517
+00:49:53,583 --> 00:49:56,355
+Pruning works when each file covers a narrow range.
+
+518
+00:49:56,635 --> 00:50:00,833
+Here it does: block numbers grow with time, and each day is its own file.
+
+519
+00:50:01,783 --> 00:50:07,730
+If rows arrive in random order, every file covers almost everything, and nothing can be skipped.
+
+520
+00:50:08,680 --> 00:50:13,963
+Sorted by tells DuckLake to sort rows when it writes new files, so their ranges stay narrow.
+
+521
+00:50:14,913 --> 00:50:17,717
+Set it for transactions: sorted by block number.
+
+522
+00:50:17,997 --> 00:50:21,932
+It applies to new writes, and to files that maintenance rewrites later.
+
+523
+00:50:22,882 --> 00:50:27,566
+Other settings live in the lake's options, like the inlining limit we set to zero.
+
+524
+00:50:27,846 --> 00:50:32,461
+Others, like target file size and Parquet compression, are set with set option.
+
+525
+00:50:33,411 --> 00:50:38,107
+Save the script as 4 underscore 2 statistics dot sequel, commit, and push.
+
+526
+00:51:01,907 --> 00:51:09,177
+To recap: the catalog keeps min and max for every column of every file, so queries skip files without opening them.
+
+527
+00:51:09,457 --> 00:51:11,288
+Sorted by keeps ranges narrow.
+
+528
+00:51:11,568 --> 00:51:14,257
+Next: what DuckLake does with very small writes.
+
+529
+00:51:22,207 --> 00:51:28,598
+Lakes have a classic problem: many small inserts, like a stream of events, make many tiny Parquet files.
+
+530
+00:51:28,878 --> 00:51:31,542
+Tiny files are slow to list and slow to read.
+
+531
+00:51:32,492 --> 00:51:34,658
+DuckLake's answer is data inlining.
+
+532
+00:51:34,938 --> 00:51:38,857
+Small inserts are stored as rows inside the catalog database.
+
+533
+00:51:39,137 --> 00:51:42,136
+Later, they are flushed into one proper Parquet file.
+
+534
+00:51:43,086 --> 00:51:48,453
+In the SQL Editor, on eth lake: a small table, a watchlist of addresses with a label.
+
+535
+00:51:48,733 --> 00:51:51,164
+Remember, inlining is off for the whole lake.
+
+536
+00:51:51,444 --> 00:51:55,779
+Turn it on for this one table: up to a hundred rows stay in the catalog.
+
+537
+00:51:58,031 --> 00:52:02,231
+Insert two addresses: the staking deposit contract, and wrapped ether.
+
+538
+00:52:02,511 --> 00:52:04,373
+And read them back, like any table.
+
+539
+00:52:05,323 --> 00:52:07,737
+But count the table's data files: zero.
+
+540
+00:52:08,017 --> 00:52:10,211
+The two rows live inside the catalog.
+
+541
+00:52:11,161 --> 00:52:15,833
+Flush the inlined data, and count again: one Parquet file, with both rows.
+
+542
+00:52:17,681 --> 00:52:20,334
+Inlining is on by default for small inserts.
+
+543
+00:52:20,614 --> 00:52:25,386
+We turned it off in Lesson 2.2 only so that every write would show up as files.
+
+544
+00:52:26,336 --> 00:52:32,793
+Keep it on for frequent small writes, and flush on a schedule, or let maintenance do it, which is the next lesson.
+
+545
+00:52:33,743 --> 00:52:38,421
+Save the script as 4 underscore 3 inlining dot sequel, commit, and push.
+
+546
+00:53:01,168 --> 00:53:09,871
+To recap: with inlining, small inserts become rows in the catalog, not tiny files, and a flush writes them out as one Parquet file.
+
+547
+00:53:10,151 --> 00:53:13,146
+Next: maintenance, to keep the lake small and fast.
+
+548
+00:53:21,107 --> 00:53:22,511
+A lake grows untidy.
+
+549
+00:53:22,791 --> 00:53:28,391
+Every load adds files, old files stay around for time travel, and delete files pile up.
+
+550
+00:53:29,341 --> 00:53:37,526
+DuckLake's recommended routine has three steps: merge small files, expire old snapshots, and clean up files nobody needs.
+
+551
+00:53:37,806 --> 00:53:39,535
+Checkpoint runs them all together.
+
+552
+00:53:40,485 --> 00:53:44,400
+In the SQL Editor, on eth lake: count the Parquet files on disk.
+
+553
+00:53:44,680 --> 00:53:45,389
+Nineteen.
+
+554
+00:53:52,519 --> 00:53:53,955
+Merge adjacent files.
+
+555
+00:53:54,235 --> 00:54:03,014
+Studio shows no result rows for this call, but behind it, the four files of the blocks table, the three months and the November days, became one.
+
+556
+00:54:03,964 --> 00:54:05,251
+Count again: twenty.
+
+557
+00:54:05,531 --> 00:54:10,284
+One more, not fewer: the new file is written, and the four old ones are still on disk.
+
+558
+00:54:11,234 --> 00:54:16,822
+Snapshots six and seven are the October copy we made and dropped in Lesson 2.5.
+
+559
+00:54:17,102 --> 00:54:18,682
+We will never travel back to them.
+
+560
+00:54:18,962 --> 00:54:19,829
+Expire them.
+
+561
+00:54:20,109 --> 00:54:22,853
+Again Studio shows no rows, but they are gone.
+
+562
+00:54:23,803 --> 00:54:25,259
+Now clean up old files.
+
+563
+00:54:25,539 --> 00:54:33,120
+First a dry run, which only lists what it would delete: the files of that October copy, and the files the merge replaced.
+
+564
+00:54:34,070 --> 00:54:36,667
+Run it for real, and count: fourteen files.
+
+565
+00:54:36,947 --> 00:54:41,185
+And time travel still works: the merged file keeps every row's history.
+
+566
+00:54:42,135 --> 00:54:44,898
+In practice, you just run checkpoint, now and then.
+
+567
+00:54:45,178 --> 00:54:50,711
+It flushes inlined data, merges, expires and cleans up, following the lake's options.
+
+568
+00:54:51,661 --> 00:54:53,058
+Be careful with two things.
+
+569
+00:54:53,338 --> 00:54:56,451
+Expiring a snapshot ends time travel to it, for good.
+
+570
+00:54:56,731 --> 00:54:58,432
+And cleanup really deletes files.
+
+571
+00:54:59,382 --> 00:55:07,150
+Files that no snapshot ever knew about, for example after a crash in the middle of a write, are removed with delete orphaned files.
+
+572
+00:55:08,100 --> 00:55:12,853
+Save the script as 4 underscore 4 maintenance dot sequel, commit, and push.
+
+573
+00:55:35,550 --> 00:55:41,904
+To recap: merge small files, expire snapshots you do not need, clean up, or simply run checkpoint.
+
+574
+00:55:42,184 --> 00:55:46,686
+Next: registering Parquet files that already exist, without copying them.
+
+575
+00:55:54,640 --> 00:56:00,946
+Sometimes the Parquet files already exist: another tool wrote them, or you are moving an old data lake.
+
+576
+00:56:01,226 --> 00:56:05,533
+Instead of reading and writing them again, you can register them in the catalog.
+
+577
+00:56:06,483 --> 00:56:10,336
+In the project, inside the lake folder, make a folder called landing.
+
+578
+00:56:10,616 --> 00:56:12,404
+Git ignores everything under lake.
+
+579
+00:56:17,096 --> 00:56:24,775
+In the SQL Editor, on eth lake: copy one day of blocks from S3, the third of November, into a Parquet file in landing.
+
+580
+00:56:25,055 --> 00:56:30,400
+We give it the table's current shape: fee recipient instead of miner, and gas used percent.
+
+581
+00:56:31,350 --> 00:56:35,720
+Now ducklake add data files: the lake, the table, the file, and the schema.
+
+582
+00:56:36,000 --> 00:56:39,265
+Nothing is copied: the catalog just records the file.
+
+583
+00:56:39,545 --> 00:56:46,539
+One Studio detail: the result pane runs a statement again to show its rows, which would register the file twice.
+
+584
+00:56:46,819 --> 00:56:50,117
+So we wrap the call in create temp table, which runs once.
+
+585
+00:56:51,067 --> 00:56:56,249
+Blocks per day: the third of November is there, seven thousand one hundred eighty-two blocks.
+
+586
+00:56:57,199 --> 00:57:01,402
+And the table's file list now includes the landing file, at its own path.
+
+587
+00:57:02,352 --> 00:57:05,711
+One thing to know: from now on, the file belongs to the lake.
+
+588
+00:57:05,991 --> 00:57:08,133
+Maintenance can merge it, and clean it up.
+
+589
+00:57:08,413 --> 00:57:10,227
+Do not keep using it from outside.
+
+590
+00:57:11,177 --> 00:57:21,015
+If a file has a different shape, two options help: allow missing for columns the file does not have, and ignore extra columns for columns the table does not have.
+
+591
+00:57:21,965 --> 00:57:28,233
+Save the script as 4 underscore 5 add files dot sequel in the sql folder, commit, and push.
+
+592
+00:57:46,643 --> 00:57:54,329
+To recap: ducklake add data files registers an existing Parquet file without copying it, and from then on the lake owns it.
+
+593
+00:57:54,609 --> 00:57:55,954
+That ends Module 4.
+
+594
+00:57:56,234 --> 00:57:58,170
+Next, we open the catalog itself.
+
+595
+00:58:06,120 --> 00:58:11,016
+In the SQL Editor, on eth lake, list the databases this connection has attached.
+
+596
+00:58:11,296 --> 00:58:19,910
+Two matter: eth lake, the lake, and underscore underscore ducklake metadata eth lake: the catalog file, as a plain DuckDB database.
+
+597
+00:58:20,860 --> 00:58:22,883
+Its tables all start with ducklake.
+
+598
+00:58:23,163 --> 00:58:26,226
+These are the tables the DuckLake specification defines.
+
+599
+00:58:26,506 --> 00:58:29,271
+Nothing else: the whole lake's metadata is in them.
+
+600
+00:58:30,221 --> 00:58:34,132
+Ducklake snapshot has one row per snapshot, with its schema version.
+
+601
+00:58:34,412 --> 00:58:38,444
+Six and seven are missing: we expired them in Lesson 4.4.
+
+602
+00:58:39,394 --> 00:58:46,360
+Ducklake snapshot changes says what each snapshot did: the November file we added, the merge, the inlining flush.
+
+603
+00:58:46,640 --> 00:58:48,798
+This is what Studio's History tab shows.
+
+604
+00:58:49,078 --> 00:58:51,267
+A commit message would be stored here too.
+
+605
+00:58:52,217 --> 00:58:57,307
+Ducklake table: one row per table, with an id, and the snapshot it was created in.
+
+606
+00:58:57,587 --> 00:59:02,302
+Begin snapshot, end snapshot: a table that was dropped gets an end snapshot.
+
+607
+00:59:03,252 --> 00:59:06,391
+And ducklake column, for column three of the blocks table.
+
+608
+00:59:06,671 --> 00:59:12,939
+Two rows: miner, valid from snapshot two until fourteen, and fee recipient from fourteen on.
+
+609
+00:59:13,219 --> 00:59:15,500
+That is the rename from Lesson 3.3.
+
+610
+00:59:15,780 --> 00:59:19,475
+Same id, new name, and the old name is kept for time travel.
+
+611
+00:59:20,425 --> 00:59:22,454
+That is the whole trick of the catalog.
+
+612
+00:59:22,734 --> 00:59:25,870
+Every row has a begin snapshot and an end snapshot.
+
+613
+00:59:26,150 --> 00:59:32,617
+The lake at snapshot s is simply every row where begin is at most s, and end is after s, or empty.
+
+614
+00:59:33,567 --> 00:59:39,091
+Save the queries as 5 underscore 1 catalog tables dot sequel, commit, and push.
+
+615
+01:00:01,540 --> 01:00:05,452
+To recap: the catalog is a plain database of ducklake tables.
+
+616
+01:00:05,732 --> 01:00:11,176
+Snapshots, tables and columns are rows, and begin and end snapshot version all of them.
+
+617
+01:00:11,456 --> 01:00:14,472
+Next: the files, their statistics, and partitions.
+
+618
+01:00:22,422 --> 01:00:24,317
+In the SQL Editor, on eth lake.
+
+619
+01:00:24,597 --> 01:00:27,595
+Ducklake data file has one row per Parquet file.
+
+620
+01:00:27,875 --> 01:00:36,238
+Here are the files of transactions, table five: one per day, with its row count, its size, and its path, relative to the data folder.
+
+621
+01:00:37,188 --> 01:00:42,331
+Ducklake file column stats holds the min and max of every column of every file.
+
+622
+01:00:42,611 --> 01:00:47,484
+For block number, each file covers its own narrow range, one day after the other.
+
+623
+01:00:47,764 --> 01:00:52,699
+This is exactly what let the query in Lesson 4.2 skip six files out of seven.
+
+624
+01:00:53,649 --> 01:01:00,415
+Ducklake file partition value: the date each file belongs to, from the partitioning in Lesson 4.1.
+
+625
+01:01:01,365 --> 01:01:06,513
+Ducklake table stats keeps totals per table, so counting rows needs no file at all.
+
+626
+01:01:06,793 --> 01:01:11,509
+Transactions: twelve point seven million rows, one point seven gigabytes.
+
+627
+01:01:12,459 --> 01:01:21,796
+And ducklake inlined data tables: the watchlist from Lesson 4.3 has a table inside the catalog, where inlined rows wait to be flushed.
+
+628
+01:01:22,746 --> 01:01:34,382
+So these are the file tables: data files and delete files, statistics per file, partition values, table totals, inlined rows, and files scheduled for deletion by maintenance.
+
+629
+01:01:35,332 --> 01:01:40,566
+Save the queries as 5 underscore 2 catalog files dot sequel, commit, and push.
+
+630
+01:02:03,327 --> 01:02:09,342
+To recap: every file is a row, with its statistics and partition value, and tables keep totals.
+
+631
+01:02:09,622 --> 01:02:15,324
+Next, the final proof: we read the lake by hand, with nothing but these tables and read parquet.
+
+632
+01:02:23,289 --> 01:02:26,627
+To end the catalog module, let's read the lake without the lake.
+
+633
+01:02:26,907 --> 01:02:36,801
+The DuckLake specification describes the steps: find the current snapshot, find the table, find the data path, list the files valid at that snapshot, and read them.
+
+634
+01:02:37,751 --> 01:02:39,646
+In the SQL Editor, on eth lake.
+
+635
+01:02:39,926 --> 01:02:43,592
+Step one: the current snapshot is the largest snapshot id.
+
+636
+01:02:43,872 --> 01:02:44,659
+Twenty-four.
+
+637
+01:02:49,785 --> 01:02:52,436
+Step two: the transactions table, valid now.
+
+638
+01:02:52,716 --> 01:02:55,649
+Table id five, and its folder, transactions.
+
+639
+01:02:56,599 --> 01:03:01,005
+Step three: the lake's data path, from ducklake metadata: our data folder.
+
+640
+01:03:01,285 --> 01:03:05,743
+Each file's path is relative to it, under the schema and the table's folder.
+
+641
+01:03:06,693 --> 01:03:16,429
+Step four: the data files of table five that are valid at snapshot twenty-four: begin snapshot at most twenty-four, end snapshot after it, or empty.
+
+642
+01:03:16,709 --> 01:03:17,684
+Seven files.
+
+643
+01:03:18,634 --> 01:03:22,628
+Step five: read exactly those files with read parquet, and count.
+
+644
+01:03:22,908 --> 01:03:26,293
+Twelve million six hundred ninety-five thousand eight hundred three.
+
+645
+01:03:27,243 --> 01:03:30,520
+And the same count, the normal way, from raw transactions.
+
+646
+01:03:30,800 --> 01:03:31,574
+Identical.
+
+647
+01:03:31,854 --> 01:03:34,551
+The lake is nothing but these tables and these files.
+
+648
+01:03:35,501 --> 01:03:40,587
+With deletes, one more step: read the delete files too, and skip the positions they list.
+
+649
+01:03:41,537 --> 01:03:47,671
+And that is all any engine needs to read DuckLake: some SQL against the catalog, and a Parquet reader.
+
+650
+01:03:47,951 --> 01:03:48,988
+Nothing is hidden.
+
+651
+01:03:49,938 --> 01:03:55,141
+Save the queries as 5 underscore 3 read by hand dot sequel, commit, and push.
+
+652
+01:04:17,668 --> 01:04:21,962
+To recap: snapshot, table, data path, valid files, read parquet.
+
+653
+01:04:22,242 --> 01:04:23,650
+Same answer as the lake.
+
+654
+01:04:23,930 --> 01:04:25,405
+That ends Module 5.
+
+655
+01:04:25,685 --> 01:04:28,124
+Next, we put dbt on top of the lake.
+
+656
+01:04:36,089 --> 01:04:39,572
+In this module, dbt builds models on top of our lake.
+
+657
+01:04:39,852 --> 01:04:44,493
+It reads the raw tables, and writes its models into the lake too, in the schema main.
+
+658
+01:04:45,443 --> 01:04:50,022
+dbt runs its own DuckDB, inside dbt duckdb.
+
+659
+01:04:50,302 --> 01:04:52,194
+So it needs to attach the lake itself.
+
+660
+01:04:52,474 --> 01:04:55,096
+That is one change, in profiles dot yml.
+
+661
+01:04:56,046 --> 01:04:59,252
+In DBT Studio, open profiles dot yml.
+
+662
+01:04:59,532 --> 01:05:03,010
+Today it points at the small dev database from Lesson 2.1.
+
+663
+01:05:03,960 --> 01:05:05,160
+Replace the output.
+
+664
+01:05:05,440 --> 01:05:09,746
+Path is a small local DuckDB file for dbt's own session.
+
+665
+01:05:10,026 --> 01:05:14,549
+Attach adds the lake: the ducklake prefix and the catalog file, as eth lake.
+
+666
+01:05:14,829 --> 01:05:19,015
+Database eth lake makes the lake dbt's target, in schema main.
+
+667
+01:05:19,295 --> 01:05:27,911
+And one thread, the safe choice with a single-file catalog: several dbt threads writing to one DuckLake can still trip over each other.
+
+668
+01:05:28,861 --> 01:05:38,351
+Check it: in the command box under the terminal, run dbt debug. dbt finds the project and the profile, attaches the lake, and connects.
+
+669
+01:05:38,631 --> 01:05:39,725
+All checks passed.
+
+670
+01:05:41,948 --> 01:05:44,757
+Commit the profile: point dbt at the lake.
+
+671
+01:05:45,037 --> 01:05:45,744
+And push.
+
+672
+01:05:59,112 --> 01:06:00,769
+Now the rule for this module.
+
+673
+01:06:01,050 --> 01:06:03,591
+Open Data Lake, and the eth lake instance.
+
+674
+01:06:03,871 --> 01:06:06,318
+Studio opens the lake, and keeps it open.
+
+675
+01:06:07,268 --> 01:06:10,889
+Back in DBT Studio, run dbt debug again.
+
+676
+01:06:11,169 --> 01:06:15,786
+This time it fails: conflicting lock is held in Rosetta DBT Studio.
+
+677
+01:06:16,066 --> 01:06:20,132
+A DuckDB catalog file can be opened by one program at a time.
+
+678
+01:06:23,530 --> 01:06:30,718
+So in this module, we always run dbt first, and open the lake in Studio afterwards, to look at the result.
+
+679
+01:06:31,668 --> 01:06:34,120
+Studio keeps the lake open until you quit it.
+
+680
+01:06:34,400 --> 01:06:39,487
+To run dbt again after looking at the lake, quit Studio, and open it again.
+
+681
+01:06:39,767 --> 01:06:42,955
+With a PostgreSQL catalog, this limit goes away.
+
+682
+01:06:43,905 --> 01:06:51,645
+To recap: profiles dot yml attaches the lake and makes it dbt's database, and dbt debug passes.
+
+683
+01:06:51,925 --> 01:06:55,809
+One program at a time: dbt first, then the lake screens.
+
+684
+01:06:56,089 --> 01:06:57,616
+Next: staging models.
+
+685
+01:07:05,566 --> 01:07:09,711
+In DBT Studio, in the models folder, create sources dot yml.
+
+686
+01:07:09,991 --> 01:07:16,852
+A source called raw, in database eth lake, schema raw, with the two tables we loaded: blocks and transactions.
+
+687
+01:07:17,802 --> 01:07:22,262
+Make a folder models, staging, and in it stg blocks dot sequel.
+
+688
+01:07:22,542 --> 01:07:29,259
+A view that renames the columns clearly, computes gas used in percent, and turns the base fee from wei into gwei.
+
+689
+01:07:34,223 --> 01:07:41,470
+And stg transactions dot sequel: the value and the fee paid in ether, and a success flag from the receipt status.
+
+690
+01:07:44,668 --> 01:07:48,117
+In the command box, run dbt run, select staging.
+
+691
+01:07:48,397 --> 01:07:50,673
+Two views, created in the lake, in a second.
+
+692
+01:07:56,272 --> 01:08:02,891
+Look at some rows with dbt show: each transaction with its block, date, addresses, and value in ether.
+
+693
+01:08:03,171 --> 01:08:08,135
+The terminal shows the columns that fit; the fee and the success flag are further right.
+
+694
+01:08:09,085 --> 01:08:15,979
+A view in a DuckLake is only a row in the catalog, in ducklake view: its SQL text, and no data files at all.
+
+695
+01:08:16,259 --> 01:08:19,993
+So staging views cost nothing to keep, and are always up to date.
+
+696
+01:08:20,943 --> 01:08:24,444
+dbt is done, so now we can open the lake in Studio.
+
+697
+01:08:24,724 --> 01:08:30,602
+In Data Lake, eth lake, refresh: the two staging views are listed, in schema main, with type view.
+
+698
+01:08:31,552 --> 01:08:34,262
+Commit the source and the staging models, and push.
+
+699
+01:08:49,327 --> 01:08:57,946
+To recap: sources point dbt at the raw tables, two staging views clean them up, and in a lake a view is just a row in the catalog.
+
+700
+01:08:58,226 --> 01:09:01,276
+Next: marts, built incrementally, with a real merge.
+
+701
+01:09:09,233 --> 01:09:17,696
+In the marts folder, daily network activity: per day, the number of blocks and transactions, how full the blocks were, and the average base fee.
+
+702
+01:09:17,976 --> 01:09:18,630
+A table.
+
+703
+01:09:21,945 --> 01:09:27,426
+And top senders: the hundred addresses that sent the most transactions, with the fees they paid.
+
+704
+01:09:32,063 --> 01:09:37,240
+Now daily gas, incremental, with the merge strategy and block date as the unique key.
+
+705
+01:09:37,520 --> 01:09:42,378
+On later runs it only processes days from the last one it has, and merges them in.
+
+706
+01:09:42,658 --> 01:09:48,602
+The post hook calls set commit message, so the snapshots daily gas makes get an author and a message.
+
+707
+01:09:49,552 --> 01:09:51,572
+Run everything: dbt run.
+
+708
+01:09:51,852 --> 01:09:55,626
+Two views, two tables, and the incremental model, built in the lake.
+
+709
+01:10:00,016 --> 01:10:01,275
+Run daily gas again.
+
+710
+01:10:01,555 --> 01:10:09,195
+This time it is incremental: dbt recomputes the last day into a temporary table, and merges it into daily gas.
+
+711
+01:10:12,203 --> 01:10:18,487
+Here is what dbt ran, in the target folder: merge into eth lake dot main dot daily gas.
+
+712
+01:10:18,767 --> 01:10:23,837
+The merge Studio's SQL Editor could not run in Lesson 3.2, running on our lake.
+
+713
+01:10:24,787 --> 01:10:29,846
+And the result, with dbt show: one row per day, from August to early November.
+
+714
+01:10:35,294 --> 01:10:43,266
+dbt is done, so open the lake in Studio: Data Lake, eth lake, History. dbt's work is a series of snapshots.
+
+715
+01:10:43,546 --> 01:10:47,825
+And the incremental merge has an author, dbt, and our commit message.
+
+716
+01:10:48,775 --> 01:10:50,108
+Commit the marts, and push.
+
+717
+01:11:06,670 --> 01:11:13,482
+To recap: two table marts, and an incremental model whose merge strategy runs a real merge into on the lake.
+
+718
+01:11:13,762 --> 01:11:18,796
+A post hook adds a commit message, and every dbt run shows up as snapshots.
+
+719
+01:11:19,076 --> 01:11:20,606
+Next: tests and docs.
+
+720
+01:11:28,566 --> 01:11:34,499
+A DuckLake supports not null, but no primary keys, no unique constraints, and no foreign keys.
+
+721
+01:11:34,779 --> 01:11:37,310
+Nothing stops a duplicate block from getting in.
+
+722
+01:11:38,260 --> 01:11:42,215
+So we check those rules with dbt tests, every time we build.
+
+723
+01:11:43,165 --> 01:11:45,331
+In models, create schema dot yml.
+
+724
+01:11:45,611 --> 01:11:57,524
+Descriptions for the models, unique and not null on the keys, accepted values on the success flag, and a relationship: every transaction's block number must exist in stg blocks.
+
+725
+01:11:58,474 --> 01:12:04,556
+Run dbt build: it builds every model in order, and runs each model's tests right after it.
+
+726
+01:12:04,836 --> 01:12:08,259
+Five models and nine tests: fourteen passes in all.
+
+727
+01:12:12,793 --> 01:12:13,731
+Now the docs.
+
+728
+01:12:14,011 --> 01:12:21,344
+Project menu, Generate Docs. dbt reads the project and the lake, and writes a small website into target.
+
+729
+01:12:23,903 --> 01:12:25,470
+Then Project, Serve Docs.
+
+730
+01:12:25,750 --> 01:12:28,922
+Studio starts a local web server, on port eighty eighty.
+
+731
+01:12:31,195 --> 01:12:35,976
+Open it in the browser, on the daily gas model: its description, and its columns.
+
+732
+01:12:36,926 --> 01:12:44,992
+And the lineage graph for this model: daily gas is built from stg transactions, the staging view on the raw transactions table.
+
+733
+01:12:45,271 --> 01:12:51,210
+The full graph of the project, from both raw tables to all three marts, opens with the button at the top.
+
+734
+01:12:52,160 --> 01:12:54,459
+Commit the tests and descriptions, and push.
+
+735
+01:13:06,818 --> 01:13:14,623
+To recap: the lake does not enforce unique keys, so dbt tests do, and dbt build runs them with every model.
+
+736
+01:13:14,903 --> 01:13:18,791
+And the docs show each model, its columns and tests, and its lineage.
+
+737
+01:13:19,071 --> 01:13:20,516
+That ends Module 6.
+
+738
+01:13:20,796 --> 01:13:22,961
+One lesson left: where to go from here.
+
+739
+01:13:30,911 --> 01:13:35,989
+Our lake lives on a laptop: a DuckDB file as catalog, and a local folder.
+
+740
+01:13:36,269 --> 01:13:37,762
+For a team, swap both.
+
+741
+01:13:38,042 --> 01:13:43,244
+Use PostgreSQL as the catalog, and object storage like S3 for the data.
+
+742
+01:13:43,524 --> 01:13:45,370
+Same lake format, same SQL.
+
+743
+01:13:46,320 --> 01:13:51,264
+Now many people and many machines can attach the same lake, and write at the same time.
+
+744
+01:13:52,214 --> 01:14:00,344
+We tested S3 compatible storage too: it works from DuckDB and dbt, but Studio's wizard does not support it yet.
+
+745
+01:14:00,624 --> 01:14:04,719
+A follow-up tutorial covers PostgreSQL with cloud storage.
+
+746
+01:14:05,669 --> 01:14:08,286
+Running a lake for real means a few more things.
+
+747
+01:14:08,566 --> 01:14:14,902
+Access control comes from two places: permissions in the catalog database, and policies on the bucket.
+
+748
+01:14:15,852 --> 01:14:20,033
+Backups: back up the catalog database, and turn on versioning for the bucket.
+
+749
+01:14:20,983 --> 01:14:25,900
+Encryption: DuckLake can encrypt every data file, and keeps the keys in the catalog.
+
+750
+01:14:26,850 --> 01:14:31,729
+And an existing DuckDB database can be moved into a DuckLake, table by table.
+
+751
+01:14:32,679 --> 01:14:38,724
+Some things are not supported today, like primary keys, unique and foreign key constraints, and indexes.
+
+752
+01:14:39,004 --> 01:14:43,546
+Check the docs page on unsupported features: it changes with each release.
+
+753
+01:14:44,496 --> 01:14:45,431
+Let's look back.
+
+754
+01:14:45,711 --> 01:14:49,048
+A DuckLake is a catalog database plus Parquet files.
+
+755
+01:14:49,328 --> 01:14:52,145
+Every change is a snapshot you can travel back to.
+
+756
+01:14:52,425 --> 01:14:54,729
+Updates and deletes never rewrite files.
+
+757
+01:14:55,009 --> 01:14:58,602
+Partitions, statistics and maintenance keep it fast and small.
+
+758
+01:14:58,882 --> 01:15:01,855
+The catalog is plain SQL you can read yourself.
+
+759
+01:15:02,135 --> 01:15:05,113
+And dbt builds tested models right on top.
+
+760
+01:15:05,393 --> 01:15:07,984
+Thanks for watching, and see you in the next course.

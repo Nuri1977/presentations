@@ -45,6 +45,9 @@ For a human retake of the app scenes (the automated recording follows the same s
 |---|---|
 | "Now run the whole project: Project menu, Run.…" | Open the **Project** menu (arrow next to Project, top right) → **Run** |
 | "dbt builds trips first, and only then the…" | Wait for “PASS=3” |
+| "Now look at the result. With top pickup…" | model_menu: Preview<br>Wait for “^Preview: top_pickup_zones$” |
+| "Ten rows, because of top n. East Harlem…" | Wait 0.8 s |
+| "Close it, and open Run History: the seed…" | Click **Close**<br>Click **Run History** |
 
 ## s08 · Commit and push
 

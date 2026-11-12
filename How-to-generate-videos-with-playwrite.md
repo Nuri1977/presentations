@@ -182,3 +182,22 @@ Before sending the script to another VoiceOver service, review it against the vi
 ## 5. Acceptance criteria
 
 A video run is complete when the isolated app launched with the expected preload, every recorded action has a semantic locator and result, the screenshots/video/trace share the same run ID, the final state is asserted, and the generated narration can be followed against the video without inventing actions. The run is repeatable from its manifest and leaves the user's normal app profile unchanged.
+
+## 6. Visual rules for lesson videos (from Project 3 on)
+
+These rules come from Nuri's review of the Project 2 (DuckLake) videos on 12 Nov 2026. Project 2 stays as it is; every new course follows them. The full version is in `SKILL.md`, "Visual rules".
+
+### Zoom: let the app do it, and show the full screen first
+
+1. **Pick one app zoom level and keep it.** Make Studio readable with its own zoom (Cmd +/-, which is Electron's zoom factor; `course.yaml` → `ui_zoom`, e.g. 1.25). Choose the level once per course, check that the sidebar, header, editor, terminal and status bar all still fit, and never change it during the course.
+2. **No crop zoom by default.** The video shows the whole app window (`zoom: none`).
+3. **Full screen first, every time.** Each app scene, and each return from a slide, opens on the full, unzoomed window and holds it for 1.5 to 2 seconds before anything zooms.
+4. **Then at most one zoom into one region**, only for a detail that is still too small (a terminal line, a result cell), and back out to the full screen before looking at another region.
+5. **Never** start a scene already zoomed, jump from one cropped region to another, stack a crop zoom on another crop zoom, or show a crop where the sidebar, header or terminal are cut in half. A viewer cannot follow it.
+
+### Slides: icons, and no empty space
+
+1. **Icons on every content slide**, for every product, format or service the slide names (DuckLake, DuckDB, dbt, Parquet, Iceberg, Delta Lake, PostgreSQL, S3, GitHub, Studio).
+2. **Icon sources, in order:** Studio's own assets, copied read-only from `dbt-studio/assets/icons/` and `dbt-studio/assets/connectionIcons/`; free open-license sets downloaded into the course's `brand/icons/` (Simple Icons CC0, Lucide ISC, Tabler MIT, Material Symbols Apache 2.0, official brand kits); an existing web URL only as a last resort. Note each source and licence in `brand/icons/SOURCES.md`.
+3. **Fill the slide.** Cards, diagrams and code cover more than 60% of the content area between the heading and the footer. When there is little text, make cards and fonts bigger, add icons or a Studio screenshot; never leave half the slide empty.
+4. **Check before approval:** on the contact sheet of slide stills, every content slide has icons and no slide is more than about 40% empty.

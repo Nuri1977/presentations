@@ -26,6 +26,18 @@ const log = (...a) => console.log(`[${((Date.now() - T0) / 1000).toFixed(1)}s]`,
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 let page, app, seeded, LAUNCH;
+// UI zoom (like Cmd + in the app): Studio re-lays-out larger, so 4K frames stay sharp instead of being cropped
+// and upscaled later. Mouse coordinates are CSS px; events are written in 1920x1080 DIP, so they are scaled by Z.
+const UIZ = course.ui_zoom || 1;            // Studio (Electron zoom factor)
+const BZ = course.browser_zoom || UIZ;      // browser pages (smaller viewport at a higher device scale)
+let Z = 1;                                  // zoom of the current surface
+const dip = (p) => [Math.round(p[0] * Z), Math.round(p[1] * Z)];
+async function applyUiZoom(z) {
+  if (!app) return;
+  await app.evaluate(({ BrowserWindow }, f) => { for (const b of BrowserWindow.getAllWindows()) b.webContents.setZoomFactor(f); }, z);
+  if (surface === 'app') Z = z;
+  await page.waitForTimeout(700);
+}
 let nFrame = 0;
 let cursor = [1180, 640];
 // Two surfaces: the Studio window ('app' scenes) and a headless Chromium page ('browser' scenes),
@@ -36,7 +48,7 @@ const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 async function getBrowserPage() {
   if (browserPage) return browserPage;
   const { chromium } = require('playwright');
-  const opts = { headless: true, viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 2, colorScheme: 'dark', userAgent: UA, acceptDownloads: true };
+  const opts = { headless: true, viewport: { width: Math.round(1920 / BZ), height: Math.round(1080 / BZ) }, deviceScaleFactor: 2 * BZ, colorScheme: 'dark', userAgent: UA, acceptDownloads: true };
   if (course.browser_profile) {
     // saved recording profile (signed in to GitHub once by Nuri with browser-login.cjs); never Nuri's own Chrome
     browser = await chromium.launchPersistentContext(course.browser_profile, opts);
@@ -65,7 +77,18 @@ async function snap() {
   // a page that is navigating cannot be captured for a moment: retry until the new page has painted
   for (let k = 0; ; k++) {
     try {
-      await page.screenshot({ path: path.join(OUT, 'frames', name), type: 'jpeg', quality: 92 });
+      if (surface === 'app' && app && UIZ !== 1) {
+        // Studio with a UI zoom: Playwright would capture CSS px x 2 (smaller than 4K); take the window's own pixels
+        const sz = await app.evaluate(async ({ BrowserWindow }, out) => {
+          const w = BrowserWindow.getAllWindows().find((b) => b.isVisible() && !b.isDestroyed());
+          const img = await w.webContents.capturePage();
+          process.mainModule.require('fs').writeFileSync(out, img.toJPEG(92));
+          return img.getSize();
+        }, path.join(OUT, 'frames', name));
+        if (sz.width < 3000) throw new Error('capturePage gave ' + sz.width + 'x' + sz.height);
+      } else {
+        await page.screenshot({ path: path.join(OUT, 'frames', name), type: 'jpeg', quality: 92 });
+      }
       return name;
     } catch (e) {
       if (k >= 30 || !/captureScreenshot|navigat|Execution context/i.test(e.message)) throw e;
@@ -74,6 +97,9 @@ async function snap() {
   }
 }
 function ev(e) {
+  if (e.at) e.at = dip(e.at);
+  if (e.from) e.from = dip(e.from);
+  if (e.to) e.to = dip(e.to);
   steps.push(e);
   fs.appendFileSync(path.join(OUT, 'events.jsonl'), JSON.stringify({ beat: beatId, t: Date.now() - T0, ...e }) + '\n');
 }
@@ -94,6 +120,20 @@ async function glideTo(x, y, label) {
   ev({ k: 'glide', from: cursor, to: [x, y], label });
   cursor = [x, y];
   await page.mouse.move(x, y);
+  // With Electron's zoom factor the mouse sometimes works in window points and sometimes in CSS px
+  // (seen in Studio 1.7.6 at zoom 1.25). Ask the page where the pointer really is and correct once.
+  if (surface === 'app' && Z !== 1) {
+    const got = await page.evaluate(() => {
+      if (!window.__recMM) { window.__recMM = [null, null]; addEventListener('mousemove', (e) => { window.__recMM = [e.clientX, e.clientY]; }, true); return null; }
+      return window.__recMM;
+    }).catch(() => null);
+    let at = got;
+    if (!at) { await page.mouse.move(x + 1, y); await page.mouse.move(x, y); at = await page.evaluate(() => window.__recMM).catch(() => null); }
+    if (at && at[0] !== null && (Math.abs(at[0] - x) > 2 || Math.abs(at[1] - y) > 2)) {
+      const f = Math.max(x, y) === x ? x / Math.max(1, at[0]) : y / Math.max(1, at[1]);
+      await page.mouse.move(x * f, y * f);
+    }
+  }
   await page.waitForTimeout(140);
   await still(); // hover state at arrival
 }
@@ -105,7 +145,14 @@ async function pointAt(locator, label, { dx = 0.5, dy = 0.5, maxDx = 9999 } = {}
   return { x, y, b };
 }
 async function click(locator, label, { button = 'left', settleMs = [150, 450], ...opt } = {}) {
-  const { x, y } = await pointAt(locator, label, opt);
+  let { x, y, b } = await pointAt(locator, label, opt);
+  // the page can still be settling (a banner, a list loading): if the target moved during the glide, follow it
+  for (let i = 0; i < 3; i++) {
+    const nb = await locator.boundingBox().catch(() => null);
+    if (!nb || (Math.abs(nb.y - b.y) < 4 && Math.abs(nb.x - b.x) < 4)) break;
+    await page.waitForTimeout(400);
+    ({ x, y, b } = await pointAt(locator, label, opt));
+  }
   await page.mouse.down({ button });
   await page.waitForTimeout(60);
   await page.mouse.up({ button });
@@ -148,6 +195,7 @@ const ACTIONS = {
   async open_project(name) {
     await click(page.getByRole('button', { name: new RegExp(esc(name)) }).first(), `open project ${name}`, { dx: 0.15, settleMs: [300, 900, 1800, 3000] });
     await sizeWindow(app, page);
+    await applyUiZoom(UIZ);
   },
   async open_file(rel) { await openPath(rel); },
   async new_file({ folder, name }) {
@@ -258,6 +306,8 @@ const ACTIONS = {
     await typeKeys(name, 'folder name');
     await click(page.getByRole('dialog').getByRole('button', { name: 'Save', exact: true }).first(), 'Save new folder', { settleMs: [250, 700, 1300] });
     if (!fs.existsSync(path.join(seeded.projectDir, parent, name))) throw new Error('folder not created: ' + name);
+    if (!(await isVisible(treeItem(name, parent.split('/').length + 2).first()))) { await page.waitForTimeout(1500); await ACTIONS.expand(parent).catch(() => {}); }
+    await ACTIONS.ensure_tree({ name, level: parent.split('/').length + 2 });
   },
   // Type at a line: at its end, or `back` characters before the end (e.g. 1 = before a closing bracket).
   async insert_at({ line, text, back = 0 }) {
@@ -291,13 +341,19 @@ const ACTIONS = {
     await click(page.getByRole('combobox').first(), 'connection select', { settleMs: [200, 500] });
     await click(page.getByRole('option', { name, exact: true }).first(), `connection ${name}`, { settleMs: [400, 1200, 2400, 3400] });
   },
-  async sql_run() {
-    // the green run arrow sits in the gutter, 74 px left of the first code line
-    const box = await boxOf(page.locator('.monaco-editor:visible .view-line').first());
-    await glideTo(Math.round(box.x - 74), Math.round(box.y + box.height / 2), 'run arrow');
+  async sql_run(arg) {
+    // the green run arrow sits in the gutter, 74 px left of a statement's line (scroll a long line back first)
+    const line = (arg && arg.line) || 1;
+    await page.evaluate(() => { const ed = window.__recEditor; if (ed) { ed.setScrollLeft(0); ed.setPosition({ lineNumber: 1, column: 1 }); } });
+    await page.waitForTimeout(300);
+    const rows = await page.locator('.monaco-editor:visible .view-lines .view-line').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [parseFloat(e.style.top), r.x, r.y, r.height]; }));
+    rows.sort((a, b) => a[0] - b[0]);
+    const [, bx, by, bh] = rows[line - 1];
+    const x = Math.round(bx - 74), y = Math.round(by + bh / 2);
+    await glideTo(x, y, 'run arrow');
     await page.mouse.down(); await page.waitForTimeout(60); await page.mouse.up();
-    ev({ k: 'press', at: [box.x - 74, box.y + box.height / 2], button: 'left', label: 'run query' });
-    await settle([300, 900, 1800, 3000]);
+    ev({ k: 'press', at: [x, y], button: 'left', label: `run query line ${line}` });
+    await settle((arg && arg.settleMs) || [300, 900, 1800, 3000]);
   },
   async point_tree(rel) {
     const parts = rel.split('/');
@@ -358,6 +414,20 @@ const ACTIONS = {
     await typeKeys(text, 'commit message');
   },
   // ---- generic actions (both surfaces) ----
+  // Wait for a long query in the SQL Editor: Studio shows a Stop Query button while it runs.
+  async sql_wait(arg) {
+    const { timeoutMs = 1200000, everyMs = 3000 } = arg || {};
+    await page.waitForTimeout(700);
+    const t0 = Date.now(); let n = 0;
+    while (await page.getByRole('button', { name: 'Stop Query' }).count()) {
+      if (Date.now() - t0 > timeoutMs) throw new Error('query still running after ' + timeoutMs + ' ms');
+      await page.waitForTimeout(everyMs);
+      if (n++ % 4 === 0) await still((Date.now() - t0) / 1000);
+    }
+    log('  query finished after', ((Date.now() - t0) / 1000).toFixed(1), 's');
+    await page.waitForTimeout(900);
+    await still();
+  },
   async click_at(spec) {
     // closes: true = the click closes this window (e.g. setup Finish), so take no frames after it
     await click(loc(spec), `click ${specLabel(spec)}`, { dx: spec.dx ?? 0.5, settleMs: spec.closes ? [] : spec.settleMs || [200, 600] });
@@ -420,12 +490,14 @@ const ACTIONS = {
     page = studioPage = next;
     await page.waitForTimeout(2500);
     await sizeWindow(app, page);
+    await applyUiZoom(UIZ);
     await page.waitForTimeout(1500);
     await still();
   },
   // Click a field and type into it, one frame per character.
   async type_text(spec) {
     await click(loc(spec), `field ${specLabel(spec)}`, { dx: spec.dx ?? 0.2, settleMs: [150] });
+    if (spec.replace) { await page.keyboard.press('Meta+A'); await page.keyboard.press('Backspace'); await page.waitForTimeout(120); } // field has a default value
     await typeKeys(spec.text, `type ${specLabel(spec)}`);
   },
   // Wait (e.g. a page load or a server check), then take one frame.
@@ -508,6 +580,15 @@ const ACTIONS = {
       if ((await item.getAttribute('aria-expanded')) !== 'true') await click(item, `expand ${parts[i]}`, { dx: 0.3, maxDx: 140, settleMs: [200, 600] });
     }
   },
+  // After creating a folder: wait for its row; if the tree did not redraw, use the Explorer's refresh button.
+  async ensure_tree({ name, level }) {
+    for (let k = 0; k < 2; k++) {
+      const t0 = Date.now();
+      while (Date.now() - t0 < 5000) { if (await isVisible(treeItem(name, level).first())) return; await page.waitForTimeout(300); }
+      await ACTIONS.refresh_explorer();
+    }
+    if (!(await isVisible(treeItem(name, level).first()))) throw new Error('tree row not shown: ' + name);
+  },
   // The Explorer's refresh button (right of the file search box): shows files added outside Studio.
   async refresh_explorer() {
     // the icon has no accessible name; it sits about 20 px right of the search box, centred on it
@@ -527,6 +608,7 @@ const ACTIONS = {
     await typeKeys(name, 'folder name');
     await click(page.getByRole('dialog').getByRole('button', { name: 'Save', exact: true }).first(), 'Save new folder', { settleMs: [250, 700, 1300] });
     if (!fs.existsSync(path.join(seeded.projectDir, name))) throw new Error('folder not created: ' + name);
+    await ACTIONS.ensure_tree({ name, level: 2 });
   },
   // Push the new commit to the tracked branch; checks that origin/main moved.
   async git_push({ name = '^(Push|Sync Changes)' } = {}) {
@@ -539,6 +621,28 @@ const ACTIONS = {
     await still();
     log('  pushed', head().slice(0, 7));
   },
+  // Scroll the widest scrollable area of the open dialog to its right edge (e.g. a preview table), as a short clip.
+  async dialog_scroll_right({ frames = 14 } = {}) {
+    const max = await page.evaluate(() => {
+      const d = [...document.querySelectorAll('[role=dialog]')].pop();
+      const els = [...d.querySelectorAll('*')].filter((e) => e.scrollWidth > e.clientWidth + 20 && getComputedStyle(e).overflowX !== 'visible');
+      els.sort((x, y) => (y.scrollWidth - y.clientWidth) - (x.scrollWidth - x.clientWidth));
+      window.__recScroller = els[0];
+      return els[0] ? els[0].scrollWidth - els[0].clientWidth : 0;
+    });
+    if (!max) throw new Error('nothing to scroll in the dialog');
+    await still();
+    const imgs = []; const ts = [];
+    for (let i = 1; i <= frames; i++) {
+      const u = i / frames; const e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+      await page.evaluate((x) => { window.__recScroller.scrollLeft = x; }, max * e);
+      await page.waitForTimeout(50);
+      imgs.push(await snap()); ts.push(i * 0.09);
+    }
+    ev({ k: 'live', imgs, ts, label: 'scroll dialog right' });
+  },
+  // Change Studio's zoom for the following beats (e.g. 1.75 for a dense dialog), like pressing Cmd +.
+  async ui_zoom(z) { await applyUiZoom(z === 'default' ? UIZ : Number(z)); await still(); },
   async press_keys(keys) {
     await page.keyboard.press(keys);
     await page.waitForTimeout(150);
@@ -602,6 +706,8 @@ const ACTIONS = {
     studioPage = page;
     await page.waitForTimeout(3000);
     await sizeWindow(app, page);
+    await applyUiZoom(UIZ);
+    cursor = cursors.app = [Math.round(1180 / UIZ), Math.round(640 / UIZ)];
     await page.mouse.move(cursor[0], cursor[1]);
     await page.waitForTimeout(2500);
     initial = await snap();
@@ -614,6 +720,8 @@ const ACTIONS = {
     cursors[surface] = cursor;
     surface = sc.kind;
     page = surface === 'browser' ? await getBrowserPage() : studioPage;
+    Z = surface === 'browser' ? BZ : UIZ;
+    if (surface === 'browser' && !cursors.browserScaled) { cursors.browser = [Math.round(960 / BZ), Math.round(300 / BZ)]; cursors.browserScaled = true; }
     cursor = cursors[surface];
     if (surface === 'browser') await page.mouse.move(cursor[0], cursor[1]);
     for (const b of sc.beats) {
@@ -634,13 +742,13 @@ const ACTIONS = {
         await still().catch(() => {});
         failed = { beat: b.id, error: e.message.split('\n')[0] };
       }
-      beats[b.id] = { steps, cursorEnd: cursor };
+      beats[b.id] = { steps, cursorEnd: dip(cursor) };
       if (failed) break;
     }
     if (failed) break;
   }
   const versions = studioPage && await studioPage.evaluate(() => document.body.innerText.match(/dbt:\s*[\d.]+|Python:\s*[\d.]+|v\d+\.\d+\.\d+/g)).catch(() => null);
-  fs.writeFileSync(path.join(OUT, 'events.json'), JSON.stringify({ size: [1920, 1080], scale: 2, initialCursor: [1180, 640], beats, failed, versions, frames: nFrame }, null, 1));
+  fs.writeFileSync(path.join(OUT, 'events.json'), JSON.stringify({ size: [1920, 1080], scale: 2, uiZoom: UIZ, browserZoom: BZ, initialCursor: [1180, 640], beats, failed, versions, frames: nFrame }, null, 1));
   log('frames', nFrame, failed ? 'FAILED ' + JSON.stringify(failed) : 'ok', versions);
   if (browser) await browser.close().catch(() => {});
   if (app) await app.close().catch(() => {});

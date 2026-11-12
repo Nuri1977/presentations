@@ -1,0 +1,24 @@
+number: "4.2"
+title: Statistics and file pruning
+slides:
+  - { id: title, type: title, h1: 'Statistics and <span class="accent">pruning</span>', lead: "Skip files without opening them.", badges: [Min and max, EXPLAIN ANALYZE, SORTED BY] }
+  - id: sorted
+    type: html
+    eyebrow: Keep ranges narrow
+    h2: Narrow ranges, few files read
+    html: |
+      <div class="row two" style="margin-top:30px">
+        <div class="card good s" data-step="1"><div class="k">Narrow ranges</div><div class="t">1 of 7 files</div>
+          <div class="files-strip"><div class="file">Oct 1<small>26,093,738 – 26,100,913</small></div><div class="file" style="opacity:.4">Oct 2<small>26,100,914 – 26,108,081</small></div><div class="file" style="opacity:.4">…</div></div></div>
+        <div class="card bad s" data-step="2"><div class="k">Random order</div><div class="t">7 of 7 files</div>
+          <div class="files-strip"><div class="file">file 1<small>26,093,7… – 26,143,9…</small></div><div class="file">file 2<small>26,093,7… – 26,143,9…</small></div><div class="file">…</div></div></div>
+      </div>
+      <div class="card hot s" data-step="3" style="padding:24px 32px;font-size:34px;font-weight:700;margin-top:30px"><span class="mono">ALTER TABLE … SET SORTED BY (block_number ASC)</span>: new files are written sorted.</div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "Min and max per column, per file, in the catalog."
+      - "Queries skip files without opening them."
+      - "<span class=\"mono\">SORTED BY</span> keeps new files narrow."
+  - { id: closing, type: closing, lesson: Lesson 4.3, h2: 'Data <span class="accent">inlining</span>' }

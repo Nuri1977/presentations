@@ -1,0 +1,67 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:05.826
+A CSV file stores data row by row.
+
+00:00:06.106 --> 00:00:10.363
+Each line is a whole record: every column of one Ethereum block.
+
+00:00:11.313 --> 00:00:13.232
+Parquet stores it column by column.
+
+00:00:13.512 --> 00:00:18.217
+All the block numbers together, then all the miners, then all the transaction counts.
+
+00:00:19.167 --> 00:00:20.207
+Why does that matter?
+
+00:00:20.487 --> 00:00:23.250
+Analytics queries use a few columns out of many.
+
+00:00:23.530 --> 00:00:27.366
+With columns stored apart, the engine reads only the ones it needs.
+
+00:00:28.316 --> 00:00:32.574
+Here is a real file: one day of Ethereum blocks from the public bucket.
+
+00:00:32.854 --> 00:00:37.790
+Seven thousand one hundred seventy-six rows, in one row group, compressed with Snappy.
+
+00:00:38.740 --> 00:00:41.832
+A big file is split into row groups, chunks of rows.
+
+00:00:42.112 --> 00:00:45.238
+Inside each chunk, every column is stored on its own.
+
+00:00:46.188 --> 00:00:48.310
+The file is five point six megabytes.
+
+00:00:48.590 --> 00:00:52.431
+More than half of it is one column, logs bloom, that we do not need.
+
+00:00:52.711 --> 00:00:54.351
+Later we simply leave it out.
+
+00:00:55.301 --> 00:01:02.025
+The most useful part: for every column in every row group, the file stores the smallest and the largest value.
+
+00:01:02.305 --> 00:01:08.972
+Block numbers in this file go from twenty-six million ninety-three thousand to twenty-six million one hundred thousand.
+
+00:01:09.922 --> 00:01:18.669
+So if you ask for block twenty-six million two hundred thousand, the engine looks at those two numbers and skips the whole file, without reading a single row.
+
+00:01:19.619 --> 00:01:27.091
+DuckLake goes one step further: it copies these statistics into its catalog, so it can skip files before even opening them.
+
+00:01:27.371 --> 00:01:29.269
+We see that in Modules 4 and 5.
+
+00:01:30.219 --> 00:01:33.047
+To recap: Parquet stores columns, not rows.
+
+00:01:33.327 --> 00:01:42.134
+It splits rows into row groups, compresses each column, and keeps the min and max of every column, so engines can skip what they do not need.
+
+00:01:42.414 --> 00:01:45.629
+Next: how table formats turn these files into tables.

@@ -1,6 +1,6 @@
 # Lesson 2.3 · Models: your first dbt model
 
-dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 3:41, 3840x2160 H.264 + AAC, 54 MB.
+dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 3:42, 3840x2160 H.264 + AAC, 51 MB.
 
 ## Files
 
@@ -25,16 +25,14 @@ Rosetta DBT Studio 1.7.6 (official release), dbt-core 1.12.6, dbt-duckdb 1.11.1,
 
 ## Changes from the draft
 
-- The plan's s05 queried `trips` in the SQL Editor. In Studio 1.7.6 the SQL Editor, Execute Query and Model > Preview all run DuckDB from Studio's own folder, so the view's relative parquet path fails ("No files found"). The lesson uses `dbt show` in Studio's terminal instead, which runs in the project folder. Logged in studio-notes.md.
-- dbt commands from Studio's dropdowns (Nuri, 10 Nov): the model runs from Model ▸ Run. Model ▸ Preview cannot read the view's relative parquet path in 1.7.6, so the rows still come from dbt show in the terminal.
-- Ends with commit + Sync Changes (push to main) and the models folder on GitHub (rehearsal repo).
-- The Source Control panel is the Git tab in the Explorer sidebar in 1.7.6; a new file must be staged with + before Commit is enabled.
+- Studio features first (Nuri, 10 Nov): Model ▸ Run, Model ▸ Preview (Preview window + Query Results tab with SQL and History), Model ▸ Compile (Compiled SQL window), and the Run History tab. No dbt show, no target/run file.
+- Preview and Query Results show TIMESTAMP columns as [object Object] / {micros} in Studio 1.7.6; the lesson scrolls the preview to the number columns and does not read the timestamps.
+- Ends with commit + Sync Changes (push to main) and the models folder on GitHub.
 
 ## Accuracy notes
 
 - Measured on 9 Nov 2026 from the TLC files downloaded that day: 591,375 raw rows in green_tripdata_2025-01..12; 565,039 rows in `trips` after the filter.
-- Run output `OK created sql view model main.trips` and the `create view "nyc_taxi_dev"."main"."trips__dbt_tmp"` statement in target/run are the real outputs of this recording (dbt-core 1.12.6, dbt-duckdb 1.11.1).
-- dbt's view materialization creates the view under a temporary name and then renames it, which is why target/run shows trips__dbt_tmp.
+- Run output `OK created sql view model main.trips` and the Preview count (565039 rows, 11 columns) are the real outputs of this recording (dbt-core 1.12.6, dbt-duckdb 1.11.1).
 - Listen once for pronunciation (see `voiceover-kokoro.txt` for the exact spoken forms).
 
 ## Re-render

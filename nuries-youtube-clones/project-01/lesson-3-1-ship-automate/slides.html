@@ -116,7 +116,7 @@
       <div class="card box"><div class="k">prod</div><ul><li>Where <span>a fresh machine</span></li><li>Built from <span>git only</span></li><li>Database <span>prod.duckdb</span></li></ul></div>
     </div>
     <div class="card s" data-step="2" style="margin-top:30px;padding:36px 44px">
-      <div class="dag" style="font-size:28px"><div class="node">git push</div><div class="arr">→</div><div class="node">install dbt</div><div class="arr">→</div><div class="node src">download data</div><div class="arr">→</div><div class="node m">dbt build</div><div class="arr">→</div><div class="node seed">publish prod.duckdb</div></div>
+      <div class="dag" style="font-size:28px"><div class="node">git push</div><div class="arr">→</div><div class="node">install dbt</div><div class="arr">→</div><div class="node src">download + load data</div><div class="arr">→</div><div class="node m">dbt build</div><div class="arr">→</div><div class="node seed">publish prod.duckdb</div></div>
     </div>
   </div>
   <div class="footer"><div class="bar" style="width:96%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 3.1</b></div></div>
@@ -129,7 +129,7 @@
     <div class="cmp" style="grid-template-columns:.8fr 40px 1.2fr;margin-top:30px;align-items:start">
       <div class="card box s" data-step="1"><div class="k">Runs on</div><ul><li>push <span>main</span></li><li>schedule <span>Mondays</span></li><li>by hand <span>dispatch</span></li><li>may write <span>releases</span></li></ul></div>
       <div></div>
-      <div class="card box s" data-step="2"><div class="k">Steps</div><ul><li>1 · checkout <span>@v7</span></li><li>2 · Python <span>3.10</span></li><li>3 · pip install <span>requirements</span></li><li>4 · download <span>12 files</span></li><li>5 · dbt build <span>--profiles-dir ci</span></li><li>6 · publish <span>warehouse</span></li></ul></div>
+      <div class="card box s" data-step="2"><div class="k">Steps</div><ul><li>1 · checkout <span>@v7</span></li><li>2 · Python <span>3.10</span></li><li>3 · pip install <span>requirements</span></li><li>4 · download + load <span>raw.green_trips</span></li><li>5 · dbt build <span>--profiles-dir ci</span></li><li>6 · publish <span>warehouse</span></li></ul></div>
     </div>
   </div>
   <div class="footer"><div class="bar" style="width:96%"></div><img src="../brand/logo_hero.svg" alt=""><div class="where">Project 1 · <b>Lesson 3.1</b></div></div>

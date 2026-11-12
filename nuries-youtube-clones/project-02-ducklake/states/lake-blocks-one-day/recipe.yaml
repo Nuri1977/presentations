@@ -1,0 +1,13 @@
+# Studio set up; the lake eth_lake exists with raw.blocks (1 Aug 2026) and is registered in Studio, not yet opened.
+name: lake-blocks-one-day
+setup_only: true
+project_name: ethereum_lake
+clean: [projects]
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com
+lake:
+  name: eth_lake
+  dir: lake
+  catalog: eth_catalog.duckdb
+  sql: [../sql/00_options.sql, ../sql/01_raw_blocks_first_day.sql]

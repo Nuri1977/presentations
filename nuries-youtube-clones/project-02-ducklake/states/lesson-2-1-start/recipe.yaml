@@ -1,0 +1,9 @@
+# Start of Lesson 2.1: Studio set up, no lake yet. The learner has made the folder ethereum_lake/lake/data.
+name: lesson-2-1-start
+setup_only: true
+project_name: ethereum_lake
+clean: [projects]
+mkdirs: [projects/ethereum_lake/lake/data]
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com

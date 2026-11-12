@@ -1,0 +1,91 @@
+1
+00:00:03,350 --> 00:00:05,800
+Last step: make the project easy to show.
+
+2
+00:00:06,080 --> 00:00:11,747
+A README that explains it, live docs, a green build badge, and a warehouse anyone can query.
+
+3
+00:00:12,697 --> 00:00:16,280
+On GitHub, open the repository's Settings, then Pages.
+
+4
+00:00:16,560 --> 00:00:20,934
+Under Source, choose GitHub Actions, so our workflow can publish the docs.
+
+5
+00:00:21,884 --> 00:00:31,101
+In Studio, open the workflow file, and paste three more build steps at the end: generate the docs, copy the site files, and upload them for Pages.
+
+6
+00:00:32,051 --> 00:00:36,174
+And a second job, docs, that runs after build and deploys the site.
+
+7
+00:00:36,454 --> 00:00:37,053
+Save.
+
+8
+00:00:38,003 --> 00:00:38,985
+Now the README.
+
+9
+00:00:39,265 --> 00:00:48,931
+Open it, select all, and paste the new one: a build badge, a docs link, what the project does and where to look, how to query the warehouse, and how to run it yourself.
+
+10
+00:00:49,211 --> 00:00:49,811
+Save.
+
+11
+00:00:50,761 --> 00:00:55,197
+Git tab: stage all, type a message, publish docs and README, and commit.
+
+12
+00:01:03,593 --> 00:01:04,568
+Sync Changes.
+
+13
+00:01:04,848 --> 00:01:06,246
+The push starts the workflow.
+
+14
+00:01:08,693 --> 00:01:13,573
+On GitHub, the Actions tab shows the run, now with two jobs: build, then docs.
+
+15
+00:01:14,523 --> 00:01:16,191
+A minute later, both are green.
+
+16
+00:01:17,723 --> 00:01:23,288
+The docs are live on GitHub Pages, for anyone, with the lineage graph of the whole project.
+
+17
+00:01:24,238 --> 00:01:28,253
+And the repository page shows the README, with the green build badge.
+
+18
+00:01:29,203 --> 00:01:31,060
+And anyone can query the warehouse.
+
+19
+00:01:31,340 --> 00:01:38,151
+With DuckDB, attach prod dot duckdb straight from the GitHub release, read only, and select from the marts.
+
+20
+00:01:39,101 --> 00:01:45,920
+East Harlem North leads, with a hundred forty-three thousand trips: built by CI, and read over the internet.
+
+21
+00:01:46,870 --> 00:01:48,047
+That's Project 1.
+
+22
+00:01:48,327 --> 00:01:59,323
+Raw files and a seed, models with ref, descriptions, docs and the DAG, tables where they matter, tests, CI on every push, live docs, and a warehouse anyone can query.
+
+23
+00:01:59,603 --> 00:02:03,123
+All built in Rosetta DBT Studio, and all on GitHub.

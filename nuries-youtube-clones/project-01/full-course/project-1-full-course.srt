@@ -1,0 +1,1719 @@
+1
+00:00:03,350 --> 00:00:04,784
+Welcome to Project 1.
+
+2
+00:00:05,064 --> 00:00:10,084
+In this course, you build a real analytics project with dbt and DuckDB.
+
+3
+00:00:10,364 --> 00:00:17,874
+You start from an empty folder, and finish with a tested, automated pipeline, all inside Rosetta DBT Studio.
+
+4
+00:00:18,824 --> 00:00:26,912
+We start with a full year of New York City green taxi trips: twelve monthly parquet files, and a small lookup table of taxi zones.
+
+5
+00:00:27,862 --> 00:00:31,687
+dbt turns the raw files into one clean model of trips.
+
+6
+00:00:32,637 --> 00:00:40,430
+On top of it, three small tables: trips per month and borough, the busiest pickup zones, and a monthly summary of how riders pay.
+
+7
+00:00:41,380 --> 00:00:45,728
+We add tests that catch bad data, and documentation with a lineage graph.
+
+8
+00:00:46,678 --> 00:00:55,023
+Finally, GitHub Actions rebuilds everything on every change, and publishes the finished DuckDB database, so anyone can query it.
+
+9
+00:00:55,973 --> 00:01:00,424
+The data comes from the New York City Taxi and Limousine Commission, the TLC.
+
+10
+00:01:00,704 --> 00:01:08,080
+Every trip has its pickup and drop-off time, the pickup and drop-off zones, the distance, how the rider paid, and what it cost.
+
+11
+00:01:09,030 --> 00:01:16,242
+For 2025, that is about five hundred ninety thousand trips, in twelve files of about one megabyte each.
+
+12
+00:01:16,522 --> 00:01:18,898
+Small enough to build on a laptop in seconds.
+
+13
+00:01:19,848 --> 00:01:23,416
+A second file maps every zone number to its name and borough.
+
+14
+00:01:23,696 --> 00:01:30,011
+Zone seventy-four, for example, is East Harlem North, in Manhattan, the busiest pickup zone of the year.
+
+15
+00:01:30,961 --> 00:01:33,643
+You need one app: Rosetta DBT Studio.
+
+16
+00:01:33,923 --> 00:01:42,341
+It is open source, it installs Python and dbt Core for you, and it gives you an editor, a terminal, lineage, and git, in one window.
+
+17
+00:01:43,291 --> 00:01:44,970
+DuckDB is the database.
+
+18
+00:01:45,250 --> 00:01:49,442
+It lives in a single file on your computer, so there is no server to set up.
+
+19
+00:01:49,722 --> 00:01:53,229
+And GitHub keeps your code, and later runs the pipeline for you.
+
+20
+00:01:54,179 --> 00:01:58,220
+The whole project lives in one public repository on GitHub.
+
+21
+00:01:58,500 --> 00:02:03,255
+We create it in lesson 2.1, and every lesson ends with a commit and a push.
+
+22
+00:02:04,205 --> 00:02:07,068
+So each lesson's commit is the code for that lesson.
+
+23
+00:02:07,348 --> 00:02:10,719
+The link to the repository is in every video description.
+
+24
+00:02:11,669 --> 00:02:13,485
+Build your own copy as you watch.
+
+25
+00:02:13,765 --> 00:02:17,028
+And if you get stuck, compare it with the course repository.
+
+26
+00:02:17,978 --> 00:02:19,541
+The course has three modules.
+
+27
+00:02:19,821 --> 00:02:23,114
+First, set up: install Rosetta DBT Studio.
+
+28
+00:02:24,064 --> 00:02:34,191
+Second, dbt basics: create the project and connect it to GitHub, get the data, then models, Jinja, properties, docs, materializations, and tests.
+
+29
+00:02:35,141 --> 00:02:42,012
+Third, ship it: automate the build with GitHub Actions, and turn the repository into a portfolio project.
+
+30
+00:02:42,962 --> 00:02:47,926
+You need a computer, a GitHub account and the basics of git, and some basic SQL.
+
+31
+00:02:48,206 --> 00:02:51,227
+No dbt installed yet: we start from zero.
+
+32
+00:02:51,507 --> 00:02:52,253
+New to git?
+
+33
+00:02:52,533 --> 00:02:54,044
+There are links in the description.
+
+34
+00:02:54,324 --> 00:02:55,749
+See you in the first lesson.
+
+35
+00:03:03,683 --> 00:03:09,276
+In this lesson, you install Rosetta DBT Studio, the one app we use for the whole course.
+
+36
+00:03:09,556 --> 00:03:15,933
+You download it, copy it to your computer, and its first-run setup installs Python and dbt Core for you.
+
+37
+00:03:16,883 --> 00:03:20,867
+Studio is open source, and every version is published on GitHub.
+
+38
+00:03:21,147 --> 00:03:25,142
+Open the releases page of rosettadb, dbt-studio.
+
+39
+00:03:25,422 --> 00:03:28,118
+The latest release is 1.7.6.
+
+40
+00:03:29,068 --> 00:03:30,431
+Scroll down to Assets.
+
+41
+00:03:30,711 --> 00:03:39,600
+There is a build for every system: a dmg for Mac, an exe for Windows, and deb, rpm and flatpak packages for Linux.
+
+42
+00:03:40,550 --> 00:03:47,636
+On a Mac, pick the dmg for your processor: arm64 for Apple silicon, x64 for Intel.
+
+43
+00:03:47,916 --> 00:03:51,775
+This Mac has an Intel chip, so click the x64 dmg.
+
+44
+00:03:52,725 --> 00:03:54,965
+When the download finishes, open the file.
+
+45
+00:03:55,245 --> 00:03:59,421
+A window shows the app on the left, and your Applications folder on the right.
+
+46
+00:04:00,371 --> 00:04:05,528
+Drag Rosetta DBT Studio onto Applications, and wait for the copy to finish.
+
+47
+00:04:06,478 --> 00:04:08,300
+Then open it from Applications.
+
+48
+00:04:08,580 --> 00:04:13,748
+The first time, macOS asks whether you want to open an app downloaded from the internet.
+
+49
+00:04:14,028 --> 00:04:14,811
+Click Open.
+
+50
+00:04:15,761 --> 00:04:17,511
+Studio starts with a short setup.
+
+51
+00:04:17,791 --> 00:04:19,642
+First, the dbt version.
+
+52
+00:04:19,922 --> 00:04:22,997
+Choose dbt 1.x, the recommended one.
+
+53
+00:04:23,947 --> 00:04:25,219
+Then the exact version.
+
+54
+00:04:25,499 --> 00:04:28,098
+Keep the latest, 1.12.6.
+
+55
+00:04:29,048 --> 00:04:33,236
+Next, the adapters, one for each database dbt can talk to.
+
+56
+00:04:33,516 --> 00:04:39,641
+This course only needs DuckDB, so uncheck the others, keep dbt-duckdb, and click Continue.
+
+57
+00:04:40,591 --> 00:04:42,924
+Skip the optional tools, and click Install.
+
+58
+00:04:43,874 --> 00:04:52,202
+Studio downloads its own copy of Python, then installs dbt Core and the DuckDB adapter, all inside its own folder.
+
+59
+00:04:52,482 --> 00:04:55,578
+Here it took about a minute and a half; the video speeds it up.
+
+60
+00:04:56,528 --> 00:05:03,092
+Python 3.10.17, and dbt 1.12.6 with one adapter.
+
+61
+00:05:03,372 --> 00:05:04,130
+Click Finish.
+
+62
+00:05:05,080 --> 00:05:07,936
+This is Studio's home screen, the Workspace Overview.
+
+63
+00:05:08,216 --> 00:05:11,442
+No projects yet: we create the first one in Module 2.
+
+64
+00:05:12,392 --> 00:05:22,318
+The status bar at the bottom shows what was installed: dbt 1.12.6, Python 3.10.17, and DuckDB.
+
+65
+00:05:23,268 --> 00:05:26,932
+At the top right are New Connection, Open Project, and Settings.
+
+66
+00:05:27,212 --> 00:05:28,542
+That is all we need for now.
+
+67
+00:05:29,492 --> 00:05:31,344
+To recap: you installed one app.
+
+68
+00:05:31,624 --> 00:05:38,009
+Studio set up its own Python and dbt Core, with the DuckDB adapter, inside its own folder.
+
+69
+00:05:38,289 --> 00:05:41,272
+You did not install Python or dbt yourself.
+
+70
+00:05:42,222 --> 00:05:47,653
+Next, we create the dbt project, and connect it to a repository on GitHub.
+
+71
+00:05:55,617 --> 00:05:57,672
+A dbt project is a folder.
+
+72
+00:05:57,952 --> 00:06:07,908
+Models, seeds, tests and macros live in their own subfolders, and one file at the top, dbt_project.yml, gives the project its name and settings.
+
+73
+00:06:08,858 --> 00:06:12,802
+A second file, profiles.yml, says where dbt runs.
+
+74
+00:06:13,082 --> 00:06:17,879
+Our profile has one target, dev, and it points at a DuckDB database file.
+
+75
+00:06:18,829 --> 00:06:20,933
+Before we start, a quick look at Settings.
+
+76
+00:06:21,213 --> 00:06:25,570
+Under General: the projects directory, where Studio creates new projects.
+
+77
+00:06:26,520 --> 00:06:36,803
+Under dbt Core: the dbt runtime, dbt version one, one point twelve, and the adapters. dbt duckdb is the one for our database.
+
+78
+00:06:37,753 --> 00:06:45,139
+And Python: Studio runs dbt with its own Python, three point ten, separate from any Python on your computer.
+
+79
+00:06:46,089 --> 00:06:47,244
+Now, the database.
+
+80
+00:06:47,524 --> 00:06:50,939
+On the home screen, click New Connection, and choose DuckDB.
+
+81
+00:06:55,708 --> 00:06:57,450
+Name it nyc taxi dev.
+
+82
+00:06:57,730 --> 00:07:03,517
+For the file, type a path next to your projects folder: nyc taxi dev dot duckdb.
+
+83
+00:07:03,797 --> 00:07:07,576
+DuckDB creates the file the first time dbt connects.
+
+84
+00:07:07,856 --> 00:07:08,456
+Save.
+
+85
+00:07:09,406 --> 00:07:10,477
+Now the project.
+
+86
+00:07:10,757 --> 00:07:15,188
+Go back home, open the DBT Project card, and click New Project.
+
+87
+00:07:17,761 --> 00:07:19,299
+Call it nyc taxi.
+
+88
+00:07:19,579 --> 00:07:24,839
+Keep the template folders switched on, pick the nyc taxi dev connection, and save.
+
+89
+00:07:27,381 --> 00:07:29,599
+Studio creates the folder and opens it.
+
+90
+00:07:29,879 --> 00:07:33,476
+Here are the template folders, and the two files we just talked about.
+
+91
+00:07:34,426 --> 00:07:44,608
+Open dbt project dot yml: the project name is nyc taxi, it uses the profile with the same name, and lists where each kind of file lives.
+
+92
+00:07:45,558 --> 00:07:48,292
+Let's check that dbt can reach the database.
+
+93
+00:07:48,572 --> 00:07:53,227
+In the command box under the terminal, type dbt debug, and press Enter.
+
+94
+00:07:54,296 --> 00:07:58,761
+dbt finds the project and the profile, and connects to DuckDB.
+
+95
+00:07:59,041 --> 00:08:00,135
+All checks passed.
+
+96
+00:08:01,085 --> 00:08:09,530
+Before the first commit, add a dot gitignore file at the top of the project, so build output, logs, data and the database stay out of git.
+
+97
+00:08:10,783 --> 00:08:14,930
+And a short README, so people who open the repository know what it is.
+
+98
+00:08:22,176 --> 00:08:24,032
+Now a repository on GitHub.
+
+99
+00:08:24,312 --> 00:08:32,679
+Create a new, empty, public repository called nyc taxi dbt, with no README, gitignore or license.
+
+100
+00:08:32,959 --> 00:08:34,511
+Here is ours, still empty.
+
+101
+00:08:35,461 --> 00:08:37,838
+GitHub shows its HTTPS address.
+
+102
+00:08:38,118 --> 00:08:38,748
+Copy it.
+
+103
+00:08:39,698 --> 00:08:44,017
+Back in Studio, open the Git tab, and click Initialize Repository.
+
+104
+00:08:46,259 --> 00:08:52,550
+Stage all the changes, type a message, create the nyc taxi dbt project, and commit.
+
+105
+00:08:55,503 --> 00:08:56,683
+Click Publish Branch.
+
+106
+00:08:56,963 --> 00:09:01,111
+Studio asks for the remote: paste the repository address, and add it.
+
+107
+00:09:01,391 --> 00:09:03,631
+Studio pushes the main branch to GitHub.
+
+108
+00:09:04,581 --> 00:09:06,436
+Refresh the repository page.
+
+109
+00:09:06,716 --> 00:09:12,051
+The project is on GitHub: the folders, the two YAML files, the gitignore, and the README.
+
+110
+00:09:13,001 --> 00:09:22,596
+To recap: a DuckDB connection, a dbt project called nyc taxi, a passing dbt debug, and the first commit on GitHub.
+
+111
+00:09:22,876 --> 00:09:26,008
+From now on, every lesson ends with a commit and a push.
+
+112
+00:09:26,288 --> 00:09:27,546
+Next, we get the data.
+
+113
+00:09:35,483 --> 00:09:40,223
+Our raw data is twelve parquet files, one per month of 2025.
+
+114
+00:09:40,503 --> 00:09:44,593
+They are too big for git, so they stay in a data folder that git ignores.
+
+115
+00:09:44,873 --> 00:09:52,502
+We load them once into a DuckDB table, raw green trips, and a source, in sources dot yml, tells dbt about it.
+
+116
+00:09:53,452 --> 00:09:58,169
+The second file is small: a lookup of the 265 taxi zones.
+
+117
+00:09:58,449 --> 00:10:01,137
+Small CSV files like this one are seeds.
+
+118
+00:10:01,417 --> 00:10:05,219
+They live in the repository, and dbt loads them as tables.
+
+119
+00:10:06,169 --> 00:10:10,351
+The files come from the New York City Taxi and Limousine Commission website.
+
+120
+00:10:10,631 --> 00:10:16,810
+Under 2025, download Green Taxi Trip Records for each month, January to December.
+
+121
+00:10:17,090 --> 00:10:18,578
+The links are in the description.
+
+122
+00:10:19,528 --> 00:10:24,222
+Further down the same page, download the Taxi Zone Lookup Table, as CSV.
+
+123
+00:10:25,172 --> 00:10:28,248
+In Studio, open the nyc taxi project.
+
+124
+00:10:28,528 --> 00:10:31,758
+Right-click the project, choose New Folder, and call it data.
+
+125
+00:10:34,707 --> 00:10:37,064
+Inside data, make a folder called raw.
+
+126
+00:10:40,512 --> 00:10:46,356
+Now move the twelve parquet files into data, raw, and the zone lookup CSV into seeds.
+
+127
+00:10:46,636 --> 00:10:48,742
+Refresh the explorer, and there they are.
+
+128
+00:10:49,692 --> 00:10:51,766
+Now load the files into DuckDB.
+
+129
+00:10:52,046 --> 00:10:56,235
+Open the SQL Editor, and pick the nyc taxi dev connection.
+
+130
+00:10:58,399 --> 00:11:00,093
+Three statements, one per line.
+
+131
+00:11:00,373 --> 00:11:01,861
+Create a schema called raw.
+
+132
+00:11:02,141 --> 00:11:09,256
+Create the table raw green trips, from read parquet over all twelve files: use the full path of your data raw folder.
+
+133
+00:11:09,536 --> 00:11:10,628
+Then count the rows.
+
+134
+00:11:11,578 --> 00:11:14,944
+Run them one by one, with the green arrow next to each line.
+
+135
+00:11:15,224 --> 00:11:20,555
+Union by name lines up the columns, even if a month's file has them in a different order.
+
+136
+00:11:28,073 --> 00:11:35,718
+Five hundred ninety-one thousand, three hundred seventy-five trips in 2025, now in one DuckDB table.
+
+137
+00:11:36,668 --> 00:11:39,649
+Back in the project, tell dbt about the table.
+
+138
+00:11:39,929 --> 00:11:43,456
+Right-click models, New File, and call it sources dot yml.
+
+139
+00:11:45,813 --> 00:11:49,702
+A source called raw, the schema we just made, with a short description.
+
+140
+00:11:50,652 --> 00:11:54,535
+It has one table, green trips: one row per green taxi trip.
+
+141
+00:11:54,815 --> 00:11:55,414
+Save.
+
+142
+00:11:55,694 --> 00:11:59,365
+In a model, source raw, green trips, now points at that table.
+
+143
+00:12:00,315 --> 00:12:01,343
+Now the Git tab.
+
+144
+00:12:01,623 --> 00:12:05,484
+Only two files changed: sources dot yml and the CSV.
+
+145
+00:12:05,764 --> 00:12:10,278
+The parquet files are not here, because the gitignore leaves out the data folder.
+
+146
+00:12:11,228 --> 00:12:16,364
+Stage all, type a message, declare the raw trips source and add the zone lookup, and commit.
+
+147
+00:12:19,918 --> 00:12:21,334
+Then click Sync Changes.
+
+148
+00:12:21,614 --> 00:12:23,567
+Studio pushes the commit to GitHub.
+
+149
+00:12:25,018 --> 00:12:30,940
+On GitHub, the repository now has the models and seeds folders, and the latest commit message.
+
+150
+00:12:31,890 --> 00:12:38,485
+To recap: the trip files sit in data raw, outside git, and live in DuckDB as raw green trips.
+
+151
+00:12:38,765 --> 00:12:40,150
+The zone lookup is a seed.
+
+152
+00:12:40,430 --> 00:12:42,819
+And sources dot yml declares the source.
+
+153
+00:12:43,099 --> 00:12:45,463
+Next, we build our first model on top of it.
+
+154
+00:12:53,417 --> 00:12:57,402
+In the last lesson, we pointed dbt at the raw taxi files.
+
+155
+00:12:57,682 --> 00:12:59,845
+Now we build on top of them, with a model.
+
+156
+00:13:00,125 --> 00:13:05,563
+A model is one select statement, saved in one .sql file, in the models folder.
+
+157
+00:13:06,513 --> 00:13:12,176
+When you run it, dbt builds a view or a table from that select, and names it after the file.
+
+158
+00:13:12,456 --> 00:13:15,287
+So trips.sql becomes a view called trips.
+
+159
+00:13:16,237 --> 00:13:18,337
+Here is the project from the last lesson.
+
+160
+00:13:18,617 --> 00:13:23,609
+Open it, right-click the models folder, choose New File, and call it trips.sql.
+
+161
+00:13:26,041 --> 00:13:31,936
+Start with a comment that says what one row is: one green taxi trip from 2025.
+
+162
+00:13:32,216 --> 00:13:33,065
+Then, select.
+
+163
+00:13:34,015 --> 00:13:41,428
+Pick the columns we need, and give them clear names: the vendor, the pickup and drop-off times, and the pickup and drop-off zones.
+
+164
+00:13:42,378 --> 00:13:47,588
+Then the passenger count, the distance, how the rider paid, and the money: fare, tip, and total.
+
+165
+00:13:48,538 --> 00:13:50,551
+Read them from the raw green trips source.
+
+166
+00:13:50,831 --> 00:13:55,269
+The source function points at the table we loaded and declared in the last lesson.
+
+167
+00:13:56,219 --> 00:14:03,318
+Finally, keep only trips that started in 2025, and drop the rows with no distance, or no charge.
+
+168
+00:14:04,268 --> 00:14:05,512
+That is the whole model.
+
+169
+00:14:05,792 --> 00:14:07,845
+One select, and no create statement.
+
+170
+00:14:08,125 --> 00:14:08,742
+Save it.
+
+171
+00:14:09,692 --> 00:14:11,213
+So what happens when you run it?
+
+172
+00:14:11,493 --> 00:14:13,677
+First, dbt compiles the file.
+
+173
+00:14:13,957 --> 00:14:19,821
+The Jinja in curly braces becomes plain SQL, and the source call becomes the real table name.
+
+174
+00:14:20,771 --> 00:14:24,175
+Then dbt wraps your select in a create view statement.
+
+175
+00:14:24,455 --> 00:14:26,183
+That is the part you never write.
+
+176
+00:14:27,133 --> 00:14:32,332
+And it sends the statement to DuckDB, which saves the view in the dev database file.
+
+177
+00:14:33,282 --> 00:14:34,110
+Let's run it.
+
+178
+00:14:34,390 --> 00:14:37,429
+Above the editor, open the Model menu, and choose Run.
+
+179
+00:14:37,709 --> 00:14:39,084
+It runs just this model.
+
+180
+00:14:40,034 --> 00:14:44,186
+The terminal shows one model, trips, created as a view in the main schema.
+
+181
+00:14:44,466 --> 00:14:45,818
+One pass, no errors.
+
+182
+00:14:46,768 --> 00:14:50,463
+To look at the rows, open the Model menu again, and choose Preview.
+
+183
+00:14:50,743 --> 00:14:54,854
+Studio compiles the model, runs its select, and opens the result.
+
+184
+00:14:57,035 --> 00:15:03,730
+Eleven columns, and five hundred sixty-five thousand trips, out of five hundred ninety-one thousand raw rows.
+
+185
+00:15:04,010 --> 00:15:07,357
+Scroll right for the distance, the payment type and the amounts.
+
+186
+00:15:08,307 --> 00:15:08,948
+Close it.
+
+187
+00:15:09,228 --> 00:15:15,038
+The same rows stay in the Query Results tab, next to the SQL that ran, and a history of your previews.
+
+188
+00:15:15,988 --> 00:15:19,061
+Want to see exactly what dbt sends to DuckDB?
+
+189
+00:15:19,341 --> 00:15:20,658
+Model menu, Compile.
+
+190
+00:15:23,237 --> 00:15:31,805
+The Compiled SQL tab shows your select, with the source call replaced by the real table: nyc taxi dev, raw, green trips.
+
+191
+00:15:32,755 --> 00:15:34,692
+Close it, and open Run History.
+
+192
+00:15:34,971 --> 00:15:41,178
+Every dbt command Studio ran is here: dbt run, select trips, one of one passed.
+
+193
+00:15:42,128 --> 00:15:43,730
+Last step: commit and push.
+
+194
+00:15:44,010 --> 00:15:45,100
+Open the Git tab.
+
+195
+00:15:45,380 --> 00:15:47,967
+Trips.sql is listed as a new file.
+
+196
+00:15:48,247 --> 00:15:51,790
+The target and logs folders are not, because git ignores them.
+
+197
+00:15:52,740 --> 00:15:57,809
+Stage it with the plus button, type a message, add the trips staging model, and click Commit.
+
+198
+00:16:01,435 --> 00:16:04,296
+Click Sync Changes, and the commit goes to GitHub.
+
+199
+00:16:06,535 --> 00:16:12,009
+On GitHub, the models folder now holds trips dot sql, next to sources dot yml.
+
+200
+00:16:12,959 --> 00:16:13,692
+To recap.
+
+201
+00:16:13,972 --> 00:16:21,596
+A model is one select in one file. dbt compiles it, wraps it in create view, and runs it in DuckDB.
+
+202
+00:16:21,876 --> 00:16:25,133
+Preview shows the rows, and the Git tab sends it to GitHub.
+
+203
+00:16:25,413 --> 00:16:28,103
+Next, we add two more models that build on trips.
+
+204
+00:16:36,050 --> 00:16:38,257
+Open the nyc taxi project.
+
+205
+00:16:38,537 --> 00:16:43,670
+First, load the zone lookup into DuckDB: open the Project menu, and choose Seed.
+
+206
+00:16:44,620 --> 00:16:51,934
+dbt reads the CSV, and inserts two hundred sixty-five rows into a table called taxi zone lookup.
+
+207
+00:16:52,884 --> 00:16:57,564
+To use one model inside another, write ref, and the name of the model or seed.
+
+208
+00:16:57,844 --> 00:17:03,017
+Not the table name: dbt fills that in, for whichever database you run against.
+
+209
+00:17:03,967 --> 00:17:11,729
+Each ref is also a dependency. dbt draws the graph from them, and always builds trips before the models that use it.
+
+210
+00:17:12,679 --> 00:17:16,029
+Right-click models, New File: trips per month dot sql.
+
+211
+00:17:19,611 --> 00:17:23,320
+Count the trips and the average fare for each month and pickup borough.
+
+212
+00:17:28,211 --> 00:17:33,385
+From ref trips, joined to ref taxi zone lookup, to get the borough of each pickup zone.
+
+213
+00:17:33,665 --> 00:17:34,927
+Group by all, and save.
+
+214
+00:17:35,877 --> 00:17:38,819
+A second model: top pickup zones dot sql.
+
+215
+00:17:44,963 --> 00:17:48,568
+This time, start with a Jinja variable: set top n to ten.
+
+216
+00:17:49,518 --> 00:17:55,046
+Then count the trips for each pickup zone, with the zone's name and borough, from the same two refs.
+
+217
+00:17:58,251 --> 00:18:01,327
+Order by trips, busiest first, and limit to top n.
+
+218
+00:18:01,607 --> 00:18:02,206
+Save.
+
+219
+00:18:03,156 --> 00:18:05,037
+Jinja has three kinds of braces.
+
+220
+00:18:05,317 --> 00:18:07,295
+Double curly braces print a value.
+
+221
+00:18:07,575 --> 00:18:10,271
+Curly brace and percent run logic, like set.
+
+222
+00:18:10,551 --> 00:18:12,518
+And curly brace and hash is a comment.
+
+223
+00:18:13,468 --> 00:18:17,412
+When dbt compiles a model, all of it turns into plain SQL.
+
+224
+00:18:17,692 --> 00:18:18,522
+Let's see that.
+
+225
+00:18:19,472 --> 00:18:23,519
+With top pickup zones open, open the Model menu, and choose Compile.
+
+226
+00:18:25,711 --> 00:18:28,356
+Studio opens the compiled SQL in a window.
+
+227
+00:18:28,636 --> 00:18:31,013
+The first tab shows what we wrote, with the Jinja.
+
+228
+00:18:31,963 --> 00:18:33,387
+Switch to Compiled SQL.
+
+229
+00:18:33,667 --> 00:18:39,138
+Both refs became full table names in the dev database, and limit top n became limit ten.
+
+230
+00:18:40,088 --> 00:18:42,225
+This is the SQL DuckDB will run.
+
+231
+00:18:42,505 --> 00:18:43,457
+Close the window.
+
+232
+00:18:44,407 --> 00:18:47,143
+Now run the whole project: Project menu, Run.
+
+233
+00:18:48,093 --> 00:18:52,495
+dbt builds trips first, and only then the two models that depend on it.
+
+234
+00:18:52,775 --> 00:18:54,261
+Three models, no errors.
+
+235
+00:18:55,211 --> 00:18:56,445
+Now look at the result.
+
+236
+00:18:56,725 --> 00:18:59,596
+With top pickup zones open, choose Model, Preview.
+
+237
+00:19:01,808 --> 00:19:03,552
+Ten rows, because of top n.
+
+238
+00:19:03,832 --> 00:19:10,608
+East Harlem North is the busiest pickup zone of 2025, with a hundred forty-three thousand trips.
+
+239
+00:19:11,558 --> 00:19:16,487
+Close it, and open Run History: the seed and the run are listed, with their status.
+
+240
+00:19:17,437 --> 00:19:18,527
+Open the Git tab.
+
+241
+00:19:18,807 --> 00:19:20,290
+The two new models are listed.
+
+242
+00:19:22,269 --> 00:19:27,056
+Stage all, type a message, add trips per month and top pickup zones, and commit.
+
+243
+00:19:30,559 --> 00:19:32,461
+Sync Changes pushes it to GitHub.
+
+244
+00:19:35,659 --> 00:19:38,044
+To recap: a seed loads a CSV.
+
+245
+00:19:38,324 --> 00:19:43,970
+Ref names a model and records the dependency, so dbt runs things in the right order.
+
+246
+00:19:44,250 --> 00:19:48,419
+Jinja adds variables and logic, and compile shows the plain SQL.
+
+247
+00:19:48,699 --> 00:19:51,150
+Next, we describe our models with properties.
+
+248
+00:19:59,117 --> 00:20:02,190
+Properties are YAML files that sit next to your SQL.
+
+249
+00:20:02,470 --> 00:20:08,533
+They describe models, seeds and sources: what a table is, what each column means, and later, the tests.
+
+250
+00:20:09,483 --> 00:20:11,869
+We already have one: sources dot yml.
+
+251
+00:20:12,149 --> 00:20:17,256
+Today we add schema dot yml for the models, and seeds dot yml for the zone lookup.
+
+252
+00:20:18,206 --> 00:20:19,391
+Open the project.
+
+253
+00:20:19,671 --> 00:20:22,562
+In models, create a new file: schema dot yml.
+
+254
+00:20:28,071 --> 00:20:29,614
+It is long, so paste it.
+
+255
+00:20:29,894 --> 00:20:34,818
+One entry per model: a name, a description, and the columns that need explaining.
+
+256
+00:20:35,098 --> 00:20:37,051
+The code is in the repository.
+
+257
+00:20:38,001 --> 00:20:41,090
+For example, payment type: one means credit card.
+
+258
+00:20:41,370 --> 00:20:44,865
+Anyone reading the model learns that here, not from a PDF.
+
+259
+00:20:45,145 --> 00:20:45,745
+Save.
+
+260
+00:20:46,695 --> 00:20:47,557
+Now the seed.
+
+261
+00:20:47,837 --> 00:20:50,332
+In seeds, a new file: seeds dot yml.
+
+262
+00:20:54,983 --> 00:21:00,317
+This one is short: the zone lookup, where it comes from, and its key column, Location ID.
+
+263
+00:21:00,597 --> 00:21:01,196
+Save.
+
+264
+00:21:04,424 --> 00:21:07,462
+Descriptions can also go into the database itself.
+
+265
+00:21:07,742 --> 00:21:12,095
+Open dbt project dot yml, and add a models block at the end.
+
+266
+00:21:13,045 --> 00:21:17,938
+Under nyc taxi, persist docs, with relation and columns set to true.
+
+267
+00:21:18,218 --> 00:21:18,817
+Save.
+
+268
+00:21:19,767 --> 00:21:25,086
+Run the project from the Project menu, so dbt rebuilds the models with their comments.
+
+269
+00:21:26,036 --> 00:21:27,522
+Three models, no errors.
+
+270
+00:21:29,236 --> 00:21:31,015
+Let's look inside DuckDB.
+
+271
+00:21:31,295 --> 00:21:39,814
+Open the SQL Editor, pick the nyc taxi dev connection, and ask DuckDB for the columns of trips per month, with their comments.
+
+272
+00:21:41,488 --> 00:21:42,888
+Run it with the green arrow.
+
+273
+00:21:45,667 --> 00:21:48,860
+Each column carries the description from schema dot yml.
+
+274
+00:21:49,140 --> 00:21:51,930
+Average fare has none, because we didn't describe it.
+
+275
+00:21:52,880 --> 00:22:01,598
+So one description shows up in three places: in the docs site, which we build next lesson, in the database, and for everyone who reads the code.
+
+276
+00:22:02,548 --> 00:22:09,371
+Back in the project, open the Git tab: two new YAML files, and the change to dbt project dot yml.
+
+277
+00:22:10,321 --> 00:22:14,708
+Stage all, type a message, describe the models and the zone seed, and commit.
+
+278
+00:22:19,920 --> 00:22:21,955
+Sync Changes, and it's on GitHub.
+
+279
+00:22:25,020 --> 00:22:27,756
+To recap: properties are YAML next to your SQL.
+
+280
+00:22:28,036 --> 00:22:35,924
+Schema dot yml describes the models, seeds dot yml the seed, and persist docs copies the descriptions into DuckDB.
+
+281
+00:22:36,204 --> 00:22:38,041
+Next, the docs site and the DAG.
+
+282
+00:22:45,983 --> 00:22:51,446
+Open the project, and create one more model in models: monthly summary dot sql.
+
+283
+00:22:56,490 --> 00:23:00,627
+First, a block called totals: the trips per month, from ref trips per month.
+
+284
+00:23:03,257 --> 00:23:08,478
+Then a block called card: the trips paid by credit card each month, straight from ref trips.
+
+285
+00:23:09,890 --> 00:23:13,155
+Join them by month, and work out the percent paid by card.
+
+286
+00:23:13,435 --> 00:23:14,034
+Save.
+
+287
+00:23:17,298 --> 00:23:22,885
+Describe it too: at the end of schema dot yml, paste the entry for monthly summary, and save.
+
+288
+00:23:23,835 --> 00:23:25,960
+All those refs form a graph: the DAG.
+
+289
+00:23:26,240 --> 00:23:28,691
+Directed, because every arrow points one way.
+
+290
+00:23:28,971 --> 00:23:31,676
+Acyclic, because no model can depend on itself.
+
+291
+00:23:32,626 --> 00:23:39,608
+dbt uses it for the build order, to run independent models in parallel, and to show you what a change affects.
+
+292
+00:23:40,558 --> 00:23:45,587
+Back in monthly summary, open the Model menu, and choose Run plus model, upstream.
+
+293
+00:23:45,867 --> 00:23:48,587
+That runs this model, and everything it depends on.
+
+294
+00:23:49,537 --> 00:23:53,735
+Three models, in DAG order: trips, trips per month, then monthly summary.
+
+295
+00:23:54,685 --> 00:23:55,623
+Now the docs.
+
+296
+00:23:55,903 --> 00:24:04,677
+Open the Project menu, and choose Generate Docs. dbt reads the project and the database, and writes a small website into target.
+
+297
+00:24:06,847 --> 00:24:08,414
+Then Project, Serve Docs.
+
+298
+00:24:08,694 --> 00:24:11,866
+Studio starts a local web server, on port eighty eighty.
+
+299
+00:24:14,085 --> 00:24:18,821
+In the browser, open localhost, port eighty eighty, and pick monthly summary.
+
+300
+00:24:19,101 --> 00:24:24,363
+Here is the description from schema dot yml, every column, and what the model depends on.
+
+301
+00:24:25,313 --> 00:24:32,133
+The button at the bottom right opens the lineage graph for this model: trips, then trips per month, then monthly summary.
+
+302
+00:24:32,413 --> 00:24:34,488
+The same order dbt just ran.
+
+303
+00:24:35,438 --> 00:24:40,282
+Back in Studio, the Git tab shows the new model, and the change to schema dot yml.
+
+304
+00:24:41,232 --> 00:24:44,932
+Stage all, type a message, add the monthly summary, and commit.
+
+305
+00:24:49,831 --> 00:24:51,866
+Sync Changes, and it's on GitHub.
+
+306
+00:24:54,931 --> 00:24:59,650
+To recap: refs form the DAG, and dbt uses it for order and impact.
+
+307
+00:24:59,930 --> 00:25:03,267
+Run plus model builds a model with everything upstream.
+
+308
+00:25:03,547 --> 00:25:07,537
+And two clicks give you a docs site, with descriptions and the lineage graph.
+
+309
+00:25:07,817 --> 00:25:10,631
+Next, views or tables: materializations.
+
+310
+00:25:18,583 --> 00:25:21,862
+dbt can build a model as a view or as a table.
+
+311
+00:25:22,142 --> 00:25:27,165
+A view stores only the query, so it is always fresh, but every read runs it again.
+
+312
+00:25:27,445 --> 00:25:31,663
+A table stores the rows: fast to read, and as fresh as the last run.
+
+313
+00:25:32,613 --> 00:25:34,902
+Right now every model is a view, the default.
+
+314
+00:25:35,182 --> 00:25:41,666
+We keep trips a view, a thin layer over the files, and make the three marts tables, because people query those.
+
+315
+00:25:41,946 --> 00:25:44,428
+Incremental and ephemeral models come later.
+
+316
+00:25:45,378 --> 00:25:49,158
+Open the project, and open dbt project dot yml.
+
+317
+00:25:51,121 --> 00:25:54,576
+Under nyc taxi, add plus materialized, table.
+
+318
+00:25:54,856 --> 00:25:57,168
+Every model in the project becomes a table.
+
+319
+00:25:57,448 --> 00:25:58,048
+Save.
+
+320
+00:25:58,998 --> 00:26:00,312
+But trips should stay a view.
+
+321
+00:26:00,592 --> 00:26:02,228
+Open trips dot sql.
+
+322
+00:26:02,508 --> 00:26:06,541
+At the very top, add a config block: materialized equals view.
+
+323
+00:26:06,821 --> 00:26:09,515
+A setting in the model wins over the project file.
+
+324
+00:26:09,795 --> 00:26:10,395
+Save.
+
+325
+00:26:11,345 --> 00:26:13,657
+Run the project: Project menu, Run.
+
+326
+00:26:14,607 --> 00:26:19,884
+The log now says sql view model for trips, and sql table model for the other three.
+
+327
+00:26:20,834 --> 00:26:22,345
+Let's check in DuckDB.
+
+328
+00:26:22,625 --> 00:26:28,867
+Open the SQL Editor, pick nyc taxi dev, and list the tables in the main schema, with their type.
+
+329
+00:26:33,119 --> 00:26:33,690
+Run it.
+
+330
+00:26:37,298 --> 00:26:38,266
+Trips is a view.
+
+331
+00:26:38,546 --> 00:26:41,394
+The three marts are base tables, and so is the seed.
+
+332
+00:26:42,344 --> 00:26:45,824
+Back in the project, the Git tab shows the two changed files.
+
+333
+00:26:48,078 --> 00:26:52,587
+Stage all, type a message, materialize the marts as tables, and commit.
+
+334
+00:26:57,249 --> 00:26:59,284
+Sync Changes, and it's on GitHub.
+
+335
+00:27:02,349 --> 00:27:05,640
+To recap: views store the query, tables store the rows.
+
+336
+00:27:05,920 --> 00:27:12,606
+One line in dbt project dot yml sets the default, and a config block in a model overrides it.
+
+337
+00:27:12,886 --> 00:27:14,217
+Next, we test the data.
+
+338
+00:27:22,183 --> 00:27:25,956
+A dbt data test is a query that looks for bad rows.
+
+339
+00:27:26,236 --> 00:27:28,450
+If it returns nothing, the test passes.
+
+340
+00:27:28,730 --> 00:27:30,427
+If it returns rows, it fails.
+
+341
+00:27:31,377 --> 00:27:36,931
+dbt has four built in: unique, not null, accepted values, and relationships.
+
+342
+00:27:37,211 --> 00:27:43,188
+Start with the grain: the column that should be unique and never empty, like the month in monthly summary.
+
+343
+00:27:44,138 --> 00:27:46,918
+Open the project, and open schema dot yml.
+
+344
+00:27:47,198 --> 00:27:49,245
+Tests go right under the column they check.
+
+345
+00:27:50,812 --> 00:27:55,374
+Under borough, in trips per month: accepted values, with the boroughs we expect.
+
+346
+00:27:57,445 --> 00:28:02,106
+Zone id in top pickup zones is that table's grain: not null and unique.
+
+347
+00:28:03,056 --> 00:28:05,192
+The same for month in monthly summary.
+
+348
+00:28:05,472 --> 00:28:06,072
+Save.
+
+349
+00:28:07,972 --> 00:28:12,004
+And in seeds dot yml, Location ID: not null and unique.
+
+350
+00:28:12,284 --> 00:28:12,884
+Save.
+
+351
+00:28:17,389 --> 00:28:19,456
+Run them all: Project menu, Test.
+
+352
+00:28:22,307 --> 00:28:25,649
+Six pass, one fails: accepted values on borough.
+
+353
+00:28:25,929 --> 00:28:28,732
+Got one result, so one borough is not in our list.
+
+354
+00:28:29,682 --> 00:28:30,495
+It is N A.
+
+355
+00:28:30,775 --> 00:28:40,589
+The zone lookup has a zone two sixty-five, outside of New York City, with the borough N A, and about two hundred fifty trips in 2025 started there.
+
+356
+00:28:40,869 --> 00:28:42,963
+The data is right; our list was wrong.
+
+357
+00:28:43,913 --> 00:28:45,564
+Add N A to the list, and save.
+
+358
+00:28:48,073 --> 00:28:52,772
+To check just this model, open trips per month, and in the Model menu choose Test.
+
+359
+00:28:54,330 --> 00:28:56,559
+One test on this model, and it passes.
+
+360
+00:28:57,530 --> 00:28:59,047
+One more command: build.
+
+361
+00:28:59,327 --> 00:29:05,773
+It seeds, runs and tests, in DAG order, so a failing test stops the models that depend on bad data.
+
+362
+00:29:06,723 --> 00:29:07,958
+Project menu, Build.
+
+363
+00:29:09,027 --> 00:29:11,234
+One seed, four models, seven tests.
+
+364
+00:29:11,514 --> 00:29:13,127
+Twelve passes, no errors.
+
+365
+00:29:14,077 --> 00:29:17,760
+The Git tab: schema dot yml and seeds dot yml changed.
+
+366
+00:29:19,028 --> 00:29:22,288
+Stage all, type a message, add data tests, and commit.
+
+367
+00:29:26,985 --> 00:29:27,960
+Sync Changes.
+
+368
+00:29:28,240 --> 00:29:30,338
+That's the end of dbt basics.
+
+369
+00:29:32,085 --> 00:29:35,031
+To recap: tests live in YAML next to the columns.
+
+370
+00:29:35,311 --> 00:29:38,122
+A failing test told us something true about the data.
+
+371
+00:29:38,402 --> 00:29:40,834
+And build runs and tests everything, in order.
+
+372
+00:29:41,114 --> 00:29:42,612
+That's dbt basics.
+
+373
+00:29:42,892 --> 00:29:47,141
+Next, we ship it: GitHub Actions builds the project on every push.
+
+374
+00:29:55,083 --> 00:29:58,645
+So far, everything ran on our laptop, in the dev target.
+
+375
+00:29:58,925 --> 00:30:02,431
+Production should be built somewhere clean, only from what is in git.
+
+376
+00:30:03,381 --> 00:30:04,631
+That is what CI does.
+
+377
+00:30:04,911 --> 00:30:14,431
+On every push, GitHub Actions starts a fresh machine, installs dbt, downloads the data, runs dbt build, and publishes the warehouse.
+
+378
+00:30:15,381 --> 00:30:16,566
+Open the project.
+
+379
+00:30:16,846 --> 00:30:22,807
+First, requirements dot text in the project root: the same dbt versions Studio uses.
+
+380
+00:30:29,678 --> 00:30:38,057
+Next, a folder called c i, with its own profiles dot yml: a prod target, and the database path from an environment variable.
+
+381
+00:30:43,250 --> 00:30:50,447
+Type the profile: nyc taxi, target prod, type duckdb, and the path from env var duckdb path.
+
+382
+00:30:51,397 --> 00:30:55,616
+The parquet files are not in git, so CI has to get the data itself.
+
+383
+00:30:55,896 --> 00:30:58,842
+A folder called scripts, and download data dot py.
+
+384
+00:31:05,587 --> 00:31:06,536
+Paste the script.
+
+385
+00:31:06,816 --> 00:31:16,494
+It downloads the twelve files into data raw, then loads them into raw green trips in the DuckDB file, the same load we did by hand in the SQL Editor.
+
+386
+00:31:16,774 --> 00:31:17,374
+Save.
+
+387
+00:31:18,324 --> 00:31:19,159
+And the workflow.
+
+388
+00:31:19,439 --> 00:31:22,175
+GitHub looks for it in dot github, workflows.
+
+389
+00:31:22,455 --> 00:31:26,125
+Make both folders, and a file: dbt build dot yml.
+
+390
+00:31:38,874 --> 00:31:40,433
+Paste the workflow, and save.
+
+391
+00:31:41,383 --> 00:31:45,368
+It runs on every push to main, every Monday morning, or by hand.
+
+392
+00:31:45,648 --> 00:31:46,891
+It may write releases.
+
+393
+00:31:47,841 --> 00:32:01,001
+The steps: check out the code, set up Python, install dbt, download and load the data, run dbt build with the c i profile, and upload prod dot duckdb to a release called warehouse.
+
+394
+00:32:01,951 --> 00:32:04,122
+Open the Git tab: four new files.
+
+395
+00:32:06,886 --> 00:32:11,649
+Stage all, type a message, add CI: build, test and publish the warehouse.
+
+396
+00:32:11,929 --> 00:32:12,494
+Commit.
+
+397
+00:32:15,343 --> 00:32:16,318
+Sync Changes.
+
+398
+00:32:16,598 --> 00:32:18,201
+This push starts the first run.
+
+399
+00:32:20,443 --> 00:32:22,543
+On GitHub, open the Actions tab.
+
+400
+00:32:22,823 --> 00:32:24,345
+The run for our commit is there.
+
+401
+00:32:25,295 --> 00:32:26,464
+Open it, and wait.
+
+402
+00:32:26,744 --> 00:32:32,439
+A fresh machine installs dbt, downloads and loads the files, and builds the project.
+
+403
+00:32:32,719 --> 00:32:34,477
+Under a minute later: success.
+
+404
+00:32:40,598 --> 00:32:47,136
+And under Releases, the warehouse release, with prod dot duckdb attached: the whole warehouse, built by CI.
+
+405
+00:32:48,086 --> 00:32:52,810
+To recap: a prod profile, pinned versions, a download script, and one workflow.
+
+406
+00:32:53,090 --> 00:32:58,818
+From now on, every push builds and tests the project on a clean machine, and publishes the warehouse.
+
+407
+00:32:59,098 --> 00:33:00,642
+Next, we make it a showcase.
+
+408
+00:33:08,583 --> 00:33:11,033
+Last step: make the project easy to show.
+
+409
+00:33:11,313 --> 00:33:16,980
+A README that explains it, live docs, a green build badge, and a warehouse anyone can query.
+
+410
+00:33:17,930 --> 00:33:21,513
+On GitHub, open the repository's Settings, then Pages.
+
+411
+00:33:21,793 --> 00:33:26,167
+Under Source, choose GitHub Actions, so our workflow can publish the docs.
+
+412
+00:33:27,117 --> 00:33:36,334
+In Studio, open the workflow file, and paste three more build steps at the end: generate the docs, copy the site files, and upload them for Pages.
+
+413
+00:33:37,284 --> 00:33:41,407
+And a second job, docs, that runs after build and deploys the site.
+
+414
+00:33:41,687 --> 00:33:42,286
+Save.
+
+415
+00:33:43,236 --> 00:33:44,218
+Now the README.
+
+416
+00:33:44,498 --> 00:33:54,164
+Open it, select all, and paste the new one: a build badge, a docs link, what the project does and where to look, how to query the warehouse, and how to run it yourself.
+
+417
+00:33:54,444 --> 00:33:55,044
+Save.
+
+418
+00:33:55,994 --> 00:34:00,430
+Git tab: stage all, type a message, publish docs and README, and commit.
+
+419
+00:34:08,826 --> 00:34:09,801
+Sync Changes.
+
+420
+00:34:10,081 --> 00:34:11,479
+The push starts the workflow.
+
+421
+00:34:13,926 --> 00:34:18,806
+On GitHub, the Actions tab shows the run, now with two jobs: build, then docs.
+
+422
+00:34:19,756 --> 00:34:21,424
+A minute later, both are green.
+
+423
+00:34:22,956 --> 00:34:28,521
+The docs are live on GitHub Pages, for anyone, with the lineage graph of the whole project.
+
+424
+00:34:29,471 --> 00:34:33,486
+And the repository page shows the README, with the green build badge.
+
+425
+00:34:34,436 --> 00:34:36,293
+And anyone can query the warehouse.
+
+426
+00:34:36,573 --> 00:34:43,384
+With DuckDB, attach prod dot duckdb straight from the GitHub release, read only, and select from the marts.
+
+427
+00:34:44,334 --> 00:34:51,153
+East Harlem North leads, with a hundred forty-three thousand trips: built by CI, and read over the internet.
+
+428
+00:34:52,103 --> 00:34:53,280
+That's Project 1.
+
+429
+00:34:53,560 --> 00:35:04,556
+Raw files and a seed, models with ref, descriptions, docs and the DAG, tables where they matter, tests, CI on every push, live docs, and a warehouse anyone can query.
+
+430
+00:35:04,836 --> 00:35:08,356
+All built in Rosetta DBT Studio, and all on GitHub.

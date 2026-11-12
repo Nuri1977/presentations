@@ -1,0 +1,30 @@
+number: "5.3"
+title: Read the lake by hand
+slides:
+  - { id: title, type: title, h1: 'Read the lake <span class="accent">by hand</span>', lead: "Only catalog tables and read_parquet.", badges: [Specification, Valid files, No magic] }
+  - id: recipe
+    type: steps
+    eyebrow: The recipe
+    h2: Five steps to read a table
+    steps:
+      - { step: 1, t: Current snapshot, d: "max(snapshot_id) from ducklake_snapshot" }
+      - { step: 1, t: The table, d: "ducklake_table, valid now" }
+      - { step: 1, t: The data path, d: "ducklake_metadata" }
+      - { step: 1, hot: true, t: Files valid at that snapshot, d: "ducklake_data_file: begin ≤ s, end > s or empty" }
+      - { step: 1, t: Read them, d: "read_parquet" }
+    checked: DuckLake specification, Queries page, checked 11 Nov 2026
+  - id: why
+    type: cards
+    eyebrow: Why it matters
+    h2: Nothing is hidden
+    cols: 2
+    cards:
+      - { step: 1, k: With deletes, t: One more step, d: "read ducklake_delete_file and skip those positions" }
+      - { step: 2, cls: hot, k: Any engine, t: SQL + a Parquet reader, d: "that is all it takes to read DuckLake" }
+  - id: recap
+    type: recap
+    items:
+      - "Snapshot, table, data path, valid files."
+      - "<span class=\"mono\">read_parquet</span> on exactly those files."
+      - "Same answer as the lake."
+  - { id: closing, type: closing, lesson: Lesson 6.1, h2: 'dbt on the <span class="accent">lake</span>' }

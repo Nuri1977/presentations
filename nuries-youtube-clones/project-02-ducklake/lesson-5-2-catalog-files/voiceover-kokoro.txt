@@ -1,0 +1,15 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In the sequel Editor, on eth lake.
+b01	Ducklake data file has one row per Par-kay file.
+b01	Here are the files of transactions, table five: one per day, with its row count, its size, and its path, relative to the data folder.
+b02	Ducklake file column stats holds the min and max of every column of every file.
+b02	For block number, each file covers its own narrow range, one day after the other.
+b02	This is exactly what let the query in Lesson 4.2 skip six files out of seven.
+b03	Ducklake file partition value: the date each file belongs to, from the partitioning in Lesson 4.1.
+b04	Ducklake table stats keeps totals per table, so counting rows needs no file at all.
+b04	Transactions: twelve point seven million rows, one point seven gigabytes.
+b05	And duck lake inlined data tables: the watchlist from Lesson 4.3 has a table inside the catalog, where inlined rows wait to be flushed.
+b06	So these are the file tables: data files and delete files, statistics per file, partition values, table totals, inlined rows, and files scheduled for deletion by maintenance.
+b07	Save the queries as 5 underscore 2 catalog files dot sequel, commit, and push.
+b08	To recap: every file is a row, with its statistics and partition value, and tables keep totals.
+b08	Next, the final proof: we read the lake by hand, with nothing but these tables and read par-kay.

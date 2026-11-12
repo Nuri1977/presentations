@@ -1,0 +1,27 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Welcome to Project 2.
+b01	In this course, you build a real data lake, on your own laptop.
+b01	Not a toy: a lake with versions, time travel, maintenance, and D B T models on top.
+b02	You need no cloud account and no server.
+b02	Everything runs inside Rosetta D B T Studio, with open source tools.
+b03	We start from a public bucket on Amazon S three, with the Ethereum blockchain as Par-kay files, one folder a day.
+b04	We load it into a duck lake: a catalog database, and a folder of Par-kay files that the catalog manages.
+b05	Then D B T builds clean models on top: staging views, and marts that grow day by day.
+b06	And at the end, answers: how busy the network was each day, what gas cost, and who sent the most transactions.
+b07	The data is real.
+b07	Three months of Ethereum blocks: August to October 2026, almost six hundred sixty thousand blocks.
+b08	And one week of transactions: twelve point seven million rows.
+b09	Big enough to feel real, small enough for a laptop.
+b09	About three gigabytes of free disk is plenty.
+b10	One app does it all: Rosetta D B T Studio.
+b10	It has screens for data lakes, a sequel editor, D B T, and git, in one window.
+b11	Underneath, duck D B is the engine, and duck lake is the lake format.
+b11	And D B T builds the models.
+b12	Here is the route.
+b12	First, we install Studio, and explain data lakes: warehouses, lakehouses, Par-kay, table formats, and how duck lake works.
+b13	Then hands on.
+b13	We create the lake and load it, change data safely, make it fast and keep it tidy, and look inside the catalog.
+b14	Finally, D B T on the lake, and where to go next.
+b15	You need a computer, some basic sequel, and a git hub account.
+b15	Every hands-on lesson ends with a commit to the course repository, linked in the description.
+b15	See you in the next lesson.

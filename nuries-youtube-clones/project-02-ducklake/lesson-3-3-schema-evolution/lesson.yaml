@@ -1,0 +1,140 @@
+# Lesson 3.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-3-3
+number: "3.3"
+title: "Schema evolution"
+module: "Module 3 · Changing data"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 3.3"
+next: "Lesson 3.4 · The data change feed"
+summary: "Change a table's shape without rewriting a single file: add a column and fill it for one day, rename a column, add a NOT NULL constraint. See the new schema in Studio, and the old one through time travel."
+start_state: lesson-3-2-end
+show_help_links: true
+links:
+  - { title: "DuckLake: schema evolution", url: "https://ducklake.select/docs/stable/duckdb/usage/schema_evolution" }
+  - { title: "DuckLake: constraints", url: "https://ducklake.select/docs/stable/duckdb/advanced_features/constraints" }
+tags: [DuckLake, schema evolution, ALTER TABLE, time travel, Rosetta DBT Studio]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-3-2-end`: raw.blocks with three months plus 1 and 2 November; snapshots 0 to 11."
+draft_changes:
+  - "No type change in the demo: transaction_count and size are already BIGINT in this data; type promotion is on the slide."
+  - "COMMENT ON is not run: Studio's SQL Editor rejects it."
+accuracy_notes:
+  - "Snapshots: 12 add column, 13 update (7,176 rows), 14 rename, 15 set not null. AT (VERSION => 11) still has the column miner. Rehearsal 12 Nov 2026."
+  - "In the catalog, the renamed column keeps its column id (two rows in ducklake_column: miner 2→14, fee_recipient from 14). Seen again in 5.1."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 3.3. Schema evolution."
+
+  - id: s01
+    kind: app
+    chapter: "Add a column"
+    beats:
+      - id: b01
+        say: "In the SQL Editor, on eth lake: add a column to blocks, gas used percent, a double."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              alter table raw.blocks add column gas_used_pct double;
+              update raw.blocks set gas_used_pct = round(100.0 * gas_used / gas_limit, 2) where date = date '2026-11-02';
+              alter table raw.blocks rename miner to fee_recipient;
+              alter table raw.blocks alter number set not null;
+              select number, fee_recipient, gas_used_pct from raw.blocks where date = date '2026-11-02' limit 3;
+              select number, miner from raw.blocks at (version => 11) limit 3;
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b02
+        say: "It is instant: no file is rewritten. Old rows simply have no value. Fill it for one day, the second of November: gas used divided by the gas limit."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 2, settleMs: [800, 2500] }
+          - sql_wait
+
+  - id: s02
+    kind: app
+    chapter: "Rename and constrain"
+    beats:
+      - id: b03
+        say: "Miner is an old name; today the field means the fee recipient. Rename it."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "And make number required: not null."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "Query the new shape: number, fee recipient, and gas used percent."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "Now time travel to version eleven, before these changes. The column is still called miner there. Each snapshot keeps its own schema."
+        zoom: sql-results
+        card: { eyebrow: "AT (VERSION => 11)", title: "miner", sub: "the old name, at the old version", pos: top-right }
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "The schema in Studio"
+    beats:
+      - id: b07
+        say: "In Data Lake, open the blocks table and its Schema tab: fee recipient in place of miner, and the new column at the end."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: button, name: Refresh, label: Refresh, settleMs: [500, 1500, 2500] }
+          - click_at: { text: blocks, label: blocks, settleMs: [500, 1500, 2500] }
+          - click_at: { role: tab, name: Schema, settleMs: [400, 1200, 2200] }
+
+  - id: s04
+    kind: slide
+    chapter: "How it works"
+    slide: how
+    beats:
+      - { id: b08, step: 1, show: "Old files are untouched; the catalog maps each column id to its name at each snapshot.", say: "How does this work without touching files? Every column has an id in the catalog. A rename changes the name, not the id, so old files still map to the right column." }
+      - { id: b09, step: 2, show: "Allowed: add, drop, rename, safe type promotion (int to bigint), not null.", say: "You can add, drop and rename columns, promote types the safe way, like integer to big integer, and add not null. And every version keeps its own schema." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b10
+        say: "Save the script as 3 underscore 3 schema evolution dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 3_3_schema_evolution.sql }
+          - paste: |
+              alter table raw.blocks add column gas_used_pct double;
+              update raw.blocks set gas_used_pct = round(100.0 * gas_used / gas_limit, 2) where date = date '2026-11-02';
+              alter table raw.blocks rename miner to fee_recipient;
+              alter table raw.blocks alter number set not null;
+              select number, fee_recipient, gas_used_pct from raw.blocks where date = date '2026-11-02' limit 3;
+              select number, miner from raw.blocks at (version => 11) limit 3;
+          - click_save
+          - expect_file: { path: sql/3_3_schema_evolution.sql, snippet: ../snippets/3.3/3_3_schema_evolution.sql }
+          - close_tab: sql/3_3_schema_evolution.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Evolve the blocks schema
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b11, step: 1, show: "Recap: add, rename, not null without rewriting files; each snapshot keeps its schema.", say: "To recap: we added a column, renamed one, and added a constraint, without rewriting a single file. And time travel still sees the old schema. Next: asking the lake what changed between two versions." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 3.4 · The data change feed."

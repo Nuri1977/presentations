@@ -10,15 +10,16 @@ start_state: after-setup
 show_help_links: true
 tags: [dbt project, dbt_project.yml, profiles.yml, dbt debug, DuckDB, GitHub]
 target_minutes: 5
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `after-setup`: Studio with Python and dbt installed (as after Lesson 1.1), no project, no connection; learner git config uses the stored token."
-  - "Rehearsal: pushes to the private Nuri1977/nyc-taxi-dbt-rehearsal. The repo-creation scene reuses the Lesson 1.2 recording; the final run creates the public Nuri1977/nyc-taxi-dbt."
+  - "Final run: pushes to the public Nuri1977/nyc-taxi-dbt, created empty before the lesson (kept from 9 Nov). The GitHub scene shows that empty repository page."
 draft_changes:
   - "Connection first, then project: Studio's New Connection page returns to the connections list on Save, so the lesson creates the DuckDB connection from Home, then picks it in Setup New Project."
   - "The dev database file lives next to the project folder (projects/nyc_taxi_dev.duckdb), so it is never committed."
   - "Studio's template creates an `analysis` folder while dbt_project.yml says `analyses`; shown as is."
-  - "Rehearsal cut: the GitHub scene shows nyc-taxi-dbt-rehearsal (Private), recorded in Lesson 1.2."
+  - "Settings tour added at the start (Nuri, 10 Nov): General (projects directory), dbt Core (runtime, version, adapters), Python."
+  - "The repository already exists (empty, public); the lesson says to create it and shows ours, rather than re-creating it on camera."
 accuracy_notes:
   - "Setup New Project fields, the DuckDB form (Connection Name, Database File Path, Schema, Test Connection) and the Git tab flow (Initialize Repository, Commit, Publish Branch → Add git remote) checked in Studio 1.7.6 on 10 Nov 2026."
 
@@ -36,13 +37,37 @@ scenes:
       - { id: b01, step: 1, show: "A folder tree: models, seeds, macros, tests, snapshots, analyses, and dbt_project.yml.", say: "A dbt project is a folder. Models, seeds, tests and macros live in their own subfolders, and one file at the top, dbt_project.yml, gives the project its name and settings." }
       - { id: b02, step: 2, show: "profiles.yml: profile nyc_taxi → target dev → type duckdb, path to the database file.", say: "A second file, profiles.yml, says where dbt runs. Our profile has one target, dev, and it points at a DuckDB database file." }
 
+  - id: s01b
+    kind: app
+    chapter: "Where Studio keeps Python and dbt"
+    beats:
+      - id: b02a
+        say: "Before we start, a quick look at Settings. Under General: the projects directory, where Studio creates new projects."
+        zoom: center-wide
+        actions:
+          - nav: Settings
+          - point_at: { text: "Projects directory", label: Projects directory, hold: 900 }
+      - id: b02b
+        say: "Under dbt Core: the dbt runtime, dbt version one, one point twelve, and the adapters. dbt duckdb is the one for our database."
+        zoom: center-wide
+        actions:
+          - click_at: { text: "dbt™ Core", label: dbt Core, settleMs: [400, 1200, 2500] }
+          - point_at: { text: "dbt-duckdb", label: dbt-duckdb, hold: 900 }
+      - id: b02c
+        say: "And Python: Studio runs dbt with its own Python, three point ten, separate from any Python on your computer."
+        zoom: center-wide
+        actions:
+          - click_at: { text: "Python", label: Python, settleMs: [400, 1200, 2500] }
+          - point_at: { text: "Python Installation", label: Python Installation, hold: 900 }
+
   - id: s02
     kind: app
     chapter: "A DuckDB connection"
     beats:
       - id: b03
-        say: "First, the database. On the home screen, click New Connection, and choose DuckDB."
+        say: "Now, the database. On the home screen, click New Connection, and choose DuckDB."
         actions:
+          - nav: Home
           - click_at: { role: button, name: New Connection, label: New Connection, settleMs: [400, 1200, 2200] }
           - click_at: { text: "^DuckDB$", regex: true, label: DuckDB, settleMs: [400, 1200, 2000] }
       - id: b04
@@ -135,24 +160,19 @@ scenes:
           - expect_file: { path: README.md, snippet: ../snippets/2.1/README.md }
 
   - id: s06
-    kind: pane
+    kind: browser
     chapter: "A repository on GitHub"
     beats:
       - id: b13
-        say: "Now create an empty repository on GitHub: the plus button, then New repository."
+        say: "Now a repository on GitHub. Create a new, empty, public repository called nyc taxi dbt, with no README, gitignore or license. Here is ours, still empty."
         zoom: center-wide
         actions:
-          - web: "github.com → + → New repository (frames from Lesson 1.2's recording)"
-      - id: b14
-        say: "Name it nyc taxi dbt, and make it public, so anyone can get the code. This rehearsal copy is private. Add no README, gitignore or license, and create it."
-        zoom: gh-form
-        actions:
-          - web: "Repository name, visibility, Create repository"
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt
       - id: b15
-        say: "Copy the HTTPS address of the new, empty repository."
+        say: "GitHub shows its HTTPS address. Copy it."
         zoom: center-wide
         actions:
-          - web: "Quick setup → copy the HTTPS URL"
+          - point_at: { selector: "#empty-setup-clone-url", label: HTTPS address, hold: 1200 }
 
   - id: s07
     kind: app
@@ -174,7 +194,7 @@ scenes:
       - id: b18
         say: "Click Publish Branch. Studio asks for the remote: paste the repository address, and add it. Studio pushes the main branch to GitHub."
         actions:
-          - publish_branch: { url: "https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal.git" }
+          - publish_branch: { url: "https://github.com/Nuri1977/nyc-taxi-dbt.git" }
 
   - id: s08
     kind: browser
@@ -184,7 +204,7 @@ scenes:
         say: "Refresh the repository page. The project is on GitHub: the folders, the two YAML files, the gitignore, and the README."
         zoom: center-wide
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt
 
   - id: s09
     kind: slide

@@ -1,0 +1,35 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	So far, everything ran on our laptop, in the dev target.
+b01	Production should be built somewhere clean, only from what is in git.
+b02	That is what C I does.
+b02	On every push, git hub Actions starts a fresh machine, installs D B T, downloads the data, runs D B T build, and publishes the warehouse.
+b03	Open the project.
+b03	First, requirements dot text in the project root: the same D B T versions Studio uses.
+b04	Next, a folder called c i, with its own profiles dot yammel: a prod target, and the database path from an environment variable.
+b05	Type the profile: N Y C taxi, target prod, type duckdb, and the path from env var duckdb path.
+b06	The par-kay files are not in git, so C I has to get the data itself.
+b06	A folder called scripts, and download data dot py.
+b07	Paste the script.
+b07	It downloads the twelve files into data raw, then loads them into raw green trips in the duck D B file, the same load we did by hand in the sequel Editor.
+b07	Save.
+b08	And the workflow.
+b08	git hub looks for it in dot github, workflows.
+b08	Make both folders, and a file: D B T build dot yammel.
+b09	Paste the workflow, and save.
+b10	It runs on every push to main, every Monday morning, or by hand.
+b10	It may write releases.
+b11	The steps: check out the code, set up Python, install D B T, download and load the data, run D B T build with the c i profile, and upload prod dot duckdb to a release called warehouse.
+b12	Open the Git tab: four new files.
+b13	Stage all, type a message, add C I: build, test and publish the warehouse.
+b13	Commit.
+b14	Sync Changes.
+b14	This push starts the first run.
+b15	On git hub, open the Actions tab.
+b15	The run for our commit is there.
+b16	Open it, and wait.
+b16	A fresh machine installs D B T, downloads and loads the files, and builds the project.
+b16	Under a minute later: success.
+b17	And under Releases, the warehouse release, with prod dot duckdb attached: the whole warehouse, built by C I.
+b18	To recap: a prod profile, pinned versions, a download script, and one workflow.
+b18	From now on, every push builds and tests the project on a clean machine, and publishes the warehouse.
+b18	Next, we make it a showcase.

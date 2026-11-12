@@ -1,0 +1,70 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:05.809
+Parquet files cannot be edited in place.
+
+00:00:06.089 --> 00:00:08.372
+So how does a lake delete or update a row?
+
+00:00:08.652 --> 00:00:10.603
+Let's watch it happen on a small table.
+
+00:00:11.553 --> 00:00:19.804
+In the SQL Editor, on eth lake, make a working copy: the blocks of the first of October, seven thousand one hundred seventy-six rows.
+
+00:00:25.087 --> 00:00:28.283
+Seven of those blocks hold fewer than fifty transactions.
+
+00:00:29.233 --> 00:00:30.332
+Delete those seven.
+
+00:00:30.612 --> 00:00:34.105
+Then update every hundredth block of the day, seventy-two of them.
+
+00:00:34.385 --> 00:00:36.654
+Studio just reports that the command ran.
+
+00:00:37.604 --> 00:00:39.174
+Now list the table's files.
+
+00:00:39.454 --> 00:00:44.140
+The original data file is still there, untouched, but it now has a delete file.
+
+00:00:44.420 --> 00:00:48.968
+And there is a second data file: the seventy-two updated rows, written fresh.
+
+00:00:49.918 --> 00:00:51.653
+The delete file is Parquet too.
+
+00:00:51.933 --> 00:00:55.649
+It lists row positions in the data file: rows the reader must skip.
+
+00:00:56.599 --> 00:01:00.097
+In Data Lake, open eth lake, refresh, and click blocks day.
+
+00:01:00.377 --> 00:01:02.638
+Data Files shows the same two files.
+
+00:01:13.296 --> 00:01:17.197
+So, a delete writes a small delete file, with the positions to skip.
+
+00:01:18.147 --> 00:01:23.535
+An update is a delete of the old rows, plus an insert of the new ones in a new data file.
+
+00:01:24.485 --> 00:01:29.592
+There is also a more compact format, deletion vectors, that you can switch on per table.
+
+00:01:29.872 --> 00:01:35.026
+And over time, maintenance rewrites files with many deletes, in Lesson 4.4.
+
+00:01:35.976 --> 00:01:40.929
+Save the script as 3 underscore 1 update delete dot sequel, commit, and push.
+
+00:02:04.597 --> 00:02:07.342
+To recap: the lake never edits a Parquet file.
+
+00:02:07.622 --> 00:02:11.777
+A delete adds a delete file, and an update is a delete plus an insert.
+
+00:02:12.057 --> 00:02:16.001
+Next: a daily load that can run twice without making duplicates.

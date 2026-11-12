@@ -1,0 +1,25 @@
+number: "3.1"
+title: Insert, update, delete
+slides:
+  - { id: title, type: title, h1: 'Update and <span class="accent">delete</span> in a lake', lead: "Without ever editing a Parquet file.", badges: [DELETE, UPDATE, Delete files] }
+  - { id: rule, type: statement, eyebrow: The rule, big: 'Parquet files are <span class="accent">never edited</span>.', bigstep: 1 }
+  - id: how
+    type: html
+    eyebrow: How it works
+    h2: Delete files and new files
+    html: |
+      <div class="steps">
+        <div class="step s" data-step="1"><div class="num">1</div><div><div class="t">DELETE</div><div class="d">writes a delete file: the row positions to skip</div>
+          <div class="files-strip" style="margin-top:12px"><div class="file">ducklake-…5d4e.parquet<small>7,176 rows, untouched</small></div><div class="file del">ducklake-…-delete.parquet<small>positions to skip</small></div></div></div></div>
+        <div class="step s" data-step="2"><div class="num">2</div><div><div class="t">UPDATE = DELETE + INSERT</div><div class="d">the old rows are skipped, the new rows go into a new file</div>
+          <div class="files-strip" style="margin-top:12px"><div class="file new">ducklake-…5f9e.parquet<small>72 updated rows</small></div></div></div></div>
+        <div class="step hot s" data-step="3"><div class="num">3</div><div><div class="t mono" style="font-size:34px">SET (write_deletion_vectors = true)</div><div class="d">a more compact format, per table; maintenance rewrites files later (4.4)</div></div></div>
+      </div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "Parquet files are never edited."
+      - "A delete adds a delete file."
+      - "An update is a delete plus an insert."
+  - { id: closing, type: closing, lesson: Lesson 3.2, h2: 'Daily loads, <span class="accent">no duplicates</span>' }

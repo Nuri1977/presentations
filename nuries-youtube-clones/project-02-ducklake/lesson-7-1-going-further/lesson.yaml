@@ -1,0 +1,65 @@
+# Lesson 7.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+# Slides only.
+id: lesson-7-1
+number: "7.1"
+title: "Going further, and recap"
+module: "Module 7 · Wrap-up"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 7.1"
+next: "The DuckLake docs and the course repository"
+summary: "Where to go from a laptop lake: a shared lake with a PostgreSQL catalog and object storage, access control, backups, encryption, moving an existing DuckDB database, and what DuckLake does not do yet. Then a recap of the whole course."
+tags: [DuckLake, PostgreSQL catalog, S3, data lake, recap]
+target_minutes: 4.5
+show_help_links: true
+links:
+  - { title: "DuckLake documentation", url: "https://ducklake.select/docs/stable/" }
+  - { title: "DuckLake: choosing a catalog database", url: "https://ducklake.select/docs/stable/duckdb/usage/choosing_a_catalog_database" }
+  - { title: "Course code", url: "https://github.com/Nuri1977/ethereum-ducklake-dbt" }
+draft_changes:
+  - "The shared-lake slide mentions the tested S3-compatible storage (RustFS) result and that a later tutorial covers PostgreSQL with cloud S3."
+accuracy_notes:
+  - "PostgreSQL catalog ATTACH form, access control, backups, encryption, migration and unsupported features from the DuckLake docs, checked 11 Nov 2026."
+  - "DuckLake on S3-compatible storage (RustFS) works from DuckDB and dbt with an S3 secret (endpoint, USE_SSL false, URL_STYLE path); Studio 1.7.6's DuckLake wizard cannot use it yet (studio-notes.md, 11 Nov 2026)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 7.1. Going further, and recap."
+
+  - id: s01
+    kind: slide
+    chapter: "A shared lake"
+    slide: shared
+    beats:
+      - { id: b01, step: 1, show: "Code: ATTACH 'ducklake:postgres:dbname=ducklake_catalog host=…' AS lake (DATA_PATH 's3://bucket/path/');", say: "Our lake lives on a laptop: a DuckDB file as catalog, and a local folder. For a team, swap both. Use PostgreSQL as the catalog, and object storage like S3 for the data. Same lake format, same SQL." }
+      - { id: b02, step: 2, show: "Many writers at once; any machine can attach the lake.", say: "Now many people and many machines can attach the same lake, and write at the same time." }
+      - { id: b03, step: 3, show: "Tested: S3-compatible storage works from DuckDB and dbt; Studio 1.7.6's wizard does not support it yet. A follow-up tutorial covers PostgreSQL + cloud S3.", say: "We tested S3 compatible storage too: it works from DuckDB and dbt, but Studio's wizard does not support it yet. A follow-up tutorial covers PostgreSQL with cloud storage." }
+
+  - id: s02
+    kind: slide
+    chapter: "Running it for real"
+    slide: ops
+    beats:
+      - { id: b04, step: 1, show: "Access control: database permissions on the catalog + bucket policies on the files.", say: "Running a lake for real means a few more things. Access control comes from two places: permissions in the catalog database, and policies on the bucket." }
+      - { id: b05, step: 2, show: "Backups: back up the catalog database; version the bucket.", say: "Backups: back up the catalog database, and turn on versioning for the bucket." }
+      - { id: b06, step: 3, show: "Encryption: data files encrypted, keys kept in the catalog.", say: "Encryption: DuckLake can encrypt every data file, and keeps the keys in the catalog." }
+      - { id: b07, step: 4, show: "Migration: move an existing DuckDB database into DuckLake.", say: "And an existing DuckDB database can be moved into a DuckLake, table by table." }
+
+  - id: s03
+    kind: slide
+    chapter: "Not yet"
+    slide: notyet
+    beats:
+      - { id: b08, step: 1, show: "Not supported today: primary keys, unique and foreign key constraints, indexes, sequences…", say: "Some things are not supported today, like primary keys, unique and foreign key constraints, and indexes. Check the docs page on unsupported features: it changes with each release." }
+
+  - id: s04
+    kind: slide
+    chapter: "Course recap"
+    slide: recap
+    beats:
+      - { id: b09, step: 1, show: "Recap of the course: catalog + Parquet; snapshots and time travel; changes without rewrites; partitions, statistics, maintenance; the catalog is plain SQL; dbt on the lake.", say: "Let's look back. A DuckLake is a catalog database plus Parquet files. Every change is a snapshot you can travel back to. Updates and deletes never rewrite files. Partitions, statistics and maintenance keep it fast and small. The catalog is plain SQL you can read yourself. And dbt builds tested models right on top. Thanks for watching, and see you in the next course." }
+
+  - id: s05
+    kind: closing
+    slide: closing
+    show: "Docs: ducklake.select. Code: github.com/Nuri1977/ethereum-ducklake-dbt."

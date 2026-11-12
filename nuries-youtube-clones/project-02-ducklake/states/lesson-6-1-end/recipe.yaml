@@ -1,0 +1,17 @@
+# lesson-6-1-end: project as pushed by GitHub (clone), lake rebuilt from the lesson scripts (S3 reads come from the cache).
+name: lesson-6-1-end
+project_name: ethereum_lake
+clone: https://github.com/Nuri1977/ethereum-ducklake-dbt.git
+dirs: [analysis, macros, models, rosetta, seeds, snapshots, tests, lake/data]
+database_file: ../ethereum_lake_dev.duckdb
+sql: []
+connection_name: ethereum_lake_dev
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com
+lake:
+  name: eth_lake
+  dir: lake
+  catalog: eth_catalog.duckdb
+  sql: [../../snippets/2.2/2_2_load_blocks.sql, ../../snippets/2.3/2_3_look_inside.sql, ../../snippets/2.4/2_4_snapshots.sql, ../../snippets/2.5/2_5_time_travel.sql, ../../snippets/3.1/3_1_update_delete.sql, ../../snippets/3.2/3_2_daily_load.sql, ../../snippets/3.3/3_3_schema_evolution.sql, ../../snippets/3.4/3_4_change_feed.sql, ../../snippets/4.1/4_1_partitioning.sql, ../../snippets/4.2/4_2_statistics.sql, ../../snippets/4.3/4_3_inlining.sql, ../../snippets/4.4/4_4_maintenance.sql, ../../snippets/4.5/4_5_add_files.sql, ../../snippets/5.1/5_1_catalog_tables.sql, ../../snippets/5.2/5_2_catalog_files.sql, ../../snippets/5.3/5_3_read_by_hand.sql]
+  dirs: [landing]

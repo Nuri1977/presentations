@@ -1,0 +1,33 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Let's start with the classic data warehouse.
+b01	One system owns everything: the storage, and the engine that runs your queries.
+b01	Data goes in through the warehouse's own door.
+b02	That makes it fast and safe, with real transactions.
+b02	But the data lives in the warehouse's own format, only its engine can read it, and you pay for storage and compute together.
+b03	A data lake turns this around.
+b03	The data is just files, on cheap storage: a folder, or a bucket on S three.
+b03	In open formats, like Par-kay.
+b04	Any engine can read those files: duck D B, Spark, Trino, or a Python script.
+b04	Storage and compute are separate.
+b05	But plain files have problems.
+b05	There are no transactions: a reader can see a write that is only half done.
+b06	There are no safe updates or deletes.
+b06	To change one row, you rewrite a whole file, and hope nobody reads it at that moment.
+b07	And there is no schema and no history.
+b07	Which columns does the table have, and what did it look like yesterday?
+b07	The files do not say.
+b08	Even finding the files is slow: listing thousands of objects in a bucket, just to plan one query.
+b09	The lakehouse fixes this, without giving up open files.
+b09	It adds a table format on top: a small layer of metadata that says which files make up each table, right now.
+b10	With that layer you get the warehouse features back: transactions, safe updates and deletes, schema changes, and a history you can travel back in.
+b10	The data stays in open files.
+b11	Four words we use through the whole course.
+b11	The lake: the data files, on some storage.
+b12	The table format: the rules for keeping track of which files make up a table, and how it changes.
+b13	The catalog: where that tracking information is stored.
+b14	And the engine: the program that reads it all and runs your queries.
+b14	In this course, that is duck D B.
+b15	To recap: a warehouse is one system for everything.
+b15	A lake is open files.
+b15	A lakehouse is open files, plus a table format that makes them behave like tables.
+b15	Next: why lakes store data in Par-kay.

@@ -9,11 +9,11 @@ summary: "Load the taxi zone lookup seed, then build two models on top of trips 
 start_state: lesson-2-3-end
 tags: [dbt ref, Jinja, dbt seed, dbt compile, dependencies, DuckDB, NYC taxi]
 target_minutes: 5
-rehearsal: true
+rehearsal: false
 start_notes:
   - "Start state `lesson-2-3-end`: a clone of what Lesson 2.3 pushed (adds models/trips.sql), the 12 parquet files in data/raw, and the nyc_taxi_dev connection. The trips view is built again by Project ▸ Run in this lesson."
 draft_changes:
-  - "dbt commands from Studio's dropdowns: Project ▸ Seed, Model ▸ Compile on top_pickup_zones, Project ▸ Run."
+  - "dbt commands from Studio's dropdowns: Project ▸ Seed, Model ▸ Compile on top_pickup_zones, Project ▸ Run; the result is shown with Model ▸ Preview and the Run History tab (Nuri, 10 Nov)."
   - "The plan's lineage view (s07) moves to Lesson 2.6, which is about the DAG."
   - "Model ▸ Compile opens a Compiled SQL window (Original SQL / Compiled SQL tabs) in Studio 1.7.6; the lesson shows it there instead of opening target/compiled."
 accuracy_notes:
@@ -150,6 +150,24 @@ scenes:
         card: { eyebrow: "dbt run", title: "trips first, then the marts", sub: "PASS=3 ERROR=0", pos: top-right }
         actions:
           - wait_text: { text: "PASS=3", label: run output }
+      - id: b19b
+        say: "Now look at the result. With top pickup zones open, choose Model, Preview."
+        zoom: model-menu
+        actions:
+          - model_menu: Preview
+          - wait_text: { text: "^Preview: top_pickup_zones$", regex: true, label: preview window, timeoutMs: 90000 }
+      - id: b19c
+        say: "Ten rows, because of top n. East Harlem North is the busiest pickup zone of 2025, with a hundred forty-three thousand trips."
+        zoom: center-wide
+        card: { eyebrow: "top_pickup_zones · 2025 data, as of 9 Nov 2026", title: "East Harlem North: 143,115", sub: "10 rows: limit {{ top_n }}", pos: bottom-right }
+        actions:
+          - pause: 800
+      - id: b19d
+        say: "Close it, and open Run History: the seed and the run are listed, with their status."
+        zoom: terminal
+        actions:
+          - click_at: { role: button, name: Close, label: Close, settleMs: [300, 800] }
+          - click_at: { role: button, name: "RUN HISTORY", label: Run History, settleMs: [400, 1200, 2200] }
 
   - id: s08
     kind: app

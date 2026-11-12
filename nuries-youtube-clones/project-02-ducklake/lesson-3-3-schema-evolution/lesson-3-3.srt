@@ -1,0 +1,83 @@
+1
+00:00:03,350 --> 00:00:08,365
+In the SQL Editor, on eth lake: add a column to blocks, gas used percent, a double.
+
+2
+00:00:15,384 --> 00:00:17,770
+It is instant: no file is rewritten.
+
+3
+00:00:18,050 --> 00:00:19,973
+Old rows simply have no value.
+
+4
+00:00:20,253 --> 00:00:25,132
+Fill it for one day, the second of November: gas used divided by the gas limit.
+
+5
+00:00:26,082 --> 00:00:29,819
+Miner is an old name; today the field means the fee recipient.
+
+6
+00:00:30,099 --> 00:00:30,803
+Rename it.
+
+7
+00:00:31,753 --> 00:00:33,859
+And make number required: not null.
+
+8
+00:00:35,364 --> 00:00:39,389
+Query the new shape: number, fee recipient, and gas used percent.
+
+9
+00:00:40,339 --> 00:00:43,749
+Now time travel to version eleven, before these changes.
+
+10
+00:00:44,029 --> 00:00:45,910
+The column is still called miner there.
+
+11
+00:00:46,190 --> 00:00:48,017
+Each snapshot keeps its own schema.
+
+12
+00:00:48,967 --> 00:00:56,170
+In Data Lake, open the blocks table and its Schema tab: fee recipient in place of miner, and the new column at the end.
+
+13
+00:01:05,246 --> 00:01:07,324
+How does this work without touching files?
+
+14
+00:01:07,604 --> 00:01:10,101
+Every column has an id in the catalog.
+
+15
+00:01:10,381 --> 00:01:15,482
+A rename changes the name, not the id, so old files still map to the right column.
+
+16
+00:01:16,432 --> 00:01:23,328
+You can add, drop and rename columns, promote types the safe way, like integer to big integer, and add not null.
+
+17
+00:01:23,608 --> 00:01:25,604
+And every version keeps its own schema.
+
+18
+00:01:26,554 --> 00:01:31,818
+Save the script as 3 underscore 3 schema evolution dot sequel, commit, and push.
+
+19
+00:01:54,903 --> 00:02:00,909
+To recap: we added a column, renamed one, and added a constraint, without rewriting a single file.
+
+20
+00:02:01,189 --> 00:02:03,467
+And time travel still sees the old schema.
+
+21
+00:02:03,747 --> 00:02:06,852
+Next: asking the lake what changed between two versions.

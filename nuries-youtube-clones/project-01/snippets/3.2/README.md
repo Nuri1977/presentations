@@ -1,31 +1,31 @@
 # NYC taxi dbt project
 
-[![dbt build & publish](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions/workflows/dbt_build.yml/badge.svg)](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/actions/workflows/dbt_build.yml)
-[![docs](https://img.shields.io/badge/docs-live-ff7a1a)](https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/)
+[![dbt build & publish](https://github.com/Nuri1977/nyc-taxi-dbt/actions/workflows/dbt_build.yml/badge.svg)](https://github.com/Nuri1977/nyc-taxi-dbt/actions/workflows/dbt_build.yml)
+[![docs](https://img.shields.io/badge/docs-live-ff7a1a)](https://nuri1977.github.io/nyc-taxi-dbt/)
 
 A dbt + DuckDB project on the NYC TLC green taxi trips of 2025, built in Rosetta DBT Studio.
 GitHub Actions builds and tests it on every push, publishes the warehouse, and deploys the docs.
 
 | What | How | Where to look |
 |---|---|---|
-| Pipeline | source → `trips` view → three mart tables | `models/` |
+| Pipeline | raw table → `trips` view → three mart tables | `models/` |
 | Tests | unique, not_null, accepted_values | `models/schema.yml`, `seeds/seeds.yml` |
-| Docs | dbt docs, lineage graph | [docs site](https://nuri1977.github.io/nyc-taxi-dbt-rehearsal/) |
+| Docs | dbt docs, lineage graph | [docs site](https://nuri1977.github.io/nyc-taxi-dbt/) |
 | CI | `dbt build` on every push and every Monday | `.github/workflows/dbt_build.yml` |
 | Environments | dev in Studio, prod in CI | `profiles.yml`, `ci/profiles.yml` |
-| Warehouse | `prod.duckdb`, a release asset | [Releases](https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/tag/warehouse) |
+| Warehouse | `prod.duckdb`, a release asset | [Releases](https://github.com/Nuri1977/nyc-taxi-dbt/releases/tag/warehouse) |
 
 ## Query the warehouse
 
-In DuckDB (or the SQL Editor of Rosetta DBT Studio):
+In the DuckDB CLI or any DuckDB client:
 
 ```sql
 install httpfs; load httpfs;
-attach 'https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal/releases/download/warehouse/prod.duckdb' as taxi (read_only);
+attach 'https://github.com/Nuri1977/nyc-taxi-dbt/releases/download/warehouse/prod.duckdb' as taxi (read_only);
 select * from taxi.main.top_pickup_zones;
 ```
 
-The marts are tables; `trips` is a view over local files, so query the marts.
+The file holds the raw trips, the `trips` view and the three mart tables.
 
 ## Run it yourself
 

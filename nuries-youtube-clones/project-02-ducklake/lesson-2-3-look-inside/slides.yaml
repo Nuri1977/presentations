@@ -1,0 +1,20 @@
+number: "2.3"
+title: Look inside
+slides:
+  - { id: title, type: title, h1: 'Look <span class="accent">inside</span> the lake', lead: "Data files, and the catalog that makes them a table.", badges: [Data Files, ducklake_list_files, Parquet] }
+  - id: point
+    type: cards
+    eyebrow: Files and catalog
+    h2: The catalog decides
+    cols: 2
+    cards:
+      - { step: 1, k: The files, t: Plain Parquet, d: "Any tool that reads Parquet can open them." }
+      - { step: 2, cls: hot, k: The catalog, t: Which files are the table now, d: "After deletes and updates, the folder holds old files and delete files too. Read the table, not the folder." }
+  - id: recap
+    type: recap
+    items:
+      - "Studio's table page: Schema and Data Files."
+      - "<span class=\"mono\">ducklake_list_files</span> gives the same list in SQL."
+      - "The files are plain Parquet on disk."
+      - "The catalog decides which files are the table."
+  - { id: closing, type: closing, lesson: Lesson 2.4, h2: 'Every change is a <span class="accent">snapshot</span>' }

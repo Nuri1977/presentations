@@ -1,0 +1,23 @@
+number: "3.3"
+title: Schema evolution
+slides:
+  - { id: title, type: title, h1: 'Schema <span class="accent">evolution</span>', lead: "Change a table's shape, keep every file.", badges: [ADD COLUMN, RENAME, NOT NULL] }
+  - id: how
+    type: html
+    eyebrow: How it works
+    h2: Columns have ids
+    html: |
+      <table class="t s" data-step="1">
+        <tr><th>column id</th><th>name</th><th>from snapshot</th><th>until snapshot</th></tr>
+        <tr><td>3</td><td class="mono">miner</td><td>2</td><td>14</td></tr>
+        <tr><td>3</td><td class="mono">fee_recipient</td><td>14</td><td>–</td></tr>
+      </table>
+      <div class="badges s" data-step="2" style="margin-top:40px"><span class="pill green">add</span><span class="pill green">drop</span><span class="pill green">rename</span><span class="pill green">int → bigint</span><span class="pill green">not null</span><span class="pill grey">files untouched</span></div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "Add, rename, constrain: no file is rewritten."
+      - "A rename keeps the column id."
+      - "Each snapshot keeps its own schema."
+  - { id: closing, type: closing, lesson: Lesson 3.4, h2: 'The data <span class="accent">change feed</span>' }

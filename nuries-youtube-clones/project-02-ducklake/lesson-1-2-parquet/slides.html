@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.2 · Parquet</title>
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .two { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 26px; }
+  .grid { display: grid; gap: 6px; font-family: var(--mono); font-size: 28px; }
+  .grid .r { display: grid; grid-template-columns: 1.2fr 1.6fr 1fr; gap: 6px; }
+  .grid .r span { padding: 12px 14px; border-radius: 8px; background: #fff; border: 1px solid var(--line); white-space: nowrap; overflow: hidden; }
+  .grid .h span { background: var(--card); font-family: Inter, sans-serif; font-weight: 850; font-size: 24px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+  .rowhl .r:not(.h) span { background: var(--blue-soft); border-color: #b9caf7; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; font-family: var(--mono); font-size: 28px; }
+  .cols .c { border-radius: 14px; border: 2px solid var(--line); background: #fff; padding: 16px; display: grid; gap: 8px; }
+  .cols .c b { font-family: Inter, sans-serif; font-size: 24px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+  .cols .c.on { border-color: var(--orange); background: var(--orange-soft); }
+  .cols .c.off { opacity: .35; }
+  .label { font-size: 30px; font-weight: 800; color: var(--muted); margin-bottom: 18px; }
+  .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; }
+  .meta .card { padding: 30px 34px; }
+  .meta .v { font-size: 60px; font-weight: 900; margin-top: 8px; }
+  .bar2 { display: flex; height: 70px; border-radius: 14px; overflow: hidden; margin-top: 18px; font-size: 26px; font-weight: 800; }
+  .bar2 div { display: grid; place-items: center; color: #fff; }
+  .rg { display: grid; gap: 14px; }
+  .rg .g { border-radius: 16px; border: 2px solid var(--line); padding: 18px 22px; background: #fff; display: flex; gap: 12px; align-items: center; font-size: 28px; font-weight: 750; }
+  .rg .g span { padding: 8px 14px; border-radius: 8px; background: var(--card); font-family: var(--mono); font-size: 24px; }
+  .statbox { font-family: var(--mono); font-size: 34px; line-height: 1.7; padding: 30px 36px; }
+  .skip { font-size: 40px; font-weight: 850; padding: 30px 36px; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 1.2</div>
+      <h1 style="margin-top:28px;font-size:132px"><span class="accent">Parquet</span>: column files</h1>
+      <p class="lead">Why every data lake stores its tables this way.</p>
+      <div class="badges"><span class="badge">Columns</span><span class="badge">Row groups</span><span class="badge">Statistics</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="rows">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Rows or columns</div>
+    <h2>Same data, two layouts</h2>
+    <div class="two">
+      <div class="s" data-step="1">
+        <div class="label">CSV: row by row</div>
+        <div class="grid rowhl">
+          <div class="r h"><span>number</span><span>miner</span><span>tx count</span></div>
+          <div class="r"><span>26093738</span><span>0x4838…5f97</span><span>219</span></div>
+          <div class="r"><span>26093739</span><span>0x95222…0d74</span><span>316</span></div>
+          <div class="r"><span>26093740</span><span>0x4838…5f97</span><span>247</span></div>
+        </div>
+      </div>
+      <div class="s" data-step="2">
+        <div class="label">Parquet: column by column</div>
+        <div class="cols">
+          <div class="c on"><b>number</b>26093738<br>26093739<br>26093740</div>
+          <div class="c" data-x><b>miner</b>0x4838…<br>0x9522…<br>0x4838…</div>
+          <div class="c on"><b>tx count</b>219<br>316<br>247</div>
+        </div>
+        <p class="lead s" data-step="3" style="font-size:36px">A query for two columns reads two columns.</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:20%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="inside">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Inside one real file</div>
+    <h2>One day of Ethereum blocks</h2>
+    <div class="meta s" data-step="1">
+      <div class="card"><div class="k">Rows</div><div class="v">7,176</div></div>
+      <div class="card"><div class="k">Row groups</div><div class="v">1</div></div>
+      <div class="card"><div class="k">Compression</div><div class="v">Snappy</div></div>
+    </div>
+    <div class="two" style="margin-top:20px">
+      <div class="rg s" data-step="2">
+        <div class="g">Row group 1 <span>number</span><span>miner</span><span>…</span></div>
+        <div class="g">Row group 2 <span>number</span><span>miner</span><span>…</span></div>
+        <div class="g" style="opacity:.5">…</div>
+      </div>
+      <div class="s" data-step="3">
+        <div class="label">5.6 MB, by column</div>
+        <div class="bar2"><div style="flex:3.0;background:var(--red)">logs_bloom 3.0 MB</div><div style="flex:2.6;background:var(--blue)">everything else 2.6 MB</div></div>
+        <p class="lead" style="font-size:34px">We leave <span class="mono">logs_bloom</span> out when we load.</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:45%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.2</b></div></div>
+  <div class="checked">blocks/date=2026-10-01, read with parquet_metadata on 12 Nov 2026</div>
+</section>
+
+<section class="stage" data-id="stats">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Statistics</div>
+    <h2>Min and max, for free</h2>
+    <div class="two">
+      <div class="codecard s" data-step="1"><div class="filetab"><span class="ic"></span>row group 1 · column statistics</div><div class="statbox"><span class="k">number</span>             <span class="str">26,093,738</span> … <span class="str">26,100,913</span>
+<span class="k">transaction_count</span>  <span class="str">2</span> … <span class="str">1,087</span></div></div>
+      <div>
+        <div class="card bad skip s" data-step="2">where number = 26,200,000<br><span style="color:var(--red)">→ skip the whole file</span></div>
+        <div class="card hot skip s" data-step="3" style="margin-top:24px">DuckLake copies these statistics into its catalog.</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:70%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What to remember</h2>
+    <div class="recap s" data-step="1">
+      <div class="item"><div class="num">1</div><div>Parquet stores columns, not rows.</div></div>
+      <div class="item"><div class="num">2</div><div>Rows are split into row groups; each column is compressed.</div></div>
+      <div class="item"><div class="num">3</div><div>Min and max per column let engines skip data.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.2</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 1.3</h1>
+      <h2 style="font-size:92px">Table formats and <span class="accent">catalogs</span></h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

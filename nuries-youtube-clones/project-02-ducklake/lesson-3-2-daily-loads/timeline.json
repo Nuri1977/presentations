@@ -1,0 +1,142 @@
+{
+ "total": 128.49,
+ "fps": 30,
+ "size": [
+  3840,
+  2160
+ ],
+ "scenes": [
+  {
+   "id": "s00",
+   "kind": "title",
+   "start": 0.0,
+   "dur": 3
+  },
+  {
+   "id": "s01",
+   "kind": "slide",
+   "start": 3.0,
+   "dur": 14.7
+  },
+  {
+   "id": "s02",
+   "kind": "app",
+   "start": 17.7,
+   "dur": 43.6
+  },
+  {
+   "id": "s03",
+   "kind": "slide",
+   "start": 61.3,
+   "dur": 21.34
+  },
+  {
+   "id": "s04",
+   "kind": "app",
+   "start": 82.64,
+   "dur": 28.14
+  },
+  {
+   "id": "s05",
+   "kind": "slide",
+   "start": 110.78,
+   "dur": 13.71
+  },
+  {
+   "id": "s06",
+   "kind": "closing",
+   "start": 124.49,
+   "dur": 4
+  }
+ ],
+ "beats": [
+  {
+   "id": "b01",
+   "scene": "s01",
+   "start": 3.0,
+   "dur": 9.5,
+   "voice_start": 3.35,
+   "voice": 8.552
+  },
+  {
+   "id": "b02",
+   "scene": "s01",
+   "start": 12.5,
+   "dur": 5.2,
+   "voice_start": 12.85,
+   "voice": 4.247
+  },
+  {
+   "id": "b03",
+   "scene": "s02",
+   "start": 17.7,
+   "dur": 12.54,
+   "voice_start": 18.05,
+   "voice": 8.305
+  },
+  {
+   "id": "b04",
+   "scene": "s02",
+   "start": 30.24,
+   "dur": 13.61,
+   "voice_start": 30.59,
+   "voice": 12.66
+  },
+  {
+   "id": "b05",
+   "scene": "s02",
+   "start": 43.85,
+   "dur": 3.68,
+   "voice_start": 44.2,
+   "voice": 2.733
+  },
+  {
+   "id": "b06",
+   "scene": "s02",
+   "start": 47.53,
+   "dur": 5.64,
+   "voice_start": 47.88,
+   "voice": 4.689
+  },
+  {
+   "id": "b07",
+   "scene": "s02",
+   "start": 53.17,
+   "dur": 8.13,
+   "voice_start": 53.52,
+   "voice": 7.176
+  },
+  {
+   "id": "b08",
+   "scene": "s03",
+   "start": 61.3,
+   "dur": 10.35,
+   "voice_start": 61.65,
+   "voice": 9.397
+  },
+  {
+   "id": "b09",
+   "scene": "s03",
+   "start": 71.65,
+   "dur": 10.99,
+   "voice_start": 72.0,
+   "voice": 10.044
+  },
+  {
+   "id": "b10",
+   "scene": "s04",
+   "start": 82.64,
+   "dur": 28.14,
+   "voice_start": 82.99,
+   "voice": 4.703
+  },
+  {
+   "id": "b11",
+   "scene": "s05",
+   "start": 110.78,
+   "dur": 13.71,
+   "voice_start": 111.13,
+   "voice": 12.762
+  }
+ ]
+}

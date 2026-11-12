@@ -1,0 +1,82 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:04.754
+A lake grows untidy.
+
+00:00:05.034 --> 00:00:10.634
+Every load adds files, old files stay around for time travel, and delete files pile up.
+
+00:00:11.584 --> 00:00:19.769
+DuckLake's recommended routine has three steps: merge small files, expire old snapshots, and clean up files nobody needs.
+
+00:00:20.049 --> 00:00:21.778
+Checkpoint runs them all together.
+
+00:00:22.728 --> 00:00:26.643
+In the SQL Editor, on eth lake: count the Parquet files on disk.
+
+00:00:26.923 --> 00:00:27.632
+Nineteen.
+
+00:00:34.762 --> 00:00:36.198
+Merge adjacent files.
+
+00:00:36.478 --> 00:00:45.257
+Studio shows no result rows for this call, but behind it, the four files of the blocks table, the three months and the November days, became one.
+
+00:00:46.207 --> 00:00:47.494
+Count again: twenty.
+
+00:00:47.774 --> 00:00:52.527
+One more, not fewer: the new file is written, and the four old ones are still on disk.
+
+00:00:53.477 --> 00:00:59.065
+Snapshots six and seven are the October copy we made and dropped in Lesson 2.5.
+
+00:00:59.345 --> 00:01:00.925
+We will never travel back to them.
+
+00:01:01.205 --> 00:01:02.072
+Expire them.
+
+00:01:02.352 --> 00:01:05.096
+Again Studio shows no rows, but they are gone.
+
+00:01:06.046 --> 00:01:07.502
+Now clean up old files.
+
+00:01:07.782 --> 00:01:15.363
+First a dry run, which only lists what it would delete: the files of that October copy, and the files the merge replaced.
+
+00:01:16.313 --> 00:01:18.910
+Run it for real, and count: fourteen files.
+
+00:01:19.190 --> 00:01:23.428
+And time travel still works: the merged file keeps every row's history.
+
+00:01:24.378 --> 00:01:27.141
+In practice, you just run checkpoint, now and then.
+
+00:01:27.421 --> 00:01:32.954
+It flushes inlined data, merges, expires and cleans up, following the lake's options.
+
+00:01:33.904 --> 00:01:35.301
+Be careful with two things.
+
+00:01:35.581 --> 00:01:38.694
+Expiring a snapshot ends time travel to it, for good.
+
+00:01:38.974 --> 00:01:40.675
+And cleanup really deletes files.
+
+00:01:41.625 --> 00:01:49.393
+Files that no snapshot ever knew about, for example after a crash in the middle of a write, are removed with delete orphaned files.
+
+00:01:50.343 --> 00:01:55.096
+Save the script as 4 underscore 4 maintenance dot sequel, commit, and push.
+
+00:02:17.793 --> 00:02:24.147
+To recap: merge small files, expire snapshots you do not need, clean up, or simply run checkpoint.
+
+00:02:24.427 --> 00:02:28.929
+Next: registering Parquet files that already exist, without copying them.

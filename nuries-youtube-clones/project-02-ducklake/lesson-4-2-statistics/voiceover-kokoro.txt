@@ -1,0 +1,21 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	In Data Lake, open the transactions table and its Statistics tab.
+b01	For every column, the catalog keeps the smallest and the largest value.
+b01	Block numbers go from about twenty-six million ninety-three thousand to twenty-six million one hundred forty-four thousand.
+b02	The catalog keeps the same numbers for every single file, so it can rule out files without opening them.
+b03	In the sequel Editor, on eth lake: the first and last block number of the week.
+b04	Now ask for a hundred blocks, with explain analyze in front.
+b04	It runs the query and returns the plan as text; Studio puts it on one line, so here is the part that matters, from the table scan: total files read, one.
+b04	Six of the seven files were skipped, using only their statistics.
+b05	Pruning works when each file covers a narrow range.
+b05	Here it does: block numbers grow with time, and each day is its own file.
+b06	If rows arrive in random order, every file covers almost everything, and nothing can be skipped.
+b07	Sorted by tells duck lake to sort rows when it writes new files, so their ranges stay narrow.
+b08	Set it for transactions: sorted by block number.
+b08	It applies to new writes, and to files that maintenance rewrites later.
+b09	Other settings live in the lake's options, like the inlining limit we set to zero.
+b09	Others, like target file size and Par-kay compression, are set with set option.
+b10	Save the script as 4 underscore 2 statistics dot sequel, commit, and push.
+b11	To recap: the catalog keeps min and max for every column of every file, so queries skip files without opening them.
+b11	Sorted by keeps ranges narrow.
+b11	Next: what duck lake does with very small writes.

@@ -1,0 +1,16 @@
+# End of Lesson 2.2 = start of 2.3: project as pushed by 2.2, lake rebuilt from the 2.2 script.
+name: lesson-2-2-end
+project_name: ethereum_lake
+clone: https://github.com/Nuri1977/ethereum-ducklake-dbt.git
+dirs: [analysis, macros, models, rosetta, seeds, snapshots, tests, lake/data]
+database_file: ../ethereum_lake_dev.duckdb
+sql: []
+connection_name: ethereum_lake_dev
+git:
+  user: Rosetta Academy
+  email: academy@users.noreply.github.com
+lake:
+  name: eth_lake
+  dir: lake
+  catalog: eth_catalog.duckdb
+  sql: [../../snippets/2.2/2_2_load_blocks.sql]

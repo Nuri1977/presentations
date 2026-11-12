@@ -68,8 +68,8 @@ Project 1 · Lesson 2.5. Properties: describe your models. Badges: schema.yml, s
 
 | Beat | Spoken | On screen | Words | ~s |
 |---|---|---|---|---|
-| b12 @1:33 | Let's look inside DuckDB. Open the SQL Editor, pick the nyc taxi dev connection, and ask DuckDB for the columns of trips per month, with their comments. | Left bar → **SQL Editor**<br>Pick the connection **nyc_taxi_dev**<br>Type 99 characters into the editor | 27 | 12 |
-| b13 @1:45 | Run it with the green arrow. | Click the green run arrow next to line 1 | 6 | 4 |
+| b12 @1:33 | Let's look inside DuckDB. Open the SQL Editor, pick the nyc taxi dev connection, and ask DuckDB for the columns of trips per month, with their comments. | Left bar → **SQL Editor**<br>Pick the connection **nyc_taxi_dev**<br>Type 99 characters into the editor<br>Zoom: explorer | 27 | 12 |
+| b13 @1:45 | Run it with the green arrow. | Click the green run arrow next to line 1<br>Zoom: explorer | 6 | 4 |
 | b14 @1:49 | Each column carries the description from schema dot yml. Average fare has none, because we didn't describe it. | Zoom: sql-results<br>Card: *persist_docs* — **Descriptions in the database** — Every SQL tool now sees them. | 18 | 7 |
 
 ## s05 · slide — slide `where`

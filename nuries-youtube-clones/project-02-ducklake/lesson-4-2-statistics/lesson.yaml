@@ -1,0 +1,127 @@
+# Lesson 4.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-4-2
+number: "4.2"
+title: "Statistics and file pruning"
+module: "Module 4 · Performance and upkeep"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 4.2"
+next: "Lesson 4.3 · Data inlining for small writes"
+summary: "DuckLake keeps the min and max of every column for every file in its catalog. See them in Studio's Statistics tab, watch EXPLAIN ANALYZE read one file out of seven for a block-number filter, and keep ranges narrow for new data with SORTED BY. Plus the lake's options."
+start_state: lesson-4-1-end
+show_help_links: true
+links:
+  - { title: "DuckLake: sorted tables", url: "https://ducklake.select/docs/stable/duckdb/advanced_features/sorted_tables" }
+  - { title: "DuckLake: configuration", url: "https://ducklake.select/docs/stable/duckdb/usage/configuration" }
+tags: [DuckLake, statistics, file pruning, sorted tables, EXPLAIN ANALYZE]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-4-1-end`: raw.transactions loaded and partitioned by date (seven files)."
+draft_changes:
+  - "No rewrite of existing files: SORTED BY applies to new writes, and the week's files already hold narrow block ranges (one day each)."
+accuracy_notes:
+  - "block_number 26,093,738 to 26,143,955 in the week; EXPLAIN ANALYZE for 26,100,000 to 26,100,100 in Studio 1.7.6: Total Files Read: 1 (the file of 1 October, 26,093,738 to 26,100,913). Checked 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 4.2. Statistics and file pruning."
+
+  - id: s01
+    kind: app
+    chapter: "Statistics in the catalog"
+    beats:
+      - id: b01
+        say: "In Data Lake, open the transactions table and its Statistics tab. For every column, the catalog keeps the smallest and the largest value. Block numbers go from about twenty-six million ninety-three thousand to twenty-six million one hundred forty-four thousand."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { text: transactions, label: transactions, settleMs: [500, 1500, 2500] }
+          - click_at: { role: tab, name: Statistics, settleMs: [400, 1200, 2500] }
+          - point_at: { text: block_number, label: block_number, hold: 900 }
+      - id: b02
+        say: "The catalog keeps the same numbers for every single file, so it can rule out files without opening them."
+        zoom: center-wide
+
+  - id: s02
+    kind: app
+    chapter: "Pruning in action"
+    beats:
+      - id: b03
+        say: "In the SQL Editor, on eth lake: the first and last block number of the week."
+        zoom: sql-results
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select min(block_number) as first_block, max(block_number) as last_block from raw.transactions;
+              explain analyze select count(*) from raw.transactions where block_number between 26100000 and 26100100;
+              alter table raw.transactions set sorted by (block_number asc);
+              select option_name, value from eth_lake.options();
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Now ask for a hundred blocks, with explain analyze in front. It runs the query and returns the plan as text; Studio puts it on one line, so here is the part that matters, from the table scan: total files read, one. Six of the seven files were skipped, using only their statistics."
+        zoom: sql-results
+        card: { eyebrow: "EXPLAIN ANALYZE", title: "Total Files Read: 1", sub: "of 7, skipped by min and max", pos: top-right }
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 3000] }
+
+  - id: s03
+    kind: slide
+    chapter: "Keep ranges narrow"
+    slide: sorted
+    beats:
+      - { id: b05, step: 1, show: "Narrow ranges per file = good pruning. Here block numbers grow with time, and each day is a file.", say: "Pruning works when each file covers a narrow range. Here it does: block numbers grow with time, and each day is its own file." }
+      - { id: b06, step: 2, show: "Wide ranges (random order) = every file matches.", say: "If rows arrive in random order, every file covers almost everything, and nothing can be skipped." }
+      - { id: b07, step: 3, show: "ALTER TABLE … SET SORTED BY (block_number ASC): new files are written sorted.", say: "Sorted by tells DuckLake to sort rows when it writes new files, so their ranges stay narrow." }
+
+  - id: s04
+    kind: app
+    chapter: "Sorted by, and options"
+    beats:
+      - id: b08
+        say: "Set it for transactions: sorted by block number. It applies to new writes, and to files that maintenance rewrites later."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+      - id: b09
+        say: "Other settings live in the lake's options, like the inlining limit we set to zero. Others, like target file size and Parquet compression, are set with set option."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b10
+        say: "Save the script as 4 underscore 2 statistics dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 4_2_statistics.sql }
+          - paste: |
+              select min(block_number) as first_block, max(block_number) as last_block from raw.transactions;
+              explain analyze select count(*) from raw.transactions where block_number between 26100000 and 26100100;
+              alter table raw.transactions set sorted by (block_number asc);
+              select option_name, value from eth_lake.options();
+          - click_save
+          - expect_file: { path: sql/4_2_statistics.sql, snippet: ../snippets/4.2/4_2_statistics.sql }
+          - close_tab: sql/4_2_statistics.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Statistics and sorted transactions
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b11, step: 1, show: "Recap: min and max per column per file in the catalog; files skipped without opening them; SORTED BY keeps ranges narrow; options.", say: "To recap: the catalog keeps min and max for every column of every file, so queries skip files without opening them. Sorted by keeps ranges narrow. Next: what DuckLake does with very small writes." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 4.3 · Data inlining."

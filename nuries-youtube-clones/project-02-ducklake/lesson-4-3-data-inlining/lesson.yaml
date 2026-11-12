@@ -1,0 +1,121 @@
+# Lesson 4.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-4-3
+number: "4.3"
+title: "Data inlining for small writes"
+module: "Module 4 · Performance and upkeep"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 4.3"
+next: "Lesson 4.4 · Maintenance"
+summary: "The setting we turned off in Lesson 2.2: with data inlining, small inserts are stored as rows inside the catalog instead of as tiny Parquet files. Create a small watchlist table with inlining on, insert two rows, see that no file appears, then flush them into one Parquet file."
+start_state: lesson-4-2-end
+show_help_links: true
+links:
+  - { title: "DuckLake: data inlining", url: "https://ducklake.select/docs/stable/duckdb/advanced_features/data_inlining" }
+tags: [DuckLake, data inlining, small files, streaming, DuckDB]
+target_minutes: 3.5
+start_notes:
+  - "Start state `lesson-4-2-end`: inlining is off for the whole lake (set in 2.2)."
+draft_changes:
+  - "Inlining is switched on for one table with set_option(…, schema => 'raw', table_name => 'watchlist') instead of a WITH clause on CREATE TABLE."
+accuracy_notes:
+  - "Two rows inserted with a table limit of 100: 0 data files; after ducklake_flush_inlined_data: 1 file, 2 rows flushed. Rehearsed with DuckDB 1.5.2 (ducklake 415a9ebd), 12 Nov 2026."
+  - "Addresses: 0x00000000219ab540356cbb839cbe05303d7705fa is the Ethereum staking deposit contract; 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 is WETH (wrapped ether)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 4.3. Data inlining for small writes."
+
+  - id: s01
+    kind: slide
+    chapter: "The small-file problem"
+    slide: problem
+    beats:
+      - { id: b01, step: 1, show: "Many small inserts = many tiny Parquet files: slow to list and read.", say: "Lakes have a classic problem: many small inserts, like a stream of events, make many tiny Parquet files. Tiny files are slow to list and slow to read." }
+      - { id: b02, step: 2, show: "Inlining: small inserts are stored as rows in the catalog; flushed to Parquet later in one go.", say: "DuckLake's answer is data inlining. Small inserts are stored as rows inside the catalog database. Later, they are flushed into one proper Parquet file." }
+
+  - id: s02
+    kind: app
+    chapter: "Inlining on one table"
+    beats:
+      - id: b03
+        say: "In the SQL Editor, on eth lake: a small table, a watchlist of addresses with a label. Remember, inlining is off for the whole lake. Turn it on for this one table: up to a hundred rows stay in the catalog."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              create table raw.watchlist (address varchar, label varchar);
+              call eth_lake.set_option('data_inlining_row_limit', 100, schema => 'raw', table_name => 'watchlist');
+              insert into raw.watchlist values ('0x00000000219ab540356cbb839cbe05303d7705fa', 'staking deposit'), ('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', 'wrapped ether');
+              select * from raw.watchlist;
+              select count(*) as files from ducklake_list_files('eth_lake', 'watchlist', schema => 'raw');
+              call ducklake_flush_inlined_data('eth_lake', schema_name => 'raw', table_name => 'watchlist');
+              select count(*) as files from ducklake_list_files('eth_lake', 'watchlist', schema => 'raw');
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Insert two addresses: the staking deposit contract, and wrapped ether. And read them back, like any table."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "But count the table's data files: zero. The two rows live inside the catalog."
+        zoom: sql-results
+        card: { eyebrow: "raw.watchlist", title: "2 rows, 0 files", sub: "inlined in the catalog", pos: top-right }
+        actions:
+          - sql_run: { line: 5, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "Flush the inlined data, and count again: one Parquet file, with both rows."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+          - sql_run: { line: 7, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: slide
+    chapter: "When to use it"
+    slide: when
+    beats:
+      - { id: b07, step: 1, show: "Default limit: small inserts are inlined; we set it to 0 in 2.2 to see files.", say: "Inlining is on by default for small inserts. We turned it off in Lesson 2.2 only so that every write would show up as files." }
+      - { id: b08, step: 2, show: "Good for: frequent small writes. Flush on a schedule, or let maintenance do it (4.4).", say: "Keep it on for frequent small writes, and flush on a schedule, or let maintenance do it, which is the next lesson." }
+
+  - id: s04
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b09
+        say: "Save the script as 4 underscore 3 inlining dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 4_3_inlining.sql }
+          - paste: |
+              create table raw.watchlist (address varchar, label varchar);
+              call eth_lake.set_option('data_inlining_row_limit', 100, schema => 'raw', table_name => 'watchlist');
+              insert into raw.watchlist values ('0x00000000219ab540356cbb839cbe05303d7705fa', 'staking deposit'), ('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', 'wrapped ether');
+              select * from raw.watchlist;
+              select count(*) as files from ducklake_list_files('eth_lake', 'watchlist', schema => 'raw');
+              call ducklake_flush_inlined_data('eth_lake', schema_name => 'raw', table_name => 'watchlist');
+              select count(*) as files from ducklake_list_files('eth_lake', 'watchlist', schema => 'raw');
+          - click_save
+          - expect_file: { path: sql/4_3_inlining.sql, snippet: ../snippets/4.3/4_3_inlining.sql }
+          - close_tab: sql/4_3_inlining.sql
+          - git_tab
+          - git_stage_all
+          - git_message: A small inlined table
+          - git_commit
+          - git_push
+
+  - id: s05
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b10, step: 1, show: "Recap: small inserts inlined into the catalog; no tiny files; flush to Parquet later.", say: "To recap: with inlining, small inserts become rows in the catalog, not tiny files, and a flush writes them out as one Parquet file. Next: maintenance, to keep the lake small and fast." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 4.4 · Maintenance."

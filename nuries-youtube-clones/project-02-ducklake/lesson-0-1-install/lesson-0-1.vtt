@@ -1,0 +1,94 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:06.563
+Rosetta DBT Studio is free and open source.
+
+00:00:06.843 --> 00:00:10.127
+Go to rosetta D B dot I O, and click Download Now.
+
+00:00:11.077 --> 00:00:15.922
+The download page has a card for each system: Windows, Linux, and macOS.
+
+00:00:16.872 --> 00:00:19.228
+On Windows, take the E X E installer.
+
+00:00:19.508 --> 00:00:22.006
+On Linux, the deb or R P M package.
+
+00:00:22.286 --> 00:00:27.014
+On a Mac, pick your processor: arm sixty-four for Apple silicon, or Intel.
+
+00:00:27.294 --> 00:00:30.144
+This Mac has an Intel chip, so click Mac Intel.
+
+00:00:31.094 --> 00:00:33.334
+When the download finishes, open the file.
+
+00:00:33.614 --> 00:00:37.790
+A window shows the app on the left, and your Applications folder on the right.
+
+00:00:38.740 --> 00:00:43.395
+Drag Rosetta DBT Studio onto Applications, and wait for the copy.
+
+00:00:44.345 --> 00:00:46.167
+Then open it from Applications.
+
+00:00:46.447 --> 00:00:50.859
+The first time, macOS asks if you want to open an app from the internet.
+
+00:00:51.140 --> 00:00:51.922
+Click Open.
+
+00:00:52.872 --> 00:00:54.622
+Studio starts with a short setup.
+
+00:00:54.902 --> 00:00:59.533
+First, the dbt version: dbt 1.x, the recommended one.
+
+00:01:00.483 --> 00:01:01.755
+Then the exact version.
+
+00:01:02.035 --> 00:01:04.634
+Keep the latest, 1.12.6.
+
+00:01:05.584 --> 00:01:06.733
+Next, the adapters.
+
+00:01:07.013 --> 00:01:13.708
+For this course we only need DuckDB, so uncheck the others, keep dbt duckdb, and click Continue.
+
+00:01:14.658 --> 00:01:16.991
+Skip the optional tools, and click Install.
+
+00:01:17.941 --> 00:01:25.441
+Studio downloads its own Python, then installs dbt Core and the DuckDB adapter, inside its own folder.
+
+00:01:25.721 --> 00:01:28.292
+It takes a minute or two; the video speeds it up.
+
+00:01:29.242 --> 00:01:35.035
+Done: Python 3.10.17, and dbt 1.12.6.
+
+00:01:35.315 --> 00:01:36.073
+Click Finish.
+
+00:01:37.023 --> 00:01:38.556
+This is Studio's home screen.
+
+00:01:38.836 --> 00:01:42.307
+Among the modules is Data Lake: that is where our lake will live.
+
+00:01:43.257 --> 00:01:50.394
+The status bar shows what was installed: dbt, Python, and the DuckDB version Studio runs inside.
+
+00:01:50.674 --> 00:01:53.281
+We come back to that one in Lesson 1.6.
+
+00:01:54.231 --> 00:01:59.333
+To recap: one app, with its own Python and dbt, and DuckDB built in.
+
+00:01:59.613 --> 00:02:01.654
+You did not install any of them yourself.
+
+00:02:02.604 --> 00:02:08.562
+Next, before we touch a lake, we explain what a data lake is, starting with warehouses and lakehouses.

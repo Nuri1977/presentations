@@ -33,7 +33,9 @@ def _merge(ch):
     if len(out) > 1 and tl['total'] - out[-1][0] < 10: out.pop()
     return out
 chapters = _merge(chapters)
-title = lesson.get('youtube_title') or f"{lesson['title']} | {course['title']} {lesson['number']} | Rosetta DBT Studio"
+# the app name is added only when the course title does not already carry it; YouTube titles stop at 100 characters
+title = lesson.get('youtube_title') or (f"{lesson['title']} | {course['title']} {lesson['number']}" + ('' if 'Rosetta DBT Studio' in course['title'] else ' | Rosetta DBT Studio'))
+assert len(title) <= 100, f'YouTube title too long ({len(title)}): {title}'
 desc = [lesson.get('summary', ''), '',
         f"Part of the free {course['title']} course on Rosetta Academy: {course['academy']}", '',
         ] + ((['Chapters'] + [f"{fmt(t)} {n}" for t, n in chapters] + ['']) if len(chapters) >= 3 else []) + [
@@ -42,6 +44,8 @@ desc = [lesson.get('summary', ''), '',
          else f"Screens from Rosetta DBT Studio {course['app']['version']}."),
         'Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html',
         'Source code: https://github.com/rosettadb/dbt-studio'] + ([course['credit_line']] if course.get('credit_line') else [])
+if course.get('code_repo'):
+    desc += ['', f"Code for this course (one commit per lesson): {course['code_repo']}"]
 if lesson.get('links'):
     desc += ['', 'Links for this lesson'] + [f"- {h['title']}: {h['url']}" for h in lesson['links']]
 help_links = lesson.get('help_links', course.get('help_links') if lesson.get('show_help_links') else None) or []

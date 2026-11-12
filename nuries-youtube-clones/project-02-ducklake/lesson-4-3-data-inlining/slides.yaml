@@ -1,0 +1,31 @@
+number: "4.3"
+title: Data inlining
+slides:
+  - { id: title, type: title, h1: 'Data <span class="accent">inlining</span>', lead: "Small writes without tiny files.", badges: [Small inserts, Catalog rows, Flush] }
+  - id: problem
+    type: html
+    eyebrow: The small-file problem
+    h2: Many small writes
+    html: |
+      <div class="row two" style="margin-top:30px">
+        <div class="card bad s" data-step="1"><div class="k">Without inlining</div><div class="t">A file per insert</div>
+          <div class="files-strip"><div class="file">2 rows</div><div class="file">1 row</div><div class="file">3 rows</div><div class="file">1 row</div><div class="file">…</div></div></div>
+        <div class="card good s" data-step="2"><div class="k">With inlining</div><div class="t">Rows in the catalog</div><div class="d">flushed later into one Parquet file</div>
+          <div class="files-strip"><div class="file new">one file<small>all the rows</small></div></div></div>
+      </div>
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: when
+    type: cards
+    eyebrow: When to use it
+    h2: On by default, for good reason
+    cols: 2
+    cards:
+      - { step: 1, k: In this course, t: Off since 2.2, d: "so every write shows up as files" }
+      - { step: 2, cls: hot, k: In real use, t: Keep it on, d: "flush on a schedule, or with maintenance (4.4)" }
+  - id: recap
+    type: recap
+    items:
+      - "Small inserts become rows in the catalog."
+      - "No tiny Parquet files."
+      - "A flush writes them as one file."
+  - { id: closing, type: closing, lesson: Lesson 4.4, h2: '<span class="accent">Maintenance</span>' }

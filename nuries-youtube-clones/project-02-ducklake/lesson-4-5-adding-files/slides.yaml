@@ -1,0 +1,21 @@
+number: "4.5"
+title: Adding existing Parquet files
+slides:
+  - { id: title, type: title, h1: 'Adding existing <span class="accent">files</span>', lead: "Register Parquet files without copying them.", badges: [COPY, ducklake_add_data_files, Landing folder] }
+  - { id: why, type: statement, eyebrow: Why add files, big: 'The files already exist? <span class="accent">Register</span> them, don''t copy them.', bigstep: 1 }
+  - id: careful
+    type: cards
+    eyebrow: Careful
+    h2: The lake owns the file now
+    cols: 2
+    cards:
+      - { step: 1, cls: bad, k: Ownership, t: Maintenance may change it, d: "merge and cleanup can rewrite or delete the file" }
+      - { step: 2, k: A different shape, t: Two options, mono: "allow_missing => true<br>ignore_extra_columns => true" }
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "<span class=\"mono\">COPY</span> wrote a file to a landing folder."
+      - "<span class=\"mono\">ducklake_add_data_files</span> registered it, no copy."
+      - "The lake owns the file from now on."
+  - { id: closing, type: closing, lesson: Lesson 5.1, h2: 'Inside the <span class="accent">catalog</span>' }

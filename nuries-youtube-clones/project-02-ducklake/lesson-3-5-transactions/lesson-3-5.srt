@@ -1,0 +1,99 @@
+1
+00:00:03,350 --> 00:00:05,194
+A transaction groups changes.
+
+2
+00:00:05,474 --> 00:00:09,674
+Here, a delete in one table and a new table, between begin and commit.
+
+3
+00:00:09,954 --> 00:00:13,216
+The lake records both in one snapshot, or nothing at all.
+
+4
+00:00:14,166 --> 00:00:21,785
+Change commit to rollback, and it is as if nothing happened: no files are added to the table, and no snapshot is created.
+
+5
+00:00:22,735 --> 00:00:26,723
+In Studio's SQL Editor, every statement is its own transaction.
+
+6
+00:00:27,003 --> 00:00:29,769
+Try to start one by hand: begin transaction.
+
+7
+00:00:33,039 --> 00:00:36,460
+Studio refuses it, and lists the statement types it accepts.
+
+8
+00:00:36,740 --> 00:00:42,729
+To group changes, use a SQL client that keeps one session open, or a tool like dbt.
+
+9
+00:00:43,679 --> 00:00:45,572
+What about two writers at the same time?
+
+10
+00:00:45,852 --> 00:00:47,368
+DuckLake is optimistic.
+
+11
+00:00:47,648 --> 00:00:49,078
+Both work without locking.
+
+12
+00:00:49,358 --> 00:00:53,563
+When the second one commits, it is checked against what the first one already committed.
+
+13
+00:00:54,513 --> 00:00:59,842
+Two inserts into the same table do not conflict, and neither do changes to different tables.
+
+14
+00:01:00,122 --> 00:01:02,383
+DuckLake simply retries the commit on top.
+
+15
+00:01:03,333 --> 00:01:12,334
+But if both delete rows from the same data file, or both change the same table's schema, the second commit fails, and that writer must try again.
+
+16
+00:01:13,284 --> 00:01:17,944
+All of this needs a catalog that many programs can open, like PostgreSQL.
+
+17
+00:01:18,224 --> 00:01:24,247
+Our catalog is a DuckDB file, and a DuckDB file can be opened by one program at a time.
+
+18
+00:01:25,197 --> 00:01:30,667
+We will see that in Module 6: while Studio has the lake open, dbt cannot open it.
+
+19
+00:01:30,947 --> 00:01:34,393
+Fine on a laptop, but a shared lake needs a shared catalog.
+
+20
+00:01:35,343 --> 00:01:39,022
+To recap: a transaction is all or nothing, and one snapshot.
+
+21
+00:01:39,302 --> 00:01:43,298
+In Studio's SQL Editor every statement is its own transaction.
+
+22
+00:01:43,578 --> 00:01:46,652
+Appends do not conflict, deletes in the same file do.
+
+23
+00:01:46,932 --> 00:01:50,495
+And a DuckDB catalog file means one program at a time.
+
+24
+00:01:50,775 --> 00:01:52,147
+That ends Module 3.
+
+25
+00:01:52,427 --> 00:01:54,902
+Next: performance, starting with partitioning.

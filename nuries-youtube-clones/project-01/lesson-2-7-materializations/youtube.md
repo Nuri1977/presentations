@@ -8,7 +8,7 @@
 
 ## Title
 
-Materializations: views and tables | dbt + DuckDB in Rosetta DBT Studio 2.7 | Rosetta DBT Studio
+Materializations: views and tables | dbt + DuckDB in Rosetta DBT Studio 2.7
 
 ## Description
 
@@ -28,6 +28,8 @@ Recorded in Rosetta DBT Studio 1.7.6 with dbt Core 1.12.6 and dbt-duckdb 1.11.1.
 Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html
 Source code: https://github.com/rosettadb/dbt-studio
 Lesson order inspired by Luke Barousse's dbt course: https://www.youtube.com/watch?v=1Bf049kXV2g
+
+Code for this course (one commit per lesson): https://github.com/Nuri1977/nyc-taxi-dbt
 
 ## Tags
 

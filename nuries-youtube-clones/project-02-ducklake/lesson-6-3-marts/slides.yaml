@@ -1,0 +1,12 @@
+number: "6.3"
+title: Marts, built incrementally
+slides:
+  - { id: title, type: title, h1: 'Marts, built <span class="accent">incrementally</span>', lead: "A real MERGE on the lake, from dbt.", badges: [Tables, Incremental merge, Commit message] }
+  - id: recap
+    type: recap
+    items:
+      - "Two table marts: activity and top senders."
+      - "<span class=\"mono\">incremental_strategy='merge'</span> runs MERGE INTO."
+      - "A post-hook writes a commit message."
+      - "Every dbt run is a set of snapshots."
+  - { id: closing, type: closing, lesson: Lesson 6.4, h2: 'Tests and <span class="accent">docs</span>' }

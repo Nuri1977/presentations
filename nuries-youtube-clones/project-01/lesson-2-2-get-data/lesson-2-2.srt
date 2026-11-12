@@ -7,141 +7,157 @@ Our raw data is twelve parquet files, one per month of 2025.
 They are too big for git, so they stay in a data folder that git ignores.
 
 3
-00:00:12,740 --> 00:00:19,324
-DuckDB reads them in place, and a source, in sources dot yml, gives them a name dbt can use.
+00:00:12,740 --> 00:00:20,369
+We load them once into a DuckDB table, raw green trips, and a source, in sources dot yml, tells dbt about it.
 
 4
-00:00:20,274 --> 00:00:24,991
+00:00:21,319 --> 00:00:26,036
 The second file is small: a lookup of the 265 taxi zones.
 
 5
-00:00:25,271 --> 00:00:27,959
+00:00:26,316 --> 00:00:29,004
 Small CSV files like this one are seeds.
 
 6
-00:00:28,239 --> 00:00:32,041
+00:00:29,284 --> 00:00:33,086
 They live in the repository, and dbt loads them as tables.
 
 7
-00:00:32,991 --> 00:00:37,173
+00:00:34,036 --> 00:00:38,218
 The files come from the New York City Taxi and Limousine Commission website.
 
 8
-00:00:37,453 --> 00:00:43,632
+00:00:38,498 --> 00:00:44,677
 Under 2025, download Green Taxi Trip Records for each month, January to December.
 
 9
-00:00:43,912 --> 00:00:45,400
+00:00:44,957 --> 00:00:46,445
 The links are in the description.
 
 10
-00:00:46,350 --> 00:00:51,044
+00:00:47,395 --> 00:00:52,089
 Further down the same page, download the Taxi Zone Lookup Table, as CSV.
 
 11
-00:00:51,994 --> 00:00:55,070
+00:00:53,039 --> 00:00:56,115
 In Studio, open the nyc taxi project.
 
 12
-00:00:55,350 --> 00:00:58,580
+00:00:56,395 --> 00:00:59,625
 Right-click the project, choose New Folder, and call it data.
 
 13
-00:01:01,529 --> 00:01:03,886
+00:01:02,574 --> 00:01:04,931
 Inside data, make a folder called raw.
 
 14
-00:01:07,334 --> 00:01:13,178
+00:01:08,379 --> 00:01:14,223
 Now move the twelve parquet files into data, raw, and the zone lookup CSV into seeds.
 
 15
-00:01:13,458 --> 00:01:15,564
+00:01:14,503 --> 00:01:16,609
 Refresh the explorer, and there they are.
 
 16
-00:01:16,514 --> 00:01:19,003
-Next, tell dbt about the raw files.
+00:01:17,559 --> 00:01:19,633
+Now load the files into DuckDB.
 
 17
-00:01:19,283 --> 00:01:22,810
-Right-click models, New File, and call it sources dot yml.
+00:01:19,913 --> 00:01:24,102
+Open the SQL Editor, and pick the nyc taxi dev connection.
 
 18
-00:01:23,760 --> 00:01:26,146
-A source called raw, with a short description.
+00:01:26,266 --> 00:01:27,960
+Three statements, one per line.
 
 19
-00:01:28,160 --> 00:01:32,043
-It has one table, green trips: one row per green taxi trip.
+00:01:28,240 --> 00:01:29,728
+Create a schema called raw.
 
 20
-00:01:32,993 --> 00:01:38,578
-And where the table lives: external location, a read parquet call over all twelve files.
+00:01:30,008 --> 00:01:37,123
+Create the table raw green trips, from read parquet over all twelve files: use the full path of your data raw folder.
 
 21
-00:01:38,858 --> 00:01:44,190
-Union by name lines up the columns, even if a month's file has them in a different order.
+00:01:37,403 --> 00:01:38,495
+Then count the rows.
 
 22
-00:01:44,470 --> 00:01:45,069
-Save.
+00:01:39,445 --> 00:01:42,811
+Run them one by one, with the green arrow next to each line.
 
 23
-00:01:46,019 --> 00:01:47,773
-Does dbt find the data?
+00:01:43,091 --> 00:01:48,422
+Union by name lines up the columns, even if a month's file has them in a different order.
 
 24
-00:01:48,053 --> 00:01:53,000
-In the command box, type dbt show, inline, and a query that counts the rows of the source.
+00:01:55,940 --> 00:02:03,585
+Five hundred ninety-one thousand, three hundred seventy-five trips in 2025, now in one DuckDB table.
 
 25
-00:01:54,280 --> 00:01:55,088
-Press Enter.
+00:02:04,535 --> 00:02:07,516
+Back in the project, tell dbt about the table.
 
 26
-00:01:59,468 --> 00:02:10,116
-dbt turns the source into the read parquet call, and DuckDB counts five hundred ninety-one thousand, three hundred seventy-five trips, in 2025.
+00:02:07,796 --> 00:02:11,323
+Right-click models, New File, and call it sources dot yml.
 
 27
-00:02:11,066 --> 00:02:12,094
-Now the Git tab.
+00:02:13,680 --> 00:02:17,569
+A source called raw, the schema we just made, with a short description.
 
 28
-00:02:12,374 --> 00:02:16,235
-Only two files changed: sources dot yml and the CSV.
+00:02:18,519 --> 00:02:22,402
+It has one table, green trips: one row per green taxi trip.
 
 29
-00:02:16,515 --> 00:02:21,029
-The parquet files are not here, because the gitignore leaves out the data folder.
+00:02:22,682 --> 00:02:23,281
+Save.
 
 30
-00:02:21,979 --> 00:02:27,115
-Stage all, type a message, declare the raw trips source and add the zone lookup, and commit.
+00:02:23,561 --> 00:02:27,232
+In a model, source raw, green trips, now points at that table.
 
 31
-00:02:30,669 --> 00:02:32,085
-Then click Sync Changes.
+00:02:28,182 --> 00:02:29,210
+Now the Git tab.
 
 32
-00:02:32,365 --> 00:02:34,318
-Studio pushes the commit to GitHub.
+00:02:29,490 --> 00:02:33,351
+Only two files changed: sources dot yml and the CSV.
 
 33
-00:02:35,769 --> 00:02:41,691
-On GitHub, the repository now has the models and seeds folders, and the latest commit message.
+00:02:33,631 --> 00:02:38,145
+The parquet files are not here, because the gitignore leaves out the data folder.
 
 34
-00:02:42,641 --> 00:02:46,045
-To recap: the trip files sit in data raw, outside git.
+00:02:39,095 --> 00:02:44,231
+Stage all, type a message, declare the raw trips source and add the zone lookup, and commit.
 
 35
-00:02:46,325 --> 00:02:47,711
-The zone lookup is a seed.
+00:02:47,785 --> 00:02:49,201
+Then click Sync Changes.
 
 36
-00:02:47,991 --> 00:02:53,837
-And sources dot yml names the raw files, raw dot green trips, which dbt can read.
+00:02:49,481 --> 00:02:51,434
+Studio pushes the commit to GitHub.
 
 37
-00:02:54,117 --> 00:02:56,482
+00:02:52,885 --> 00:02:58,807
+On GitHub, the repository now has the models and seeds folders, and the latest commit message.
+
+38
+00:02:59,757 --> 00:03:06,352
+To recap: the trip files sit in data raw, outside git, and live in DuckDB as raw green trips.
+
+39
+00:03:06,632 --> 00:03:08,017
+The zone lookup is a seed.
+
+40
+00:03:08,297 --> 00:03:10,686
+And sources dot yml declares the source.
+
+41
+00:03:10,966 --> 00:03:13,330
 Next, we build our first model on top of it.

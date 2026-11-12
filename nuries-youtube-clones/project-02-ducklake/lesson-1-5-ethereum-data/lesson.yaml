@@ -1,0 +1,74 @@
+# Lesson 1.5 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-1-5
+number: "1.5"
+title: "The Ethereum data: blocks, transactions, gas"
+module: "Module 1 · Data lakes explained"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 1.5"
+next: "Lesson 1.6 · Under the hood: DuckDB and DuckLake in Studio"
+summary: "Just enough Ethereum to read the data: blocks every 12 seconds, transactions inside them, gas and the base fee, wei and ether, hex addresses. Where the data comes from (the AWS public blockchain bucket) and what this course loads."
+tags: [Ethereum, blockchain data, AWS open data, Parquet, gas, base fee]
+target_minutes: 3.5
+show_help_links: true
+links:
+  - { title: "AWS Public Blockchain Data", url: "https://registry.opendata.aws/aws-public-blockchain/" }
+  - { title: "Ethereum: gas and fees", url: "https://ethereum.org/en/developers/docs/gas/" }
+draft_changes:
+  - "The browser shows the dataset's page on the AWS Open Data registry instead of the raw bucket listing (an XML page)."
+accuracy_notes:
+  - "1 October 2026 (from the bucket): 7,176 blocks (00:00:11 to 23:59:59), 284 transactions per block on average, average base fee 0.639 gwei, blocks 50.5% full, gas limit 60 million; 2,036,041 transactions, 98.9% succeeded. Measured 12 Nov 2026."
+  - "1 ether = 10^18 wei; 1 gwei = 10^9 wei (ethereum.org)."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 1.5. The Ethereum data."
+
+  - id: s01
+    kind: slide
+    chapter: "Blocks"
+    slide: blocks
+    beats:
+      - { id: b01, step: 1, show: "A chain of blocks, one every 12 seconds; 7,176 on 1 October 2026.", say: "Ethereum is a chain of blocks. A new block is added every twelve seconds. On the first of October 2026, that was seven thousand one hundred seventy-six blocks." }
+      - { id: b02, step: 2, show: "A block holds transactions: 284 on average.", say: "Each block holds a list of transactions, two hundred eighty-four on average that day." }
+
+  - id: s02
+    kind: slide
+    chapter: "Gas and fees"
+    slide: gas
+    beats:
+      - { id: b03, step: 1, show: "Gas: the work a transaction needs. A block has a gas limit, 60 million.", say: "Every transaction needs some work, measured in gas. A block has a gas limit, sixty million, and it was about half full on average." }
+      - { id: b04, step: 2, show: "Base fee per gas, set by the network: 0.639 gwei on average.", say: "For each unit of gas you pay a base fee, set by the network from how busy it is. That day it averaged zero point six four gwei." }
+      - { id: b05, step: 3, show: "Units: 1 ether = 10^18 wei; 1 gwei = 10^9 wei.", say: "The units: values are stored in wei. One ether is ten to the eighteen wei, and one gwei is a billion wei. Our staging models convert them." }
+      - { id: b06, step: 4, show: "Addresses and hashes are hex text: 0x…", say: "Addresses and hashes are long hexadecimal strings, starting with zero x. We never read them out loud." }
+
+  - id: s03
+    kind: browser
+    chapter: "Where the data lives"
+    beats:
+      - id: b07
+        say: "The data is free and public. Amazon publishes it in the AWS Public Blockchain dataset, as Parquet files on S3, one folder per day, updated every day."
+        zoom: center-wide
+        actions:
+          - goto: https://registry.opendata.aws/aws-public-blockchain/
+
+  - id: s04
+    kind: slide
+    chapter: "Two tables"
+    slide: tables
+    beats:
+      - { id: b08, step: 1, show: "blocks: number, timestamp, miner, gas_used, gas_limit, base_fee_per_gas, transaction_count, date.", say: "We use two tables. Blocks: one row per block, with its number, time, the address that built it, the gas used, and the base fee." }
+      - { id: b09, step: 2, show: "transactions: hash, block_number, from_address, to_address, value, receipt_gas_used, receipt_effective_gas_price, receipt_status, date.", say: "And transactions: one row per transaction, with who sent it, to whom, the value, the gas it used, the price paid, and whether it succeeded." }
+
+  - id: s05
+    kind: slide
+    chapter: "What we load"
+    slide: load
+    beats:
+      - { id: b10, step: 1, show: "Blocks: three months, 659,896 rows, about 230 MB in the lake.", say: "We load three months of blocks: about six hundred sixty thousand rows." }
+      - { id: b11, step: 2, show: "Transactions: one week, 12.7 million rows, about 1.7 GB; without the input column.", say: "And one week of transactions: twelve point seven million rows, about one point seven gigabytes. Not every day of the year: just enough to be real, and still fit on a laptop." }
+
+  - id: s06
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 1.6 · Under the hood."

@@ -30,6 +30,11 @@ b17	Close the window.
 b18	Now run the whole project: Project menu, Run.
 b19	D B T builds trips first, and only then the two models that depend on it.
 b19	Three models, no errors.
+b19b	Now look at the result.
+b19b	With top pickup zones open, choose Model, Preview.
+b19c	Ten rows, because of top n.
+b19c	East Harlem North is the busiest pickup zone of 2025, with a hundred forty-three thousand trips.
+b19d	Close it, and open Run History: the seed and the run are listed, with their status.
 b20	Open the Git tab.
 b20	The two new models are listed.
 b21	Stage all, type a message, add trips per month and top pickup zones, and commit.

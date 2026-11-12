@@ -1,0 +1,83 @@
+1
+00:00:03,350 --> 00:00:05,196
+Ethereum is a chain of blocks.
+
+2
+00:00:05,476 --> 00:00:07,805
+A new block is added every twelve seconds.
+
+3
+00:00:08,085 --> 00:00:13,810
+On the first of October 2026, that was seven thousand one hundred seventy-six blocks.
+
+4
+00:00:14,760 --> 00:00:19,519
+Each block holds a list of transactions, two hundred eighty-four on average that day.
+
+5
+00:00:20,469 --> 00:00:23,366
+Every transaction needs some work, measured in gas.
+
+6
+00:00:23,646 --> 00:00:27,997
+A block has a gas limit, sixty million, and it was about half full on average.
+
+7
+00:00:28,947 --> 00:00:33,638
+For each unit of gas you pay a base fee, set by the network from how busy it is.
+
+8
+00:00:33,918 --> 00:00:36,604
+That day it averaged zero point six four gwei.
+
+9
+00:00:37,554 --> 00:00:39,612
+The units: values are stored in wei.
+
+10
+00:00:39,892 --> 00:00:43,902
+One ether is ten to the eighteen wei, and one gwei is a billion wei.
+
+11
+00:00:44,182 --> 00:00:45,964
+Our staging models convert them.
+
+12
+00:00:46,914 --> 00:00:51,556
+Addresses and hashes are long hexadecimal strings, starting with zero x.
+
+13
+00:00:51,836 --> 00:00:53,210
+We never read them out loud.
+
+14
+00:00:54,160 --> 00:00:55,751
+The data is free and public.
+
+15
+00:00:56,031 --> 00:01:05,298
+Amazon publishes it in the AWS Public Blockchain dataset, as Parquet files on S3, one folder per day, updated every day.
+
+16
+00:01:06,248 --> 00:01:07,427
+We use two tables.
+
+17
+00:01:07,707 --> 00:01:13,869
+Blocks: one row per block, with its number, time, the address that built it, the gas used, and the base fee.
+
+18
+00:01:14,819 --> 00:01:23,181
+And transactions: one row per transaction, with who sent it, to whom, the value, the gas it used, the price paid, and whether it succeeded.
+
+19
+00:01:24,131 --> 00:01:28,173
+We load three months of blocks: about six hundred sixty thousand rows.
+
+20
+00:01:29,123 --> 00:01:35,152
+And one week of transactions: twelve point seven million rows, about one point seven gigabytes.
+
+21
+00:01:35,432 --> 00:01:39,985
+Not every day of the year: just enough to be real, and still fit on a laptop.

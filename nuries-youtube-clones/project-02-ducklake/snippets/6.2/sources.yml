@@ -1,0 +1,7 @@
+sources:
+  - name: raw
+    database: eth_lake
+    schema: raw
+    tables:
+      - name: blocks
+      - name: transactions

@@ -1,0 +1,22 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Open Data Lake, then eth lake, and click the blocks table.
+b01	Studio opens the table's own page.
+b02	The Schema tab lists the columns and their types, as the catalog stores them.
+b03	And Data Files: three Par-kay files, one per load.
+b03	August, September, and October, each about seventy megabytes, with its row count and the snapshot that added it.
+b04	The same list is one function in sequel.
+b04	In the sequel Editor, on eth lake, duck lake list files gives each data file of the table, and its size.
+b05	The files are on your disk.
+b05	Glob lists every Par-kay file under the lake's data folder: the same three, in a folder per schema and table.
+b06	And they are plain Par-kay.
+b06	Read them directly, without the lake, and you get the same six hundred sixty thousand rows.
+b07	So any tool that reads Par-kay can read these files.
+b08	But only the catalog knows which files make up the table right now.
+b08	After a delete or an update, the folder also holds files that are no longer current, and delete files.
+b08	Reading the folder directly would give the wrong answer.
+b08	That is what the catalog is for.
+b09	Save the queries as sql, 2 underscore 3 look inside dot sequel, then commit, and push.
+b10	To recap: Studio's table page shows the schema and the data files.
+b10	In sequel, duck lake list files gives the same list, and the files are plain Par-kay on disk.
+b10	But the catalog decides which files are the table.
+b10	Next: snapshots.

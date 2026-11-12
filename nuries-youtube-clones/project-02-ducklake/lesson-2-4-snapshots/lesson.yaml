@@ -1,0 +1,125 @@
+# Lesson 2.4 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-4
+number: "2.4"
+title: "Snapshots: every change is a version"
+module: "Module 2 · Your first lake in Studio"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 2.4"
+next: "Lesson 2.5 · Time travel"
+summary: "Every change to a DuckLake is a snapshot. See them in Studio's History tabs and with eth_lake.snapshots(), find the current one, load one more day of blocks and watch a new snapshot appear. Plus transactions and commit messages, which group changes into one snapshot."
+start_state: lesson-2-3-end
+show_help_links: true
+links:
+  - { title: "DuckLake: snapshots", url: "https://ducklake.select/docs/stable/duckdb/usage/snapshots" }
+tags: [DuckLake, snapshots, versioning, commit message, Rosetta DBT Studio]
+target_minutes: 3.5
+start_notes:
+  - "Start state `lesson-2-3-end`: raw.blocks with three months, snapshots 0 to 4."
+draft_changes:
+  - "The BEGIN … COMMIT block with a commit message is a slide: Studio's SQL Editor runs one statement at a time and rejects BEGIN. Lesson 6.3 sets a commit message live from dbt."
+accuracy_notes:
+  - "Snapshots before the lesson: 0 schema main, 1 schema raw, 2 table created (August), 3 and 4 inserts. The insert of 1 Nov 2026 (7,176 blocks) is snapshot 5. Rehearsal 12 Nov 2026."
+  - "set_commit_message(author, message) inside a transaction: DuckLake docs, Snapshots page, checked 11 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 2.4. Snapshots: every change is a version."
+
+  - id: s01
+    kind: slide
+    chapter: "What a snapshot is"
+    slide: what
+    beats:
+      - { id: b01, step: 1, show: "Snapshot timeline 0 to 4: schema main, schema raw, August, September, October.", say: "Every change to a DuckLake creates a snapshot: a numbered version of the whole lake. So far we have five: zero to four." }
+      - { id: b02, step: 2, show: "A snapshot is a few rows in the catalog, not a copy of the data.", say: "A snapshot is not a copy of the data. It is a few rows in the catalog that say which files were valid from that moment on." }
+
+  - id: s02
+    kind: app
+    chapter: "Snapshots in Studio"
+    beats:
+      - id: b03
+        say: "In Data Lake, open eth lake, and its History tab. Each row is a snapshot: its number, time, schema version, and what changed."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: tab, name: History, settleMs: [400, 1200, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Snapshots in SQL"
+    beats:
+      - id: b04
+        say: "In the SQL Editor, the same list comes from eth lake dot snapshots. Changes says, in words, what each snapshot did."
+        zoom: sql-results
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select snapshot_id, schema_version, changes from eth_lake.snapshots() order by 1;
+              select * from eth_lake.current_snapshot();
+              insert into raw.blocks select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-11-01/*.parquet');
+              select snapshot_id, changes from eth_lake.snapshots() order by 1 desc limit 2;
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "Current snapshot tells you where the lake is now: snapshot four."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b06
+        say: "Now change something. Insert one more day of blocks, the first of November, straight from S3."
+        zoom: explorer
+        actions:
+          - sql_run: { line: 3, settleMs: [800] }
+          - sql_wait
+      - id: b07
+        say: "And list the newest snapshots again. Snapshot five: inserted into the blocks table. One statement, one snapshot."
+        zoom: sql-results
+        card: { eyebrow: "eth_lake.snapshots()", title: "Snapshot 5", sub: "7,176 blocks of 1 November", pos: top-right }
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+
+  - id: s04
+    kind: slide
+    chapter: "Transactions and commit messages"
+    slide: tx
+    beats:
+      - { id: b08, step: 1, show: "Code: BEGIN; INSERT …; CALL eth_lake.set_commit_message('Nuri', 'Load blocks for 1 Nov'); COMMIT;", say: "You can also group several statements into one snapshot, with a transaction: begin, your changes, commit. Inside it, set commit message adds an author and a message, like a git commit." }
+      - { id: b09, step: 2, show: "Studio's SQL Editor runs one statement at a time; we set a commit message live from dbt in Lesson 6.3.", say: "Studio's SQL Editor runs one statement at a time, so we cannot type a transaction there. We set a real commit message later, from dbt, in Lesson 6.3." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b10
+        say: "Save the queries as 2 underscore 4 snapshots dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 2_4_snapshots.sql }
+          - paste: |
+              select snapshot_id, schema_version, changes from eth_lake.snapshots() order by 1;
+              select * from eth_lake.current_snapshot();
+              insert into raw.blocks select * exclude (logs_bloom, last_modified) from read_parquet('s3://aws-public-blockchain/v1.0/eth/blocks/date=2026-11-01/*.parquet');
+              select snapshot_id, changes from eth_lake.snapshots() order by 1 desc limit 2;
+          - click_save
+          - expect_file: { path: sql/2_4_snapshots.sql, snippet: ../snippets/2.4/2_4_snapshots.sql }
+          - close_tab: sql/2_4_snapshots.sql
+          - git_tab
+          - git_stage_all
+          - git_message: Snapshots and one more day
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b11, step: 1, show: "Recap: every change is a snapshot; History tab; snapshots(); current_snapshot(); transactions group changes.", say: "To recap: every change is a snapshot. Studio shows them in History, SQL shows them with snapshots and current snapshot, and a transaction groups changes into one. Next: we use snapshots to travel back in time." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.5 · Time travel."

@@ -1,0 +1,30 @@
+number: "4.4"
+title: Maintenance
+slides:
+  - { id: title, type: title, h1: '<span class="accent">Maintenance</span>', lead: "Keep the lake small and fast.", badges: [Merge, Expire, Clean up, CHECKPOINT] }
+  - id: why
+    type: steps
+    eyebrow: Why maintenance
+    h2: Merge, expire, clean up
+    steps:
+      - { step: 1, t: Merge adjacent files, d: "many small files become a few bigger ones" }
+      - { step: 1, t: Expire snapshots, d: "versions you will never travel back to" }
+      - { step: 1, t: Clean up old files, d: "files no snapshot uses any more" }
+    note: { step: 2, text: "<span class=\"mono\">CHECKPOINT</span> runs them all, following the lake's options." }
+    checked: Checked against the DuckLake docs on 11 Nov 2026
+  - id: careful
+    type: cards
+    eyebrow: Careful
+    h2: Some steps cannot be undone
+    cols: 2
+    cards:
+      - { step: 1, cls: bad, k: Expire and clean up, t: For good, d: "no more time travel to expired snapshots; deleted files are gone" }
+      - { step: 2, k: Orphaned files, t: ducklake_delete_orphaned_files, d: "files no snapshot ever knew, e.g. after a crash" }
+  - id: recap
+    type: recap
+    items:
+      - "Merge small files."
+      - "Expire snapshots you don't need."
+      - "Clean up, or just run <span class=\"mono\">CHECKPOINT</span>."
+      - "Expiring ends time travel to those versions."
+  - { id: closing, type: closing, lesson: Lesson 4.5, h2: 'Adding existing <span class="accent">files</span>' }

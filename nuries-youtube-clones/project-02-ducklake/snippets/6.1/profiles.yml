@@ -1,0 +1,12 @@
+ethereum_lake:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: lake/dbt_session.duckdb
+      attach:
+        - path: "ducklake:lake/eth_catalog.duckdb"
+          alias: eth_lake
+      database: eth_lake
+      schema: main
+      threads: 1

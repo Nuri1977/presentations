@@ -3,27 +3,27 @@ id: lesson-2-2
 number: "2.2"
 title: "Get the data"
 module: "Module 2 · dbt basics"
-draft_section: "plan-dbt-project01.md, section 9, Lesson 3.2 Get the data (now 2.2), with the change of 10 Nov 2026 (commit + push at the end)"
+draft_section: "plan-dbt-project01.md, section 9, Lesson 3.2 Get the data (now 2.2), with the changes of 10 Nov 2026 (raw data in DuckDB, commit + push at the end)"
 next: "Lesson 2.3 · Models"
-summary: "Bring the NYC TLC green taxi data for 2025 into the nyc_taxi dbt project: twelve parquet files in data/raw (kept out of git), the taxi zone lookup CSV as a seed, and a sources.yml that names the raw files raw.green_trips. Check the source with dbt show, then commit and push from Rosetta DBT Studio's Git tab."
+summary: "Bring the NYC TLC green taxi data for 2025 into the nyc_taxi dbt project: twelve parquet files in data/raw (kept out of git), loaded once into a DuckDB table raw.green_trips from Rosetta DBT Studio's SQL Editor; the taxi zone lookup CSV as a seed; and a sources.yml that declares raw.green_trips. Then commit and push from Studio's Git tab."
 start_state: lesson-2-1-end
 show_help_links: false
 links:
   - { title: "TLC Trip Record Data (download page)", url: "https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page" }
   - { title: "Green taxi files, 2025 (January; change 01 to 02 … 12)", url: "https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2025-01.parquet" }
   - { title: "Taxi zone lookup (CSV)", url: "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv" }
-tags: [dbt sources, dbt seeds, sources.yml, parquet, DuckDB, NYC taxi, GitHub]
+tags: [dbt sources, dbt seeds, sources.yml, parquet, DuckDB, SQL Editor, NYC taxi]
 target_minutes: 5
-rehearsal: true
+rehearsal: false
 start_notes:
-  - "Start state `lesson-2-1-end`: a clone of what Lesson 2.1 pushed (nyc-taxi-dbt-rehearsal, main at be0f093), the empty template folders, and the nyc_taxi_dev DuckDB connection."
+  - "Start state `lesson-2-1-end`: a clone of what Lesson 2.1 pushed to Nuri1977/nyc-taxi-dbt, the empty template folders, and the nyc_taxi_dev DuckDB connection."
   - "The data files are copied into data/raw and seeds off camera, at the point where the learner moves the downloaded files."
 draft_changes:
   - "The plan downloaded the files on camera from the TLC page. The TLC site refuses automated browsers (Access Denied), so the download is a slide with the page path and the file links, and the links go in the YouTube description."
-  - "The plan's s06 counted rows in the SQL Editor; Studio's SQL Editor runs DuckDB from / and cannot read relative parquet paths (studio-notes.md), so the count uses dbt show --inline in the terminal (2.2 keeps terminal commands)."
+  - "Raw data is loaded into DuckDB (raw.green_trips) from the SQL Editor instead of a source with external_location over a relative path: Studio's Preview, Query Results and SQL Editor run DuckDB outside the project folder and cannot read relative paths (plan change of 10 Nov afternoon). The load uses the full path of the learner's data/raw folder."
   - "Push: after the commit Studio's Git tab offers Sync Changes (1↑), which pushes to origin/main."
 accuracy_notes:
-  - "Rows: 591,375 in green_tripdata_2025-01..12 (files downloaded 9 Nov 2026), counted by dbt show --inline on the source in Studio 1.7.6 on 10 Nov 2026."
+  - "Rows: 591,375 in green_tripdata_2025-01..12 (files downloaded 9 Nov 2026), counted in Studio's SQL Editor on 10 Nov 2026."
   - "taxi_zone_lookup.csv: 265 zones (LocationID, Borough, Zone, service_zone)."
 
 scenes:
@@ -37,7 +37,7 @@ scenes:
     chapter: "Sources and seeds"
     slide: sources
     beats:
-      - { id: b01, step: 1, show: "Source card: big raw files stay outside git; 12 parquet files in data/raw; DuckDB reads them in place; sources.yml names them raw.green_trips.", say: "Our raw data is twelve parquet files, one per month of 2025. They are too big for git, so they stay in a data folder that git ignores. DuckDB reads them in place, and a source, in sources dot yml, gives them a name dbt can use." }
+      - { id: b01, step: 1, show: "Source card: big raw files stay outside git; 12 parquet files in data/raw, loaded once into the DuckDB table raw.green_trips; sources.yml declares it.", say: "Our raw data is twelve parquet files, one per month of 2025. They are too big for git, so they stay in a data folder that git ignores. We load them once into a DuckDB table, raw green trips, and a source, in sources dot yml, tells dbt about it." }
       - { id: b02, step: 2, show: "Seed card: a small CSV that lives in the repo; seeds/taxi_zone_lookup.csv, 265 zones.", say: "The second file is small: a lookup of the 265 taxi zones. Small CSV files like this one are seeds. They live in the repository, and dbt loads them as tables." }
 
   - id: s02
@@ -75,45 +75,54 @@ scenes:
 
   - id: s04
     kind: app
-    chapter: "Declare the source"
+    chapter: "Load the files into DuckDB"
     beats:
       - id: b08
-        say: "Next, tell dbt about the raw files. Right-click models, New File, and call it sources dot yml."
+        say: "Now load the files into DuckDB. Open the SQL Editor, and pick the nyc taxi dev connection."
         zoom: explorer
         actions:
-          - new_file: { folder: models, name: sources.yml }
+          - nav: SQL Editor
+          - sql_connection: nyc_taxi_dev
       - id: b09
-        say: "A source called raw, with a short description."
-        zoom: code-close
+        say: "Three statements, one per line. Create a schema called raw. Create the table raw green trips, from read parquet over all twelve files: use the full path of your data raw folder. Then count the rows."
+        zoom: explorer
         actions:
-          - type: "sources:\n  - name: raw\n    description: NYC TLC green taxi trip records for 2025, read in place from data/raw.\n"
+          - type: "create schema raw;\ncreate table raw.green_trips as select * from read_parquet('/Users/Shared/academy/learner/projects/nyc_taxi/data/raw/green_tripdata_2025-*.parquet', union_by_name = true);\nselect count(*) as trips from raw.green_trips;"
       - id: b10
-        say: "It has one table, green trips: one row per green taxi trip."
-        zoom: code-close
+        say: "Run them one by one, with the green arrow next to each line. Union by name lines up the columns, even if a month's file has them in a different order."
+        zoom: explorer
         actions:
-          - type: "    tables:\n      - name: green_trips\n        description: One row per green taxi trip, as reported to the TLC.\n"
+          - sql_run: { line: 1, settleMs: [400, 1200, 2500] }
+          - sql_run: { line: 2, settleMs: [500, 1500, 3000, 6000, 9000] }
+          - sql_run: { line: 3 }
       - id: b11
-        say: "And where the table lives: external location, a read parquet call over all twelve files. Union by name lines up the columns, even if a month's file has them in a different order. Save."
-        zoom: code-close
-        card: { eyebrow: "external_location", title: "No table to load", sub: "DuckDB reads the parquet files in place.", pos: bottom-right }
-        actions:
-          - type: "        config:\n          external_location: \"read_parquet('data/raw/green_tripdata_2025-*.parquet', union_by_name = true)\"\n"
-          - click_save
-          - expect_file: { path: models/sources.yml, snippet: ../snippets/2.2/sources.yml }
+        say: "Five hundred ninety-one thousand, three hundred seventy-five trips in 2025, now in one DuckDB table."
+        zoom: sql-results
+        card: { eyebrow: "raw.green_trips · 2025 data, as of 9 Nov 2026", title: "591,375 trips", sub: "all 12 files, loaded once", pos: top-right }
 
   - id: s05
     kind: app
-    chapter: "Check the source"
+    chapter: "Declare the source"
     beats:
       - id: b12
-        say: "Does dbt find the data? In the command box, type dbt show, inline, and a query that counts the rows of the source. Press Enter."
-        zoom: terminal-close
+        say: "Back in the project, tell dbt about the table. Right-click models, New File, and call it sources dot yml."
+        zoom: explorer
         actions:
-          - terminal: { cmd: "dbt show --inline \"select count(*) as trips from {{ source('raw', 'green_trips') }}\"", until: "Previewing inline node" }
+          - nav: DBT Studio
+          - new_file: { folder: models, name: sources.yml }
       - id: b13
-        say: "dbt turns the source into the read parquet call, and DuckDB counts five hundred ninety-one thousand, three hundred seventy-five trips, in 2025."
-        zoom: terminal-close
-        card: { eyebrow: "2025 data, as of 9 Nov 2026", title: "591,375 trips", sub: "raw.green_trips, all 12 files", pos: top-right }
+        say: "A source called raw, the schema we just made, with a short description."
+        zoom: code-close
+        actions:
+          - type: "sources:\n  - name: raw\n    description: NYC TLC green taxi trip records for 2025, loaded from data/raw into DuckDB.\n"
+      - id: b13b
+        say: "It has one table, green trips: one row per green taxi trip. Save. In a model, source raw, green trips, now points at that table."
+        zoom: code-close
+        card: { eyebrow: "source('raw', 'green_trips')", title: "nyc_taxi_dev.raw.green_trips", sub: "No file paths in the models.", pos: top-right }
+        actions:
+          - type: "    tables:\n      - name: green_trips\n        description: One row per green taxi trip, as reported to the TLC.\n"
+          - click_save
+          - expect_file: { path: models/sources.yml, snippet: ../snippets/2.2/sources.yml }
 
   - id: s06
     kind: app
@@ -146,14 +155,14 @@ scenes:
         say: "On GitHub, the repository now has the models and seeds folders, and the latest commit message."
         zoom: center-wide
         actions:
-          - goto: https://github.com/Nuri1977/nyc-taxi-dbt-rehearsal
+          - goto: https://github.com/Nuri1977/nyc-taxi-dbt
 
   - id: s08
     kind: slide
     chapter: "Recap"
     slide: recap
     beats:
-      - { id: b18, step: 1, show: "Recap: trips in data/raw, zones in seeds, source raw.green_trips; dbt show counted 591,375 rows; two files in git; pushed with Sync Changes.", say: "To recap: the trip files sit in data raw, outside git. The zone lookup is a seed. And sources dot yml names the raw files, raw dot green trips, which dbt can read. Next, we build our first model on top of it." }
+      - { id: b18, step: 1, show: "Recap: trips in data/raw, loaded into raw.green_trips (591,375 rows); zones in seeds; sources.yml declares the source; two files in git; pushed with Sync Changes.", say: "To recap: the trip files sit in data raw, outside git, and live in DuckDB as raw green trips. The zone lookup is a seed. And sources dot yml declares the source. Next, we build our first model on top of it." }
 
   - id: s09
     kind: closing

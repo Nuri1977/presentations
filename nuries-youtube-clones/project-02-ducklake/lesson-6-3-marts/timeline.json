@@ -1,0 +1,140 @@
+{
+ "total": 139.32,
+ "fps": 30,
+ "size": [
+  3840,
+  2160
+ ],
+ "scenes": [
+  {
+   "id": "s00",
+   "kind": "title",
+   "start": 0.0,
+   "dur": 3
+  },
+  {
+   "id": "s01",
+   "kind": "app",
+   "start": 3.0,
+   "dur": 22.83
+  },
+  {
+   "id": "s02",
+   "kind": "app",
+   "start": 25.83,
+   "dur": 17.49
+  },
+  {
+   "id": "s03",
+   "kind": "app",
+   "start": 43.32,
+   "dur": 45.74
+  },
+  {
+   "id": "s04",
+   "kind": "app",
+   "start": 89.06,
+   "dur": 13.48
+  },
+  {
+   "id": "s05",
+   "kind": "app",
+   "start": 102.54,
+   "dur": 17.9
+  },
+  {
+   "id": "s06",
+   "kind": "slide",
+   "start": 120.44,
+   "dur": 14.89
+  },
+  {
+   "id": "s07",
+   "kind": "closing",
+   "start": 135.32,
+   "dur": 4
+  }
+ ],
+ "beats": [
+  {
+   "id": "b01",
+   "scene": "s01",
+   "start": 3.0,
+   "dur": 12.71,
+   "voice_start": 3.35,
+   "voice": 9.397
+  },
+  {
+   "id": "b02",
+   "scene": "s01",
+   "start": 15.71,
+   "dur": 10.12,
+   "voice_start": 16.06,
+   "voice": 5.481
+  },
+  {
+   "id": "b03",
+   "scene": "s02",
+   "start": 25.83,
+   "dur": 17.49,
+   "voice_start": 26.18,
+   "voice": 16.539
+  },
+  {
+   "id": "b04",
+   "scene": "s03",
+   "start": 43.32,
+   "dur": 10.46,
+   "voice_start": 43.67,
+   "voice": 6.074
+  },
+  {
+   "id": "b05",
+   "scene": "s03",
+   "start": 53.78,
+   "dur": 12.19,
+   "voice_start": 54.13,
+   "voice": 9.179
+  },
+  {
+   "id": "b06",
+   "scene": "s03",
+   "start": 65.97,
+   "dur": 12.58,
+   "voice_start": 66.32,
+   "voice": 11.634
+  },
+  {
+   "id": "b07",
+   "scene": "s03",
+   "start": 78.55,
+   "dur": 10.51,
+   "voice_start": 78.9,
+   "voice": 5.059
+  },
+  {
+   "id": "b08",
+   "scene": "s04",
+   "start": 89.06,
+   "dur": 13.48,
+   "voice_start": 89.41,
+   "voice": 12.531
+  },
+  {
+   "id": "b09",
+   "scene": "s05",
+   "start": 102.54,
+   "dur": 17.9,
+   "voice_start": 102.89,
+   "voice": 1.333
+  },
+  {
+   "id": "b10",
+   "scene": "s06",
+   "start": 120.44,
+   "dur": 14.89,
+   "voice_start": 120.79,
+   "voice": 13.936
+  }
+ ]
+}

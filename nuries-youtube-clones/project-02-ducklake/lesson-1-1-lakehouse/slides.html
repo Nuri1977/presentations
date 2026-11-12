@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.1 · Warehouse, data lake, lakehouse</title>
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .two { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 30px; }
+  .vault { border-radius: 26px; border: 3px solid var(--text); padding: 36px; background: var(--card); display: grid; gap: 22px; }
+  .vault .layer { border-radius: 16px; padding: 26px 30px; font-size: 40px; font-weight: 850; background: #fff; border: 1px solid var(--line); }
+  .vault .layer small { display: block; font-size: 28px; color: var(--muted); font-weight: 560; margin-top: 6px; }
+  .door { font-size: 32px; font-weight: 750; color: var(--muted); }
+  .pc { display: grid; gap: 18px; }
+  .pc .card { padding: 28px 32px; font-size: 36px; font-weight: 700; line-height: 1.3; }
+  .storage { border-radius: 26px; border: 2px dashed #9db5f3; background: var(--blue-soft); padding: 36px; }
+  .storage .k { font-size: 28px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); }
+  .engines { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 30px; }
+  .engines .pill { font-size: 32px; }
+  .lacks { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 40px; align-content: center; }
+  .lacks .card { padding: 34px 38px; }
+  .stack { display: grid; gap: 0; border-radius: 26px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 18px 44px rgba(20,23,31,.07); }
+  .stack > div { padding: 34px 40px; font-size: 42px; font-weight: 850; }
+  .stack > div small { display: block; font-size: 30px; color: var(--muted); font-weight: 520; margin-top: 6px; }
+  .stack .fmt { background: var(--orange-soft); border-bottom: 2px solid var(--orange); }
+  .stack .fil { background: var(--blue-soft); }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 1.1</div>
+      <h1 style="margin-top:28px;font-size:124px">Warehouse, lake, <span class="accent">lakehouse</span></h1>
+      <p class="lead">Why lakes exist, and what a lakehouse adds.</p>
+      <div class="badges"><span class="badge">Data warehouse</span><span class="badge">Data lake</span><span class="badge">Lakehouse</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="warehouse">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The classic way</div>
+    <h2>The data warehouse</h2>
+    <div class="two">
+      <div class="s" data-step="1">
+        <div class="vault"><div class="layer">Query engine<small>runs your SQL</small></div><div class="layer">Storage<small>in its own format</small></div></div>
+        <p class="door" style="margin-top:22px">Data goes in through the warehouse's own loader.</p>
+      </div>
+      <div class="pc s" data-step="2">
+        <div class="card good">Fast, safe, real transactions</div>
+        <div class="card bad">Its own format, one engine</div>
+        <div class="card bad">Storage and compute billed together</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:15%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<section class="stage" data-id="lake">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Turn it around</div>
+    <h2>The data lake</h2>
+    <div class="storage s" data-step="1" style="margin-top:40px">
+      <div class="k">Cheap storage: a folder, or a bucket on S3</div>
+      <div class="files-strip">
+        <div class="file">blocks-08.parquet<small>open format</small></div>
+        <div class="file">blocks-09.parquet<small>open format</small></div>
+        <div class="file">blocks-10.parquet<small>open format</small></div>
+        <div class="file">transactions.parquet<small>open format</small></div>
+      </div>
+    </div>
+    <div class="engines s" data-step="2"><span class="pill">DuckDB</span><span class="pill grey">Spark</span><span class="pill grey">Trino</span><span class="pill grey">Python</span><span class="pill green">all read the same files</span></div>
+  </div>
+  <div class="footer"><div class="bar" style="width:30%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<section class="stage" data-id="lacks">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The catch</div>
+    <h2>What plain files cannot do</h2>
+    <div class="lacks">
+      <div class="card bad s" data-step="1"><div class="t">No transactions</div><div class="d">A reader can see a write that is half done.</div></div>
+      <div class="card bad s" data-step="2"><div class="t">No safe updates</div><div class="d">Changing one row means rewriting a whole file.</div></div>
+      <div class="card bad s" data-step="3"><div class="t">No schema, no history</div><div class="d">Which columns? What did it look like yesterday?</div></div>
+      <div class="card bad s" data-step="4"><div class="t">Slow listing</div><div class="d">Thousands of objects to list before one query.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:45%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<section class="stage" data-id="lakehouse">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Best of both</div>
+    <h2>The lakehouse</h2>
+    <div class="two">
+      <div class="stack s" data-step="1">
+        <div class="fmt">Table format<small>which files make up each table, right now</small></div>
+        <div class="fil">Open files<small>Parquet, on any storage</small></div>
+      </div>
+      <div class="s" data-step="2">
+        <ul class="ticks" style="font-size:42px;gap:22px">
+          <li>Transactions</li><li>Updates and deletes</li><li>Schema changes</li><li>History and time travel</li><li>Data stays in open files</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:60%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<section class="stage" data-id="words">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Four words for this course</div>
+    <h2>Lake, format, catalog, engine</h2>
+    <div class="row four">
+      <div class="card s" data-step="1"><div class="k">Lake</div><div class="t">The files</div><div class="d">on some storage</div></div>
+      <div class="card s" data-step="2"><div class="k">Table format</div><div class="t">The rules</div><div class="d">for tracking which files are a table</div></div>
+      <div class="card hot s" data-step="3"><div class="k">Catalog</div><div class="t">The record</div><div class="d">where that tracking lives</div></div>
+      <div class="card s" data-step="4"><div class="k">Engine</div><div class="t">DuckDB</div><div class="d">reads it all and runs your queries</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:80%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<section class="stage" data-id="recap">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Recap</div>
+    <h2>What to remember</h2>
+    <div class="recap s" data-step="1">
+      <div class="item"><div class="num">1</div><div>A warehouse is one system for everything.</div></div>
+      <div class="item"><div class="num">2</div><div>A lake is open files on cheap storage.</div></div>
+      <div class="item"><div class="num">3</div><div>A lakehouse is open files plus a table format.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:100%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 1.1</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 1.2</h1>
+      <h2 style="font-size:92px">Why lakes use <span class="accent">Parquet</span></h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>

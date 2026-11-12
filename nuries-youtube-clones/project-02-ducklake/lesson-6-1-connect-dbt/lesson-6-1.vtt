@@ -1,0 +1,88 @@
+WEBVTT
+
+00:00:03.350 --> 00:00:06.833
+In this module, dbt builds models on top of our lake.
+
+00:00:07.113 --> 00:00:11.754
+It reads the raw tables, and writes its models into the lake too, in the schema main.
+
+00:00:12.704 --> 00:00:17.283
+dbt runs its own DuckDB, inside dbt duckdb.
+
+00:00:17.563 --> 00:00:19.455
+So it needs to attach the lake itself.
+
+00:00:19.735 --> 00:00:22.357
+That is one change, in profiles dot yml.
+
+00:00:23.307 --> 00:00:26.513
+In DBT Studio, open profiles dot yml.
+
+00:00:26.793 --> 00:00:30.271
+Today it points at the small dev database from Lesson 2.1.
+
+00:00:31.221 --> 00:00:32.421
+Replace the output.
+
+00:00:32.701 --> 00:00:37.007
+Path is a small local DuckDB file for dbt's own session.
+
+00:00:37.287 --> 00:00:41.810
+Attach adds the lake: the ducklake prefix and the catalog file, as eth lake.
+
+00:00:42.090 --> 00:00:46.276
+Database eth lake makes the lake dbt's target, in schema main.
+
+00:00:46.556 --> 00:00:55.172
+And one thread, the safe choice with a single-file catalog: several dbt threads writing to one DuckLake can still trip over each other.
+
+00:00:56.122 --> 00:01:05.612
+Check it: in the command box under the terminal, run dbt debug. dbt finds the project and the profile, attaches the lake, and connects.
+
+00:01:05.892 --> 00:01:06.986
+All checks passed.
+
+00:01:09.209 --> 00:01:12.018
+Commit the profile: point dbt at the lake.
+
+00:01:12.298 --> 00:01:13.005
+And push.
+
+00:01:26.373 --> 00:01:28.030
+Now the rule for this module.
+
+00:01:28.311 --> 00:01:30.852
+Open Data Lake, and the eth lake instance.
+
+00:01:31.132 --> 00:01:33.579
+Studio opens the lake, and keeps it open.
+
+00:01:34.529 --> 00:01:38.150
+Back in DBT Studio, run dbt debug again.
+
+00:01:38.430 --> 00:01:43.047
+This time it fails: conflicting lock is held in Rosetta DBT Studio.
+
+00:01:43.327 --> 00:01:47.393
+A DuckDB catalog file can be opened by one program at a time.
+
+00:01:50.791 --> 00:01:57.979
+So in this module, we always run dbt first, and open the lake in Studio afterwards, to look at the result.
+
+00:01:58.929 --> 00:02:01.381
+Studio keeps the lake open until you quit it.
+
+00:02:01.661 --> 00:02:06.748
+To run dbt again after looking at the lake, quit Studio, and open it again.
+
+00:02:07.028 --> 00:02:10.216
+With a PostgreSQL catalog, this limit goes away.
+
+00:02:11.166 --> 00:02:18.906
+To recap: profiles dot yml attaches the lake and makes it dbt's database, and dbt debug passes.
+
+00:02:19.186 --> 00:02:23.070
+One program at a time: dbt first, then the lake screens.
+
+00:02:23.350 --> 00:02:24.877
+Next: staging models.

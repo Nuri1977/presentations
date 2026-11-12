@@ -1,0 +1,71 @@
+1
+00:00:03,350 --> 00:00:11,692
+In the SQL Editor, on eth lake, start with the table as it is now: six hundred sixty-seven thousand blocks, three months and one day.
+
+2
+00:00:15,384 --> 00:00:17,266
+Now add at, version equals two.
+
+3
+00:00:17,546 --> 00:00:24,174
+That is the table as it was at snapshot two, right after we loaded August: two hundred twenty-two thousand blocks.
+
+4
+00:00:25,124 --> 00:00:26,763
+Any query works on the past.
+
+5
+00:00:27,043 --> 00:00:31,492
+Blocks per month at version three: August and September, no October yet.
+
+6
+00:00:32,442 --> 00:00:35,046
+Time travel also helps you recover data.
+
+7
+00:00:35,326 --> 00:00:41,242
+Create a table from the past: October, as it was at version four, before the November day came in.
+
+8
+00:00:42,192 --> 00:00:47,432
+It holds exactly the October blocks: two hundred twenty-two thousand four hundred fifty-one.
+
+9
+00:00:47,712 --> 00:00:50,355
+We only needed it for the demo, so drop it again.
+
+10
+00:00:51,305 --> 00:00:56,052
+You can also travel by time: at timestamp, for example now minus one day.
+
+11
+00:00:57,002 --> 00:01:00,726
+Or attach the whole lake, read only, as it was at one snapshot.
+
+12
+00:01:01,676 --> 00:01:06,039
+The cost: as long as an old snapshot exists, its files stay on disk.
+
+13
+00:01:06,319 --> 00:01:10,076
+In Lesson 4.4 we expire old snapshots, and clean up.
+
+14
+00:01:11,026 --> 00:01:16,133
+Save the queries as 2 underscore 5 time travel dot sequel, commit, and push.
+
+15
+00:01:37,961 --> 00:01:42,182
+To recap: add at version to any table to read the past, in any query.
+
+16
+00:01:42,462 --> 00:01:44,935
+Copy past data back with create table as.
+
+17
+00:01:45,215 --> 00:01:46,789
+That is the end of Module 2.
+
+18
+00:01:47,069 --> 00:01:52,186
+Next, in Module 3, we change data: updates, deletes, and what they do to the files.

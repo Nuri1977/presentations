@@ -1,0 +1,133 @@
+# Lesson 6.2 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-6-2
+number: "6.2"
+title: "Staging models for blocks and transactions"
+module: "Module 6 · dbt on DuckLake"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 6.2"
+next: "Lesson 6.3 · Marts, built incrementally"
+summary: "Declare the lake's raw tables as dbt sources, and build two staging views on them: stg_blocks with clear names, gas used in percent and the base fee in gwei, and stg_transactions with values and fees in ether and a success flag. Run them with dbt, look at the rows with dbt show, then see the views in Studio's Data Lake screens."
+start_state: lesson-6-1-end
+show_help_links: true
+links:
+  - { title: "dbt: sources", url: "https://docs.getdbt.com/docs/build/sources" }
+  - { title: "DuckLake: views", url: "https://ducklake.select/docs/stable/specification/tables/ducklake_view" }
+tags: [dbt, staging models, sources, DuckLake, views, Ethereum]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-6-1-end`: profiles.yml attaches the lake; Studio freshly opened, the lake not opened yet."
+draft_changes:
+  - "Rows are shown with dbt show in the terminal instead of Model ▸ Preview: Preview runs on Studio's own connection, and opening the lake in Studio would block dbt (6.1)."
+  - "No extra day of raw data: 6.3 shows the incremental model with a second run instead."
+accuracy_notes:
+  - "dbt run builds main.stg_blocks and main.stg_transactions as views in eth_lake; views are catalog entries only (ducklake_view). Rehearsal 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 6.2. Staging models."
+
+  - id: s01
+    kind: app
+    chapter: "Sources"
+    beats:
+      - id: b01
+        say: "In DBT Studio, in the models folder, create sources dot yml. A source called raw, in database eth lake, schema raw, with the two tables we loaded: blocks and transactions."
+        zoom: code-mid
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: models, name: sources.yml }
+          - paste: { text: "sources:\n  - name: raw\n    database: eth_lake\n    schema: raw\n    tables:\n      - name: blocks\n      - name: transactions\n" }
+          - click_save
+          - expect_file: { path: models/sources.yml, snippet: ../snippets/6.2/sources.yml }
+
+  - id: s02
+    kind: app
+    chapter: "stg_blocks"
+    beats:
+      - id: b02
+        say: "Make a folder models, staging, and in it stg blocks dot sequel. A view that renames the columns clearly, computes gas used in percent, and turns the base fee from wei into gwei."
+        zoom: code-mid
+        actions:
+          - close_tab: models/sources.yml
+          - new_folder: { parent: models, name: staging }
+          - new_file: { folder: models/staging, name: stg_blocks.sql }
+          - paste: { text: "{{ config(materialized='view') }}\n\nselect\n    number as block_number,\n    date as block_date,\n    timestamp as block_time,\n    fee_recipient,\n    transaction_count,\n    gas_used,\n    gas_limit,\n    round(100.0 * gas_used / gas_limit, 2) as gas_used_pct,\n    base_fee_per_gas / 1e9 as base_fee_gwei\nfrom {{ source('raw', 'blocks') }}\n" }
+          - click_save
+          - expect_file: { path: models/staging/stg_blocks.sql, snippet: ../snippets/6.2/stg_blocks.sql }
+
+  - id: s03
+    kind: app
+    chapter: "stg_transactions"
+    beats:
+      - id: b03
+        say: "And stg transactions dot sequel: the value and the fee paid in ether, and a success flag from the receipt status."
+        zoom: code-mid
+        actions:
+          - close_tab: models/staging/stg_blocks.sql
+          - new_file: { folder: models/staging, name: stg_transactions.sql }
+          - paste: { text: "{{ config(materialized='view') }}\n\nselect\n    hash as transaction_hash,\n    block_number,\n    date as block_date,\n    from_address,\n    to_address,\n    value / 1e18 as value_eth,\n    receipt_gas_used * receipt_effective_gas_price / 1e18 as fee_eth,\n    receipt_status = 1 as succeeded\nfrom {{ source('raw', 'transactions') }}\n" }
+          - click_save
+          - expect_file: { path: models/staging/stg_transactions.sql, snippet: ../snippets/6.2/stg_transactions.sql }
+
+  - id: s04
+    kind: app
+    chapter: "Run and look"
+    beats:
+      - id: b04
+        say: "In the command box, run dbt run, select staging. Two views, created in the lake, in a second."
+        zoom: terminal-close
+        actions:
+          - close_tab: models/staging/stg_transactions.sql
+          - terminal: { cmd: "dbt run --select staging", until: "Completed successfully", timeoutMs: 180000 }
+      - id: b05
+        say: "Look at some rows with dbt show: each transaction with its block, date, addresses, and value in ether. The terminal shows the columns that fit; the fee and the success flag are further right."
+        zoom: terminal-close
+        actions:
+          - terminal: { cmd: "dbt show --select stg_transactions --limit 5", until: "Previewing node", timeoutMs: 180000 }
+
+  - id: s05
+    kind: slide
+    chapter: "Views in a lake"
+    slide: views
+    beats:
+      - { id: b06, step: 1, show: "A view in DuckLake is a row in ducklake_view: SQL text, no Parquet files.", say: "A view in a DuckLake is only a row in the catalog, in ducklake view: its SQL text, and no data files at all. So staging views cost nothing to keep, and are always up to date." }
+
+  - id: s06
+    kind: app
+    chapter: "The views in Studio"
+    beats:
+      - id: b07
+        say: "dbt is done, so now we can open the lake in Studio. In Data Lake, eth lake, refresh: the two staging views are listed, in schema main, with type view."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - click_at: { role: link, name: "DuckLake eth_lake", label: eth_lake, settleMs: [500, 1500, 2500] }
+          - click_at: { role: button, name: Refresh, label: Refresh, settleMs: [500, 1500, 2500] }
+
+  - id: s07
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b08
+        say: "Commit the source and the staging models, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - git_tab
+          - git_stage_all
+          - git_message: Staging models
+          - git_commit
+          - git_push
+
+  - id: s08
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b09, step: 1, show: "Recap: sources for raw tables; stg_blocks and stg_transactions as views; dbt run, dbt show; views are catalog rows.", say: "To recap: sources point dbt at the raw tables, two staging views clean them up, and in a lake a view is just a row in the catalog. Next: marts, built incrementally, with a real merge." }
+
+  - id: s09
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 6.3 · Marts, built incrementally."

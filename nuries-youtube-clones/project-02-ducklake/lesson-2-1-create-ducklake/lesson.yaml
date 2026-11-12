@@ -1,0 +1,237 @@
+# Lesson 2.1 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-2-1
+number: "2.1"
+title: "Create a DuckLake in Studio"
+module: "Module 2 · Your first lake in Studio"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 2.1 Create a DuckLake in Studio"
+next: "Lesson 2.2 · Load three months of blocks from S3"
+summary: "Create the ethereum_lake project and your first DuckLake in Rosetta DBT Studio: a lake called eth_lake with a local data folder and a DuckDB catalog file, made in the Data Lake wizard. Look at the new lake, run the first query on it from the SQL Editor, and push the project to GitHub."
+start_state: after-setup
+show_help_links: true
+links:
+  - { title: "DuckLake documentation: connecting", url: "https://ducklake.select/docs/stable/duckdb/usage/connecting" }
+tags: [DuckLake, data lake, Rosetta DBT Studio, DuckDB, catalog, Parquet]
+target_minutes: 4
+rehearsal: false
+start_notes:
+  - "Start state `after-setup`: Studio set up (Python 3.10.17, dbt 1.12.6), no project, no connection, no lake."
+  - "Pushes to the public Nuri1977/ethereum-ducklake-dbt, created empty before the lesson."
+draft_changes:
+  - "The Studio project is a dbt project from the start (Studio's template), with its own small DuckDB connection; Module 6 points dbt at the lake. The lake lives in the project's lake/ folder, which git ignores."
+  - "Studio 1.7.6 offers only the DuckDB catalog (SQLite and PostgreSQL say Soon), and the catalog file must end in .duckdb or .db: lake/eth_catalog.duckdb."
+  - "The SQL the wizard stands for (INSTALL, ATTACH, USE) is a slide: Studio's SQL Editor does not accept ATTACH or USE."
+accuracy_notes:
+  - "Wizard steps and field names, the instance page tabs and the snapshot 0 row checked in Studio 1.7.6 on 11 Nov 2026 (studio-notes.md)."
+  - "A new lake has one snapshot, number 0, which creates the schema main."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 2.1. Create a DuckLake in Studio. Badges: Data Lake wizard, DuckDB catalog, first push."
+
+  - id: s01
+    kind: slide
+    chapter: "What we create"
+    slide: plan
+    beats:
+      - { id: b01, step: 1, show: "The project folder ethereum_lake, with lake/eth_catalog.duckdb (the catalog) and lake/data/ (the Parquet files).", say: "In this lesson we create the project for the whole course, and our first lake. On disk, the lake is two things inside one folder: a catalog file, and a data folder for the Parquet files." }
+      - { id: b02, step: 2, show: "Name: eth_lake. Storage: local folder. Catalog: DuckDB file.", say: "We call the lake eth lake. Its storage is a local folder, and its catalog is a single DuckDB file." }
+
+  - id: s02
+    kind: app
+    chapter: "The project"
+    beats:
+      - id: b03
+        say: "First, the project. dbt needs a connection, so on the home screen click New Connection, and choose DuckDB."
+        actions:
+          - nav: Home
+          - click_at: { role: button, name: New Connection, label: New Connection, settleMs: [400, 1200, 2200] }
+          - click_at: { text: "^DuckDB$", regex: true, label: DuckDB, settleMs: [400, 1200, 2000] }
+      - id: b04
+        say: "Name it ethereum lake dev, with a small DuckDB file next to the projects folder. We point dbt at the lake later, in Module 6. Save."
+        zoom: center-wide
+        actions:
+          - click_at: { role: textbox, name: Connection Name, label: Connection Name, dx: 0.9 }
+          - press_keys: "Meta+A"
+          - type_keys: ethereum_lake_dev
+          - type_text: { role: textbox, name: Database File Path, label: Database File Path, text: /Users/Shared/academy/learner/projects/ethereum_lake_dev.duckdb }
+          - click_at: { role: button, name: Save, exact: true, label: Save, settleMs: [400, 1500, 2500] }
+      - id: b05
+        say: "Now open the DBT Project card, click New Project, and call it ethereum lake. Pick the connection, and save."
+        zoom: center-wide
+        actions:
+          - nav: Home
+          - click_at: { role: button, name: "DBT Project", regex: true, label: DBT Project, settleMs: [400, 1500] }
+          - click_at: { role: button, name: New Project, label: New Project, settleMs: [400, 1500] }
+          - type_text: { role: textbox, name: Project Name, label: Project Name, text: ethereum_lake }
+          - click_at: { role: combobox, name: "Connection", regex: true, label: Connection }
+          - click_at: { role: option, name: "ethereum_lake_dev", regex: true, label: ethereum_lake_dev }
+          - click_at: { role: button, name: Save, exact: true, label: Save, settleMs: [500, 1500, 3000, 4500] }
+      - id: b06
+        say: "In the project, make a folder called lake, and inside it, a folder called data. The lake lives here."
+        zoom: explorer
+        actions:
+          - new_root_folder: lake
+          - new_folder: { parent: lake, name: data }
+
+  - id: s03
+    kind: app
+    chapter: "The Data Lake wizard"
+    beats:
+      - id: b07
+        say: "Now open Data Lake from the sidebar. There are no lakes yet. Click Create DataLake, and choose DuckLake."
+        zoom: center-wide
+        actions:
+          - nav: DataLake
+          - pause: 2500
+          - point_at: { text: No DataLakes created yet, hold: 500 }
+          - click_at: { role: button, name: Create DataLake, settleMs: [400, 1200, 2000] }
+          - point_at: { role: heading, name: DuckLake, hold: 600 }
+          - click_at: { role: heading, name: DuckLake, settleMs: [400, 1200, 2000] }
+      - id: b08
+        say: "Step one, the name: eth underscore lake. Next."
+        zoom: center-wide
+        actions:
+          - type_text: { role: textbox, name: Instance Name, text: eth_lake }
+          - click_at: { role: button, name: Next, settleMs: [300, 900] }
+      - id: b09
+        say: "Step two, storage. Keep Local, and give the full path of the data folder we just made. This is where the Parquet files will go."
+        zoom: center-wide
+        actions:
+          - type_text: { role: textbox, name: Local Data Path, text: /Users/Shared/academy/learner/projects/ethereum_lake/lake/data }
+          - click_at: { role: button, name: Next, settleMs: [300, 900] }
+      - id: b10
+        say: "Step three, the catalog. DuckDB is the catalog type. Replace the suggested path with a file in the lake folder: eth catalog dot duckdb."
+        zoom: center-wide
+        actions:
+          - type_text: { role: textbox, name: Catalog Database File, replace: true, text: /Users/Shared/academy/learner/projects/ethereum_lake/lake/eth_catalog.duckdb }
+      - id: b11
+        say: "Next. The runtime options, memory and threads, can stay as they are. Next again, and the review shows the name, the data folder, and the DuckDB catalog. Click Create Instance."
+        zoom: center-wide
+        actions:
+          - click_at: { role: button, name: Next, settleMs: [300, 900] }
+          - point_at: { role: textbox, name: Max Memory, hold: 500 }
+          - click_at: { role: button, name: Next, settleMs: [300, 900] }
+          - point_at: { text: Local Filesystem, hold: 600 }
+          - click_at: { role: button, name: Create Instance, settleMs: [500, 1500, 3000, 5000] }
+
+  - id: s04
+    kind: app
+    chapter: "The new lake"
+    beats:
+      - id: b12
+        say: "Here is the lake. No tables yet. Open History: there is already one snapshot, number zero. Creating the lake created the schema main. Every change will add a row here."
+        zoom: center-wide
+        card: { eyebrow: "eth_lake · History", title: "Snapshot 0", sub: "created the schema main", pos: top-right }
+        actions:
+          - point_at: { role: tab, name: "Tables & Views", hold: 500 }
+          - click_at: { role: tab, name: History, settleMs: [400, 1200, 2500] }
+      - id: b13
+        say: "Now the SQL Editor. The connection list has a new group, DuckLake Instances. Pick eth lake, and ask for its snapshots."
+        zoom: explorer
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - type: "select * from eth_lake.snapshots();"
+      - id: b14
+        say: "Run it with the green arrow. One row: snapshot zero. The lake answers SQL."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 1, settleMs: [500, 1500, 3000] }
+
+  - id: s05
+    kind: slide
+    chapter: "What the wizard did"
+    slide: sql
+    beats:
+      - { id: b15, step: 1, show: "Code: INSTALL ducklake; ATTACH 'ducklake:lake/eth_catalog.duckdb' AS eth_lake (DATA_PATH 'lake/data/'); USE eth_lake;", say: "In plain DuckDB, the wizard stands for three statements: install the extension, attach the catalog file with its data path, and use it. Studio runs them each time it opens the lake." }
+      - { id: b16, step: 2, show: "Note: with a DuckDB catalog file, one program at a time can open the lake.", say: "And remember: with a DuckDB file as the catalog, one program at a time can open the lake. For a laptop, that is enough." }
+
+  - id: s06
+    kind: app
+    chapter: "Files that keep git clean"
+    beats:
+      - id: b17
+        say: "Back in the project. Add a dot gitignore file, so build output, logs, the database files, and the whole lake folder stay out of git. The lake is data, not code."
+        zoom: code-close
+        actions:
+          - nav: DBT Studio
+          - new_root_file: .gitignore
+          - type: |
+              target/
+              dbt_packages/
+              logs/
+              lake/
+              *.duckdb
+              *.duckdb.wal
+              .env
+          - click_save
+          - expect_file: { path: .gitignore, snippet: ../snippets/2.1/gitignore }
+      - id: b18
+        say: "And a short README."
+        zoom: code-close
+        actions:
+          - new_root_file: README.md
+          - type: |
+              # Ethereum data lake with DuckLake
+
+              Code for the course Data lakes and DuckLake in Rosetta DBT Studio, Project 2.
+              One commit per lesson.
+          - click_save
+          - expect_file: { path: README.md, snippet: ../snippets/2.1/README.md }
+
+  - id: s07
+    kind: browser
+    chapter: "A repository on GitHub"
+    beats:
+      - id: b19
+        say: "On GitHub, create a new, empty, public repository called ethereum ducklake dbt, with no README, gitignore or license. Here is ours, still empty. Copy its HTTPS address."
+        zoom: center-wide
+        actions:
+          - goto: https://github.com/Nuri1977/ethereum-ducklake-dbt
+          - point_at: { selector: "#empty-setup-clone-url", label: HTTPS address, hold: 1200 }
+
+  - id: s08
+    kind: app
+    chapter: "First commit and push"
+    beats:
+      - id: b20
+        say: "Back in Studio, open the Git tab, and click Initialize Repository."
+        zoom: git-panel
+        actions:
+          - git_tab
+          - git_init
+      - id: b21
+        say: "Stage all the changes, type a message, create the ethereum lake project, and commit."
+        zoom: git-panel
+        actions:
+          - git_stage_all
+          - git_message: Create the ethereum_lake project
+          - git_commit
+      - id: b22
+        say: "Click Publish Branch, paste the repository address, and add it. Studio pushes the main branch to GitHub."
+        actions:
+          - publish_branch: { url: "https://github.com/Nuri1977/ethereum-ducklake-dbt.git" }
+
+  - id: s09
+    kind: browser
+    chapter: "The code is on GitHub"
+    beats:
+      - id: b23
+        say: "Refresh the repository page. The project is on GitHub. The lake folder is not: git ignores it."
+        zoom: center-wide
+        actions:
+          - goto: https://github.com/Nuri1977/ethereum-ducklake-dbt
+
+  - id: s10
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b24, step: 1, show: "Recap: project ethereum_lake; eth_lake created in the Data Lake wizard; catalog file plus data folder; snapshot 0; first push.", say: "To recap: we created the ethereum lake project, and the eth lake DuckLake inside it, with the Data Lake wizard. It is a catalog file and a data folder, it starts with snapshot zero, and the SQL Editor can query it. The project is on GitHub. Next, we load three months of blocks into the lake." }
+
+  - id: s11
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 2.2 · Load three months of blocks from S3."

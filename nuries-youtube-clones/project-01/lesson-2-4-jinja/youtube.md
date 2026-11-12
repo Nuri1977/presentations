@@ -1,6 +1,6 @@
 # YouTube upload: Dependencies & Jinja
 
-- **File:** `lesson-2-4.mp4` (3840x2160, 3:00). Upload the 4K file; YouTube shows HD and 4K only after processing finishes, which can take from minutes to an hour, so the first view may look blurry.
+- **File:** `lesson-2-4.mp4` (3840x2160, 3:23). Upload the 4K file; YouTube shows HD and 4K only after processing finishes, which can take from minutes to an hour, so the first view may look blurry.
 - **Visibility:** unlisted (embedded only in Academy)
 - **Captions:** upload `lesson-2-4.srt` (English)
 - **Thumbnail:** `thumbnail.png` (1280x720)
@@ -8,7 +8,7 @@
 
 ## Title
 
-Dependencies & Jinja | dbt + DuckDB in Rosetta DBT Studio 2.4 | Rosetta DBT Studio
+Dependencies & Jinja | dbt + DuckDB in Rosetta DBT Studio 2.4
 
 ## Description
 
@@ -24,13 +24,15 @@ Chapters
 1:30 Jinja in one minute
 1:46 Compile: see the plain SQL
 2:11 Run in dependency order
-2:22 Commit and push
-2:40 Recap
+2:44 Commit and push
+3:02 Recap
 
 Recorded in Rosetta DBT Studio 1.7.6 with dbt Core 1.12.6 and dbt-duckdb 1.11.1.
 Download Rosetta DBT Studio: https://rosettadb.io/download-dbtstudio.html
 Source code: https://github.com/rosettadb/dbt-studio
 Lesson order inspired by Luke Barousse's dbt course: https://www.youtube.com/watch?v=1Bf049kXV2g
+
+Code for this course (one commit per lesson): https://github.com/Nuri1977/nyc-taxi-dbt
 
 ## Tags
 

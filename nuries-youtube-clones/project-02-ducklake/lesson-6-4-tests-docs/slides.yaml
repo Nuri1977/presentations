@@ -1,0 +1,21 @@
+number: "6.4"
+title: Tests and docs
+slides:
+  - { id: title, type: title, h1: 'Tests and <span class="accent">docs</span>', lead: "Check what the lake does not enforce.", badges: [schema.yml, dbt build, Lineage] }
+  - id: why
+    type: cards
+    eyebrow: Why tests
+    h2: The lake does not enforce keys
+    cols: 2
+    cards:
+      - { step: 1, k: DuckLake, ticks: [NOT NULL, "!Primary keys", "!Unique", "!Foreign keys"] }
+      - { step: 2, cls: hot, k: dbt tests, t: Checked on every build, d: "unique, not_null, accepted_values, relationships" }
+    checked: DuckLake docs (Constraints, Unsupported Features), checked 11 Nov 2026
+  - id: recap
+    type: recap
+    items:
+      - "The lake does not enforce unique keys."
+      - "dbt tests check them."
+      - "<span class=\"mono\">dbt build</span> = models + tests, in order."
+      - "Docs show models, columns, tests and lineage."
+  - { id: closing, type: closing, lesson: Lesson 7.1, h2: 'Going <span class="accent">further</span>' }

@@ -39,6 +39,17 @@ ZOOMS = {  # DIP rects, 16:9, about 1.6x
     'setup': (0, 20, 960, 540), 'statusbar': (1280, 720, 640, 360), 'home-header': (960, 0, 960, 540), 'center-wide': (320, 120, 1280, 720), 'gh-form': (300, 140, 1350, 760),
 }
 
+# Crop zooms upscale the frame: cap them so text stays sharp. With a UI zoom (Studio already drawn larger)
+# the cap is lower. course.yaml video.max_crop_zoom overrides.
+MAXZ = course['video'].get('max_crop_zoom') or (1.35 if events.get('uiZoom', 1) > 1 else 2.4)
+def capz(r):
+    x, y, w, h = r
+    minw = 1920.0 / MAXZ
+    if w >= minw: return r
+    cx, cy = x + w / 2, y + h / 2
+    w2, h2 = minw, minw * 9 / 16
+    return (min(max(0.0, cx - w2 / 2), 1920 - w2), min(max(0.0, cy - h2 / 2), 1080 - h2), w2, h2)
+
 # ------------------------------------------------------------------ timeline
 def ease(x):
     x = min(1.0, max(0.0, x)); return x * x * (3 - 2 * x)
@@ -100,7 +111,7 @@ for sc in lesson['scenes']:
                 tdur = min(n / 9, max(n / 30, A - fixed_end - 0.45))
             end, img_changes, glides, presses = layout(tdur)
             d = max(A, end + 0.45)
-            z = ZOOMS[b['zoom']] if b.get('zoom') else FULL
+            z = capz(ZOOMS[b['zoom']]) if b.get('zoom') and b['zoom'] != 'none' else FULL
             bt.update(dur=d, img_changes=sorted(img_changes, key=lambda x: x[0]), glides=glides, presses=presses,
                       zoom_from=prev_zoom, zoom_to=z, cursor_end=tuple(events['beats'][b['id']]['cursorEnd']))
             prev_zoom = z

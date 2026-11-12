@@ -1,0 +1,23 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Every change to a duck lake creates a snapshot: a numbered version of the whole lake.
+b01	So far we have five: zero to four.
+b02	A snapshot is not a copy of the data.
+b02	It is a few rows in the catalog that say which files were valid from that moment on.
+b03	In Data Lake, open eth lake, and its History tab.
+b03	Each row is a snapshot: its number, time, schema version, and what changed.
+b04	In the sequel Editor, the same list comes from eth lake dot snapshots.
+b04	Changes says, in words, what each snapshot did.
+b05	Current snapshot tells you where the lake is now: snapshot four.
+b06	Now change something.
+b06	Insert one more day of blocks, the first of November, straight from S three.
+b07	And list the newest snapshots again.
+b07	Snapshot five: inserted into the blocks table.
+b07	One statement, one snapshot.
+b08	You can also group several statements into one snapshot, with a transaction: begin, your changes, commit.
+b08	Inside it, set commit message adds an author and a message, like a git commit.
+b09	Studio's sequel Editor runs one statement at a time, so we cannot type a transaction there.
+b09	We set a real commit message later, from D B T, in Lesson 6.3.
+b10	Save the queries as 2 underscore 4 snapshots dot sequel, commit, and push.
+b11	To recap: every change is a snapshot.
+b11	Studio shows them in History, sequel shows them with snapshots and current snapshot, and a transaction groups changes into one.
+b11	Next: we use snapshots to travel back in time.

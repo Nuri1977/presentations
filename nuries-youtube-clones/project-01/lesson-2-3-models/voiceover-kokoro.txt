@@ -11,14 +11,14 @@ b04	Then, select.
 b05	Pick the columns we need, and give them clear names: the vendor, the pickup and drop-off times, and the pickup and drop-off zones.
 b06	Then the passenger count, the distance, how the rider paid, and the money: fare, tip, and total.
 b07	Read them from the raw green trips source.
-b07	The source function points at the par-kay files we declared in the last lesson.
+b07	The source function points at the table we loaded and declared in the last lesson.
 b08	Finally, keep only trips that started in 2025, and drop the rows with no distance, or no charge.
 b09	That is the whole model.
 b09	One select, and no create statement.
 b09	Save it.
 b10	So what happens when you run it?
 b10	First, D B T compiles the file.
-b10	The jinja in curly braces becomes plain sequel, and the source call becomes the real read par-kay call.
+b10	The jinja in curly braces becomes plain sequel, and the source call becomes the real table name.
 b11	Then D B T wraps your select in a create view statement.
 b11	That is the part you never write.
 b12	And it sends the statement to duck D B, which saves the view in the dev database file.
@@ -27,16 +27,17 @@ b13	Above the editor, open the Model menu, and choose Run.
 b13	It runs just this model.
 b14	The terminal shows one model, trips, created as a view in the main schema.
 b14	One pass, no errors.
-b15	To look at the rows, use the command box under the terminal.
-b15	The model's Preview runs outside the project folder, so it can't find the par-kay files yet.
-b15	Type: D B T show, select trips, limit ten.
-b15	Then press Enter.
-b16	D B T runs the model's select, and prints the first ten trips: New Year's Day, 2025, with the pickup and drop-off times and zones.
-b16	Across the whole year, the model keeps more than half a million trips.
-b17	Want to see exactly what D B T sent to duck D B?
-b17	Refresh the Explorer, and open target, then run, N Y C taxi, models, and trips dot sequel.
-b18	There it is: create view, followed by your select. D B T builds the view under a temporary name, then swaps it in.
-b19	And the source call became read par-kay, with the file pattern from sources dot yammel.
+b15	To look at the rows, open the Model menu again, and choose Preview.
+b15	Studio compiles the model, runs its select, and opens the result.
+b16	Eleven columns, and five hundred sixty-five thousand trips, out of five hundred ninety-one thousand raw rows.
+b16	Scroll right for the distance, the payment type and the amounts.
+b16b	Close it.
+b16b	The same rows stay in the Query Results tab, next to the sequel that ran, and a history of your previews.
+b17	Want to see exactly what D B T sends to duck D B?
+b17	Model menu, Compile.
+b18	The Compiled sequel tab shows your select, with the source call replaced by the real table: N Y C taxi dev, raw, green trips.
+b19	Close it, and open Run History.
+b19	Every D B T command Studio ran is here: D B T run, select trips, one of one passed.
 b20	Last step: commit and push.
 b20	Open the Git tab.
 b20	Trips dot sequel is listed as a new file.
@@ -45,5 +46,6 @@ b21	Stage it with the plus button, type a message, add the trips staging model, 
 b22	Click Sync Changes, and the commit goes to git hub.
 b22b	On git hub, the models folder now holds trips dot sql, next to sources dot yammel.
 b23	To recap.
-b23	A model is one select in one file. D B T compiles it, wraps it in create view, and runs it in duck D B. D B T show prints the rows, and the Git tab sends it to git hub.
+b23	A model is one select in one file. D B T compiles it, wraps it in create view, and runs it in duck D B.
+b23	Preview shows the rows, and the Git tab sends it to git hub.
 b23	Next, we add two more models that build on trips.

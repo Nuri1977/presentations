@@ -1,0 +1,131 @@
+# Lesson 5.3 - the single source for this lesson's video. Edit this file; everything else is generated.
+id: lesson-5-3
+number: "5.3"
+title: "Read the lake by hand"
+module: "Module 5 · Inside the catalog"
+draft_section: "plan-ducklake-project02.md, section 5, Lesson 5.3"
+next: "Lesson 6.1 · Connect a dbt project to the lake"
+summary: "No magic: answer a query with only the catalog tables and read_parquet. Find the current snapshot, the table, the data path, the files valid at that snapshot, read exactly those files, and get the same count as the lake. This is what any engine must do to read DuckLake."
+start_state: lesson-5-2-end
+show_help_links: true
+links:
+  - { title: "DuckLake specification: queries", url: "https://ducklake.select/docs/stable/specification/queries" }
+tags: [DuckLake, specification, catalog, read_parquet, DuckDB]
+target_minutes: 4
+start_notes:
+  - "Start state `lesson-5-2-end`: current snapshot 24."
+draft_changes:
+  - "The files are read with a glob plus a filter on the file names the catalog lists: DuckDB does not accept a subquery as a table function argument."
+  - "raw.transactions is used (no delete files), so reading its data files gives the full answer; a table with delete files would also need ducklake_delete_file."
+accuracy_notes:
+  - "Current snapshot 24; transactions table id 5, path transactions/; data_path is the absolute data folder (the rehearsal's own lake stored it as data/, relative); 7 files valid at 24; 12,695,803 rows by hand and from raw.transactions. Rehearsed with DuckDB 1.5.2, 12 Nov 2026."
+
+scenes:
+  - id: s00
+    kind: title
+    slide: title
+    show: "Project 2 · Lesson 5.3. Read the lake by hand."
+
+  - id: s01
+    kind: slide
+    chapter: "The recipe"
+    slide: recipe
+    beats:
+      - { id: b01, step: 1, show: "Steps: current snapshot → table → data path → files valid at that snapshot → read them.", say: "To end the catalog module, let's read the lake without the lake. The DuckLake specification describes the steps: find the current snapshot, find the table, find the data path, list the files valid at that snapshot, and read them." }
+
+  - id: s02
+    kind: app
+    chapter: "Step by step"
+    beats:
+      - id: b02
+        say: "In the SQL Editor, on eth lake. Step one: the current snapshot is the largest snapshot id. Twenty-four."
+        zoom: sql-results
+        actions:
+          - nav: SQL Editor
+          - sql_connection: eth_lake
+          - paste: |-
+              select max(snapshot_id) as current_snapshot from __ducklake_metadata_eth_lake.ducklake_snapshot;
+              select table_id, table_name, path from __ducklake_metadata_eth_lake.ducklake_table where table_name = 'transactions' and end_snapshot is null;
+              select value as data_path from __ducklake_metadata_eth_lake.ducklake_metadata where key = 'data_path';
+              select path from __ducklake_metadata_eth_lake.ducklake_data_file where table_id = 5 and begin_snapshot <= 24 and (end_snapshot > 24 or end_snapshot is null) order by 1;
+              select count(*) as transactions from read_parquet('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/transactions/**/*.parquet', filename = true) where regexp_extract(filename, 'transactions/(.*)$', 1) in (select path from __ducklake_metadata_eth_lake.ducklake_data_file where table_id = 5 and begin_snapshot <= 24 and (end_snapshot > 24 or end_snapshot is null));
+              select count(*) as transactions from raw.transactions;
+          - sql_run: { line: 1, settleMs: [500, 1500, 2500] }
+      - id: b03
+        say: "Step two: the transactions table, valid now. Table id five, and its folder, transactions."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 2, settleMs: [500, 1500, 2500] }
+      - id: b04
+        say: "Step three: the lake's data path, from ducklake metadata: our data folder. Each file's path is relative to it, under the schema and the table's folder."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 3, settleMs: [500, 1500, 2500] }
+      - id: b05
+        say: "Step four: the data files of table five that are valid at snapshot twenty-four: begin snapshot at most twenty-four, end snapshot after it, or empty. Seven files."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 4, settleMs: [500, 1500, 2500] }
+
+  - id: s03
+    kind: app
+    chapter: "Read the files"
+    beats:
+      - id: b06
+        say: "Step five: read exactly those files with read parquet, and count. Twelve million six hundred ninety-five thousand eight hundred three."
+        zoom: sql-results
+        actions:
+          - sql_run: { line: 5, settleMs: [800, 2500, 4500] }
+          - sql_wait
+      - id: b07
+        say: "And the same count, the normal way, from raw transactions. Identical. The lake is nothing but these tables and these files."
+        zoom: sql-results
+        card: { eyebrow: "by hand = through the lake", title: "12,695,803", sub: "raw.transactions", pos: top-right }
+        actions:
+          - sql_run: { line: 6, settleMs: [500, 1500, 2500] }
+
+  - id: s04
+    kind: slide
+    chapter: "Why it matters"
+    slide: why
+    beats:
+      - { id: b08, step: 1, show: "With delete files: also read ducklake_delete_file and skip those positions.", say: "With deletes, one more step: read the delete files too, and skip the positions they list." }
+      - { id: b09, step: 2, show: "This is all a new engine has to implement: SQL against the catalog, plus a Parquet reader.", say: "And that is all any engine needs to read DuckLake: some SQL against the catalog, and a Parquet reader. Nothing is hidden." }
+
+  - id: s05
+    kind: app
+    chapter: "Commit and push"
+    beats:
+      - id: b10
+        say: "Save the queries as 5 underscore 3 read by hand dot sequel, commit, and push."
+        zoom: git-panel
+        actions:
+          - nav: DBT Studio
+          - new_file: { folder: sql, name: 5_3_read_by_hand.sql }
+          - paste: |
+              select max(snapshot_id) as current_snapshot from __ducklake_metadata_eth_lake.ducklake_snapshot;
+              select table_id, table_name, path from __ducklake_metadata_eth_lake.ducklake_table where table_name = 'transactions' and end_snapshot is null;
+              select value as data_path from __ducklake_metadata_eth_lake.ducklake_metadata where key = 'data_path';
+              select path from __ducklake_metadata_eth_lake.ducklake_data_file where table_id = 5 and begin_snapshot <= 24 and (end_snapshot > 24 or end_snapshot is null) order by 1;
+              select count(*) as transactions from read_parquet('/Users/Shared/academy/learner/projects/ethereum_lake/lake/data/raw/transactions/**/*.parquet', filename = true) where regexp_extract(filename, 'transactions/(.*)$', 1) in (select path from __ducklake_metadata_eth_lake.ducklake_data_file where table_id = 5 and begin_snapshot <= 24 and (end_snapshot > 24 or end_snapshot is null));
+              select count(*) as transactions from raw.transactions;
+          - click_save
+          - expect_file: { path: sql/5_3_read_by_hand.sql, snippet: ../snippets/5.3/5_3_read_by_hand.sql }
+          - close_tab: sql/5_3_read_by_hand.sql
+          - git_tab
+          - git_stage_all
+          - git_message: "Read the lake by hand"
+          - git_commit
+          - git_push
+
+  - id: s06
+    kind: slide
+    chapter: "Recap"
+    slide: recap
+    beats:
+      - { id: b11, step: 1, show: "Recap: snapshot → table → data path → valid files → read_parquet; same result as the lake.", say: "To recap: snapshot, table, data path, valid files, read parquet. Same answer as the lake. That ends Module 5. Next, we put dbt on top of the lake." }
+
+  - id: s07
+    kind: closing
+    slide: closing
+    show: "Next · Lesson 6.1 · Connect a dbt project to the lake."

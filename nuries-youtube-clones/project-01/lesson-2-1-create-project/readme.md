@@ -1,6 +1,6 @@
 # Lesson 2.1 · Create the dbt project
 
-dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 3:15, 3840x2160 H.264 + AAC, 42 MB.
+dbt + DuckDB in Rosetta DBT Studio · Module 2 · dbt basics. Rendered 3:39, 3840x2160 H.264 + AAC, 43 MB.
 
 ## Files
 
@@ -28,7 +28,8 @@ Rosetta DBT Studio 1.7.6 (official release), dbt-core 1.12.6, dbt-duckdb 1.11.1,
 - Connection first, then project: Studio's New Connection page returns to the connections list on Save, so the lesson creates the DuckDB connection from Home, then picks it in Setup New Project.
 - The dev database file lives next to the project folder (projects/nyc_taxi_dev.duckdb), so it is never committed.
 - Studio's template creates an `analysis` folder while dbt_project.yml says `analyses`; shown as is.
-- Rehearsal cut: the GitHub scene shows nyc-taxi-dbt-rehearsal (Private), recorded in Lesson 1.2.
+- Settings tour added at the start (Nuri, 10 Nov): General (projects directory), dbt Core (runtime, version, adapters), Python.
+- The repository already exists (empty, public); the lesson says to create it and shows ours, rather than re-creating it on camera.
 
 ## Accuracy notes
 

@@ -1,0 +1,107 @@
+1
+00:00:03,350 --> 00:00:06,473
+Every table format answers the same three questions.
+
+2
+00:00:06,753 --> 00:00:08,733
+Which files make up the table right now?
+
+3
+00:00:09,013 --> 00:00:10,002
+What is its schema?
+
+4
+00:00:10,282 --> 00:00:12,523
+And which version is this, so we can go back?
+
+5
+00:00:13,473 --> 00:00:17,932
+Apache Iceberg keeps its answers as files, in the same bucket as the data.
+
+6
+00:00:18,212 --> 00:00:26,380
+A metadata file in JSON points to a manifest list, which points to manifest files, which finally list the Parquet data files.
+
+7
+00:00:27,330 --> 00:00:33,120
+And you still need a catalog service, which holds one pointer: the current metadata file of each table.
+
+8
+00:00:34,070 --> 00:00:36,071
+Delta Lake also uses files.
+
+9
+00:00:36,350 --> 00:00:44,059
+Each change is a numbered JSON file in a folder called delta log, and every so often a checkpoint file sums up the log.
+
+10
+00:00:45,009 --> 00:00:47,703
+Both designs work, and both are widely used.
+
+11
+00:00:47,983 --> 00:00:49,263
+But they share some costs.
+
+12
+00:00:49,543 --> 00:00:52,396
+Every change writes new small metadata files.
+
+13
+00:00:53,346 --> 00:00:58,722
+A query needs several round trips, file after file, before it reads a single row of data.
+
+14
+00:00:59,672 --> 00:01:04,669
+And for real use you run a catalog service anyway, often backed by a database.
+
+15
+00:01:05,619 --> 00:01:07,484
+DuckLake starts from that last point.
+
+16
+00:01:07,764 --> 00:01:12,211
+If you need a database for the catalog anyway, why not put all the metadata in it?
+
+17
+00:01:12,491 --> 00:01:16,755
+Files, schemas, snapshots, statistics: all plain SQL tables.
+
+18
+00:01:17,705 --> 00:01:22,998
+The data itself stays exactly where it was: Parquet files, on a disk or in a bucket.
+
+19
+00:01:23,948 --> 00:01:30,465
+Now a change is one database transaction, and finding the files for a query is one SQL query.
+
+20
+00:01:31,415 --> 00:01:32,430
+Side by side.
+
+21
+00:01:32,710 --> 00:01:39,077
+Iceberg and Delta keep metadata as files in the bucket, have many engines, and years of production use.
+
+22
+00:01:39,357 --> 00:01:44,421
+DuckLake keeps metadata in a database, is read by DuckDB today, and is younger.
+
+23
+00:01:44,701 --> 00:01:49,271
+In this course, we use DuckLake: it runs on a laptop with no services at all.
+
+24
+00:01:50,221 --> 00:01:53,980
+To recap: a table format tracks files, schema and versions.
+
+25
+00:01:54,260 --> 00:01:57,338
+Iceberg and Delta store that as files next to the data.
+
+26
+00:01:57,618 --> 00:02:00,051
+DuckLake stores it as tables in a database.
+
+27
+00:02:00,331 --> 00:02:02,692
+Next: how DuckLake works, step by step.

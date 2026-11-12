@@ -1,0 +1,36 @@
+# Spoken forms sent to Kokoro (beat<TAB>text). Generated from lesson.yaml + course.yaml pronunciation.
+b01	Before we build a lake, let's look under the hood.
+b01	Rosetta D B T Studio is an Electron app.
+b01	That means two parts: the window you see, and a Node.js process behind it.
+b02	The window never touches a database.
+b02	When you run a query, it sends a request to the main process, which runs the sequel and sends back the rows.
+b03	The main process uses duck D B's official Node package, duck D B slash node A P I.
+b03	Studio 1.7.6 ships version 1.5.2.
+b03	duck D B runs inside Studio itself: no server, nothing else to install.
+b04	In Studio's code, it is three calls.
+b04	Create a duck D B instance.
+b04	Connect to it.
+b04	And run sequel on the connection.
+b05	duck lake is not built into duck D B.
+b05	It is an extension.
+b05	So on that connection, Studio first runs install duck lake, and load duck lake.
+b06	Then it attaches the lake: the catalog file, a name, and the data path.
+b06	And it makes the lake the current database.
+b06	That is exactly what you could type yourself.
+b07	There is one adapter per catalog type.
+b07	In 1.7.6 the wizard offers duck D B; SQLite and PostgreSQL are marked as coming soon.
+b07	When a lake is closed, Studio detaches it.
+b08	You can see the engine in Studio.
+b08	Open Settings, then duck D B.
+b08	This is Studio's own duck D B database, for caching and previews.
+b09	And the status bar always shows the duck D B version inside the app: 1.5.2.
+b10	One more thing for later.
+b10	When D B T runs, it uses its own duck D B, the Python package inside D B T duck D B, version 1.5.6.
+b10	So two engines read and write the same lake.
+b10	We checked that they agree.
+b11	But with a duck D B file as the catalog, only one of them can open it at a time.
+b11	Keep that in mind for Module 6.
+b12	To recap: duck D B runs inside Studio, through its Node package.
+b12	duck lake is an extension that Studio loads.
+b12	And everything the Data Lake screens do is plain sequel.
+b12	Now, let's create our lake.

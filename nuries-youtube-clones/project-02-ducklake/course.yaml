@@ -1,0 +1,109 @@
+# Course-level settings for the rosetta-academy-video skill (see plan-ducklake-project02.md).
+title: "Data Lakes with DuckLake in Rosetta DBT Studio"
+subtitle: "Project 2: an Ethereum data lake on your laptop"
+series: nuries-youtube-clones/project-02-ducklake
+academy: https://academy.rosettadb.io/
+source_draft: plan-ducklake-project02.md
+code_repo: https://github.com/Nuri1977/ethereum-ducklake-dbt     # to confirm with Nuri; created empty before Lesson 2.1
+help_links_title: "New to git and GitHub? Start here (free videos):"
+help_links:
+  - { title: "Git and GitHub for Beginners - Crash Course (freeCodeCamp)", url: "https://www.youtube.com/watch?v=RGOj5yH7evk" }
+  - { title: "Git Tutorial for Beginners: Learn Git in 1 Hour (Programming with Mosh)", url: "https://www.youtube.com/watch?v=8JJ101D3knE" }
+
+app:
+  name: Rosetta DBT Studio
+  version: 1.7.6                      # pinned: every lesson of this course records this release
+  release_url: https://github.com/rosettadb/dbt-studio/releases/tag/1.7.6
+  assets:
+    mac_x64: Rosetta-DBT-Studio-1.7.6-x64.zip      # this Mac is Intel (i7-9750H)
+    mac_arm64: Rosetta-DBT-Studio-1.7.6-arm64.zip
+
+# Fast path agreed with Nuri on 9 Nov 2026: the pilot's stills recorder (Playwright _electron) on the Mac,
+# true 4K frames, cursor drawn in compose. Computer-use live capture is a later upgrade.
+runner: mac-desktop
+capture: { mode: stills, scale: 2, window: [1920, 1080] }
+learner_home: /Users/Shared/academy/learner       # fake HOME so on-screen paths are clean (D10)
+projects_dir: projects                            # project at <learner_home>/projects/<project_name>
+browser_profile: /Users/Shared/academy/learner/profiles/browser   # recording browser (Playwright Chromium), signed in to GitHub once by Nuri
+theme: dark                           # Studio theme during recording
+slides_theme: v2                      # slides-theme-light/ (white) + v2 cards
+
+runtime:                              # Studio's managed CPython + dbt (same pins as the dbt Fundamentals pilot)
+  python: 3.10.17
+  python_build_tag: "20250409"
+  dbt_core: 1.12.6
+  dbt_duckdb: 1.11.1
+
+dataset:
+  name: Ethereum public data (AWS Open Data), blocks and transactions
+  bucket: s3://aws-public-blockchain/v1.0/eth/
+  region: us-east-2
+  blocks: 2026-08-01 .. 2026-10-29 (90 days), plus 2026-11-01 .. 2026-11-03 for later lessons
+  transactions: 2026-10-01 .. 2026-10-07, without the input column
+  local_cache: .cache/data/eth                   # tools/download_eth.py; start states read from here, not S3
+
+voice:
+  engine: kokoro
+  voice: af_heart
+  speed: 1.0
+
+video:
+  width: 3840
+  height: 2160
+  fps: 30
+  crf: 16
+  title_card_s: 3
+  closing_card_s: 4
+
+youtube:
+  visibility: unlisted
+  playlist: "Data Lakes with DuckLake in Rosetta DBT Studio: Project 2"
+  tags: [DuckLake, data lake, lakehouse, DuckDB, dbt, Parquet, Ethereum, Rosetta DBT Studio, SQL]
+
+# Spoken forms. Slides and captions keep the written form; only the voice uses these.
+pronunciation:
+  - [ '\bdbt\b', 'D B T' ]
+  - [ '\bDBT\b', 'D B T' ]
+  - [ '\bSQL\b', 'sequel' ]
+  - [ '\.sql\b', ' dot sequel' ]
+  - [ '\bDuckDB\b', 'duck D B' ]
+  - [ '\bYAML\b', 'yammel' ]
+  - [ '\.yml\b', ' dot yammel' ]
+  - [ '\byml\b', 'yammel' ]
+  - [ '\bDAG\b', 'dag' ]
+  - [ '\bCTE\b', 'C T E' ]
+  - [ '\bJinja\b', 'jinja' ]
+  - [ '\bCI\b', 'C I' ]
+  - [ '\bNYC\b', 'N Y C' ]
+  - [ '\bnyc\b', 'N Y C' ]
+  - [ '\bTLC\b', 'T L C' ]
+  - [ '\bEWR\b', 'Newark airport' ]
+  - [ '\bparquet\b', 'par-kay' ]
+  - [ '\bParquet\b', 'Par-kay' ]
+  - [ '\bCSV\b', 'C S V' ]
+  - [ '\bGitHub\b', 'git hub' ]
+  - [ '\bdmg\b', 'D M G' ]
+  - [ '\bexe\b', 'E X E' ]
+  - [ '\brpm\b', 'R P M' ]
+  - [ '\barm64\b', 'arm sixty-four' ]
+  - [ '\bx64\b', 'x sixty-four' ]
+  - [ '\brosettadb\b', 'rosetta D B' ]
+  - [ '\bREADME\b', 'read me' ]
+  - [ '\bgitignore\b', 'git ignore' ]
+  - [ '\bHTTPS\b', 'H T T P S' ]
+  - [ '\bDuckLake\b', 'duck lake' ]
+  - [ '\bducklake\b', 'duck lake' ]
+  - [ '\.duckdb\b', ' dot duck D B' ]
+  - [ '\bduckdb\b', 'duck D B' ]
+  - [ '\beth_lake\b', 'eth lake' ]
+  - [ '\bDataLake\b', 'Data Lake' ]
+  - [ '\bS3\b', 'S three' ]
+  - [ '\bACID\b', 'acid' ]
+  - [ '\bgwei\b', 'gway' ]
+  - [ '\bwei\b', 'way' ]
+  - [ '\bETL\b', 'E T L' ]
+  - [ '\bMERGE\b', 'merge' ]
+# Studio and browser drawn larger (like Cmd +), so frames stay sharp; crop zooms are capped (compose.py)
+ui_zoom: 1.25
+browser_zoom: 1.5
+pronunciation_extra_note: "DuckLake course additions are in the list above"

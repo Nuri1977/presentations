@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 0 · Welcome</title>
+<link rel="stylesheet" href="../slides-theme/theme.css">
+<style>
+  .bignum { font-size: 120px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; color: var(--text); }
+  .bignum small { font-size: 40px; font-weight: 700; color: var(--muted); letter-spacing: 0; }
+  .map { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 36px; align-content: center; }
+  .map .card { padding: 30px 34px; }
+  .map .card .t { font-size: 42px; }
+  .map .card ul { margin: 14px 0 0; padding-left: 28px; font-size: 30px; line-height: 1.4; color: var(--muted); font-weight: 520; }
+  .need { margin-top: 26px; display: flex; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div id="viewport">
+
+<section class="stage" data-id="title">
+  <div class="bg hero"></div>
+  <div class="title-grid">
+    <div>
+      <div class="eyebrow">Project 2 · Lesson 0 · Welcome</div>
+      <h1 style="margin-top:28px">Data lakes and <span class="accent">DuckLake</span></h1>
+      <p class="lead">An Ethereum data lake on your laptop, in Rosetta DBT Studio.</p>
+      <div class="badges"><span class="badge">Rosetta DBT Studio</span><span class="badge">DuckLake</span><span class="badge">DuckDB</span><span class="badge">dbt</span></div>
+    </div>
+    <img class="hero-icon" src="../brand/icon.svg" alt="">
+  </div>
+  <img class="lockup" src="../brand/logo_new.svg" alt="Rosetta DBT Studio">
+</section>
+
+<section class="stage" data-id="promise">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">Welcome</div>
+    <div class="statement">
+      <div class="big s" data-step="1">A real <span class="accent">data lake</span> on your laptop, with versions, time travel and dbt on top.</div>
+      <div class="badges s" data-step="2"><span class="pill">No cloud account</span><span class="pill">No server</span><span class="pill green">Open source</span></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:16%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 0</b></div></div>
+</section>
+
+<section class="stage" data-id="build">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">What you will build</div>
+    <h2>From public files to answers</h2>
+    <div class="flow">
+      <div class="node blue s" data-step="1"><div class="k">Source</div><div class="n">Ethereum on S3</div><div class="d">public Parquet, one folder a day</div></div>
+      <div class="arrow s" data-step="2">→</div>
+      <div class="node hot s" data-step="2"><div class="k">Lake</div><div class="n">DuckLake</div><div class="d">a catalog file and a folder of Parquet files</div></div>
+      <div class="arrow s" data-step="3">→</div>
+      <div class="node s" data-step="3"><div class="k">dbt</div><div class="n">Models</div><div class="d">staging views, incremental marts</div></div>
+      <div class="arrow s" data-step="4">→</div>
+      <div class="node green s" data-step="4"><div class="k">Answers</div><div class="n">Daily activity</div><div class="d">gas fees, busiest senders</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:32%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 0</b></div></div>
+</section>
+
+<section class="stage" data-id="data">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The data</div>
+    <h2>Real Ethereum data</h2>
+    <div class="row three">
+      <div class="card hot s" data-step="1"><div class="k">Blocks</div><div class="bignum" style="margin-top:14px">659,896</div><div class="d">August to October 2026<br>92 days</div></div>
+      <div class="card s" data-step="2"><div class="k">Transactions</div><div class="bignum" style="margin-top:14px">12.7 <small>million</small></div><div class="d">1 to 7 October 2026<br>one week</div></div>
+      <div class="card s" data-step="3"><div class="k">Disk</div><div class="bignum" style="margin-top:14px">3 <small>GB</small></div><div class="d">free space is plenty<br>for the whole course</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:48%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 0</b></div></div>
+  <div class="checked">Rows counted on 12 Nov 2026 from the AWS public blockchain bucket</div>
+</section>
+
+<section class="stage" data-id="tools">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The tools</div>
+    <h2>One app, open source inside</h2>
+    <div class="row two">
+      <div class="card hot s" data-step="1"><div class="k">The app</div><div class="t">Rosetta DBT Studio</div><div class="d">Data Lake screens, a SQL Editor, dbt and git, in one window.</div></div>
+      <div class="card s" data-step="2"><div class="k">Underneath</div><div class="t">DuckDB · DuckLake · dbt</div><div class="d">DuckDB is the engine, DuckLake the lake format, dbt builds the models.</div></div>
+    </div>
+  </div>
+  <div class="footer"><div class="bar" style="width:64%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 0</b></div></div>
+</section>
+
+<section class="stage" data-id="map">
+  <div class="bg"></div>
+  <div class="pad">
+    <div class="eyebrow">The course map</div>
+    <h2>Eight modules</h2>
+    <div class="map">
+      <div class="card s" data-step="1"><div class="k">Modules 0 and 1</div><div class="t">Install, and lakes explained</div><ul><li>Install Studio</li><li>Lakehouse, Parquet, table formats</li><li>How DuckLake works</li></ul></div>
+      <div class="card hot s" data-step="2"><div class="k">Modules 2 to 5</div><div class="t">Hands on</div><ul><li>Your first lake</li><li>Changing data</li><li>Performance and upkeep</li><li>Inside the catalog</li></ul></div>
+      <div class="card s" data-step="3"><div class="k">Modules 6 and 7</div><div class="t">dbt, and beyond</div><ul><li>dbt on DuckLake</li><li>Going further</li></ul></div>
+    </div>
+    <div class="need s" data-step="4"><span class="pill grey">A computer</span><span class="pill grey">Basic SQL</span><span class="pill grey">A GitHub account</span><span class="pill blue mono">github.com/Nuri1977/ethereum-ducklake-dbt</span></div>
+  </div>
+  <div class="footer"><div class="bar" style="width:84%"></div><img src="../brand/logo_new.svg" alt=""><div class="where">Project 2 · <b>Lesson 0</b></div></div>
+</section>
+
+<section class="stage" data-id="closing">
+  <div class="bg hero"></div>
+  <div class="next-grid">
+    <div>
+      <div class="eyebrow">Next</div>
+      <h1 style="margin-top:28px">Lesson 0.1</h1>
+      <h2 style="font-size:92px">Install <span class="accent">Rosetta DBT Studio</span></h2>
+      <div class="repo">github.com/Nuri1977/ethereum-ducklake-dbt</div>
+    </div>
+    <img class="logo-hero" src="../brand/icon.svg" alt="Rosetta DBT Studio">
+  </div>
+</section>
+
+</div>
+<script src="../slides-theme/theme.js"></script>
+</body>
+</html>
